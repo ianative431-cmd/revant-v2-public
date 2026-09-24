@@ -29,8 +29,15 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  // Déclenche le rafraîchissement du token si nécessaire.
-  await supabase.auth.getUser();
+  // Déclenche le rafraîchissement du token si nécessaire. Une erreur ici
+  // (réseau, config Supabase) ne doit jamais faire planter la requête :
+  // elle est traitée comme une session non rafraîchie, pas comme une
+  // erreur serveur à afficher.
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // volontairement silencieux — voir SECURITY.md, règle "erreurs serveur"
+  }
 
   return response;
 }

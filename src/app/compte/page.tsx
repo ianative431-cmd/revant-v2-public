@@ -1,0 +1,45 @@
+import { requireUser } from "@/server/auth/session";
+import { signOutAction } from "../(auth)/actions";
+
+export default async function ComptePage() {
+  // Vérification côté serveur — inaccessible sans session valide,
+  // quelle que soit l'URL tapée directement.
+  const user = await requireUser();
+
+  return (
+    <div className="min-h-screen bg-[#EFEFED] px-4 py-10 flex justify-center">
+      <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm">
+        <h1 className="text-xl font-bold mb-1">Mon compte</h1>
+        <p className="text-sm text-neutral-500 mb-6">Connecté avec succès.</p>
+
+        <dl className="text-sm mb-6 space-y-2">
+          {user.email && (
+            <div className="flex justify-between">
+              <dt className="text-neutral-500">E-mail</dt>
+              <dd>{user.email}</dd>
+            </div>
+          )}
+          {user.phone && (
+            <div className="flex justify-between">
+              <dt className="text-neutral-500">Téléphone</dt>
+              <dd>+{user.phone}</dd>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <dt className="text-neutral-500">Compte créé le</dt>
+            <dd>{new Date(user.created_at).toLocaleDateString("fr-FR")}</dd>
+          </div>
+        </dl>
+
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className="w-full border border-black rounded-full py-3 text-sm font-medium"
+          >
+            Se déconnecter
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
