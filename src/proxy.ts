@@ -7,7 +7,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * la vérification de rôle (acheteur/vendeur/admin) doit se faire dans
  * chaque route/page côté serveur (voir SECURITY.md), jamais uniquement ici.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
