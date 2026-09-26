@@ -10,14 +10,14 @@ export default function ConnexionPage() {
   return (
     <div>
       <h1 className="text-xl font-bold mb-1">Connexion</h1>
-      <p className="text-sm text-neutral-500 mb-6">Accède à ton compte Revant.</p>
+      <p className="text-sm text-black/60 mb-6">Accède à ton compte Revant.</p>
 
       <div className="flex gap-2 mb-6">
         <button
           type="button"
           onClick={() => setMode("email")}
           className={`flex-1 py-2 rounded-full text-sm font-medium ${
-            mode === "email" ? "bg-black text-white" : "bg-neutral-100"
+            mode === "email" ? "bg-black text-white" : "bg-black/5"
           }`}
         >
           E-mail
@@ -26,7 +26,7 @@ export default function ConnexionPage() {
           type="button"
           onClick={() => setMode("phone")}
           className={`flex-1 py-2 rounded-full text-sm font-medium ${
-            mode === "phone" ? "bg-black text-white" : "bg-neutral-100"
+            mode === "phone" ? "bg-black text-white" : "bg-black/5"
           }`}
         >
           Téléphone
@@ -35,7 +35,7 @@ export default function ConnexionPage() {
 
       {mode === "email" ? <EmailLoginForm /> : <PhoneLoginForm />}
 
-      <p className="text-sm text-neutral-500 mt-6 text-center">
+      <p className="text-sm text-black/60 mt-6 text-center">
         Pas encore de compte ?{" "}
         <Link href="/inscription" className="text-black font-medium underline">
           Inscris-toi
@@ -125,7 +125,7 @@ function PhoneLoginForm() {
   return (
     <form action={verifyAction} className="flex flex-col gap-3">
       <input type="hidden" name="phone" value={phone} />
-      <p className="text-sm text-neutral-500">Code envoyé au {phone}</p>
+      <p className="text-sm text-black/60">Code envoyé au {phone}</p>
       <input
         name="code"
         type="text"

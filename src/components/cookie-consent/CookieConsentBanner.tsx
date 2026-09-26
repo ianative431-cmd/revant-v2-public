@@ -53,7 +53,7 @@ export default function CookieConsentBanner() {
 
   return (
     <div className="fixed bottom-0 inset-x-0 z-50 flex justify-center px-4 pb-4">
-      <div className="w-full max-w-lg bg-white rounded-[22px] shadow-lg p-5 border border-neutral-200">
+      <div className="w-full max-w-lg bg-white rounded-[22px] shadow-lg p-5 border border-black/10">
         {mode === "banner" ? (
           <>
             <p className="text-sm mb-4">
@@ -81,7 +81,7 @@ export default function CookieConsentBanner() {
               </button>
               <button
                 onClick={() => setMode("customize")}
-                className="flex-1 bg-neutral-100 rounded-full py-2.5 text-sm font-medium"
+                className="flex-1 bg-black/5 rounded-full py-2.5 text-sm font-medium"
               >
                 Personnaliser
               </button>
@@ -107,9 +107,9 @@ export default function CookieConsentBanner() {
                     />
                     <span>
                       <span className="font-medium">{meta.label}</span>
-                      {isNecessary && <span className="text-neutral-400"> (toujours actif)</span>}
+                      {isNecessary && <span className="text-black/40"> (toujours actif)</span>}
                       <br />
-                      <span className="text-neutral-500">{meta.description}</span>
+                      <span className="text-black/60">{meta.description}</span>
                     </span>
                   </label>
                 );
@@ -118,7 +118,7 @@ export default function CookieConsentBanner() {
             <div className="flex gap-2">
               <button
                 onClick={() => setMode("banner")}
-                className="flex-1 bg-neutral-100 rounded-full py-2.5 text-sm font-medium"
+                className="flex-1 bg-black/5 rounded-full py-2.5 text-sm font-medium"
               >
                 Retour
               </button>

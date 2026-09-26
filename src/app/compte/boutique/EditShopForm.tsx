@@ -20,7 +20,7 @@ export default function EditShopForm({
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
-      <label className="text-xs text-neutral-500">
+      <label className="text-xs text-black/60">
         Nom
         <input
           name="name"
@@ -33,7 +33,7 @@ export default function EditShopForm({
         />
       </label>
 
-      <label className="text-xs text-neutral-500">
+      <label className="text-xs text-black/60">
         Slogan
         <input
           name="slogan"
@@ -44,7 +44,7 @@ export default function EditShopForm({
         />
       </label>
 
-      <label className="text-xs text-neutral-500">
+      <label className="text-xs text-black/60">
         Description
         <textarea
           name="description"
@@ -55,7 +55,7 @@ export default function EditShopForm({
         />
       </label>
 
-      <label className="text-xs text-neutral-500">
+      <label className="text-xs text-black/60">
         Adresse de la boutique (revant.app/shop/...)
         <input
           name="slug"
@@ -68,7 +68,7 @@ export default function EditShopForm({
           className="mt-1 w-full border rounded-xl px-4 py-3 text-sm"
         />
       </label>
-      <p className="text-xs text-neutral-400 -mt-2">
+      <p className="text-xs text-black/40 -mt-2">
         Si tu changes l&apos;adresse, l&apos;ancienne continuera de rediriger automatiquement vers
         la nouvelle.
       </p>

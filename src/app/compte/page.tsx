@@ -9,7 +9,7 @@ export default async function ComptePage() {
   const user = await requireUserWithLegalConsent();
 
   return (
-    <div className="min-h-screen bg-[#EFEFED] px-4 py-10 flex justify-center">
+    <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm">
         <AvatarUploader
           userId={user.id}
@@ -18,23 +18,23 @@ export default async function ComptePage() {
           phone={user.phone}
         />
         <h1 className="text-xl font-bold mb-1 text-center">Mon compte</h1>
-        <p className="text-sm text-neutral-500 mb-6 text-center">Connecté avec succès.</p>
+        <p className="text-sm text-black/60 mb-6 text-center">Connecté avec succès.</p>
 
         <dl className="text-sm mb-6 space-y-2">
           {user.email && (
             <div className="flex justify-between">
-              <dt className="text-neutral-500">E-mail</dt>
+              <dt className="text-black/60">E-mail</dt>
               <dd>{user.email}</dd>
             </div>
           )}
           {user.phone && (
             <div className="flex justify-between">
-              <dt className="text-neutral-500">Téléphone</dt>
+              <dt className="text-black/60">Téléphone</dt>
               <dd>+{user.phone}</dd>
             </div>
           )}
           <div className="flex justify-between">
-            <dt className="text-neutral-500">Compte créé le</dt>
+            <dt className="text-black/60">Compte créé le</dt>
             <dd>{new Date(user.created_at).toLocaleDateString("fr-FR")}</dd>
           </div>
         </dl>
@@ -50,14 +50,14 @@ export default async function ComptePage() {
 
         <Link
           href="/compte/boutique"
-          className="block text-center text-sm underline mt-4 text-neutral-600"
+          className="block text-center text-sm underline mt-4 text-black/70"
         >
           Ma boutique
         </Link>
 
         <Link
           href="/compte/confidentialite"
-          className="block text-center text-sm underline mt-2 text-neutral-600"
+          className="block text-center text-sm underline mt-2 text-black/70"
         >
           Confidentialité et données
         </Link>

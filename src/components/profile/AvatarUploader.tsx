@@ -169,7 +169,7 @@ export default function AvatarUploader({
           type="button"
           onClick={() => setMenuOpen((v) => !v)}
           disabled={isBusy}
-          className="w-24 h-24 rounded-full overflow-hidden bg-neutral-200 flex items-center justify-center text-xl font-semibold text-neutral-600 border border-neutral-300 disabled:opacity-60"
+          className="w-24 h-24 rounded-full overflow-hidden bg-black/10 flex items-center justify-center text-xl font-semibold text-black/70 border border-black/15 disabled:opacity-60"
           aria-label="Modifier la photo de profil"
         >
           {status === "cropping" && pendingPreviewUrl ? (
@@ -189,17 +189,17 @@ export default function AvatarUploader({
         </button>
 
         {menuOpen && status !== "cropping" && (
-          <div className="absolute z-10 top-full mt-2 left-1/2 -translate-x-1/2 bg-white border border-neutral-200 rounded-xl shadow-md text-sm overflow-hidden w-48">
+          <div className="absolute z-10 top-full mt-2 left-1/2 -translate-x-1/2 bg-white border border-black/10 rounded-xl shadow-md text-sm overflow-hidden w-48">
             <button
               type="button"
-              className="w-full text-left px-4 py-3 hover:bg-neutral-50"
+              className="w-full text-left px-4 py-3 hover:bg-black/[0.03]"
               onClick={() => galleryInputRef.current?.click()}
             >
               Choisir dans la galerie
             </button>
             <button
               type="button"
-              className="w-full text-left px-4 py-3 hover:bg-neutral-50 border-t border-neutral-100"
+              className="w-full text-left px-4 py-3 hover:bg-black/[0.03] border-t border-black/[0.06]"
               onClick={() => cameraInputRef.current?.click()}
             >
               Prendre une photo
@@ -207,7 +207,7 @@ export default function AvatarUploader({
             {avatarUrl && (
               <button
                 type="button"
-                className="w-full text-left px-4 py-3 hover:bg-neutral-50 border-t border-neutral-100 text-red-600"
+                className="w-full text-left px-4 py-3 hover:bg-black/[0.03] border-t border-black/[0.06] text-red-600"
                 onClick={() => {
                   setMenuOpen(false);
                   setConfirmDelete(true);
@@ -249,7 +249,7 @@ export default function AvatarUploader({
           <button
             type="button"
             onClick={cancelCrop}
-            className="px-4 py-2 rounded-full border border-neutral-300 text-sm font-medium"
+            className="px-4 py-2 rounded-full border border-black/15 text-sm font-medium"
           >
             Annuler
           </button>
@@ -280,7 +280,7 @@ export default function AvatarUploader({
               <button
                 type="button"
                 onClick={() => setConfirmDelete(false)}
-                className="flex-1 py-2 rounded-full border border-neutral-300 text-sm"
+                className="flex-1 py-2 rounded-full border border-black/15 text-sm"
               >
                 Annuler
               </button>

@@ -17,7 +17,7 @@ export default function PaletteCard({
   return (
     <div
       className={`rounded-2xl p-4 border ${
-        selected ? "border-black" : "border-neutral-200"
+        selected ? "border-black" : "border-black/10"
       }`}
     >
       <PaletteStackPreview colors={palette.colors} />
@@ -25,7 +25,7 @@ export default function PaletteCard({
       <div className="flex items-center justify-between mt-4">
         <span className="text-sm font-medium">{palette.name}</span>
         {selected ? (
-          <span className="text-xs text-neutral-500">Palette actuelle</span>
+          <span className="text-xs text-black/60">Palette actuelle</span>
         ) : (
           <form action={formAction}>
             <input type="hidden" name="paletteId" value={palette.id} />

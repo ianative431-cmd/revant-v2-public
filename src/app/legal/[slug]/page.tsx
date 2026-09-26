@@ -17,19 +17,19 @@ export default async function LegalDocumentPage({
   if (!doc) notFound();
 
   return (
-    <div className="min-h-screen bg-[#EFEFED] px-4 py-10">
+    <div className="min-h-screen bg-[#F3E9DA] px-4 py-10">
       <div className="max-w-2xl mx-auto bg-white rounded-[22px] p-8">
-        <Link href="/legal" className="text-sm underline text-neutral-500">
+        <Link href="/legal" className="text-sm underline text-black/60">
           ← Centre juridique
         </Link>
 
         <h1 className="text-2xl font-bold mt-4 mb-1">{doc.title}</h1>
-        <p className="text-xs text-neutral-500 mb-6">
+        <p className="text-xs text-black/60 mb-6">
           Version {doc.version} — en vigueur depuis le{" "}
           {new Date(doc.effectiveDate).toLocaleDateString("fr-FR")}
         </p>
 
-        <p className="text-xs bg-neutral-100 rounded-xl p-3 mb-6 text-neutral-600">
+        <p className="text-xs bg-black/5 rounded-xl p-3 mb-6 text-black/70">
           {LEGAL_DISCLAIMER}
         </p>
 
@@ -37,7 +37,7 @@ export default async function LegalDocumentPage({
           <div key={section.heading} className="mb-5">
             <h2 className="text-base font-semibold mb-2">{section.heading}</h2>
             {section.body.map((paragraph, i) => (
-              <p key={i} className="text-sm text-neutral-700 mb-2">
+              <p key={i} className="text-sm text-black/80 mb-2">
                 {paragraph}
               </p>
             ))}

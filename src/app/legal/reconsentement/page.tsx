@@ -14,10 +14,10 @@ export default async function ReconsentementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#EFEFED] px-4 py-10 flex justify-center">
+    <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
       <div className="w-full max-w-md bg-white rounded-[22px] p-8 shadow-sm">
         <h1 className="text-xl font-bold mb-1">Nos conditions ont été mises à jour</h1>
-        <p className="text-sm text-neutral-500 mb-6">
+        <p className="text-sm text-black/60 mb-6">
           Merci de relire et d&apos;accepter la nouvelle version avant de continuer à utiliser ton
           compte Revant.
         </p>

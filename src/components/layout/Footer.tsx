@@ -3,8 +3,8 @@ import ManageCookiesButton from "@/components/cookie-consent/ManageCookiesButton
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-neutral-200 px-4 py-6 mt-auto">
-      <div className="max-w-2xl mx-auto flex flex-wrap gap-x-5 gap-y-2 text-xs text-neutral-500">
+    <footer className="bg-white border-t border-black/10 px-4 py-6 mt-auto">
+      <div className="max-w-2xl mx-auto flex flex-wrap gap-x-5 gap-y-2 text-xs text-black/60">
         <Link href="/legal" className="underline">
           Centre juridique
         </Link>
@@ -28,7 +28,7 @@ export default function Footer() {
           Contact
         </a>
       </div>
-      <p className="max-w-2xl mx-auto text-xs text-neutral-400 mt-3">© Revant</p>
+      <p className="max-w-2xl mx-auto text-xs text-black/40 mt-3">© Revant</p>
     </footer>
   );
 }

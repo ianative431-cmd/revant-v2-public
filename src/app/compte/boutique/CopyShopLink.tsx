@@ -22,11 +22,11 @@ export default function CopyShopLink({ url }: { url: string }) {
 
   return (
     <div className="mt-3 w-full text-center">
-      <p className="text-xs text-neutral-500 break-all mb-2">{url}</p>
+      <p className="text-xs text-black/60 break-all mb-2">{url}</p>
       <button
         type="button"
         onClick={handleCopy}
-        className="text-xs underline text-neutral-700"
+        className="text-xs underline text-black/80"
       >
         {copied ? "Lien copié !" : "Copier le lien"}
       </button>

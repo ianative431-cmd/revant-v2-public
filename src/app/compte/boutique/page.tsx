@@ -14,10 +14,10 @@ export default async function MaBoutiquePage() {
 
   if (!shop) {
     return (
-      <div className="min-h-screen bg-[#EFEFED] px-4 py-10 flex justify-center">
+      <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
         <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm text-center">
           <h1 className="text-xl font-bold mb-1">Aucune boutique pour l&apos;instant</h1>
-          <p className="text-sm text-neutral-500 mb-6">
+          <p className="text-sm text-black/60 mb-6">
             Crée ta boutique pour commencer à vendre sur Revant.
           </p>
           <Link
@@ -35,10 +35,10 @@ export default async function MaBoutiquePage() {
   const qrCodeDataUrl = await generateQrCodeDataUrl(publicUrl);
 
   return (
-    <div className="min-h-screen bg-[#EFEFED] px-4 py-10 flex justify-center">
+    <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm">
         <h1 className="text-xl font-bold mb-1">Ma boutique</h1>
-        <p className="text-sm text-neutral-500 mb-6">{shop.name}</p>
+        <p className="text-sm text-black/60 mb-6">{shop.name}</p>
 
         <div className="flex flex-col items-center mb-6">
           {/* eslint-disable-next-line @next/next/no-img-element -- data URL générée côté serveur, pas une source distante à optimiser */}
@@ -48,11 +48,11 @@ export default async function MaBoutiquePage() {
 
         <dl className="text-sm mb-6 space-y-2">
           <div className="flex justify-between gap-3">
-            <dt className="text-neutral-500">Revant ID</dt>
+            <dt className="text-black/60">Revant ID</dt>
             <dd className="font-mono text-xs break-all text-right">{shop.id}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-neutral-500">Type</dt>
+            <dt className="text-black/60">Type</dt>
             <dd>{shop.shop_type === "standard" ? "Boutique classique" : shop.shop_type}</dd>
           </div>
         </dl>

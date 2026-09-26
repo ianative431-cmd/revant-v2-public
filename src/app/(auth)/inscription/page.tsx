@@ -6,8 +6,8 @@ import { signUpWithEmail, sendPhoneOtp, verifyPhoneOtp } from "../actions";
 
 function LegalSummaryAndConsent() {
   return (
-    <div className="bg-neutral-50 rounded-xl p-3 mb-3">
-      <p className="text-xs text-neutral-600 mb-2">
+    <div className="bg-black/[0.03] rounded-xl p-3 mb-3">
+      <p className="text-xs text-black/70 mb-2">
         En créant un compte, tu acceptes notamment : une commission Revant de 0,5 % sur chaque
         vente, la mise en séquestre des fonds jusqu&apos;à confirmation de la remise du produit, et
         le traitement de tes données décrit dans notre politique de confidentialité.
@@ -40,7 +40,7 @@ export default function InscriptionPage() {
   return (
     <div>
       <h1 className="text-xl font-bold mb-1">Créer un compte</h1>
-      <p className="text-sm text-neutral-500 mb-6">
+      <p className="text-sm text-black/60 mb-6">
         Rejoins Revant — seconde vie, nouvelle valeur.
       </p>
 
@@ -49,7 +49,7 @@ export default function InscriptionPage() {
           type="button"
           onClick={() => setMode("email")}
           className={`flex-1 py-2 rounded-full text-sm font-medium ${
-            mode === "email" ? "bg-black text-white" : "bg-neutral-100"
+            mode === "email" ? "bg-black text-white" : "bg-black/5"
           }`}
         >
           E-mail
@@ -58,7 +58,7 @@ export default function InscriptionPage() {
           type="button"
           onClick={() => setMode("phone")}
           className={`flex-1 py-2 rounded-full text-sm font-medium ${
-            mode === "phone" ? "bg-black text-white" : "bg-neutral-100"
+            mode === "phone" ? "bg-black text-white" : "bg-black/5"
           }`}
         >
           Téléphone
@@ -67,7 +67,7 @@ export default function InscriptionPage() {
 
       {mode === "email" ? <EmailSignupForm /> : <PhoneSignupForm />}
 
-      <p className="text-sm text-neutral-500 mt-6 text-center">
+      <p className="text-sm text-black/60 mt-6 text-center">
         Déjà un compte ?{" "}
         <Link href="/connexion" className="text-black font-medium underline">
           Connecte-toi
@@ -161,7 +161,7 @@ function PhoneSignupForm() {
   return (
     <form action={verifyAction} className="flex flex-col gap-3">
       <input type="hidden" name="phone" value={phone} />
-      <p className="text-sm text-neutral-500">Code envoyé au {phone}</p>
+      <p className="text-sm text-black/60">Code envoyé au {phone}</p>
       <input
         name="code"
         type="text"
