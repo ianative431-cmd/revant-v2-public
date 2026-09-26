@@ -49,8 +49,15 @@ export default async function ComptePage() {
         </form>
 
         <Link
-          href="/compte/confidentialite"
+          href="/compte/boutique"
           className="block text-center text-sm underline mt-4 text-neutral-600"
+        >
+          Ma boutique
+        </Link>
+
+        <Link
+          href="/compte/confidentialite"
+          className="block text-center text-sm underline mt-2 text-neutral-600"
         >
           Confidentialité et données
         </Link>
