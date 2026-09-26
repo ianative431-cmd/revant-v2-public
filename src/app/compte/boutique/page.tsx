@@ -65,14 +65,12 @@ export default async function MaBoutiquePage() {
         />
 
         <div className="mt-6 border-t pt-4">
-          <button
-            type="button"
-            disabled
-            title="Éditeur visuel de boutique — bientôt disponible"
-            className="w-full border border-neutral-200 text-neutral-400 rounded-full py-3 text-sm font-medium cursor-not-allowed"
+          <Link
+            href="/compte/boutique/personnaliser"
+            className="block text-center w-full border border-black rounded-full py-3 text-sm font-medium"
           >
-            Personnaliser l&apos;apparence (bientôt disponible)
-          </button>
+            Personnaliser l&apos;apparence
+          </Link>
         </div>
       </div>
     </div>

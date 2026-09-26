@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { slugify, isValidSlug } from "@/lib/slug";
 import { getShopByOwnerId } from "@/server/shops/shops";
+import { getPaletteById, getPalettesForShopType } from "@/content/shops/color-palettes";
 
 export type ShopActionState = { error: string | null };
 
@@ -171,4 +172,46 @@ export async function updateShop(
   }
 
   redirect("/compte/boutique");
+}
+
+/**
+ * Attribution d'une palette de couleurs prédéfinie à la boutique
+ * (section 9 du prompt maître). L'écran ne propose que les palettes
+ * autorisées pour le type de boutique concerné, mais on revérifie ici
+ * côté serveur — jamais uniquement côté frontend (SECURITY.md).
+ */
+export async function selectShopColorPalette(
+  _prevState: ShopActionState,
+  formData: FormData
+): Promise<ShopActionState> {
+  const user = await requireUserWithLegalConsent();
+  const supabase = await createSupabaseServerClient();
+
+  const shop = await getShopByOwnerId(supabase, user.id);
+  if (!shop) {
+    return { error: "Aucune boutique associée à ce compte." };
+  }
+
+  const paletteId = String(formData.get("paletteId") ?? "").trim();
+  const palette = getPaletteById(paletteId);
+
+  if (!palette) {
+    return { error: "Palette introuvable." };
+  }
+
+  const allowedPalettes = getPalettesForShopType(shop.shop_type);
+  if (!allowedPalettes.some((p) => p.id === palette.id)) {
+    return { error: "Cette palette n'est pas disponible pour ce type de boutique." };
+  }
+
+  const { error } = await supabase
+    .from("shops")
+    .update({ color_palette_id: palette.id })
+    .eq("id", shop.id);
+
+  if (error) {
+    return { error: "Impossible d'enregistrer la palette. Réessaie plus tard." };
+  }
+
+  redirect("/compte/boutique/personnaliser");
 }

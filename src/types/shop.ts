@@ -23,6 +23,8 @@ export type Shop = {
   description: string | null;
   shop_type: ShopType;
   status: ShopStatus;
+  /** Identifiant de la palette prédéfinie choisie, voir src/content/shops/color-palettes.ts. */
+  color_palette_id: string | null;
   created_at: string;
   updated_at: string;
 };
