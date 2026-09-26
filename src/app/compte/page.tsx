@@ -1,6 +1,7 @@
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { signOutAction } from "../(auth)/actions";
 import Link from "next/link";
+import AvatarUploader from "@/components/profile/AvatarUploader";
 
 export default async function ComptePage() {
   // Vérification côté serveur — inaccessible sans session valide, et
@@ -10,8 +11,14 @@ export default async function ComptePage() {
   return (
     <div className="min-h-screen bg-[#EFEFED] px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm">
-        <h1 className="text-xl font-bold mb-1">Mon compte</h1>
-        <p className="text-sm text-neutral-500 mb-6">Connecté avec succès.</p>
+        <AvatarUploader
+          userId={user.id}
+          initialAvatarUrl={(user.user_metadata?.avatar_url as string | undefined) ?? null}
+          email={user.email}
+          phone={user.phone}
+        />
+        <h1 className="text-xl font-bold mb-1 text-center">Mon compte</h1>
+        <p className="text-sm text-neutral-500 mb-6 text-center">Connecté avec succès.</p>
 
         <dl className="text-sm mb-6 space-y-2">
           {user.email && (
