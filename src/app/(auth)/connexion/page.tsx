@@ -81,36 +81,42 @@ function EmailLoginForm() {
 function PhoneLoginForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [phone, setPhone] = useState("");
-  const [sendState, sendAction, sendPending] = useActionState(sendPhoneOtp, { error: null });
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
   const [verifyState, verifyAction, verifyPending] = useActionState(verifyPhoneOtp, {
     error: null,
   });
 
+  async function handleSend(formData: FormData) {
+    setSending(true);
+    setSendError(null);
+    const result = await sendPhoneOtp({ error: null }, formData);
+    setSending(false);
+    if (result.error) {
+      setSendError(result.error);
+      return;
+    }
+    setPhone(String(formData.get("phone") ?? ""));
+    setOtpSent(true);
+  }
+
   if (!otpSent) {
     return (
-      <form
-        action={async (formData) => {
-          await sendAction(formData);
-          setOtpSent(true);
-        }}
-        className="flex flex-col gap-3"
-      >
+      <form action={handleSend} className="flex flex-col gap-3">
         <input
           name="phone"
           type="tel"
           required
           placeholder="+22790000000"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
           className="border rounded-xl px-4 py-3 text-sm"
         />
-        {sendState.error && <p className="text-red-600 text-sm">{sendState.error}</p>}
+        {sendError && <p className="text-red-600 text-sm">{sendError}</p>}
         <button
           type="submit"
-          disabled={sendPending}
+          disabled={sending}
           className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
         >
-          {sendPending ? "Envoi..." : "Recevoir un code par SMS"}
+          {sending ? "Envoi..." : "Recevoir un code par SMS"}
         </button>
       </form>
     );

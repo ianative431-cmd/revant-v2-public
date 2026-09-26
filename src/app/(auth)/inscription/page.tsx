@@ -4,6 +4,36 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signUpWithEmail, sendPhoneOtp, verifyPhoneOtp } from "../actions";
 
+function LegalSummaryAndConsent() {
+  return (
+    <div className="bg-neutral-50 rounded-xl p-3 mb-3">
+      <p className="text-xs text-neutral-600 mb-2">
+        En créant un compte, tu acceptes notamment : une commission Revant de 0,5 % sur chaque
+        vente, la mise en séquestre des fonds jusqu&apos;à confirmation de la remise du produit, et
+        le traitement de tes données décrit dans notre politique de confidentialité.
+      </p>
+      <label className="flex items-start gap-2 text-xs mb-1">
+        <input type="checkbox" name="acceptCgu" required className="mt-0.5" />
+        <span>
+          J&apos;accepte les{" "}
+          <Link href="/legal/cgu" target="_blank" className="underline">
+            Conditions Générales d&apos;Utilisation
+          </Link>
+        </span>
+      </label>
+      <label className="flex items-start gap-2 text-xs">
+        <input type="checkbox" name="acceptConfidentialite" required className="mt-0.5" />
+        <span>
+          J&apos;accepte la{" "}
+          <Link href="/legal/confidentialite" target="_blank" className="underline">
+            Politique de confidentialité
+          </Link>
+        </span>
+      </label>
+    </div>
+  );
+}
+
 export default function InscriptionPage() {
   const [mode, setMode] = useState<"email" | "phone">("email");
 
@@ -69,6 +99,7 @@ function EmailSignupForm() {
         placeholder="Mot de passe (8 caractères min.)"
         className="border rounded-xl px-4 py-3 text-sm"
       />
+      <LegalSummaryAndConsent />
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}
       <button
         type="submit"
@@ -84,36 +115,44 @@ function EmailSignupForm() {
 function PhoneSignupForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [phone, setPhone] = useState("");
-  const [sendState, sendAction, sendPending] = useActionState(sendPhoneOtp, { error: null });
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
   const [verifyState, verifyAction, verifyPending] = useActionState(verifyPhoneOtp, {
     error: null,
   });
 
+  async function handleSend(formData: FormData) {
+    setSending(true);
+    setSendError(null);
+    const result = await sendPhoneOtp({ error: null }, formData);
+    setSending(false);
+    if (result.error) {
+      setSendError(result.error);
+      return;
+    }
+    setPhone(String(formData.get("phone") ?? ""));
+    setOtpSent(true);
+  }
+
   if (!otpSent) {
     return (
-      <form
-        action={async (formData) => {
-          await sendAction(formData);
-          setOtpSent(true);
-        }}
-        className="flex flex-col gap-3"
-      >
+      <form action={handleSend} className="flex flex-col gap-3">
+        <input type="hidden" name="mode" value="inscription" />
         <input
           name="phone"
           type="tel"
           required
           placeholder="+22790000000"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
           className="border rounded-xl px-4 py-3 text-sm"
         />
-        {sendState.error && <p className="text-red-600 text-sm">{sendState.error}</p>}
+        <LegalSummaryAndConsent />
+        {sendError && <p className="text-red-600 text-sm">{sendError}</p>}
         <button
           type="submit"
-          disabled={sendPending}
+          disabled={sending}
           className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
         >
-          {sendPending ? "Envoi..." : "Recevoir un code par SMS"}
+          {sending ? "Envoi..." : "Recevoir un code par SMS"}
         </button>
       </form>
     );

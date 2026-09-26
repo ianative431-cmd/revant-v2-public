@@ -1,10 +1,11 @@
-import { requireUser } from "@/server/auth/session";
+import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { signOutAction } from "../(auth)/actions";
+import Link from "next/link";
 
 export default async function ComptePage() {
-  // Vérification côté serveur — inaccessible sans session valide,
-  // quelle que soit l'URL tapée directement.
-  const user = await requireUser();
+  // Vérification côté serveur — inaccessible sans session valide, et
+  // sans consentement légal à jour, quelle que soit l'URL tapée directement.
+  const user = await requireUserWithLegalConsent();
 
   return (
     <div className="min-h-screen bg-[#EFEFED] px-4 py-10 flex justify-center">
@@ -39,6 +40,13 @@ export default async function ComptePage() {
             Se déconnecter
           </button>
         </form>
+
+        <Link
+          href="/compte/confidentialite"
+          className="block text-center text-sm underline mt-4 text-neutral-600"
+        >
+          Confidentialité et données
+        </Link>
       </div>
     </div>
   );
