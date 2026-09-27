@@ -5,6 +5,7 @@ import { getProductsForShop } from "@/server/products/products";
 import { env } from "@/lib/env";
 import ProductCard from "@/components/products/ProductCard";
 import { officialBackgroundPublicUrl, personalBackgroundPublicUrl } from "@/lib/background-image";
+import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -21,11 +22,6 @@ export async function generateMetadata({ params }: Props) {
     description: result.shop.slogan ?? result.shop.description ?? undefined,
   };
 }
-
-const SHOP_TYPE_LABEL: Record<string, string> = {
-  pro: "Boutique Pro",
-  fournisseur: "Fournisseur",
-};
 
 export default async function ShopPublicPage({ params }: Props) {
   const { slug } = await params;
@@ -44,7 +40,7 @@ export default async function ShopPublicPage({ params }: Props) {
   }
 
   const { shop } = result;
-  const typeLabel = SHOP_TYPE_LABEL[shop.shop_type];
+  const typeLabel = shop.shop_type === "standard" ? null : getShopTypeLabel(shop.shop_type);
   const products = await getProductsForShop(supabase, shop.id);
   const supabaseUrl = env.supabaseUrl();
 

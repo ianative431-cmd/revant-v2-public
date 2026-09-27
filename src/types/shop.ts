@@ -1,11 +1,14 @@
 /**
- * Types de boutique (section 13 du prompt maître). "pro" et
- * "fournisseur" ne peuvent être attribués que par l'administration
- * (voir supabase/migrations/0002_shops.sql, trigger
- * shops_protect_admin_columns) — aucun code applicatif ne doit
+ * "standard" et "restaurant" sont choisis librement par le vendeur à la
+ * création (voir migration 0010_restaurant_shop_type.sql). "pro" et
+ * "fournisseur" restent attribués UNIQUEMENT par l'administration (voir
+ * le trigger shops_protect_admin_columns) — aucun code applicatif ne doit
  * permettre à un vendeur de se les attribuer lui-même.
  */
-export type ShopType = "standard" | "pro" | "fournisseur";
+export type ShopType = "standard" | "restaurant" | "pro" | "fournisseur";
+
+/** Types de boutique qu'un utilisateur peut choisir lui-même à la création. */
+export const SELF_SERVICE_SHOP_TYPES = ["standard", "restaurant"] as const;
 
 /**
  * "suspended" ne peut être défini que par l'administration (même

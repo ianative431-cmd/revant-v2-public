@@ -50,8 +50,17 @@ export const SHOP_COLOR_PALETTES: ShopColorPalette[] = [
  * l'ensemble "standard". Utilisé à la fois pour l'affichage et pour la
  * revérification côté serveur (jamais uniquement côté frontend).
  */
+/**
+ * Palettes autorisées pour un type de boutique donné. Les boutiques
+ * "standard" ET "restaurant" partagent l'ensemble "standard" (ce sont
+ * deux choix de commerce ordinaires, pas des paliers professionnels) ;
+ * "pro" et "fournisseur" partagent l'ensemble "pro". Utilisé à la fois
+ * pour l'affichage et pour la revérification côté serveur (jamais
+ * uniquement côté frontend).
+ */
 export function getPalettesForShopType(shopType: ShopType): ShopColorPalette[] {
-  const audience: ShopPaletteAudience = shopType === "standard" ? "standard" : "pro";
+  const audience: ShopPaletteAudience =
+    shopType === "standard" || shopType === "restaurant" ? "standard" : "pro";
   return SHOP_COLOR_PALETTES.filter((p) => p.audience === audience);
 }
 

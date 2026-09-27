@@ -3,6 +3,7 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { generateQrCodeDataUrl } from "@/lib/qr";
+import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 import { env } from "@/lib/env";
 import EditShopForm from "./EditShopForm";
 import CopyShopLink from "./CopyShopLink";
@@ -53,7 +54,7 @@ export default async function MaBoutiquePage() {
           </div>
           <div className="flex justify-between">
             <dt className="text-black/60">Type</dt>
-            <dd>{shop.shop_type === "standard" ? "Boutique classique" : shop.shop_type}</dd>
+            <dd>{getShopTypeLabel(shop.shop_type)}</dd>
           </div>
         </dl>
 

@@ -59,3 +59,19 @@ export async function resolveShopBySlug(
   if (!currentShop) return { kind: "not_found" };
   return { kind: "redirect", toSlug: currentShop.slug };
 }
+
+/**
+ * Restaurants réels et actifs, pour la page de découverte publique
+ * /restaurants. Aucune boutique fictive : si aucun vendeur n'a encore
+ * créé de restaurant, la liste renvoyée est simplement vide (voir
+ * l'état vide honnête géré par la page).
+ */
+export async function getActiveRestaurants(supabase: SupabaseClient): Promise<Shop[]> {
+  const { data } = await supabase
+    .from("shops")
+    .select("*")
+    .eq("shop_type", "restaurant")
+    .eq("status", "active")
+    .order("created_at", { ascending: false });
+  return (data ?? []) as Shop[];
+}

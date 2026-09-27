@@ -6,6 +6,7 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { slugify, isValidSlug } from "@/lib/slug";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { getPaletteById, getPalettesForShopType } from "@/content/shops/color-palettes";
+import { SELF_SERVICE_SHOP_TYPES, type ShopType } from "@/types/shop";
 
 export type ShopActionState = { error: string | null };
 
@@ -60,6 +61,7 @@ export async function createShop(
   const name = String(formData.get("name") ?? "").trim();
   const slogan = String(formData.get("slogan") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const requestedType = String(formData.get("shopType") ?? "standard").trim();
 
   if (!isValidName(name)) {
     return { error: `Le nom de la boutique doit contenir entre ${NAME_MIN} et ${NAME_MAX} caractères.` };
@@ -70,6 +72,15 @@ export async function createShop(
   if (description.length > DESCRIPTION_MAX) {
     return { error: `La description ne peut pas dépasser ${DESCRIPTION_MAX} caractères.` };
   }
+  // Revérification côté serveur : seuls "standard" et "restaurant" sont
+  // auto-attribuables (voir SELF_SERVICE_SHOP_TYPES) — "pro" et
+  // "fournisseur" ne peuvent être obtenus que par l'administration, et
+  // la policy RLS shops_owner_insert (migration 0010) applique de toute
+  // façon la même règle au niveau base de données.
+  if (!(SELF_SERVICE_SHOP_TYPES as readonly string[]).includes(requestedType)) {
+    return { error: "Type de commerce invalide." };
+  }
+  const shopType = requestedType as ShopType;
 
   const supabase = await createSupabaseServerClient();
 
@@ -89,6 +100,7 @@ export async function createShop(
     name,
     slogan: slogan.length > 0 ? slogan : null,
     description: description.length > 0 ? description : null,
+    shop_type: shopType,
   });
 
   if (error) {

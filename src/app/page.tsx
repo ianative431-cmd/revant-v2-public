@@ -21,9 +21,14 @@ export default async function Home({ searchParams }: Props) {
         <span className="text-xl font-bold" style={{ fontFamily: "Georgia, serif" }}>
           Revant
         </span>
-        <Link href="/compte" className="text-sm underline">
-          Mon compte
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/restaurants" className="text-sm underline">
+            Restaurants
+          </Link>
+          <Link href="/compte" className="text-sm underline">
+            Mon compte
+          </Link>
+        </div>
       </header>
 
       <nav className="px-4 pb-4 flex gap-2 overflow-x-auto">
