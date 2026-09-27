@@ -12,6 +12,8 @@ export type Product = {
   status: ProductStatus;
   /** Arrière-plan officiel choisi pour cette annonce (indépendant de celui de la boutique). */
   background_id: string | null;
+  /** Arrière-plan personnel choisi pour cette annonce (mutuellement exclusif avec background_id). */
+  personal_background_id: string | null;
   created_at: string;
   updated_at: string;
 };
