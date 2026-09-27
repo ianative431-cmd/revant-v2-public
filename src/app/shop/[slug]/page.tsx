@@ -4,6 +4,7 @@ import { resolveShopBySlug } from "@/server/shops/shops";
 import { getProductsForShop } from "@/server/products/products";
 import { env } from "@/lib/env";
 import ProductCard from "@/components/products/ProductCard";
+import { officialBackgroundPublicUrl, personalBackgroundPublicUrl } from "@/lib/background-image";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -47,9 +48,34 @@ export default async function ShopPublicPage({ params }: Props) {
   const products = await getProductsForShop(supabase, shop.id);
   const supabaseUrl = env.supabaseUrl();
 
+  // Arrière-plan de la boutique : officiel OU personnel (jamais les
+  // deux, contrainte shops_background_exclusive) — sinon aucun,
+  // fallback silencieux vers le fond beige par défaut de Revant
+  // (section 13 du prompt maître "arrière-plans" : jamais d'image cassée).
+  let backgroundUrl: string | null = null;
+  if (shop.background_id) {
+    const { data: bg } = await supabase
+      .from("backgrounds")
+      .select("image_path")
+      .eq("id", shop.background_id)
+      .eq("is_active", true)
+      .maybeSingle();
+    if (bg) backgroundUrl = officialBackgroundPublicUrl(supabaseUrl, bg.image_path);
+  } else if (shop.personal_background_id) {
+    const { data: bg } = await supabase
+      .from("user_backgrounds")
+      .select("image_path")
+      .eq("id", shop.personal_background_id)
+      .maybeSingle();
+    if (bg) backgroundUrl = personalBackgroundPublicUrl(supabaseUrl, bg.image_path);
+  }
+
   return (
-    <div className="min-h-screen bg-[#F3E9DA] px-4 py-10">
-      <div className="max-w-2xl mx-auto bg-white rounded-[22px] p-8">
+    <div
+      className="min-h-screen bg-[#F3E9DA] px-4 py-10 bg-cover bg-center"
+      style={backgroundUrl ? { backgroundImage: `url(${backgroundUrl})` } : undefined}
+    >
+      <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-sm rounded-[22px] p-8">
         <div className="flex items-center gap-2 mb-2">
           <h1 className="text-2xl font-bold">{shop.name}</h1>
           {typeLabel && (

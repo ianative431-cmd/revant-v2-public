@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
+import { env } from "@/lib/env";
 import NewProductForm from "./NewProductForm";
 
 export default async function NouveauProduitPage() {
@@ -21,7 +22,7 @@ export default async function NouveauProduitPage() {
           ← Mes annonces
         </Link>
         <h1 className="text-xl font-bold mt-4 mb-6">Nouvelle annonce</h1>
-        <NewProductForm shopId={shop.id} />
+        <NewProductForm shopId={shop.id} supabaseUrl={env.supabaseUrl()} />
       </div>
     </div>
   );

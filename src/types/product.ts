@@ -10,6 +10,8 @@ export type Product = {
   category: string;
   image_path: string;
   status: ProductStatus;
+  /** Arrière-plan officiel choisi pour cette annonce (indépendant de celui de la boutique). */
+  background_id: string | null;
   created_at: string;
   updated_at: string;
 };

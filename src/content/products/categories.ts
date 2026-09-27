@@ -17,6 +17,7 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
   { slug: "chaussures", label: "Chaussures" },
   { slug: "sacs-accessoires", label: "Sacs & accessoires" },
   { slug: "maison", label: "Maison" },
+  { slug: "electronique", label: "Électronique" },
   { slug: "autre", label: "Autre" },
 ];
 

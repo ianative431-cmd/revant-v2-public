@@ -25,6 +25,10 @@ export type Shop = {
   status: ShopStatus;
   /** Identifiant de la palette prédéfinie choisie, voir src/content/shops/color-palettes.ts. */
   color_palette_id: string | null;
+  /** Arrière-plan officiel choisi (mutuellement exclusif avec personal_background_id). */
+  background_id: string | null;
+  /** Arrière-plan personnel choisi (mutuellement exclusif avec background_id). */
+  personal_background_id: string | null;
   created_at: string;
   updated_at: string;
 };
