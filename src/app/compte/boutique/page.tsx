@@ -64,6 +64,13 @@ export default async function MaBoutiquePage() {
           initialSlug={shop.slug}
         />
 
+        <Link
+          href="/compte/boutique/produits"
+          className="block text-center w-full bg-black text-white rounded-full py-3 text-sm font-medium mb-3"
+        >
+          Mes annonces
+        </Link>
+
         <div className="mt-6 border-t pt-4">
           <Link
             href="/compte/boutique/personnaliser"
