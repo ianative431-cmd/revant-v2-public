@@ -56,6 +56,13 @@ export default async function ComptePage() {
         </Link>
 
         <Link
+          href="/compte/commandes"
+          className="block text-center text-sm underline mt-2 text-black/70"
+        >
+          Mes commandes
+        </Link>
+
+        <Link
           href="/compte/confidentialite"
           className="block text-center text-sm underline mt-2 text-black/70"
         >

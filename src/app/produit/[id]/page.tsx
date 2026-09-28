@@ -2,11 +2,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/server/auth/session";
 import { getProductById } from "@/server/products/products";
 import { getCategoryLabel } from "@/content/products/categories";
 import { productImagePublicUrl } from "@/lib/product-image";
 import { officialBackgroundPublicUrl } from "@/lib/background-image";
 import { env } from "@/lib/env";
+import OrderButton from "./OrderButton";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -21,9 +23,12 @@ export default async function ProductPage({ params }: Props) {
 
   const { data: shop } = await supabase
     .from("shops")
-    .select("slug, name")
+    .select("slug, name, owner_id")
     .eq("id", product.shop_id)
     .maybeSingle();
+
+  const currentUser = await getCurrentUser();
+  const isOwner = !!currentUser && !!shop && shop.owner_id === currentUser.id;
 
   const imageUrl = productImagePublicUrl(env.supabaseUrl(), product.image_path);
 
@@ -83,10 +88,20 @@ export default async function ProductPage({ params }: Props) {
           </Link>
         )}
 
-        {/* Pas de bouton "Acheter" : le panier/la commande/le paiement
-            (sections 21 et 31 du prompt maître) ne sont pas encore
-            construits — mieux vaut ne rien afficher qu'un bouton qui ne
-            ferait rien. */}
+        {product.status === "active" && !isOwner && (
+          <div className="mt-3">
+            {currentUser ? (
+              <OrderButton productId={product.id} />
+            ) : (
+              <Link
+                href="/connexion"
+                className="block text-center bg-black text-white rounded-full py-3 text-sm font-medium"
+              >
+                Se connecter pour commander
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

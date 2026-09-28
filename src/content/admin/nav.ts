@@ -12,7 +12,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Boutiques", href: "/admin/boutiques", ready: true },
   { label: "Produits", href: "/admin/produits", ready: true },
   { label: "Arrière-plans", href: "/admin/arriere-plans", ready: true },
-  { label: "Commandes", href: "/admin/commandes", ready: false },
+  { label: "Commandes", href: "/admin/commandes", ready: true },
   { label: "Livraisons", href: "/admin/livraisons", ready: false },
   { label: "Paiements", href: "/admin/paiements", ready: false },
   { label: "Finance", href: "/admin/finance", ready: false },
@@ -33,14 +33,13 @@ export const ADMIN_NAV: AdminNavItem[] = [
  * simplement parce qu'elle s'affiche).
  */
 export const ADMIN_STUB_REQUIREMENTS: Record<string, string> = {
-  "/admin/commandes": "un vrai système de commandes (panier, checkout, statut de livraison)",
-  "/admin/livraisons": "un vrai système de commandes et de livraison",
+  "/admin/livraisons": "un vrai suivi de livraison distinct (aujourd'hui, paiement et livraison sont confirmés ensemble en une seule étape par le vendeur)",
   "/admin/paiements": "une intégration de paiement réelle (Visa/Mastercard, mobile money)",
   "/admin/finance": "un grand livre financier réel (ledger) et des commandes payées",
   "/admin/retraits": "un portefeuille vendeur réel avec des soldes calculés côté serveur",
   "/admin/promotions": "un système de codes promo/réductions relié aux commandes",
   "/admin/parrainages": "un programme de parrainage avec suivi des invitations",
-  "/admin/avis": "un système de commandes réel (un avis doit être lié à un achat confirmé)",
+  "/admin/avis": "un système d'avis (les commandes confirmées existent désormais, mais rien ne relie encore un avis à un achat réel)",
   "/admin/messages": "une messagerie interne entre acheteurs et vendeurs",
   "/admin/whatsapp": "une intégration WhatsApp Business API",
   "/admin/securite": "des journaux d'audit et de sécurité réels à afficher",

@@ -72,6 +72,13 @@ export default async function MaBoutiquePage() {
           Mes annonces
         </Link>
 
+        <Link
+          href="/compte/boutique/commandes"
+          className="block text-center w-full border border-black rounded-full py-3 text-sm font-medium mb-3"
+        >
+          Commandes
+        </Link>
+
         <div className="mt-6 border-t pt-4">
           <Link
             href="/compte/boutique/personnaliser"

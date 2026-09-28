@@ -4,6 +4,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 export type AdminOverviewStats = {
   shops: { total: number; standard: number; restaurant: number; pro: number; fournisseur: number; suspended: number };
   products: { total: number; active: number; sold: number };
+  orders: { total: number; en_attente: number; confirmee: number; annulee: number };
   users: { total: number; admin: number; seller: number; customer: number };
   backgrounds: { total: number; active: number };
 };
@@ -19,15 +20,17 @@ export type AdminOverviewStats = {
 export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
   const admin = createSupabaseAdminClient();
 
-  const [shopsRes, productsRes, profilesRes, backgroundsRes] = await Promise.all([
+  const [shopsRes, productsRes, ordersRes, profilesRes, backgroundsRes] = await Promise.all([
     admin.from("shops").select("shop_type, status"),
     admin.from("products").select("status"),
+    admin.from("orders").select("status"),
     admin.from("profiles").select("role"),
     admin.from("backgrounds").select("is_active"),
   ]);
 
   const shopsData = shopsRes.data ?? [];
   const productsData = productsRes.data ?? [];
+  const ordersData = ordersRes.data ?? [];
   const profilesData = profilesRes.data ?? [];
   const backgroundsData = backgroundsRes.data ?? [];
 
@@ -44,6 +47,12 @@ export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
       total: productsData.length,
       active: productsData.filter((p) => p.status === "active").length,
       sold: productsData.filter((p) => p.status === "sold").length,
+    },
+    orders: {
+      total: ordersData.length,
+      en_attente: ordersData.filter((o) => o.status === "en_attente").length,
+      confirmee: ordersData.filter((o) => o.status === "confirmee").length,
+      annulee: ordersData.filter((o) => o.status === "annulee").length,
     },
     users: {
       total: profilesData.length,

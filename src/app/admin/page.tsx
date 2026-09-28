@@ -20,7 +20,7 @@ export default async function AdminDashboardPage() {
         Chiffres réels, à l&apos;instant — aucune donnée simulée.
       </p>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
         <StatCard
           label="Boutiques"
           value={stats.shops.total}
@@ -30,6 +30,11 @@ export default async function AdminDashboardPage() {
           label="Produits"
           value={stats.products.total}
           sub={`${stats.products.active} actif${stats.products.active > 1 ? "s" : ""}`}
+        />
+        <StatCard
+          label="Commandes"
+          value={stats.orders.total}
+          sub={`${stats.orders.en_attente} en attente`}
         />
         <StatCard
           label="Utilisateurs"
