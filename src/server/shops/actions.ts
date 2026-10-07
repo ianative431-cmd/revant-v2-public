@@ -6,13 +6,15 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { slugify, isValidSlug } from "@/lib/slug";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { getPaletteById, getPalettesForShopType } from "@/content/shops/color-palettes";
-import { SELF_SERVICE_SHOP_TYPES, type ShopType } from "@/types/shop";
 
 export type ShopActionState = { error: string | null };
 
+/** Types de boutique qu'un utilisateur peut choisir lui-même à la création. */
+const SELF_SERVICE_SHOP_TYPES = ["standard", "restaurant"] as const;
+type SelfServiceShopType = (typeof SELF_SERVICE_SHOP_TYPES)[number];
+
 const NAME_MIN = 2;
 const NAME_MAX = 80;
-const SLOGAN_MAX = 120;
 const DESCRIPTION_MAX = 1000;
 
 function isValidName(value: string): boolean {
@@ -37,12 +39,13 @@ async function findAvailableSlug(supabase: ServerSupabase, desired: string): Pro
   // Borne la boucle : largement suffisant en pratique, et évite tout
   // risque de boucle infinie en cas de comportement inattendu.
   for (let attempts = 0; attempts < 25; attempts++) {
-    const [{ data: slugTaken }, { data: historyTaken }] = await Promise.all([
-      supabase.from("shops").select("id").eq("slug", candidate).maybeSingle(),
-      supabase.from("shop_slug_history").select("slug").eq("slug", candidate).maybeSingle(),
-    ]);
+    const { data: slugTaken } = await supabase
+      .from("shops")
+      .select("id")
+      .eq("slug", candidate)
+      .maybeSingle();
 
-    if (!slugTaken && !historyTaken) return candidate;
+    if (!slugTaken) return candidate;
     candidate = `${root}-${suffix}`;
     suffix += 1;
   }
@@ -59,15 +62,11 @@ export async function createShop(
   const user = await requireUserWithLegalConsent();
 
   const name = String(formData.get("name") ?? "").trim();
-  const slogan = String(formData.get("slogan") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const requestedType = String(formData.get("shopType") ?? "standard").trim();
 
   if (!isValidName(name)) {
     return { error: `Le nom de la boutique doit contenir entre ${NAME_MIN} et ${NAME_MAX} caractères.` };
-  }
-  if (slogan.length > SLOGAN_MAX) {
-    return { error: `Le slogan ne peut pas dépasser ${SLOGAN_MAX} caractères.` };
   }
   if (description.length > DESCRIPTION_MAX) {
     return { error: `La description ne peut pas dépasser ${DESCRIPTION_MAX} caractères.` };
@@ -80,7 +79,7 @@ export async function createShop(
   if (!(SELF_SERVICE_SHOP_TYPES as readonly string[]).includes(requestedType)) {
     return { error: "Type de commerce invalide." };
   }
-  const shopType = requestedType as ShopType;
+  const shopType = requestedType as SelfServiceShopType;
 
   const supabase = await createSupabaseServerClient();
 
@@ -98,9 +97,8 @@ export async function createShop(
     owner_id: user.id,
     slug,
     name,
-    slogan: slogan.length > 0 ? slogan : null,
     description: description.length > 0 ? description : null,
-    shop_type: shopType,
+    is_restaurant: shopType === "restaurant",
   });
 
   if (error) {
@@ -123,15 +121,11 @@ export async function updateShop(
   }
 
   const name = String(formData.get("name") ?? "").trim();
-  const slogan = String(formData.get("slogan") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const requestedSlug = slugify(String(formData.get("slug") ?? "").trim());
 
   if (!isValidName(name)) {
     return { error: `Le nom de la boutique doit contenir entre ${NAME_MIN} et ${NAME_MAX} caractères.` };
-  }
-  if (slogan.length > SLOGAN_MAX) {
-    return { error: `Le slogan ne peut pas dépasser ${SLOGAN_MAX} caractères.` };
   }
   if (description.length > DESCRIPTION_MAX) {
     return { error: `La description ne peut pas dépasser ${DESCRIPTION_MAX} caractères.` };
@@ -145,27 +139,20 @@ export async function updateShop(
   let finalSlug = shop.slug;
 
   if (requestedSlug !== shop.slug) {
-    const [{ data: slugTaken }, { data: historyTaken }] = await Promise.all([
-      supabase.from("shops").select("id").eq("slug", requestedSlug).maybeSingle(),
-      supabase.from("shop_slug_history").select("slug").eq("slug", requestedSlug).maybeSingle(),
-    ]);
+    const { data: slugTaken } = await supabase
+      .from("shops")
+      .select("id")
+      .eq("slug", requestedSlug)
+      .maybeSingle();
 
-    if (slugTaken || historyTaken) {
+    if (slugTaken) {
       return { error: "Cette adresse de boutique est déjà utilisée." };
     }
 
-    // On enregistre l'ancien slug AVANT de le remplacer : si cette
-    // étape réussit mais que la suivante échoue, aucun visiteur ayant
-    // gardé l'ancien lien ne se retrouve avec un lien mort (voir
-    // ARCHITECTURE.md, section boutiques).
-    const { error: historyError } = await supabase
-      .from("shop_slug_history")
-      .insert({ slug: shop.slug, shop_id: shop.id });
-
-    if (historyError) {
-      return { error: "Impossible de changer l'adresse de la boutique. Réessaie plus tard." };
-    }
-
+    // NB : contrairement à une version antérieure, l'ancien slug n'est
+    // plus archivé (table shop_slug_history retirée du schéma actuel) —
+    // un ancien lien partagé cessera donc de fonctionner après un
+    // changement d'adresse. À signaler à l'utilisateur si besoin.
     finalSlug = requestedSlug;
   }
 
@@ -173,7 +160,6 @@ export async function updateShop(
     .from("shops")
     .update({
       name,
-      slogan: slogan.length > 0 ? slogan : null,
       description: description.length > 0 ? description : null,
       slug: finalSlug,
     })
@@ -211,14 +197,14 @@ export async function selectShopColorPalette(
     return { error: "Palette introuvable." };
   }
 
-  const allowedPalettes = getPalettesForShopType(shop.shop_type);
+  const allowedPalettes = getPalettesForShopType(shop);
   if (!allowedPalettes.some((p) => p.id === palette.id)) {
     return { error: "Cette palette n'est pas disponible pour ce type de boutique." };
   }
 
   const { error } = await supabase
     .from("shops")
-    .update({ color_palette_id: palette.id })
+    .update({ background_color: palette.id })
     .eq("id", shop.id);
 
   if (error) {

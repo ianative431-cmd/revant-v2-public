@@ -1,18 +1,15 @@
-import type { ShopType } from "@/types/shop";
+import type { Shop } from "@/types/shop";
 
 /**
- * Libellé affiché pour chaque type de boutique. Source unique utilisée à
- * la fois par la page publique (/shop/[slug]) et le tableau de bord
- * vendeur (/compte/boutique) — pour éviter que les deux dérivent avec
- * le temps.
+ * Libellé affiché pour le "type" d'une boutique. Dérivé des indicateurs
+ * réels (is_restaurant, is_pro, is_premium) — il n'existe plus de
+ * colonne shop_type unique en base. Source unique utilisée à la fois
+ * par la page publique (/shop/[slug]) et le tableau de bord vendeur
+ * (/compte/boutique) — pour éviter que les deux dérivent avec le temps.
  */
-const SHOP_TYPE_LABELS: Record<ShopType, string> = {
-  standard: "Boutique classique",
-  restaurant: "Restaurant",
-  pro: "Boutique Pro",
-  fournisseur: "Fournisseur",
-};
-
-export function getShopTypeLabel(shopType: ShopType): string {
-  return SHOP_TYPE_LABELS[shopType];
+export function getShopTypeLabel(shop: Pick<Shop, "is_restaurant" | "is_pro" | "is_premium">): string {
+  if (shop.is_restaurant) return "Restaurant";
+  if (shop.is_premium) return "Boutique Premium";
+  if (shop.is_pro) return "Boutique Pro";
+  return "Boutique classique";
 }

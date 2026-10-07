@@ -1,37 +1,40 @@
 /**
- * "standard" et "restaurant" sont choisis librement par le vendeur à la
- * création (voir migration 0010_restaurant_shop_type.sql). "pro" et
- * "fournisseur" restent attribués UNIQUEMENT par l'administration (voir
- * le trigger shops_protect_admin_columns) — aucun code applicatif ne doit
- * permettre à un vendeur de se les attribuer lui-même.
+ * Statut réel d'une boutique (table shops, schéma Supabase actuel).
+ * "draft"/"pending" et "closed" s'ajoutent à l'ancien "active"/"suspended" —
+ * le cycle de vie complet est désormais piloté par l'admin/modération.
  */
-export type ShopType = "standard" | "restaurant" | "pro" | "fournisseur";
-
-/** Types de boutique qu'un utilisateur peut choisir lui-même à la création. */
-export const SELF_SERVICE_SHOP_TYPES = ["standard", "restaurant"] as const;
+export type ShopStatus = "draft" | "pending" | "active" | "suspended" | "closed";
 
 /**
- * "suspended" ne peut être défini que par l'administration (même
- * garantie base de données que ci-dessus).
+ * Le modèle "shop_type" (standard/restaurant/pro/fournisseur) a été
+ * remplacé par des indicateurs indépendants sur la vraie boutique :
+ * is_restaurant, is_pro, is_premium. is_restaurant reste le seul que
+ * le vendeur peut choisir lui-même à la création ; is_pro et
+ * is_premium restent réservés à l'administration.
  */
-export type ShopStatus = "active" | "suspended";
-
 export type Shop = {
   /** Revant ID stable de la boutique — ne change jamais, même si le slug change. */
   id: string;
   owner_id: string;
   slug: string;
   name: string;
-  slogan: string | null;
   description: string | null;
-  shop_type: ShopType;
   status: ShopStatus;
+  is_restaurant: boolean;
+  is_pro: boolean;
+  is_premium: boolean;
+  country_code: string;
+  city: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  instagram: string | null;
+  snapchat: string | null;
+  tiktok: string | null;
+  logo_url: string | null;
+  banner_url: string | null;
   /** Identifiant de la palette prédéfinie choisie, voir src/content/shops/color-palettes.ts. */
-  color_palette_id: string | null;
-  /** Arrière-plan officiel choisi (mutuellement exclusif avec personal_background_id). */
-  background_id: string | null;
-  /** Arrière-plan personnel choisi (mutuellement exclusif avec background_id). */
-  personal_background_id: string | null;
+  background_color: string | null;
+  background_image_url: string | null;
   created_at: string;
   updated_at: string;
 };

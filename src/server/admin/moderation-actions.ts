@@ -52,17 +52,24 @@ export async function deleteProductAsAdmin(
   await requireAdmin();
 
   const productId = String(formData.get("productId") ?? "");
-  const imagePath = String(formData.get("imagePath") ?? "");
+  const imageUrlsRaw = String(formData.get("imageUrls") ?? "");
+  const imageUrls = imageUrlsRaw.length > 0 ? imageUrlsRaw.split(",") : [];
 
   const admin = createSupabaseAdminClient();
+  // product_images est en clé étrangère ON DELETE CASCADE vers products :
+  // supprimer le produit suffit à nettoyer les lignes d'images associées.
   const { error } = await admin.from("products").delete().eq("id", productId);
 
   if (error) {
     return { error: "Impossible de supprimer cette annonce." };
   }
 
-  if (imagePath) {
-    await admin.storage.from(PRODUCT_IMAGE_BUCKET).remove([imagePath]);
+  const paths = imageUrls
+    .map((url) => url.split(`/${PRODUCT_IMAGE_BUCKET}/`)[1])
+    .filter((path): path is string => Boolean(path));
+
+  if (paths.length > 0) {
+    await admin.storage.from(PRODUCT_IMAGE_BUCKET).remove(paths);
   }
 
   revalidatePath("/admin/produits");

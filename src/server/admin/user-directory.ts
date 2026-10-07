@@ -20,17 +20,39 @@ export type AdminUserRow = {
  * pagination sera nécessaire avant une croissance importante — ne pas
  * la simuler avant d'en avoir besoin.
  */
+const ROLE_PRIORITY: AppRole[] = [
+  "super_admin",
+  "admin",
+  "moderator",
+  "finance_admin",
+  "support_admin",
+  "kyc_admin",
+  "catalog_admin",
+  "seller",
+  "buyer",
+];
+
 export async function getAdminUserDirectory(perPage = 200): Promise<AdminUserRow[]> {
   const admin = createSupabaseAdminClient();
 
-  const [{ data: usersData }, { data: profilesData }] = await Promise.all([
+  const [{ data: usersData }, { data: roleRows }] = await Promise.all([
     admin.auth.admin.listUsers({ page: 1, perPage }),
-    admin.from("profiles").select("id, role"),
+    admin.from("user_roles").select("user_id, role"),
   ]);
 
-  const roleById = new Map<string, AppRole>();
-  for (const p of profilesData ?? []) {
-    roleById.set(p.id, (p.role as AppRole) ?? "customer");
+  const rolesById = new Map<string, AppRole[]>();
+  for (const r of roleRows ?? []) {
+    const existing = rolesById.get(r.user_id) ?? [];
+    existing.push(r.role);
+    rolesById.set(r.user_id, existing);
+  }
+
+  function primaryRole(userId: string): AppRole {
+    const roles = rolesById.get(userId) ?? [];
+    for (const candidate of ROLE_PRIORITY) {
+      if (roles.includes(candidate)) return candidate;
+    }
+    return "buyer";
   }
 
   return (usersData?.users ?? []).map((u) => ({
@@ -38,6 +60,6 @@ export async function getAdminUserDirectory(perPage = 200): Promise<AdminUserRow
     email: u.email ?? null,
     phone: u.phone ?? null,
     created_at: u.created_at,
-    role: roleById.get(u.id) ?? "customer",
+    role: primaryRole(u.id),
   }));
 }

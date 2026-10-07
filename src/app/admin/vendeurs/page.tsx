@@ -31,7 +31,7 @@ export default async function AdminVendeursPage() {
                   <p className="text-sm font-medium truncate">{u.email ?? u.phone ?? u.id}</p>
                   {shop ? (
                     <p className="text-xs text-black/50 mt-0.5">
-                      {shop.name} · {getShopTypeLabel(shop.shop_type)} ·{" "}
+                      {shop.name} · {getShopTypeLabel(shop)} ·{" "}
                       {shop.status === "suspended" ? "Suspendue" : "Active"}
                     </p>
                   ) : (

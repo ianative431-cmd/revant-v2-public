@@ -1,19 +1,19 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveProducts } from "@/server/products/products";
-import { PRODUCT_CATEGORIES, isValidCategory } from "@/content/products/categories";
-import { env } from "@/lib/env";
+import { getActiveCategories } from "@/server/catalog/categories";
 import ProductCard from "@/components/products/ProductCard";
 
 type Props = { searchParams: Promise<{ categorie?: string }> };
 
 export default async function Home({ searchParams }: Props) {
   const { categorie } = await searchParams;
-  const activeCategory = categorie && isValidCategory(categorie) ? categorie : undefined;
 
   const supabase = await createSupabaseServerClient();
-  const products = await getActiveProducts(supabase, { category: activeCategory });
-  const supabaseUrl = env.supabaseUrl();
+  const categories = await getActiveCategories(supabase);
+  const activeCategory = categories.find((c) => c.slug === categorie);
+
+  const products = await getActiveProducts(supabase, { categoryId: activeCategory?.id });
 
   return (
     <div className="min-h-screen bg-[#F3E9DA]">
@@ -40,15 +40,15 @@ export default async function Home({ searchParams }: Props) {
         >
           Tout
         </Link>
-        {PRODUCT_CATEGORIES.map((c) => (
+        {categories.map((c) => (
           <Link
-            key={c.slug}
+            key={c.id}
             href={`/?categorie=${c.slug}`}
             className={`shrink-0 text-xs font-medium rounded-full px-4 py-2 ${
-              activeCategory === c.slug ? "bg-black text-white" : "bg-black/5"
+              activeCategory?.id === c.id ? "bg-black text-white" : "bg-black/5"
             }`}
           >
-            {c.label}
+            {c.name}
           </Link>
         ))}
       </nav>
@@ -71,7 +71,7 @@ export default async function Home({ searchParams }: Props) {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} supabaseUrl={supabaseUrl} />
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}

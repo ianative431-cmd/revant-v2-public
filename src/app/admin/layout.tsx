@@ -1,4 +1,10 @@
 import { requireAdmin } from "@/server/auth/roles";
+
+// Données admin réelles, propres à chaque requête authentifiée — ne
+// doivent jamais être figées au moment du build ni mises en cache
+// statiquement (afficherait un état obsolète ou, pire, les données
+// d'un autre utilisateur).
+export const dynamic = "force-dynamic";
 import AdminSidebar from "./AdminSidebar";
 
 /**

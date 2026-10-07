@@ -4,10 +4,6 @@ import Image from "next/image";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/server/auth/session";
 import { getProductById } from "@/server/products/products";
-import { getCategoryLabel } from "@/content/products/categories";
-import { productImagePublicUrl } from "@/lib/product-image";
-import { officialBackgroundPublicUrl } from "@/lib/background-image";
-import { env } from "@/lib/env";
 import OrderButton from "./OrderButton";
 
 type Props = { params: Promise<{ id: string }> };
@@ -29,22 +25,8 @@ export default async function ProductPage({ params }: Props) {
 
   const currentUser = await getCurrentUser();
   const isOwner = !!currentUser && !!shop && shop.owner_id === currentUser.id;
-
-  const imageUrl = productImagePublicUrl(env.supabaseUrl(), product.image_path);
-
-  // Arrière-plan de présentation (section 5 / 9 du prompt maître
-  // "arrière-plans") : affiché derrière la photo, qui garde ses
-  // proportions d'origine (object-contain plutôt que cover ici).
-  let productBackgroundUrl: string | null = null;
-  if (product.background_id) {
-    const { data: bg } = await supabase
-      .from("backgrounds")
-      .select("image_path")
-      .eq("id", product.background_id)
-      .eq("is_active", true)
-      .maybeSingle();
-    if (bg) productBackgroundUrl = officialBackgroundPublicUrl(env.supabaseUrl(), bg.image_path);
-  }
+  const outOfStock = product.stock_quantity <= 0;
+  const imageUrl = product.images[0] ?? null;
 
   return (
     <div className="min-h-screen bg-[#F3E9DA] px-4 py-6">
@@ -53,27 +35,34 @@ export default async function ProductPage({ params }: Props) {
           ← Retour
         </Link>
 
-        <div
-          className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 mt-4 bg-cover bg-center"
-          style={productBackgroundUrl ? { backgroundImage: `url(${productBackgroundUrl})` } : undefined}
-        >
-          <Image
-            src={imageUrl}
-            alt={product.title}
-            fill
-            sizes="100vw"
-            className={productBackgroundUrl ? "object-contain p-6" : "object-cover"}
-          />
-          {product.status === "sold" && (
+        <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 mt-4">
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={product.name}
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-xs text-black/30">
+              Pas de photo
+            </div>
+          )}
+          {outOfStock && (
             <span className="absolute top-3 left-3 bg-black text-white text-xs font-medium px-3 py-1 rounded-full">
-              Vendu
+              Épuisé
             </span>
           )}
         </div>
 
-        <h1 className="text-xl font-bold mt-4">{product.title}</h1>
-        <p className="text-lg font-semibold">{product.price_fcfa.toLocaleString("fr-FR")} FCFA</p>
-        <p className="text-xs text-black/60 mb-3">{getCategoryLabel(product.category)}</p>
+        <h1 className="text-xl font-bold mt-4">{product.name}</h1>
+        <p className="text-lg font-semibold">
+          {product.base_price.toLocaleString("fr-FR")} {product.currency}
+        </p>
+        {product.categoryName && (
+          <p className="text-xs text-black/60 mb-3">{product.categoryName}</p>
+        )}
 
         {product.description && (
           <p className="text-sm whitespace-pre-line mb-6">{product.description}</p>
@@ -88,7 +77,7 @@ export default async function ProductPage({ params }: Props) {
           </Link>
         )}
 
-        {product.status === "active" && !isOwner && (
+        {product.status === "active" && !outOfStock && !isOwner && (
           <div className="mt-3">
             {currentUser ? (
               <OrderButton productId={product.id} />

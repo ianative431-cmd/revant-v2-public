@@ -2,67 +2,87 @@ import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type AdminOverviewStats = {
-  shops: { total: number; standard: number; restaurant: number; pro: number; fournisseur: number; suspended: number };
-  products: { total: number; active: number; sold: number };
-  orders: { total: number; en_attente: number; confirmee: number; annulee: number };
-  users: { total: number; admin: number; seller: number; customer: number };
-  backgrounds: { total: number; active: number };
+  users: number;
+  suspendedUsers: number;
+  shops: number;
+  activeShops: number;
+  products: number;
+  pendingProducts: number;
+  orders: number;
+  pendingOrders: number;
+  openDisputes: number;
+  pendingKyc: number;
+  openSupport: number;
+  recentOrders: Array<{
+    id: string;
+    orderNumber: string;
+    status: string;
+    totalAmount: number;
+    currency: string;
+    createdAt: string;
+  }>;
+};
+
+type SnapshotShape = {
+  users: number;
+  suspended_users: number;
+  shops: number;
+  active_shops: number;
+  products: number;
+  pending_products: number;
+  orders: number;
+  pending_orders: number;
+  open_disputes: number;
+  pending_kyc: number;
+  open_support: number;
+  recent_orders: Array<{
+    id: string;
+    order_number: string;
+    status: string;
+    total_amount: number;
+    currency: string;
+    created_at: string;
+  }>;
 };
 
 /**
- * Compteurs réels pour le tableau de bord (section 10 du prompt maître
- * "mise à jour"). Utilise le client service role : les boutiques
- * suspendues et les comptes autres que le sien ne sont, par conception,
- * pas visibles via les RLS normales (voir migrations 0002 et 0006).
- * Aucune donnée simulée — si une requête échoue, le compteur reste à 0
- * plutôt que d'afficher un chiffre inventé.
+ * Compteurs réels pour le tableau de bord admin. Ne recalcule rien
+ * côté frontend : délègue entièrement au RPC admin_overview_snapshot,
+ * qui vérifie lui-même côté serveur que l'appelant a un rôle admin
+ * (SECURITY DEFINER + vérification interne) et agrège les vraies
+ * tables (utilisateurs, boutiques, produits, commandes, litiges, KYC,
+ * support). Aucune donnée simulée — si l'appel échoue, l'erreur
+ * remonte plutôt que d'afficher un chiffre inventé.
  */
 export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
   const admin = createSupabaseAdminClient();
+  const { data, error } = await admin.rpc("admin_overview_snapshot");
 
-  const [shopsRes, productsRes, ordersRes, profilesRes, backgroundsRes] = await Promise.all([
-    admin.from("shops").select("shop_type, status"),
-    admin.from("products").select("status"),
-    admin.from("orders").select("status"),
-    admin.from("profiles").select("role"),
-    admin.from("backgrounds").select("is_active"),
-  ]);
+  if (error) {
+    throw new Error(`Impossible de charger les statistiques admin : ${error.message}`);
+  }
 
-  const shopsData = shopsRes.data ?? [];
-  const productsData = productsRes.data ?? [];
-  const ordersData = ordersRes.data ?? [];
-  const profilesData = profilesRes.data ?? [];
-  const backgroundsData = backgroundsRes.data ?? [];
+  const snapshot = data as unknown as SnapshotShape;
 
   return {
-    shops: {
-      total: shopsData.length,
-      standard: shopsData.filter((s) => s.shop_type === "standard").length,
-      restaurant: shopsData.filter((s) => s.shop_type === "restaurant").length,
-      pro: shopsData.filter((s) => s.shop_type === "pro").length,
-      fournisseur: shopsData.filter((s) => s.shop_type === "fournisseur").length,
-      suspended: shopsData.filter((s) => s.status === "suspended").length,
-    },
-    products: {
-      total: productsData.length,
-      active: productsData.filter((p) => p.status === "active").length,
-      sold: productsData.filter((p) => p.status === "sold").length,
-    },
-    orders: {
-      total: ordersData.length,
-      en_attente: ordersData.filter((o) => o.status === "en_attente").length,
-      confirmee: ordersData.filter((o) => o.status === "confirmee").length,
-      annulee: ordersData.filter((o) => o.status === "annulee").length,
-    },
-    users: {
-      total: profilesData.length,
-      admin: profilesData.filter((p) => p.role === "admin").length,
-      seller: profilesData.filter((p) => p.role === "seller").length,
-      customer: profilesData.filter((p) => p.role === "customer").length,
-    },
-    backgrounds: {
-      total: backgroundsData.length,
-      active: backgroundsData.filter((b) => b.is_active).length,
-    },
+    users: snapshot.users,
+    suspendedUsers: snapshot.suspended_users,
+    shops: snapshot.shops,
+    activeShops: snapshot.active_shops,
+    products: snapshot.products,
+    pendingProducts: snapshot.pending_products,
+    orders: snapshot.orders,
+    pendingOrders: snapshot.pending_orders,
+    openDisputes: snapshot.open_disputes,
+    pendingKyc: snapshot.pending_kyc,
+    openSupport: snapshot.open_support,
+    recentOrders: (snapshot.recent_orders ?? []).map((o) => ({
+      id: o.id,
+      orderNumber: o.order_number,
+      status: o.status,
+      totalAmount: o.total_amount,
+      currency: o.currency,
+      createdAt: o.created_at,
+    })),
   };
 }

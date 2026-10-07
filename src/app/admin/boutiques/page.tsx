@@ -24,7 +24,7 @@ export default async function AdminBoutiquesPage() {
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate">{shop.name}</p>
                 <p className="text-xs text-black/50 mt-0.5">
-                  {getShopTypeLabel(shop.shop_type)} ·{" "}
+                  {getShopTypeLabel(shop)} ·{" "}
                   {shop.status === "suspended" ? (
                     <span className="text-red-600">Suspendue</span>
                   ) : (

@@ -5,10 +5,10 @@ import { deleteProductAsAdmin } from "@/server/admin/moderation-actions";
 
 export default function DeleteProductButton({
   productId,
-  imagePath,
+  imageUrls,
 }: {
   productId: string;
-  imagePath: string;
+  imageUrls: string[];
 }) {
   const [state, formAction, pending] = useActionState(deleteProductAsAdmin, { error: null });
 
@@ -20,7 +20,7 @@ export default function DeleteProductButton({
       }}
     >
       <input type="hidden" name="productId" value={productId} />
-      <input type="hidden" name="imagePath" value={imagePath} />
+      <input type="hidden" name="imageUrls" value={imageUrls.join(",")} />
       <button
         type="submit"
         disabled={pending}

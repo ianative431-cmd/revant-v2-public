@@ -42,22 +42,10 @@ export async function resolveShopBySlug(
 
   if (shop) return { kind: "found", shop: shop as Shop };
 
-  const { data: history } = await supabase
-    .from("shop_slug_history")
-    .select("shop_id")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (!history) return { kind: "not_found" };
-
-  const { data: currentShop } = await supabase
-    .from("shops")
-    .select("slug")
-    .eq("id", history.shop_id)
-    .maybeSingle();
-
-  if (!currentShop) return { kind: "not_found" };
-  return { kind: "redirect", toSlug: currentShop.slug };
+  // NB : l'archivage des anciens slugs (table shop_slug_history) n'existe
+  // plus dans le schéma actuel — un ancien lien renvoie directement
+  // "introuvable" plutôt qu'une redirection.
+  return { kind: "not_found" };
 }
 
 /**
@@ -70,7 +58,7 @@ export async function getActiveRestaurants(supabase: SupabaseClient): Promise<Sh
   const { data } = await supabase
     .from("shops")
     .select("*")
-    .eq("shop_type", "restaurant")
+    .eq("is_restaurant", true)
     .eq("status", "active")
     .order("created_at", { ascending: false });
   return (data ?? []) as Shop[];

@@ -4,10 +4,7 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { getPalettesForShopType } from "@/content/shops/color-palettes";
-import { getActiveBackgrounds, getUserBackgrounds } from "@/server/backgrounds/backgrounds";
-import { env } from "@/lib/env";
 import PaletteCard from "./PaletteCard";
-import BackgroundSection from "./BackgroundSection";
 
 export default async function PersonnaliserBoutiquePage() {
   const user = await requireUserWithLegalConsent();
@@ -18,10 +15,7 @@ export default async function PersonnaliserBoutiquePage() {
     redirect("/boutiques/creer");
   }
 
-  const palettes = getPalettesForShopType(shop.shop_type);
-  const officialBackgrounds = await getActiveBackgrounds(supabase);
-  const personalBackgrounds = await getUserBackgrounds(supabase, user.id);
-  const supabaseUrl = env.supabaseUrl();
+  const palettes = getPalettesForShopType(shop);
 
   return (
     <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
@@ -40,23 +34,15 @@ export default async function PersonnaliserBoutiquePage() {
             <PaletteCard
               key={palette.id}
               palette={palette}
-              selected={shop.color_palette_id === palette.id}
+              selected={shop.background_color === palette.id}
             />
           ))}
         </div>
 
-        <BackgroundSection
-          officialBackgrounds={officialBackgrounds}
-          personalBackgrounds={personalBackgrounds}
-          currentBackgroundId={shop.background_id}
-          currentPersonalBackgroundId={shop.personal_background_id}
-          supabaseUrl={supabaseUrl}
-        />
-
         <div className="bg-white rounded-2xl p-4 mt-6">
           <p className="text-xs font-semibold text-black/60 mb-3">Bientôt disponible</p>
           <div className="flex flex-col gap-2">
-            {["Logo et bannière", "Sections de la boutique", "Typographie"].map((label) => (
+            {["Image d'arrière-plan personnalisée", "Logo et bannière", "Typographie"].map((label) => (
               <button
                 key={label}
                 type="button"

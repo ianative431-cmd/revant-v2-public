@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -10,9 +10,7 @@ import {
   buildProductImagePath,
   compressProductImage,
 } from "@/lib/product-image";
-import { officialBackgroundPublicUrl } from "@/lib/background-image";
-import { PRODUCT_CATEGORIES } from "@/content/products/categories";
-import type { Background } from "@/types/background";
+import type { Category } from "@/server/catalog/categories";
 
 type Status =
   | "idle"
@@ -20,7 +18,6 @@ type Status =
   | "error-type"
   | "error-size"
   | "error-network"
-  | "error-offline"
   | "error-generic"
   | "error-validation";
 
@@ -28,36 +25,21 @@ const ERROR_MESSAGES: Record<string, string> = {
   "error-type": "Cette image n'est pas valide (JPEG, PNG ou WebP attendus).",
   "error-size": "L'image dépasse la taille maximale autorisée (8 Mo).",
   "error-network": "L'envoi a échoué. Vérifie ta connexion et réessaie.",
-  "error-offline": "Tu es hors ligne. Reconnecte-toi pour publier ton annonce.",
   "error-generic": "Une erreur est survenue. Réessaie dans un instant.",
   "error-validation": "Vérifie le titre, le prix et la photo avant de publier.",
 };
 
 export default function NewProductForm({
   shopId,
-  supabaseUrl,
+  categories,
 }: {
   shopId: string;
-  supabaseUrl: string;
+  categories: Category[];
 }) {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
-  const [backgrounds, setBackgrounds] = useState<Background[]>([]);
-  const [showBackgroundPicker, setShowBackgroundPicker] = useState(false);
-  const [selectedBackgroundId, setSelectedBackgroundId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!showBackgroundPicker || backgrounds.length > 0) return;
-    const supabase = createSupabaseBrowserClient();
-    supabase
-      .from("backgrounds")
-      .select("*")
-      .eq("is_active", true)
-      .order("display_order", { ascending: true })
-      .then(({ data }) => setBackgrounds((data ?? []) as Background[]));
-  }, [showBackgroundPicker, backgrounds.length]);
 
   function handleFileSelected(selected: File | undefined) {
     if (!selected) return;
@@ -81,19 +63,14 @@ export default function NewProductForm({
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const title = String(formData.get("title") ?? "").trim();
+    const name = String(formData.get("name") ?? "").trim();
     const description = String(formData.get("description") ?? "").trim();
     const priceRaw = String(formData.get("price") ?? "").trim();
-    const category = String(formData.get("category") ?? "");
+    const categoryId = String(formData.get("categoryId") ?? "");
     const price = Number(priceRaw);
 
-    if (title.length < 2 || title.length > 120 || !Number.isFinite(price) || price <= 0 || !file) {
+    if (name.length < 2 || name.length > 120 || !Number.isFinite(price) || price <= 0 || !file) {
       setStatus("error-validation");
-      return;
-    }
-
-    if (typeof navigator !== "undefined" && !navigator.onLine) {
-      setStatus("error-offline");
       return;
     }
 
@@ -113,20 +90,38 @@ export default function NewProductForm({
         return;
       }
 
-      const { error: insertError } = await supabase.from("products").insert({
-        shop_id: shopId,
-        title,
-        description: description.length > 0 ? description : null,
-        price_fcfa: Math.round(price),
-        category,
-        image_path: path,
-        background_id: selectedBackgroundId,
-      });
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
 
-      if (insertError) {
+      const { data: product, error: insertError } = await supabase
+        .from("products")
+        .insert({
+          shop_id: shopId,
+          name,
+          description: description.length > 0 ? description : null,
+          base_price: Math.round(price),
+          category_id: categoryId.length > 0 ? categoryId : null,
+          slug: `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60)}-${Date.now().toString(36)}`,
+        })
+        .select("id")
+        .single();
+
+      if (insertError || !product) {
         // Image envoyée mais annonce non enregistrée : on nettoie le
         // fichier orphelin plutôt que de le laisser traîner en stockage.
         await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
+        setStatus("error-generic");
+        return;
+      }
+
+      const { error: imageError } = await supabase.from("product_images").insert({
+        product_id: product.id,
+        image_url: publicUrl,
+        sort_order: 0,
+      });
+
+      if (imageError) {
         setStatus("error-generic");
         return;
       }
@@ -148,67 +143,16 @@ export default function NewProductForm({
       />
 
       {previewUrl && (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local (blob URL), pas une image distante à optimiser */}
-          <img
-            src={previewUrl}
-            alt="Aperçu de l'annonce"
-            className="rounded-xl w-full aspect-square object-cover"
-          />
-
-          {/* Action secondaire discrète — volontairement plus petite et
-              moins visible que "Ajouter des photos" (consigne explicite). */}
-          <button
-            type="button"
-            onClick={() => setShowBackgroundPicker((v) => !v)}
-            className="self-start text-xs text-black/50 underline"
-          >
-            🖼️ Arrière-plan{selectedBackgroundId ? " (choisi)" : ""}
-          </button>
-
-          {showBackgroundPicker && (
-            <div className="border border-black/10 rounded-xl p-3">
-              {backgrounds.length === 0 ? (
-                <p className="text-xs text-black/40">
-                  Aucun arrière-plan disponible pour l&apos;instant.
-                </p>
-              ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedBackgroundId(null)}
-                    className={`text-[10px] rounded-lg border p-1 ${
-                      !selectedBackgroundId ? "border-black" : "border-black/10"
-                    }`}
-                  >
-                    Aucun
-                  </button>
-                  {backgrounds.map((bg) => (
-                    <button
-                      key={bg.id}
-                      type="button"
-                      onClick={() => setSelectedBackgroundId(bg.id)}
-                      className={`relative aspect-video rounded-lg overflow-hidden border ${
-                        selectedBackgroundId === bg.id ? "border-black" : "border-black/10"
-                      }`}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element -- vignette de sélection, pas critique pour l'optimisation next/image */}
-                      <img
-                        src={officialBackgroundPublicUrl(supabaseUrl, bg.image_path)}
-                        alt={bg.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </>
+        // eslint-disable-next-line @next/next/no-img-element -- aperçu local (blob URL), pas une image distante à optimiser
+        <img
+          src={previewUrl}
+          alt="Aperçu de l'annonce"
+          className="rounded-xl w-full aspect-square object-cover"
+        />
       )}
 
       <input
-        name="title"
+        name="name"
         type="text"
         required
         minLength={2}
@@ -217,13 +161,18 @@ export default function NewProductForm({
         className="border rounded-xl px-4 py-3 text-sm"
       />
 
-      <select name="category" required defaultValue="" className="border rounded-xl px-4 py-3 text-sm bg-white">
+      <select
+        name="categoryId"
+        required
+        defaultValue=""
+        className="border rounded-xl px-4 py-3 text-sm bg-white"
+      >
         <option value="" disabled>
           Catégorie
         </option>
-        {PRODUCT_CATEGORIES.map((c) => (
-          <option key={c.slug} value={c.slug}>
-            {c.label}
+        {categories.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
           </option>
         ))}
       </select>

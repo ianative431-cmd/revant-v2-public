@@ -54,13 +54,12 @@ export default async function MaBoutiquePage() {
           </div>
           <div className="flex justify-between">
             <dt className="text-black/60">Type</dt>
-            <dd>{getShopTypeLabel(shop.shop_type)}</dd>
+            <dd>{getShopTypeLabel(shop)}</dd>
           </div>
         </dl>
 
         <EditShopForm
           initialName={shop.name}
-          initialSlogan={shop.slogan ?? ""}
           initialDescription={shop.description ?? ""}
           initialSlug={shop.slug}
         />

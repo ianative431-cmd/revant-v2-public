@@ -11,7 +11,6 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Vendeurs", href: "/admin/vendeurs", ready: true },
   { label: "Boutiques", href: "/admin/boutiques", ready: true },
   { label: "Produits", href: "/admin/produits", ready: true },
-  { label: "Arrière-plans", href: "/admin/arriere-plans", ready: true },
   { label: "Commandes", href: "/admin/commandes", ready: true },
   { label: "Livraisons", href: "/admin/livraisons", ready: false },
   { label: "Paiements", href: "/admin/paiements", ready: false },

@@ -4,17 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { productImagePublicUrl } from "@/lib/product-image";
-import { getCategoryLabel } from "@/content/products/categories";
 import type { Product } from "@/types/product";
 
-export default function ProductManageRow({
-  product,
-  supabaseUrl,
-}: {
-  product: Product;
-  supabaseUrl: string;
-}) {
+export default function ProductManageRow({ product }: { product: Product }) {
   const router = useRouter();
   const [status, setStatus] = useState(product.status);
   const [pending, setPending] = useState(false);
@@ -25,7 +17,7 @@ export default function ProductManageRow({
     setPending(true);
     setError(null);
     const supabase = createSupabaseBrowserClient();
-    const nextStatus = status === "active" ? "sold" : "active";
+    const nextStatus = status === "active" ? "archived" : "active";
 
     const { error: updateError } = await supabase
       .from("products")
@@ -55,22 +47,28 @@ export default function ProductManageRow({
     router.refresh();
   }
 
+  const imageUrl = product.images[0] ?? null;
+
   return (
     <div className="flex gap-3 bg-white rounded-2xl p-3">
       <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-black/5 shrink-0">
-        <Image
-          src={productImagePublicUrl(supabaseUrl, product.image_path)}
-          alt={product.title}
-          fill
-          sizes="64px"
-          className="object-cover"
-        />
+        {imageUrl ? (
+          <Image src={imageUrl} alt={product.name} fill sizes="64px" className="object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-[10px] text-black/30">
+            Pas de photo
+          </div>
+        )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{product.title}</p>
-        <p className="text-xs text-black/60">{getCategoryLabel(product.category)}</p>
-        <p className="text-sm font-semibold">{product.price_fcfa.toLocaleString("fr-FR")} FCFA</p>
+        <p className="text-sm font-medium truncate">{product.name}</p>
+        {product.categoryName && (
+          <p className="text-xs text-black/60">{product.categoryName}</p>
+        )}
+        <p className="text-sm font-semibold">
+          {product.base_price.toLocaleString("fr-FR")} {product.currency}
+        </p>
 
         <div className="flex gap-2 mt-2">
           <button
@@ -79,7 +77,7 @@ export default function ProductManageRow({
             disabled={pending}
             className="text-xs border border-black rounded-full px-3 py-1 disabled:opacity-50"
           >
-            {status === "active" ? "Marquer vendu" : "Remettre en vente"}
+            {status === "active" ? "Retirer de la vente" : "Remettre en vente"}
           </button>
 
           {confirmDelete ? (

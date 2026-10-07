@@ -2,9 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { resolveShopBySlug } from "@/server/shops/shops";
 import { getProductsForShop } from "@/server/products/products";
-import { env } from "@/lib/env";
 import ProductCard from "@/components/products/ProductCard";
-import { officialBackgroundPublicUrl, personalBackgroundPublicUrl } from "@/lib/background-image";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -19,7 +17,7 @@ export async function generateMetadata({ params }: Props) {
   }
   return {
     title: `${result.shop.name} — Revant`,
-    description: result.shop.slogan ?? result.shop.description ?? undefined,
+    description: result.shop.description ?? undefined,
   };
 }
 
@@ -40,31 +38,14 @@ export default async function ShopPublicPage({ params }: Props) {
   }
 
   const { shop } = result;
-  const typeLabel = shop.shop_type === "standard" ? null : getShopTypeLabel(shop.shop_type);
+  const isDefaultType = !shop.is_restaurant && !shop.is_pro && !shop.is_premium;
+  const typeLabel = isDefaultType ? null : getShopTypeLabel(shop);
   const products = await getProductsForShop(supabase, shop.id);
-  const supabaseUrl = env.supabaseUrl();
 
-  // Arrière-plan de la boutique : officiel OU personnel (jamais les
-  // deux, contrainte shops_background_exclusive) — sinon aucun,
-  // fallback silencieux vers le fond beige par défaut de Revant
-  // (section 13 du prompt maître "arrière-plans" : jamais d'image cassée).
-  let backgroundUrl: string | null = null;
-  if (shop.background_id) {
-    const { data: bg } = await supabase
-      .from("backgrounds")
-      .select("image_path")
-      .eq("id", shop.background_id)
-      .eq("is_active", true)
-      .maybeSingle();
-    if (bg) backgroundUrl = officialBackgroundPublicUrl(supabaseUrl, bg.image_path);
-  } else if (shop.personal_background_id) {
-    const { data: bg } = await supabase
-      .from("user_backgrounds")
-      .select("image_path")
-      .eq("id", shop.personal_background_id)
-      .maybeSingle();
-    if (bg) backgroundUrl = personalBackgroundPublicUrl(supabaseUrl, bg.image_path);
-  }
+  // Arrière-plan de la boutique : image personnalisée si définie, sinon
+  // fallback silencieux vers le fond beige par défaut de Revant (jamais
+  // d'image cassée).
+  const backgroundUrl = shop.background_image_url;
 
   return (
     <div
@@ -81,8 +62,6 @@ export default async function ShopPublicPage({ params }: Props) {
           )}
         </div>
 
-        {shop.slogan && <p className="text-sm text-black/60 mb-4">{shop.slogan}</p>}
-
         {shop.description && (
           <p className="text-sm text-black/80 mb-6 whitespace-pre-line">{shop.description}</p>
         )}
@@ -94,7 +73,7 @@ export default async function ShopPublicPage({ params }: Props) {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} supabaseUrl={supabaseUrl} />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           )}

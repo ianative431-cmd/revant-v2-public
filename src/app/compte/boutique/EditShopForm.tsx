@@ -5,14 +5,12 @@ import { updateShop } from "@/server/shops/actions";
 
 type Props = {
   initialName: string;
-  initialSlogan: string;
   initialDescription: string;
   initialSlug: string;
 };
 
 export default function EditShopForm({
   initialName,
-  initialSlogan,
   initialDescription,
   initialSlug,
 }: Props) {
@@ -29,17 +27,6 @@ export default function EditShopForm({
           minLength={2}
           maxLength={80}
           defaultValue={initialName}
-          className="mt-1 w-full border rounded-xl px-4 py-3 text-sm"
-        />
-      </label>
-
-      <label className="text-xs text-black/60">
-        Slogan
-        <input
-          name="slogan"
-          type="text"
-          maxLength={120}
-          defaultValue={initialSlogan}
           className="mt-1 w-full border rounded-xl px-4 py-3 text-sm"
         />
       </label>

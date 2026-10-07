@@ -4,7 +4,6 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { getProductsForShop } from "@/server/products/products";
-import { env } from "@/lib/env";
 import ProductManageRow from "./ProductManageRow";
 
 export default async function MesProduitsPage() {
@@ -17,7 +16,6 @@ export default async function MesProduitsPage() {
   }
 
   const products = await getProductsForShop(supabase, shop.id);
-  const supabaseUrl = env.supabaseUrl();
 
   return (
     <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
@@ -41,7 +39,7 @@ export default async function MesProduitsPage() {
         ) : (
           <div className="flex flex-col gap-3">
             {products.map((product) => (
-              <ProductManageRow key={product.id} product={product} supabaseUrl={supabaseUrl} />
+              <ProductManageRow key={product.id} product={product} />
             ))}
           </div>
         )}

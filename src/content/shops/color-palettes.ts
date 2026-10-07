@@ -1,4 +1,4 @@
-import type { ShopType } from "@/types/shop";
+import type { Shop } from "@/types/shop";
 
 /**
  * "standard" = comptes normaux. "pro" = comptes professionnels (types de
@@ -58,9 +58,10 @@ export const SHOP_COLOR_PALETTES: ShopColorPalette[] = [
  * pour l'affichage et pour la revérification côté serveur (jamais
  * uniquement côté frontend).
  */
-export function getPalettesForShopType(shopType: ShopType): ShopColorPalette[] {
-  const audience: ShopPaletteAudience =
-    shopType === "standard" || shopType === "restaurant" ? "standard" : "pro";
+export function getPalettesForShopType(
+  shop: Pick<Shop, "is_pro" | "is_premium">
+): ShopColorPalette[] {
+  const audience: ShopPaletteAudience = shop.is_pro || shop.is_premium ? "pro" : "standard";
   return SHOP_COLOR_PALETTES.filter((p) => p.audience === audience);
 }
 

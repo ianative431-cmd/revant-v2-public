@@ -1,19 +1,29 @@
-export type ProductStatus = "active" | "sold";
+import type { Enums } from "@/types/database";
 
+export type ProductStatus = Enums<"product_status">;
+
+/**
+ * Modèle réel (table products + product_images + categories, schéma
+ * Supabase actuel) : plusieurs photos par produit (ordonnées), prix
+ * avec devise explicite, catégorie reliée à une vraie table plutôt
+ * qu'une chaîne libre. "sold" n'existe plus comme statut dédié — le
+ * stock (stock_quantity = 0) indique un article épuisé.
+ */
 export type Product = {
   /** Revant ID stable de l'annonce. */
   id: string;
   shop_id: string;
-  title: string;
+  name: string;
   description: string | null;
-  price_fcfa: number;
-  category: string;
-  image_path: string;
+  base_price: number;
+  currency: string;
+  stock_quantity: number;
   status: ProductStatus;
-  /** Arrière-plan officiel choisi pour cette annonce (indépendant de celui de la boutique). */
-  background_id: string | null;
-  /** Arrière-plan personnel choisi pour cette annonce (mutuellement exclusif avec background_id). */
-  personal_background_id: string | null;
+  slug: string;
+  category_id: string | null;
+  categoryName: string | null;
+  /** URLs publiques, dans l'ordre d'affichage (image principale en premier). */
+  images: string[];
   created_at: string;
   updated_at: string;
 };

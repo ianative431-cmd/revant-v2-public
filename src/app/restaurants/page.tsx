@@ -41,9 +41,6 @@ export default async function RestaurantsPage() {
                 className="block bg-white rounded-2xl p-4"
               >
                 <p className="text-sm font-semibold">{shop.name}</p>
-                {shop.slogan && (
-                  <p className="text-xs text-black/60 mt-0.5">{shop.slogan}</p>
-                )}
                 {shop.description && (
                   <p className="text-xs text-black/40 mt-1 line-clamp-2">{shop.description}</p>
                 )}

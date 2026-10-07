@@ -3,7 +3,7 @@ import Link from "next/link";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
-import { env } from "@/lib/env";
+import { getActiveCategories } from "@/server/catalog/categories";
 import NewProductForm from "./NewProductForm";
 
 export default async function NouveauProduitPage() {
@@ -15,6 +15,8 @@ export default async function NouveauProduitPage() {
     redirect("/boutiques/creer");
   }
 
+  const categories = await getActiveCategories(supabase);
+
   return (
     <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm bg-white rounded-[22px] p-8">
@@ -22,7 +24,7 @@ export default async function NouveauProduitPage() {
           ← Mes annonces
         </Link>
         <h1 className="text-xl font-bold mt-4 mb-6">Nouvelle annonce</h1>
-        <NewProductForm shopId={shop.id} supabaseUrl={env.supabaseUrl()} />
+        <NewProductForm shopId={shop.id} categories={categories} />
       </div>
     </div>
   );
