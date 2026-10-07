@@ -1,5 +1,5 @@
 import "server-only";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type AdminOverviewStats = {
   users: number;
@@ -48,15 +48,16 @@ type SnapshotShape = {
 /**
  * Compteurs réels pour le tableau de bord admin. Ne recalcule rien
  * côté frontend : délègue entièrement au RPC admin_overview_snapshot,
- * qui vérifie lui-même côté serveur que l'appelant a un rôle admin
- * (SECURITY DEFINER + vérification interne) et agrège les vraies
- * tables (utilisateurs, boutiques, produits, commandes, litiges, KYC,
- * support). Aucune donnée simulée — si l'appel échoue, l'erreur
- * remonte plutôt que d'afficher un chiffre inventé.
+ * SECURITY DEFINER et qui vérifie lui-même côté base que l'appelant a
+ * un rôle admin (has_any_admin_role) avant de renvoyer quoi que ce
+ * soit — appelé depuis le client normal (session de l'admin), jamais
+ * besoin de la clé service role ici. Aucune donnée simulée : si
+ * l'appel échoue, l'erreur remonte plutôt que d'afficher un chiffre
+ * inventé.
  */
 export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
-  const admin = createSupabaseAdminClient();
-  const { data, error } = await admin.rpc("admin_overview_snapshot");
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("admin_overview_snapshot");
 
   if (error) {
     throw new Error(`Impossible de charger les statistiques admin : ${error.message}`);

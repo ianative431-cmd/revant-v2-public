@@ -14,7 +14,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Commandes", href: "/admin/commandes", ready: true },
   { label: "Livraisons", href: "/admin/livraisons", ready: false },
   { label: "Paiements", href: "/admin/paiements", ready: false },
-  { label: "Finance", href: "/admin/finance", ready: false },
+  { label: "Finance", href: "/admin/finance", ready: true },
   { label: "Retraits", href: "/admin/retraits", ready: false },
   { label: "Promotions", href: "/admin/promotions", ready: false },
   { label: "Parrainages", href: "/admin/parrainages", ready: false },
@@ -34,8 +34,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
 export const ADMIN_STUB_REQUIREMENTS: Record<string, string> = {
   "/admin/livraisons": "un vrai suivi de livraison distinct (aujourd'hui, paiement et livraison sont confirmés ensemble en une seule étape par le vendeur)",
   "/admin/paiements": "une intégration de paiement réelle (Visa/Mastercard, mobile money)",
-  "/admin/finance": "un grand livre financier réel (ledger) et des commandes payées",
-  "/admin/retraits": "un portefeuille vendeur réel avec des soldes calculés côté serveur",
+  "/admin/retraits": "une vue détaillée par portefeuille vendeur (l'approbation des retraits se fait déjà depuis Finance)",
   "/admin/promotions": "un système de codes promo/réductions relié aux commandes",
   "/admin/parrainages": "un programme de parrainage avec suivi des invitations",
   "/admin/avis": "un système d'avis (les commandes confirmées existent désormais, mais rien ne relie encore un avis à un achat réel)",
