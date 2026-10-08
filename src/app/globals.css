@@ -1,20 +1,46 @@
 @import "tailwindcss";
 
-:root {
-  /* Charte Revant : deux couleurs, beige et noir (voir ARCHITECTURE.md). */
-  --background: #f3e9da;
-  --foreground: #000000;
+/*
+ * Charte Revant : deux palettes réelles, Terracotta (par défaut) et
+ * Slate-Lilac, remplaçant l'ancienne charte beige/noir. La palette
+ * active est posée en attribut sur <html> par le serveur (cookie,
+ * voir src/server/theme/site-palette.ts) puis modifiable à tout
+ * moment côté client (voir PaletteSwitcher) sans rechargement.
+ *
+ * --brand-surface est volontairement plus sombre que --brand-bg en
+ * Terracotta et plus clair que --brand-bg en Slate-Lilac (valeurs
+ * exactes fournies par Mourad) — --brand-on-surface compense pour
+ * garder un texte lisible sur les cartes dans les deux cas.
+ */
+:root,
+:root[data-site-palette="terracotta"] {
+  --brand-bg: #a79986;
+  --brand-surface: #3e3d38;
+  --brand-accent: #803e2f;
+  --brand-text: #1f1d20;
+  --brand-on-surface: #f3ede6;
+}
+
+:root[data-site-palette="slate-lilac"] {
+  --brand-bg: #dedcdc;
+  --brand-surface: #c5bac4;
+  --brand-accent: #57707a;
+  --brand-text: #191d23;
+  --brand-on-surface: #191d23;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-text: var(--brand-text);
+  --color-brand-on-surface: var(--brand-on-surface);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--brand-bg);
+  color: var(--brand-text);
   font-family: Arial, Helvetica, sans-serif;
 }

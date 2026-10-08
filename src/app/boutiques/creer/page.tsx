@@ -15,10 +15,10 @@ export default async function CreerBoutiquePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
+    <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm">
         <h1 className="text-xl font-bold mb-1">Créer ma boutique</h1>
-        <p className="text-sm text-black/60 mb-6">
+        <p className="text-sm text-brand-text/60 mb-6">
           Ton adresse publique sera générée automatiquement à partir du nom — tu pourras la
           changer plus tard.
         </p>

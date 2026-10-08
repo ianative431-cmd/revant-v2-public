@@ -18,9 +18,9 @@ export default async function MesProduitsPage() {
   const products = await getProductsForShop(supabase, shop.id);
 
   return (
-    <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
+    <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm">
-        <Link href="/compte/boutique" className="text-sm underline text-black/60">
+        <Link href="/compte/boutique" className="text-sm underline text-brand-text/60">
           ← Ma boutique
         </Link>
 
@@ -28,14 +28,14 @@ export default async function MesProduitsPage() {
           <h1 className="text-xl font-bold">Mes annonces</h1>
           <Link
             href="/compte/boutique/produits/nouveau"
-            className="bg-black text-white rounded-full px-4 py-2 text-xs font-medium"
+            className="bg-brand-accent text-white rounded-full px-4 py-2 text-xs font-medium"
           >
             + Ajouter
           </Link>
         </div>
 
         {products.length === 0 ? (
-          <p className="text-sm text-black/60 text-center py-10">Aucune annonce pour l&apos;instant.</p>
+          <p className="text-sm text-brand-text/60 text-center py-10">Aucune annonce pour l&apos;instant.</p>
         ) : (
           <div className="flex flex-col gap-3">
             {products.map((product) => (

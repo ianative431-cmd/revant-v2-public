@@ -29,13 +29,13 @@ export default async function ProductPage({ params }: Props) {
   const imageUrl = product.images[0] ?? null;
 
   return (
-    <div className="min-h-screen bg-[#F3E9DA] px-4 py-6">
+    <div className="min-h-screen bg-brand-bg px-4 py-6">
       <div className="max-w-md mx-auto">
         <Link href="/" className="text-sm underline">
           ← Retour
         </Link>
 
-        <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 mt-4">
+        <div className="relative aspect-square rounded-2xl overflow-hidden bg-brand-text/5 mt-4">
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -45,12 +45,12 @@ export default async function ProductPage({ params }: Props) {
               className="object-cover"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-xs text-black/30">
+            <div className="absolute inset-0 flex items-center justify-center text-xs text-brand-text/30">
               Pas de photo
             </div>
           )}
           {outOfStock && (
-            <span className="absolute top-3 left-3 bg-black text-white text-xs font-medium px-3 py-1 rounded-full">
+            <span className="absolute top-3 left-3 bg-brand-accent text-white text-xs font-medium px-3 py-1 rounded-full">
               Épuisé
             </span>
           )}
@@ -61,7 +61,7 @@ export default async function ProductPage({ params }: Props) {
           {product.base_price.toLocaleString("fr-FR")} {product.currency}
         </p>
         {product.categoryName && (
-          <p className="text-xs text-black/60 mb-3">{product.categoryName}</p>
+          <p className="text-xs text-brand-text/60 mb-3">{product.categoryName}</p>
         )}
 
         {product.description && (
@@ -71,7 +71,7 @@ export default async function ProductPage({ params }: Props) {
         {shop && (
           <Link
             href={`/shop/${shop.slug}`}
-            className="block text-center border border-black rounded-full py-3 text-sm font-medium"
+            className="block text-center border border-brand-accent rounded-full py-3 text-sm font-medium"
           >
             Voir la boutique {shop.name}
           </Link>
@@ -84,7 +84,7 @@ export default async function ProductPage({ params }: Props) {
             ) : (
               <Link
                 href="/connexion"
-                className="block text-center bg-black text-white rounded-full py-3 text-sm font-medium"
+                className="block text-center bg-brand-accent text-white rounded-full py-3 text-sm font-medium"
               >
                 Se connecter pour commander
               </Link>

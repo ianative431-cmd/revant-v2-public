@@ -53,7 +53,7 @@ export default function CookieConsentBanner() {
 
   return (
     <div className="fixed bottom-0 inset-x-0 z-50 flex justify-center px-4 pb-4">
-      <div className="w-full max-w-lg bg-white rounded-[22px] shadow-lg p-5 border border-black/10">
+      <div className="w-full max-w-lg bg-white rounded-[22px] shadow-lg p-5 border border-brand-text/10">
         {mode === "banner" ? (
           <>
             <p className="text-sm mb-4">
@@ -67,7 +67,7 @@ export default function CookieConsentBanner() {
             <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => save({ categories: defaultCategories(true), consentType: "accept_all" })}
-                className="flex-1 bg-black text-white rounded-full py-2.5 text-sm font-medium"
+                className="flex-1 bg-brand-accent text-white rounded-full py-2.5 text-sm font-medium"
               >
                 Tout accepter
               </button>
@@ -75,13 +75,13 @@ export default function CookieConsentBanner() {
                 onClick={() =>
                   save({ categories: defaultCategories(false), consentType: "reject_non_essential" })
                 }
-                className="flex-1 border border-black rounded-full py-2.5 text-sm font-medium"
+                className="flex-1 border border-brand-accent rounded-full py-2.5 text-sm font-medium"
               >
                 Refuser les non essentiels
               </button>
               <button
                 onClick={() => setMode("customize")}
-                className="flex-1 bg-black/5 rounded-full py-2.5 text-sm font-medium"
+                className="flex-1 bg-brand-text/5 rounded-full py-2.5 text-sm font-medium"
               >
                 Personnaliser
               </button>
@@ -107,9 +107,9 @@ export default function CookieConsentBanner() {
                     />
                     <span>
                       <span className="font-medium">{meta.label}</span>
-                      {isNecessary && <span className="text-black/40"> (toujours actif)</span>}
+                      {isNecessary && <span className="text-brand-text/40"> (toujours actif)</span>}
                       <br />
-                      <span className="text-black/60">{meta.description}</span>
+                      <span className="text-brand-text/60">{meta.description}</span>
                     </span>
                   </label>
                 );
@@ -118,13 +118,13 @@ export default function CookieConsentBanner() {
             <div className="flex gap-2">
               <button
                 onClick={() => setMode("banner")}
-                className="flex-1 bg-black/5 rounded-full py-2.5 text-sm font-medium"
+                className="flex-1 bg-brand-text/5 rounded-full py-2.5 text-sm font-medium"
               >
                 Retour
               </button>
               <button
                 onClick={() => save({ categories, consentType: "custom" })}
-                className="flex-1 bg-black text-white rounded-full py-2.5 text-sm font-medium"
+                className="flex-1 bg-brand-accent text-white rounded-full py-2.5 text-sm font-medium"
               >
                 Enregistrer mes choix
               </button>

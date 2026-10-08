@@ -11,9 +11,9 @@ export default async function RestaurantsPage() {
   const restaurants = await getActiveRestaurants(supabase);
 
   return (
-    <div className="min-h-screen bg-[#F3E9DA]">
+    <div className="min-h-screen bg-brand-bg">
       <header className="px-4 pt-6 pb-4 flex items-center justify-between">
-        <Link href="/" className="text-sm underline text-black/60">
+        <Link href="/" className="text-sm underline text-brand-text/60">
           ← Accueil
         </Link>
         <span className="text-sm font-medium">Restaurants</span>
@@ -22,12 +22,12 @@ export default async function RestaurantsPage() {
       <main className="px-4 pb-16">
         {restaurants.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-sm text-black/60 mb-4">
+            <p className="text-sm text-brand-text/60 mb-4">
               Aucun restaurant sur Revant pour l&apos;instant.
             </p>
             <Link
               href="/boutiques/creer"
-              className="inline-block bg-black text-white rounded-full px-6 py-3 text-sm font-medium"
+              className="inline-block bg-brand-accent text-white rounded-full px-6 py-3 text-sm font-medium"
             >
               Ouvrir mon restaurant sur Revant
             </Link>
@@ -42,7 +42,7 @@ export default async function RestaurantsPage() {
               >
                 <p className="text-sm font-semibold">{shop.name}</p>
                 {shop.description && (
-                  <p className="text-xs text-black/40 mt-1 line-clamp-2">{shop.description}</p>
+                  <p className="text-xs text-brand-text/40 mt-1 line-clamp-2">{shop.description}</p>
                 )}
               </Link>
             ))}

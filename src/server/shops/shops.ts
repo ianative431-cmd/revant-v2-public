@@ -63,3 +63,21 @@ export async function getActiveRestaurants(supabase: SupabaseClient): Promise<Sh
     .order("created_at", { ascending: false });
   return (data ?? []) as Shop[];
 }
+
+/**
+ * Boutiques réelles et actives (tous types confondus), pour la
+ * section "Boutiques en vedette" de l'accueil. Aucune boutique
+ * fictive : liste vide tant qu'aucun vendeur n'est actif.
+ */
+export async function getActiveShops(
+  supabase: SupabaseClient,
+  options?: { limit?: number }
+): Promise<Shop[]> {
+  const { data } = await supabase
+    .from("shops")
+    .select("*")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(options?.limit ?? 8);
+  return (data ?? []) as Shop[];
+}

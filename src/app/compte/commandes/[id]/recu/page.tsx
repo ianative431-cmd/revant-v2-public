@@ -39,9 +39,9 @@ export default async function RecuPage({ params }: Props) {
   const qrCodeDataUrl = await generateQrCodeDataUrl(verifyUrl);
 
   return (
-    <div className="min-h-screen bg-[#F3E9DA] px-4 py-10 flex justify-center">
+    <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm">
-        <Link href="/compte/commandes" className="text-sm underline text-black/60">
+        <Link href="/compte/commandes" className="text-sm underline text-brand-text/60">
           ← Mes commandes
         </Link>
 
@@ -50,15 +50,15 @@ export default async function RecuPage({ params }: Props) {
             <span className="text-lg font-bold" style={{ fontFamily: "Georgia, serif" }}>
               Revant
             </span>
-            <span className="text-xs text-black/50">
+            <span className="text-xs text-brand-text/50">
               {order.confirmed_at
                 ? new Date(order.confirmed_at).toLocaleDateString("fr-FR")
                 : new Date(order.created_at).toLocaleDateString("fr-FR")}
             </span>
           </div>
 
-          <div className="border-b border-dashed border-black/15 pb-3 mb-3">
-            <div className="flex justify-between text-xs text-black/40 uppercase mb-2">
+          <div className="border-b border-dashed border-brand-text/15 pb-3 mb-3">
+            <div className="flex justify-between text-xs text-brand-text/40 uppercase mb-2">
               <span>Description</span>
               <span>Montant</span>
             </div>
@@ -75,7 +75,7 @@ export default async function RecuPage({ params }: Props) {
             <span>{order.price_fcfa.toLocaleString("fr-FR")} FCFA</span>
           </div>
 
-          <dl className="text-xs text-black/50 space-y-1 mb-6">
+          <dl className="text-xs text-brand-text/50 space-y-1 mb-6">
             <div className="flex justify-between">
               <dt>Vendu par</dt>
               <dd>{order.shop_name}</dd>
@@ -92,10 +92,10 @@ export default async function RecuPage({ params }: Props) {
             </div>
           </dl>
 
-          <div className="flex flex-col items-center border-t border-dashed border-black/15 pt-4">
+          <div className="flex flex-col items-center border-t border-dashed border-brand-text/15 pt-4">
             {/* eslint-disable-next-line @next/next/no-img-element -- data URL générée côté serveur */}
             <img src={qrCodeDataUrl} alt="QR code de vérification du reçu" width={120} height={120} />
-            <p className="text-[10px] text-black/40 mt-2 text-center">
+            <p className="text-[10px] text-brand-text/40 mt-2 text-center">
               Paiement réglé directement entre acheteur et vendeur — confirmé par le vendeur sur
               Revant.
             </p>
