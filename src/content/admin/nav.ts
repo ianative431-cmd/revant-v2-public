@@ -20,7 +20,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Parrainages", href: "/admin/parrainages", ready: false },
   { label: "Avis & signalements", href: "/admin/avis", ready: false },
   { label: "Messages", href: "/admin/messages", ready: false },
-  { label: "WhatsApp", href: "/admin/whatsapp", ready: false },
+  { label: "WhatsApp", href: "/admin/whatsapp", ready: true },
   { label: "Sécurité", href: "/admin/securite", ready: false },
   { label: "Paramètres", href: "/admin/parametres", ready: false },
 ];
@@ -39,7 +39,6 @@ export const ADMIN_STUB_REQUIREMENTS: Record<string, string> = {
   "/admin/parrainages": "un programme de parrainage avec suivi des invitations",
   "/admin/avis": "un système d'avis (les commandes confirmées existent désormais, mais rien ne relie encore un avis à un achat réel)",
   "/admin/messages": "une messagerie interne entre acheteurs et vendeurs",
-  "/admin/whatsapp": "une intégration WhatsApp Business API",
   "/admin/securite": "des journaux d'audit et de sécurité réels à afficher",
   "/admin/parametres": "des paramètres de plateforme réellement configurables",
 };

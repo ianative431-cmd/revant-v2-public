@@ -67,3 +67,21 @@ export async function requireAdmin() {
 
   return user;
 }
+
+/**
+ * Garde-fou réservé au super administrateur (ex. intégration Meta
+ * WhatsApp Business : la connexion d'un compte professionnel entier
+ * ne doit pas être accessible à un rôle admin plus restreint).
+ * Redirige vers le tableau de bord admin plutôt que d'afficher la
+ * page à quelqu'un qui n'a pas ce rôle précis.
+ */
+export async function requireSuperAdmin() {
+  const user = await requireUserWithLegalConsent();
+  const roles = await getCurrentUserRoles();
+
+  if (!roles.includes("super_admin")) {
+    redirect("/admin");
+  }
+
+  return user;
+}

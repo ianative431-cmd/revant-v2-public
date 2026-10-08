@@ -1674,6 +1674,96 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_connection: {
+        Row: {
+          ai_assistant_enabled: boolean
+          auto_replies_enabled: boolean
+          business_name: string | null
+          connected_at: string | null
+          connected_by: string | null
+          human_handoff_enabled: boolean
+          id: number
+          last_error: string | null
+          last_verified_at: string | null
+          meta_business_id: string | null
+          notifications_enabled: boolean
+          phone_number_display: string | null
+          phone_number_id: string | null
+          status: Database["public"]["Enums"]["whatsapp_connection_status"]
+          updated_at: string
+          verification_codes_enabled: boolean
+          waba_id: string | null
+          webhook_status: Database["public"]["Enums"]["whatsapp_webhook_status"]
+          whatsapp_login_enabled: boolean
+        }
+        Insert: {
+          ai_assistant_enabled?: boolean
+          auto_replies_enabled?: boolean
+          business_name?: string | null
+          connected_at?: string | null
+          connected_by?: string | null
+          human_handoff_enabled?: boolean
+          id?: number
+          last_error?: string | null
+          last_verified_at?: string | null
+          meta_business_id?: string | null
+          notifications_enabled?: boolean
+          phone_number_display?: string | null
+          phone_number_id?: string | null
+          status?: Database["public"]["Enums"]["whatsapp_connection_status"]
+          updated_at?: string
+          verification_codes_enabled?: boolean
+          waba_id?: string | null
+          webhook_status?: Database["public"]["Enums"]["whatsapp_webhook_status"]
+          whatsapp_login_enabled?: boolean
+        }
+        Update: {
+          ai_assistant_enabled?: boolean
+          auto_replies_enabled?: boolean
+          business_name?: string | null
+          connected_at?: string | null
+          connected_by?: string | null
+          human_handoff_enabled?: boolean
+          id?: number
+          last_error?: string | null
+          last_verified_at?: string | null
+          meta_business_id?: string | null
+          notifications_enabled?: boolean
+          phone_number_display?: string | null
+          phone_number_id?: string | null
+          status?: Database["public"]["Enums"]["whatsapp_connection_status"]
+          updated_at?: string
+          verification_codes_enabled?: boolean
+          waba_id?: string | null
+          webhook_status?: Database["public"]["Enums"]["whatsapp_webhook_status"]
+          whatsapp_login_enabled?: boolean
+        }
+        Relationships: []
+      }
+      whatsapp_secret: {
+        Row: {
+          access_token: string | null
+          id: number
+          token_expires_at: string | null
+          updated_at: string
+          webhook_verify_token: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          id?: number
+          token_expires_at?: string | null
+          updated_at?: string
+          webhook_verify_token?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          id?: number
+          token_expires_at?: string | null
+          updated_at?: string
+          webhook_verify_token?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       admin_finance_summary: {
@@ -1788,6 +1878,14 @@ export type Database = {
         | "reserve"
         | "release"
       message_type: "text" | "order_link" | "product_link"
+      whatsapp_connection_status:
+        | "disconnected"
+        | "connecting"
+        | "connected"
+        | "expired"
+        | "error"
+        | "unavailable"
+      whatsapp_webhook_status: "operational" | "error" | "not_configured"
       notification_type:
         | "order"
         | "payment"
