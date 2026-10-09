@@ -9,7 +9,7 @@ export default function CommissionForm({ initialValue }: { initialValue: number 
   return (
     <form action={formAction} className="flex items-end gap-2">
       <div>
-        <label className="block text-[11px] text-black/50 mb-1" htmlFor="commissionPercent">
+        <label className="block text-[11px] text-white/40 mb-1" htmlFor="commissionPercent">
           Commission Revant (%)
         </label>
         <input
@@ -20,17 +20,17 @@ export default function CommissionForm({ initialValue }: { initialValue: number 
           min={0}
           max={100}
           defaultValue={initialValue}
-          className="w-24 border border-black/10 rounded-lg px-3 py-2 text-sm"
+          className="w-24 bg-[#0B0B10] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white/30"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="bg-black text-white rounded-full px-4 py-2 text-sm font-medium disabled:opacity-50"
+        className="bg-white text-[#0B0B10] rounded-full px-4 py-2 text-sm font-medium disabled:opacity-50"
       >
         {pending ? "..." : "Enregistrer"}
       </button>
-      {state.error && <p className="text-red-600 text-[11px] ml-2">{state.error}</p>}
+      {state.error && <p className="text-red-400 text-[11px] ml-2">{state.error}</p>}
     </form>
   );
 }

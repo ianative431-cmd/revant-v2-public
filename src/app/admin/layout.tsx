@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/server/auth/roles";
+import { requireAdmin, getCurrentUserRole } from "@/server/auth/roles";
 
 // Données admin réelles, propres à chaque requête authentifiée — ne
 // doivent jamais être figées au moment du build ni mises en cache
@@ -15,11 +15,12 @@ import AdminSidebar from "./AdminSidebar";
  * chaque page l'appelait individuellement).
  */
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
-  await requireAdmin();
+  const user = await requireAdmin();
+  const role = await getCurrentUserRole();
 
   return (
     <div className="min-h-screen bg-brand-bg md:flex">
-      <AdminSidebar />
+      <AdminSidebar adminEmail={user.email ?? "—"} adminRole={role} />
       <div className="flex-1 min-w-0">
         <main className="px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>
