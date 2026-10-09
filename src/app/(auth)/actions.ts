@@ -3,6 +3,11 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getRequiredConsentVersions } from "@/server/legal/consent";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  RATE_LIMIT_ERROR_MESSAGE,
+} from "@/server/security/rate-limit";
 
 export type AuthActionState = { error: string | null };
 
@@ -64,6 +69,15 @@ export async function signUpWithEmail(
     return { error: "Le mot de passe doit contenir au moins 8 caractères." };
   }
 
+  const ip = await getClientIdentifier();
+  const [allowedByEmail, allowedByIp] = await Promise.all([
+    checkRateLimit(`signup:email:${email}`, 5, 3600),
+    checkRateLimit(`signup:ip:${ip}`, 15, 3600),
+  ]);
+  if (!allowedByEmail || !allowedByIp) {
+    return { error: RATE_LIMIT_ERROR_MESSAGE };
+  }
+
   const consentResult = buildLegalConsentOrError(formData);
   if (consentResult.error) return { error: consentResult.error };
 
@@ -94,6 +108,15 @@ export async function signInWithEmail(
     return { error: "Identifiants invalides." };
   }
 
+  const ip = await getClientIdentifier();
+  const [allowedByEmail, allowedByIp] = await Promise.all([
+    checkRateLimit(`signin:email:${email}`, 10, 900),
+    checkRateLimit(`signin:ip:${ip}`, 30, 900),
+  ]);
+  if (!allowedByEmail || !allowedByIp) {
+    return { error: RATE_LIMIT_ERROR_MESSAGE };
+  }
+
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -115,6 +138,17 @@ export async function sendPhoneOtp(
 
   if (!isValidNigerPhone(phone)) {
     return { error: "Numéro invalide. Format attendu : +227XXXXXXXX." };
+  }
+
+  // Fenêtre courte et seuil bas : chaque SMS envoyé a un coût réel
+  // (Twilio), contrairement aux autres limites de cette page.
+  const ip = await getClientIdentifier();
+  const [allowedByPhone, allowedByIp] = await Promise.all([
+    checkRateLimit(`sms:phone:${phone}`, 3, 600),
+    checkRateLimit(`sms:ip:${ip}`, 8, 600),
+  ]);
+  if (!allowedByPhone || !allowedByIp) {
+    return { error: RATE_LIMIT_ERROR_MESSAGE };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -148,6 +182,14 @@ export async function verifyPhoneOtp(
 
   if (!isValidNigerPhone(phone) || !/^\d{4,8}$/.test(code)) {
     return { error: "Code invalide." };
+  }
+
+  // Protection anti-bruteforce du code à 4-8 chiffres : seuil bas,
+  // par numéro ciblé (pas seulement par IP, qui peut être partagée
+  // sur un réseau mobile).
+  const allowedByPhone = await checkRateLimit(`otp-verify:phone:${phone}`, 8, 600);
+  if (!allowedByPhone) {
+    return { error: RATE_LIMIT_ERROR_MESSAGE };
   }
 
   const supabase = await createSupabaseServerClient();

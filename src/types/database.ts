@@ -1806,6 +1806,14 @@ export type Database = {
         Args: { p_action: string; p_note?: string; p_report_id: string }
         Returns: undefined
       }
+      check_rate_limit: {
+        Args: {
+          p_key: string
+          p_max_attempts: number
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
       create_payment_intent: {
         Args: {
           p_idempotency_key: string

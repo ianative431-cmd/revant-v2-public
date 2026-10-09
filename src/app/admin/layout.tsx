@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   await requireAdmin();
 
   return (
-    <div className="min-h-screen bg-[#F3E9DA] md:flex">
+    <div className="min-h-screen bg-brand-bg md:flex">
       <AdminSidebar />
       <div className="flex-1 min-w-0">
         <main className="px-4 py-6 md:px-8 md:py-8">{children}</main>
