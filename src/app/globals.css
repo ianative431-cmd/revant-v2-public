@@ -39,8 +39,62 @@
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
+html {
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 1rem;
+}
+
 body {
+  min-height: 100%;
+  margin: 0;
   background: var(--brand-bg);
   color: var(--brand-text);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+img, video {
+  height: auto;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button, [role="button"], a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, input, select, textarea, a {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand-accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  html { scroll-padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
+
+@media (min-width: 1600px) {
+  body { font-size: 1.0625rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
