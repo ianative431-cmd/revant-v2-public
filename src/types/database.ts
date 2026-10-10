@@ -764,7 +764,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          buyer_id?: string
+          buyer_id?: string | null
           cancelled_at?: string | null
           created_at?: string
           currency?: string
