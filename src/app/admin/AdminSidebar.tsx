@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -94,9 +95,7 @@ export default function AdminSidebar({
       {/* Desktop : colonne fixe sombre */}
       <aside className="hidden md:flex md:flex-col md:w-64 md:shrink-0 md:min-h-screen md:bg-[#0B0B10] md:py-6 md:px-3">
         <Link href="/" className="flex items-center gap-2 px-3 mb-8">
-          <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white font-bold text-sm">
-            R
-          </span>
+          <Image src="/images/logo-revant.svg" alt="Revant" width={32} height={32} className="rounded-lg" />
           <span className="text-white font-semibold text-base" style={{ fontFamily: "Georgia, serif" }}>
             Revant
           </span>
