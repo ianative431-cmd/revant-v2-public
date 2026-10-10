@@ -76,10 +76,15 @@ export default function NewProductForm({
 
     setStatus("submitting");
 
+    let uploadedPath: string | null = null;
+    let uploaded = false;
+    let createdProductId: string | null = null;
+
     try {
       const compressed = await compressProductImage(file);
       const supabase = createSupabaseBrowserClient();
       const path = buildProductImagePath(shopId);
+      uploadedPath = path;
 
       const { error: uploadError } = await supabase.storage
         .from(PRODUCT_IMAGE_BUCKET)
@@ -89,6 +94,7 @@ export default function NewProductForm({
         setStatus("error-network");
         return;
       }
+      uploaded = true;
 
       const {
         data: { publicUrl },
@@ -115,6 +121,8 @@ export default function NewProductForm({
         return;
       }
 
+      createdProductId = product.id;
+
       const { error: imageError } = await supabase.from("product_images").insert({
         product_id: product.id,
         image_url: publicUrl,
@@ -122,6 +130,11 @@ export default function NewProductForm({
       });
 
       if (imageError) {
+        // Évite une annonce publiée sans image si l'association échoue.
+        await supabase.from("products").delete().eq("id", product.id);
+        createdProductId = null;
+        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
+        uploaded = false;
         setStatus("error-generic");
         return;
       }
@@ -129,6 +142,18 @@ export default function NewProductForm({
       router.push("/compte/boutique/produits");
       router.refresh();
     } catch {
+      // Nettoyage best-effort en cas d'erreur après l'envoi de l'image.
+      try {
+        const supabase = createSupabaseBrowserClient();
+        if (createdProductId) {
+          await supabase.from("products").delete().eq("id", createdProductId);
+        }
+        if (uploaded && uploadedPath) {
+          await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([uploadedPath]);
+        }
+      } catch {
+        // Ne masque pas l'erreur initiale si le nettoyage échoue aussi.
+      }
       setStatus("error-generic");
     }
   }
