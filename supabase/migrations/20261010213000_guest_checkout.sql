@@ -39,7 +39,8 @@ BEGIN
 
   IF p_guest_name IS NULL OR length(trim(p_guest_name)) < 2 OR length(trim(p_guest_name)) > 100
      OR p_guest_phone IS NULL OR length(trim(p_guest_phone)) < 8 OR length(trim(p_guest_phone)) > 24
-     OR trim(p_guest_phone) !~ '^[0-9+() .-]+     OR p_guest_city IS NULL OR length(trim(p_guest_city)) < 2 OR length(trim(p_guest_city)) > 100
+     OR p_guest_phone ~ '[^0-9+() .-]'
+     OR p_guest_city IS NULL OR length(trim(p_guest_city)) < 2 OR length(trim(p_guest_city)) > 100
      OR p_guest_address IS NULL OR length(trim(p_guest_address)) < 5 OR length(trim(p_guest_address)) > 300
      OR p_tracking_token_hash IS NULL OR p_tracking_token_hash !~ '^[0-9a-f]{64}$' THEN
     RAISE EXCEPTION 'invalid request';
