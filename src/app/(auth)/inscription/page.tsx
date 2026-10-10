@@ -79,6 +79,7 @@ export default function InscriptionPage() {
 
 function EmailSignupForm() {
   const [state, formAction, pending] = useActionState(signUpWithEmail, { error: null });
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
@@ -90,15 +91,26 @@ function EmailSignupForm() {
         placeholder="E-mail"
         className="border rounded-xl px-4 py-3 text-sm"
       />
-      <input
-        name="password"
-        type="password"
-        required
-        minLength={8}
-        maxLength={128}
-        placeholder="Mot de passe (8 caractères min.)"
-        className="border rounded-xl px-4 py-3 text-sm"
-      />
+      <div className="relative">
+        <input
+          name="password"
+          type={showPassword ? "text" : "password"}
+          required
+          minLength={8}
+          maxLength={128}
+          placeholder="Mot de passe (8 caractères min.)"
+          className="w-full border rounded-xl px-4 py-3 pr-20 text-sm"
+        />
+        <button
+          type="button"
+          aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+          aria-pressed={showPassword}
+          onClick={() => setShowPassword((visible) => !visible)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium underline"
+        >
+          {showPassword ? "Masquer" : "Afficher"}
+        </button>
+      </div>
       <LegalSummaryAndConsent />
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}
       <button
