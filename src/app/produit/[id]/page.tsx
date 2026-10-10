@@ -83,10 +83,10 @@ export default async function ProductPage({ params }: Props) {
               <OrderButton productId={product.id} />
             ) : (
               <Link
-                href="/connexion"
+                href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`}
                 className="block text-center bg-brand-accent text-white rounded-full py-3 text-sm font-medium"
               >
-                Se connecter pour commander
+                Acheter sans compte
               </Link>
             )}
           </div>
