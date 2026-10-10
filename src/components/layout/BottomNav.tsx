@@ -24,15 +24,21 @@ function Item({ href, label, icon }: { href: string; label: string; icon: React.
 export default async function BottomNav() {
   const user = await getCurrentUser();
   let publishHref = "/boutiques/creer";
+  let shopHref = "/boutiques";
+  let shopLabel = "Boutiques";
   if (user) {
     const supabase = await createSupabaseServerClient();
     const shop = await getShopByOwnerId(supabase, user.id);
-    if (shop) publishHref = "/compte/boutique/produits/nouveau";
+    if (shop) {
+      publishHref = "/compte/boutique/produits/nouveau";
+      shopHref = "/compte/boutique";
+      shopLabel = "Ma boutique";
+    }
   }
   return (
     <nav aria-label="Navigation principale" className="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-5xl items-center justify-around rounded-full bg-black px-2 pb-[env(safe-area-inset-bottom,0px)] shadow-2xl">
       <Item href="/" label="Accueil" icon={<HomeIcon/>}/>
-      <Item href="/compte/boutique" label="Boutique" icon={<ShopIcon/>}/>
+      <Item href={shopHref} label={shopLabel} icon={<ShopIcon/>}/>
       <Link href={publishHref} aria-label="Publier une annonce" className="relative -mt-6 mx-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-black shadow-lg ring-4 ring-[#f7f7f7]"><PlusIcon/></Link>
       <Item href="/compte/commandes" label="Commandes" icon={<WalletIcon/>}/>
       <Item href="/compte" label="Profil" icon={<ProfileIcon/>}/>

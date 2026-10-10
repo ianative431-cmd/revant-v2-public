@@ -29,13 +29,27 @@ const HERO_PHOTO = "https://images.unsplash.com/photo-1514435116008-a80913c597af
 
 export default async function Home({ searchParams }: Props) {
   const { categorie, q } = await searchParams;
-  const supabase = await createSupabaseServerClient();
-  const categories = await getActiveCategories(supabase);
+  // Le catalogue public ne doit jamais être bloqué par l'absence de session
+  // ou par une indisponibilité temporaire de la configuration Supabase.
+  let categories: Awaited<ReturnType<typeof getActiveCategories>> = [];
+  let loadedProducts: Awaited<ReturnType<typeof getActiveProducts>> = [];
+  let shops: Awaited<ReturnType<typeof getActiveShops>> = [];
+  try {
+    const supabase = await createSupabaseServerClient();
+    categories = await getActiveCategories(supabase);
+    const categoryId = categories.find((c) => c.slug === categorie)?.id;
+    [loadedProducts, shops] = await Promise.all([
+      getActiveProducts(supabase, { categoryId, limit: 24 }),
+      getActiveShops(supabase, { limit: 8 }),
+    ]);
+  } catch {
+    // On conserve la navigation publique et les états vides si le backend
+    // n'est pas configuré, sans renvoyer le visiteur vers la connexion.
+    categories = [];
+    loadedProducts = [];
+    shops = [];
+  }
   const activeCategory = categories.find((c) => c.slug === categorie);
-  const [loadedProducts, shops] = await Promise.all([
-    getActiveProducts(supabase, { categoryId: activeCategory?.id, limit: 24 }),
-    getActiveShops(supabase, { limit: 8 }),
-  ]);
   const term = q?.trim().toLocaleLowerCase("fr");
   const products = term
     ? loadedProducts.filter((p) => `${p.name} ${p.description ?? ""} ${p.categoryName ?? ""}`.toLocaleLowerCase("fr").includes(term))
@@ -101,11 +115,11 @@ export default async function Home({ searchParams }: Props) {
         ) : (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {FARM_PHOTOS.map((farm) => (
-              <div key={farm.title} className="relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200">
-                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${farm.photo}")` }} />
+              <Link key={farm.title} href="/boutiques" aria-label={`Ouvrir le répertoire des boutiques — ${farm.title}`} className="group relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200 outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black">
+                <div className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105" style={{ backgroundImage: `url("${farm.photo}")` }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                <div className="absolute bottom-3 left-3 text-white"><strong className="block text-sm">{farm.title}</strong><span className="text-[11px] text-white/80">{farm.subtitle}</span></div>
-              </div>
+                <div className="absolute bottom-3 left-3 right-3 text-white"><strong className="block text-sm">{farm.title}</strong><span className="text-[11px] text-white/80">{farm.subtitle}</span><span className="mt-2 inline-block rounded bg-white px-2 py-1 text-[10px] font-bold text-black">DÉCOUVRIR →</span></div>
+              </Link>
             ))}
           </div>
         )}
