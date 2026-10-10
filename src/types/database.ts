@@ -722,10 +722,15 @@ export type Database = {
       }
       orders: {
         Row: {
-          buyer_id: string
+          buyer_id: string | null
           cancelled_at: string | null
           created_at: string
           currency: string
+          guest_name: string | null
+          guest_phone: string | null
+          delivery_city: string | null
+          delivery_address: string | null
+          guest_access_token_hash: string | null
           delivered_at: string | null
           delivery_fee: number
           id: string
@@ -738,10 +743,15 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          buyer_id: string
+          buyer_id: string | null
           cancelled_at?: string | null
           created_at?: string
           currency?: string
+          guest_name?: string | null
+          guest_phone?: string | null
+          delivery_city?: string | null
+          delivery_address?: string | null
+          guest_access_token_hash?: string | null
           delivered_at?: string | null
           delivery_fee?: number
           id?: string
@@ -758,6 +768,11 @@ export type Database = {
           cancelled_at?: string | null
           created_at?: string
           currency?: string
+          guest_name?: string | null
+          guest_phone?: string | null
+          delivery_city?: string | null
+          delivery_address?: string | null
+          guest_access_token_hash?: string | null
           delivered_at?: string | null
           delivery_fee?: number
           id?: string
