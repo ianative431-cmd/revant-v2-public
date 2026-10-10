@@ -1,34 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
 import ManageCookiesButton from "@/components/cookie-consent/ManageCookiesButton";
-
 export default function Footer() {
-  return (
-    <footer className="bg-white border-t border-brand-text/10 px-4 py-6 mt-auto">
-      <div className="max-w-2xl mx-auto flex flex-wrap gap-x-5 gap-y-2 text-xs text-brand-text/60">
-        <Link href="/legal" className="underline">
-          Centre juridique
-        </Link>
-        <Link href="/legal/cgu" className="underline">
-          CGU
-        </Link>
-        <Link href="/legal/confidentialite" className="underline">
-          Confidentialité
-        </Link>
-        <Link href="/legal/cookies" className="underline">
-          Cookies
-        </Link>
-        <Link href="/legal/mentions-legales" className="underline">
-          Mentions légales
-        </Link>
-        <Link href="/legal/remboursement-annulation" className="underline">
-          Remboursement
-        </Link>
-        <ManageCookiesButton />
-        <a href="mailto:ianative431@gmail.com" className="underline">
-          Contact
-        </a>
-      </div>
-      <p className="max-w-2xl mx-auto text-xs text-brand-text/40 mt-3">© Revant</p>
-    </footer>
-  );
+  return <footer className="mt-auto border-t border-brand-text/10 bg-white px-4 py-7"><div className="mx-auto flex max-w-2xl flex-col items-center gap-4 text-center text-xs text-brand-text/70"><Link href="/" aria-label="Revant — accueil"><Image src="/images/logo-revant.svg" alt="Logo Revant" width={64} height={64} className="h-14 w-14 rounded-md"/></Link><div className="flex flex-wrap justify-center gap-x-5 gap-y-3"><Link href="/legal" className="underline">Centre juridique</Link><Link href="/legal/cgu" className="underline">CGU</Link><Link href="/legal/confidentialite" className="underline">Confidentialité</Link><Link href="/legal/cookies" className="underline">Cookies</Link><Link href="/legal/mentions-legales" className="underline">Mentions légales</Link><Link href="/legal/remboursement-annulation" className="underline">Remboursement</Link><ManageCookiesButton/><a href="mailto:ianative431@gmail.com" className="underline">Contact</a></div><p>© Revant</p></div></footer>;
 }

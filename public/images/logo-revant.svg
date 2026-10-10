@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-  <rect width="48" height="48" rx="12" fill="#1A211C"/>
-  <path d="M15 34V14h9.5c3.59 0 6.5 2.91 6.5 6.5 0 2.73-1.68 5.06-4.06 6.02L31 34h-5.1l-4.6-7.5H19V34h-4zm4-11.5h5c1.66 0 3-1.34 3-3s-1.34-3-3-3h-5v6z" fill="#E8DFD3"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Logo Revant"><rect width="1024" height="1024" fill="#151c18"/><g fill="#efe4d7"><path d="M310 292h245c92 0 151 66 151 139 0 67-36 117-98 139l-86-85h37c25 0 41-18 41-43s-16-43-41-43H310z"/><path d="M310 610c0-61 47-105 106-105 33 0 58 12 83 37l230 230H611L430 591c-41-40-91-20-120 37z"/></g></svg>
