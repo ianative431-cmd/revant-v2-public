@@ -16,11 +16,11 @@ export default async function SiteHeader() {
   const palette = await getSitePalette();
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#090909] text-white">
-      <div className="mx-auto flex min-h-[68px] max-w-[1500px] items-center justify-between gap-4 px-4 sm:px-7">
+      <div className="mx-auto flex min-h-[68px] max-w-[1500px] items-center justify-between gap-3 px-4 sm:px-7">
         <Link href="/" className="shrink-0 text-2xl font-black tracking-tight sm:text-3xl">REVANT</Link>
         <nav className="hidden items-center gap-7 text-xs font-medium text-white/85 md:flex">
           <Link href="/" className="border-b-2 border-white py-6">Accueil</Link>
-          <Link href="#boutiques-paysannes" className="py-6 hover:text-white">Boutique</Link>
+          <Link href="/#boutiques-paysannes" className="py-6 hover:text-white">Boutique</Link>
           <Link href="/#categories" className="py-6 hover:text-white">Catégories</Link>
           <Link href="/#a-propos" className="py-6 hover:text-white">À propos</Link>
         </nav>
@@ -29,9 +29,15 @@ export default async function SiteHeader() {
             <SearchIcon />
             <input name="q" aria-label="Rechercher des produits" placeholder="Rechercher" className="w-24 bg-transparent text-xs text-white outline-none placeholder:text-white/50 sm:w-32" />
           </form>
-          <Link href="/?q=" aria-label="Rechercher" className="sm:hidden"><SearchIcon /></Link>
+          <details className="relative sm:hidden">
+            <summary aria-label="Ouvrir la recherche" className="list-none cursor-pointer"><SearchIcon /></summary>
+            <form action="/" method="get" className="absolute right-0 top-9 z-50 flex w-64 items-center gap-2 rounded-xl border border-neutral-200 bg-white p-3 text-black shadow-xl">
+              <input name="q" autoFocus aria-label="Rechercher des produits" placeholder="Rechercher un produit" className="min-w-0 flex-1 bg-transparent text-sm outline-none" />
+              <button type="submit" aria-label="Lancer la recherche" className="rounded-lg bg-black p-2 text-white"><SearchIcon /></button>
+            </form>
+          </details>
           <Link href="/compte" aria-label="Mon compte"><UserIcon /></Link>
-          <Link href="/#produits" aria-label="Voir les produits"><BagIcon /></Link>
+          <Link href="/#produits" aria-label="Découvrir les produits"><BagIcon /></Link>
           <div className="hidden lg:block"><PaletteSwitcher current={palette} /></div>
         </div>
       </div>
