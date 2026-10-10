@@ -48,6 +48,16 @@ export default async function BoutiqueCommandesPage() {
                       {order.price_fcfa.toLocaleString("fr-FR")} FCFA ·{" "}
                       {new Date(order.created_at).toLocaleDateString("fr-FR")}
                     </p>
+                    {order.buyer_name && (
+                      <p className="text-xs text-brand-text/70 mt-2">
+                        Acheteur : {order.buyer_name}{order.buyer_phone ? ` · ${order.buyer_phone}` : ""}
+                      </p>
+                    )}
+                    {order.delivery_city && (
+                      <p className="text-xs text-brand-text/60 mt-1">
+                        Livraison : {order.delivery_city}{order.delivery_address ? ` — ${order.delivery_address}` : ""}
+                      </p>
+                    )}
                   </div>
                   <span
                     className={`text-[11px] shrink-0 rounded-full px-2 py-1 ${
