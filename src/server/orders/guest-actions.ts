@@ -29,17 +29,17 @@ export async function createGuestOrder(
   if (city.length < 2 || city.length > 120) return { error: "Indique ta ville." };
   if (address.length < 4 || address.length > 240) return { error: "Indique une adresse de livraison valide." };
 
-  const ip = await getClientIdentifier();
-  const ipHash = createHash("sha256").update(ip).digest("hex");
-  if (!(await checkRateLimit(`guest-order:${ipHash}`, 5, 3600))) {
-    return { error: RATE_LIMIT_ERROR_MESSAGE };
-  }
-
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceKey) {
     console.error("[guest-checkout] Supabase server configuration is missing.");
     return { error: "La commande est momentanément indisponible. Réessaie plus tard." };
+  }
+
+  const ip = await getClientIdentifier();
+  const ipHash = createHash("sha256").update(ip).digest("hex");
+  if (!(await checkRateLimit(`guest-order:${ipHash}`, 5, 3600))) {
+    return { error: RATE_LIMIT_ERROR_MESSAGE };
   }
 
   const supabase = createClient(url, serviceKey, {
