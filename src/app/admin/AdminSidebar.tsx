@@ -19,6 +19,7 @@ import {
   Star,
   MessageSquare,
   MessageCircle,
+  ExternalLink,
   ShieldCheck,
   Settings,
   LogOut,
@@ -43,6 +44,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin/avis": Star,
   "/admin/messages": MessageSquare,
   "/admin/whatsapp": MessageCircle,
+  "/admin/maison": ExternalLink,
   "/admin/securite": ShieldCheck,
   "/admin/parametres": Settings,
 };

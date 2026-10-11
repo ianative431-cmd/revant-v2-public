@@ -21,6 +21,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Avis & signalements", href: "/admin/avis", ready: false },
   { label: "Messages", href: "/admin/messages", ready: false },
   { label: "WhatsApp", href: "/admin/whatsapp", ready: true },
+  { label: "Liens Maison", href: "/admin/maison", ready: true },
   { label: "Sécurité", href: "/admin/securite", ready: false },
   { label: "Paramètres", href: "/admin/parametres", ready: false },
 ];
