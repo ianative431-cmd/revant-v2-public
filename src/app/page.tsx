@@ -6,6 +6,7 @@ import { getActiveShops } from "@/server/shops/shops";
 import ProductCard from "@/components/products/ProductCard";
 import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
+import RevantMegaShortcuts from "@/components/layout/RevantMegaShortcuts";
 
 type Props = { searchParams: Promise<{ categorie?: string; q?: string }> };
 
@@ -71,6 +72,8 @@ export default async function Home({ searchParams }: Props) {
         </div>
         <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2" aria-hidden="true"><span className="h-2 w-2 rounded-full bg-white"/><span className="h-2 w-2 rounded-full border border-white/80"/><span className="h-2 w-2 rounded-full border border-white/80"/></div>
       </section>
+
+      <RevantMegaShortcuts />
 
       <section id="a-propos" className="grid grid-cols-2 gap-px border-b border-black/5 bg-[#e8e8e8] px-3 sm:grid-cols-4">
         {[
