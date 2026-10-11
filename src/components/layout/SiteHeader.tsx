@@ -63,7 +63,6 @@ export default async function SiteHeader() {
         <form action="/" method="get" role="search" className="flex min-h-12 items-center gap-3 rounded-full border border-white/15 bg-white px-4 text-neutral-900 shadow-sm focus-within:ring-2 focus-within:ring-[#803e2f]">
           <SearchIcon/><input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-neutral-500" />
           <button type="submit" aria-label="Lancer la recherche" className="rounded-full bg-[#803e2f] px-3 py-2 text-xs font-bold text-white">OK</button>
-          <PhotoActionMenu />
         </form>
       </div>
     </header>

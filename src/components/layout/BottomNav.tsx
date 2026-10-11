@@ -19,12 +19,12 @@ function ProfileIcon() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c1.2-3.5 4-5.3 7-5.3s5.8 1.8 7 5.3" strokeLinecap="round"/></svg>;
 }
 function Item({ href, label, icon, active }: { href: string; label: string; icon: React.ReactNode; active: boolean }) {
-  return <Link href={href} aria-current={active ? "page" : undefined} className={`group flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${active ? "text-[#8fcf9b]" : "text-neutral-400 hover:text-white"}`}><span className="transition-colors">{icon}</span><span className="text-[9px] font-medium tracking-[.01em]">{label}</span></Link>;
+  return <Link href={href} aria-current={active ? "page" : undefined} className={`group flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors ${active ? "text-[#803e2f]" : "text-neutral-600 hover:text-neutral-950"}`}><span>{icon}</span><span className="text-[9px] font-medium tracking-[.01em]">{label}</span></Link>;
 }
 export default function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Navigation principale" className="fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-w-5xl items-stretch justify-around border-t border-white/10 bg-[#101010]/95 px-2 pb-[env(safe-area-inset-bottom,0px)] text-white shadow-[0_-6px_24px_rgba(0,0,0,.10)] backdrop-blur-md">
+    <nav aria-label="Navigation principale" className="fixed inset-x-0 bottom-2 z-50 mx-auto flex w-full max-w-lg items-stretch justify-around px-2 pb-[env(safe-area-inset-bottom,0px)]">
       <Item href="/" label="Accueil" active={pathname === "/"} icon={<HomeIcon/>}/>
       <Item href="/categories" label="Catégorie" active={pathname === "/categories"} icon={<CategoryIcon/>}/>
       <Item href="/messages" label="Message" active={pathname === "/messages" || pathname.startsWith("/messages/")} icon={<MessageIcon/>}/>
