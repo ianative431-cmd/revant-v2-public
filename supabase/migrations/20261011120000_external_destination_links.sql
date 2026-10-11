@@ -24,5 +24,8 @@ create policy external_destination_links_public_read
   on public.external_destination_links for select
   using (is_active = true);
 
+-- Explicit Data API privileges; RLS still limits public reads to active links.
+grant select on public.external_destination_links to anon, authenticated;
+
 -- Deliberately no authenticated insert/update/delete policies. Admin mutations
 -- go through server actions that call requireSuperAdmin() before using service role.
