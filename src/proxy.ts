@@ -2,41 +2,44 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Rafraîchit la session Supabase à chaque requête et propage les cookies
- * mis à jour. Ne prend AUCUNE décision de contrôle d'accès par rôle ici —
- * la vérification de rôle (acheteur/vendeur/admin) doit se faire dans
- * chaque route/page côté serveur (voir SECURITY.md), jamais uniquement ici.
+ * Rafraîchit la session Supabase à chaque requête et propage les cookies.
+ * Les contrôles d'accès par rôle restent dans les routes/pages serveur.
  */
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.SUPABASE_ANON_KEY;
 
-  // Déclenche le rafraîchissement du token si nécessaire. Une erreur ici
-  // (réseau, config Supabase) ne doit jamais faire planter la requête :
-  // elle est traitée comme une session non rafraîchie, pas comme une
-  // erreur serveur à afficher.
+  // Ne pas initialiser le client avec une clé absente.
+  if (!supabaseUrl || !supabaseKey) {
+    console.error("[supabase-proxy] URL ou clé publique Supabase manquante");
+    return response;
+  }
+
+  const supabase = createServerClient(supabaseUrl, supabaseKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        response = NextResponse.next({ request });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        );
+      },
+    },
+  });
+
   try {
     await supabase.auth.getUser();
-  } catch {
-    // volontairement silencieux — voir SECURITY.md, règle "erreurs serveur"
+  } catch (error) {
+    console.error("[supabase-proxy] Échec du rafraîchissement de session", error);
   }
 
   return response;
