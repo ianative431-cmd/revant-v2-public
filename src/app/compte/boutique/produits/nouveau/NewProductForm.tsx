@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -40,6 +40,26 @@ export default function NewProductForm({
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
+
+  useEffect(() => {
+    if (typeof window === "undefined" || sessionStorage.getItem("revant-photo-action") !== "add") return;
+    const dataUrl = sessionStorage.getItem("revant-photo-prefill");
+    sessionStorage.removeItem("revant-photo-action");
+    sessionStorage.removeItem("revant-photo-prefill");
+    if (!dataUrl) return;
+    fetch(dataUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const selected = new File([blob], "revant-product-photo.jpg", { type: blob.type || "image/jpeg" });
+        if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type) || selected.size > PRODUCT_IMAGE_MAX_BYTES) {
+          setStatus(selected.size > PRODUCT_IMAGE_MAX_BYTES ? "error-size" : "error-type");
+          return;
+        }
+        setFile(selected);
+        setPreviewUrl(URL.createObjectURL(selected));
+      })
+      .catch(() => setStatus("error-generic"));
+  }, []);
 
   function handleFileSelected(selected: File | undefined) {
     if (!selected) return;

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import PaletteSwitcher from "./PaletteSwitcher";
+import PhotoActionMenu from "./PhotoActionMenu";
 import { getSitePalette } from "@/server/theme/site-palette";
 
 function SearchIcon() {
@@ -46,6 +47,7 @@ export default async function SiteHeader() {
         </nav>
         <div className="flex items-center gap-1 sm:gap-4">
           <form action="/" method="get" className="hidden items-center gap-2 rounded-full border border-white/20 px-3 py-2 sm:flex"><SearchIcon/><input name="q" aria-label="Rechercher des produits" placeholder="Rechercher" className="w-24 bg-transparent text-xs text-white outline-none placeholder:text-white/50 sm:w-32"/></form>
+          <PhotoActionMenu />
           <Link href="/compte" aria-label="Mon compte" className="rounded-full p-1.5 hover:bg-white/10"><UserIcon/></Link>
           <Link href="/boutiques" aria-label="Découvrir les boutiques" className="rounded-full p-1.5 hover:bg-white/10"><BagIcon/></Link>
           <details className="relative">
@@ -61,6 +63,7 @@ export default async function SiteHeader() {
         <form action="/" method="get" role="search" className="flex min-h-12 items-center gap-3 rounded-full border border-white/15 bg-white px-4 text-neutral-900 shadow-sm focus-within:ring-2 focus-within:ring-[#803e2f]">
           <SearchIcon/><input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-neutral-500" />
           <button type="submit" aria-label="Lancer la recherche" className="rounded-full bg-[#803e2f] px-3 py-2 text-xs font-bold text-white">OK</button>
+          <PhotoActionMenu />
         </form>
       </div>
     </header>

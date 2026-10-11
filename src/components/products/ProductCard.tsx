@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types/product";
+import AddToCartButton from "@/components/products/AddToCartButton";
 
 function formatPrice(amount: number, currency: string): string {
   return `${amount.toLocaleString("fr-FR")} ${currency}`;
@@ -24,7 +25,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </Link>
       <div className="p-3 pt-2">
-        {outOfStock ? <span className="block rounded-full bg-neutral-200 py-2 text-center text-[10px] font-bold text-neutral-500">INDISPONIBLE</span> : <Link href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`} className="block rounded-full bg-black py-2.5 text-center text-[10px] font-bold text-white transition hover:bg-neutral-800">ACHETER SANS COMPTE</Link>}
+        {outOfStock ? <span className="block rounded-full bg-neutral-200 py-2 text-center text-[10px] font-bold text-neutral-500">INDISPONIBLE</span> : <><AddToCartButton compact item={{ id: product.id, name: product.name, price: product.base_price, currency: product.currency, image: imageUrl }} /><Link href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`} className="mt-2 block rounded-full bg-black py-2.5 text-center text-[10px] font-bold text-white transition hover:bg-neutral-800">ACHETER SANS COMPTE</Link></>}
       </div>
     </article>
   );

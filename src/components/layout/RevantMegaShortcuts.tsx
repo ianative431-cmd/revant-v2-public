@@ -2,9 +2,9 @@ import Link from "next/link";
 
 const shortcuts = [
   { label: "Mode", href: "/?categorie=vetements-homme#produits", icon: "mode" },
-  { label: "Chaussures", href: "/?categorie=chaussures#produits", icon: "shoe" },
+  { label: "Parfums", href: "/?categorie=parfums#produits", icon: "perfume" },
   { label: "Accessoires", href: "/?categorie=sacs-accessoires#produits", icon: "bag" },
-  { label: "Maison", href: "/?categorie=maison#produits", icon: "home" },
+  { label: "Maison", href: "/maison", icon: "home" },
   { label: "Électronique", href: "/?categorie=electronique#produits", icon: "phone" },
   { label: "Boutiques", href: "/boutiques", icon: "shop" },
   { label: "Terroir", href: "/#boutiques-paysannes", icon: "leaf" },
@@ -15,7 +15,7 @@ function ShortcutIcon({ kind }: { kind: string }) {
   const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.65, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   return <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" {...common}>
     {kind === "mode" && <><path d="M7 4h10l2 5-2 2v9H7v-9L5 9l2-5Z"/><path d="M9 4c0 2 1 3 3 3s3-1 3-3"/></>}
-    {kind === "shoe" && <><path d="M4 14c2.5 0 4-2 5-5l3 3c2 2 4 2 7 2 1 0 2 1 2 3v2H4c-1 0-2-1-2-2s1-3 2-3Z"/><path d="m9 9 2 2m1 1 2 1"/></>}
+    {kind === "perfume" && <><rect x="7" y="8" width="10" height="13" rx="2"/><path d="M10 8V5h4v3M11 5V3h2v2M9.5 12h5"/></>}
     {kind === "bag" && <><path d="M5 8h14l1 12H4L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></>}
     {kind === "home" && <><path d="m3 11 9-7 9 7"/><path d="M5.5 10v9h13v-9M9 19v-5h6v5"/></>}
     {kind === "phone" && <><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M10 5h4M11 18.5h2"/></>}
