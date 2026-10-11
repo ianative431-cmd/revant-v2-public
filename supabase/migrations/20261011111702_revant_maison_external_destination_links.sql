@@ -24,7 +24,8 @@ create policy external_destination_links_public_read
   on public.external_destination_links for select
   using (is_active = true);
 
--- Explicit Data API privileges; RLS still limits public reads to active links.
+-- Explicit Data API privileges: public roles can read active rows only, never write.
+revoke insert, update, delete on public.external_destination_links from public, anon, authenticated;
 grant select on public.external_destination_links to anon, authenticated;
 
 -- Deliberately no authenticated insert/update/delete policies. Admin mutations
