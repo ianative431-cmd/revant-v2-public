@@ -8,6 +8,8 @@ type CartItem = { id: string; name: string; price: number; currency: string; ima
 const KEY = "revant-cart-v1";
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
+  // Hydrate the browser-only cart after mount; localStorage is unavailable during SSR.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { try { const value = localStorage.getItem(KEY); if (value) setItems(JSON.parse(value) as CartItem[]); } catch { setItems([]); } }, []);
   function remove(id: string) { const next = items.filter((item) => item.id !== id); setItems(next); localStorage.setItem(KEY, JSON.stringify(next)); }
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
