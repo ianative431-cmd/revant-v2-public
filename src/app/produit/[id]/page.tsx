@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/server/auth/session";
 import { getProductById } from "@/server/products/products";
 import AddToCartButton from "@/components/products/AddToCartButton";
+import { startConversationAboutProduct } from "@/app/messages/actions";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -37,6 +38,7 @@ export default async function ProductPage({ params }: Props) {
             <p className="mt-3 text-2xl font-extrabold">{product.base_price.toLocaleString("fr-FR")} {product.currency}</p>
             {product.description && <p className="mt-5 whitespace-pre-line text-sm leading-relaxed text-neutral-700">{product.description}</p>}
             {shop && <Link href={`/shop/${shop.slug}`} className="mt-6 text-sm font-semibold underline">Voir la boutique {shop.name}</Link>}
+            {!isOwner && shop && <form action={startConversationAboutProduct} className="mt-4 w-full"><input type="hidden" name="productId" value={product.id}/><button type="submit" className="w-full rounded-full border border-[#803e2f] px-5 py-3 text-sm font-bold text-[#803e2f] transition hover:bg-[#f7eee9]">Contacter le vendeur</button></form>}
             {isOwner ? <p className="mt-6 rounded-lg bg-neutral-100 p-3 text-sm">C’est ton annonce. Tu ne peux pas acheter ton propre produit.</p> : outOfStock ? <p className="mt-6 rounded-lg bg-neutral-100 p-3 text-sm">Ce produit est actuellement épuisé.</p> : <><AddToCartButton item={{ id: product.id, name: product.name, price: product.base_price, currency: product.currency, image: imageUrl }} /><Link href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`} className="mt-3 block w-full rounded-full bg-black px-6 py-4 text-center text-sm font-bold text-white hover:bg-neutral-800">Commander sans créer de compte</Link></>}
             <p className="mt-3 text-xs text-neutral-500">Aucun compte n’est nécessaire pour passer commande.</p>
           </div>
