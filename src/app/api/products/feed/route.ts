@@ -1,39 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getActiveProducts } from "@/server/products/products";
 import { getActiveCategories } from "@/server/catalog/categories";
+import { getActiveProducts } from "@/server/products/products";
 
-export const dynamic = "force-dynamic";
+const PAGE_SIZE = 24;
 
 export async function GET(request: NextRequest) {
-  const params = request.nextUrl.searchParams;
-  const offset = Number(params.get("offset") ?? "0");
-  const requestedLimit = Number(params.get("limit") ?? "24");
-  if (!Number.isInteger(offset) || offset < 0 || offset > 1000000) {
-    return NextResponse.json({ error: "Offset invalide." }, { status: 400 });
-  }
-  const limit = Number.isInteger(requestedLimit) ? Math.min(48, Math.max(1, requestedLimit)) : 24;
+  const { searchParams } = new URL(request.url);
+  const rawOffset = Number(searchParams.get("offset") ?? 0);
+  const offset = Number.isFinite(rawOffset) ? Math.max(0, Math.floor(rawOffset)) : 0;
+  const rawLimit = Number(searchParams.get("limit") ?? PAGE_SIZE);
+  const limit = Number.isFinite(rawLimit)
+    ? Math.min(PAGE_SIZE, Math.max(1, Math.floor(rawLimit)))
+    : PAGE_SIZE;
+  const categorySlug = (searchParams.get("categorie") ?? "").trim();
+  const searchTerm = (searchParams.get("q") ?? "").trim();
+
   try {
     const supabase = await createSupabaseServerClient();
-    const categories = await getActiveCategories(supabase);
-    const categorySlug = params.get("categorie") ?? "";
-    const category = categories.find((item) => item.slug === categorySlug);
-    if (categorySlug && !category) {
-      return NextResponse.json({ products: [], hasMore: false });
+    let categoryId: string | undefined;
+
+    if (categorySlug) {
+      const categories = await getActiveCategories(supabase);
+      const category = categories.find((item) => item.slug === categorySlug);
+      if (!category) {
+        return NextResponse.json({ products: [], hasMore: false });
+      }
+      categoryId = category.id;
     }
-    const searchTerm = (params.get("q") ?? "").trim().slice(0, 100);
-    const page = await getActiveProducts(supabase, {
-      categoryId: category?.id,
-      limit: limit + 1,
+
+    const products = await getActiveProducts(supabase, {
+      categoryId,
       offset,
+      limit,
       searchTerm: searchTerm || undefined,
     });
-    const hasMore = page.length > limit;
+
     return NextResponse.json(
-      { products: page.slice(0, limit), hasMore },
-      { headers: { "Cache-Control": "private, no-store" } }
+      { products, hasMore: products.length === limit },
+      { headers: { "Cache-Control": "no-store" } },
     );
-  } catch {
-    return NextResponse.json({ error: "Le catalogue est temporairement indisponible." }, { status: 503 });
+  } catch (error) {
+    console.error("GET /api/products/feed failed", error);
+    return NextResponse.json(
+      { error: "Impossible de charger les produits pour le moment." },
+      { status: 503 },
+    );
   }
 }
