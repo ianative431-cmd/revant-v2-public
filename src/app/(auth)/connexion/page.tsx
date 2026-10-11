@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signInWithEmail, sendPhoneOtp, verifyPhoneOtp } from "../actions";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
 export default function ConnexionPage() {
   const [mode, setMode] = useState<"email" | "phone">("email");
@@ -10,7 +11,9 @@ export default function ConnexionPage() {
   return (
     <div>
       <h1 className="text-xl font-bold mb-1">Connexion</h1>
-      <p className="text-sm text-black/60 mb-6">Accède à ton compte Revant.</p>
+      <p className="text-sm text-black/60 mb-4">Accède à ton compte Revant.</p>
+      <GoogleSignInButton nextPath="/compte" />
+      <p className="my-4 text-center text-xs text-black/40">ou continue avec</p>
 
       <div className="flex gap-2 mb-6">
         <button

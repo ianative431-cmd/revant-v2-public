@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signUpWithEmail, sendPhoneOtp, verifyPhoneOtp } from "../actions";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
 function LegalSummaryAndConsent() {
   return (
@@ -40,9 +41,11 @@ export default function InscriptionPage() {
   return (
     <div>
       <h1 className="text-xl font-bold mb-1">Créer un compte</h1>
-      <p className="text-sm text-black/60 mb-6">
+      <p className="text-sm text-black/60 mb-4">
         Rejoins Revant — seconde vie, nouvelle valeur.
       </p>
+      <GoogleSignInButton nextPath="/compte" />
+      <p className="my-4 text-center text-xs text-black/40">ou inscris-toi avec</p>
 
       <div className="flex gap-2 mb-6">
         <button

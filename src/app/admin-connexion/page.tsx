@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { signInSuperAdmin, type AdminLoginState } from "./actions";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
 const initialState: AdminLoginState = { error: null };
 
@@ -72,6 +73,11 @@ export default function AdminConnexionPage() {
             L’accès est accordé uniquement si le rôle super-administrateur est confirmé côté serveur.
           </p>
         </form>
+
+        <div className="mt-4 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+          <p className="mb-3 text-center text-xs text-white/45">Ou utilise ton compte Google autorisé</p>
+          <GoogleSignInButton nextPath="/admin" variant="dark" />
+        </div>
 
         <p className="mt-6 text-center text-sm text-white/45">
           <Link href="/" className="underline underline-offset-4 hover:text-white">
