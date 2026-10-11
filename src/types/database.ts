@@ -963,9 +963,6 @@ export type Database = {
       products: {
         Row: {
           base_price: number
-          size_stock: Json
-          brand: string | null
-          volume_ml: number | null
           brand_id: string | null
           category_id: string | null
           created_at: string
@@ -974,6 +971,9 @@ export type Database = {
           id: string
           is_featured: boolean
           name: string
+          product_type: string
+          size_stock: Json
+          perfume_volume_ml: number | null
           shop_id: string
           slug: string
           status: Database["public"]["Enums"]["product_status"]
@@ -982,9 +982,6 @@ export type Database = {
         }
         Insert: {
           base_price?: number
-          size_stock?: Json
-          brand?: string | null
-          volume_ml?: number | null
           brand_id?: string | null
           category_id?: string | null
           created_at?: string
@@ -993,6 +990,9 @@ export type Database = {
           id?: string
           is_featured?: boolean
           name: string
+          product_type?: string
+          size_stock?: Json
+          perfume_volume_ml?: number | null
           shop_id: string
           slug: string
           status?: Database["public"]["Enums"]["product_status"]
@@ -1009,6 +1009,9 @@ export type Database = {
           id?: string
           is_featured?: boolean
           name?: string
+          product_type?: string
+          size_stock?: Json
+          perfume_volume_ml?: number | null
           shop_id?: string
           slug?: string
           status?: Database["public"]["Enums"]["product_status"]
