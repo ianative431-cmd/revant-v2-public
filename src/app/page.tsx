@@ -3,7 +3,6 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveProducts } from "@/server/products/products";
 import { getActiveCategories } from "@/server/catalog/categories";
 import { getActiveShops } from "@/server/shops/shops";
-import ProductCard from "@/components/products/ProductCard";
 import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import RevantMegaShortcuts from "@/components/layout/RevantMegaShortcuts";
