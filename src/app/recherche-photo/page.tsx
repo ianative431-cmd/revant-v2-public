@@ -21,10 +21,7 @@ export default function RecherchePhotoPage() {
       setFileName("Image trop volumineuse : maximum 8 Mo.");
       return;
     }
-    setPreview((old) => {
-      if (old) URL.revokeObjectURL(old);
-      return URL.createObjectURL(file);
-    });
+    setPreview(URL.createObjectURL(file));
     setFileName(file.name);
   }
 
@@ -35,7 +32,10 @@ export default function RecherchePhotoPage() {
       <h1 className="mt-5 text-2xl font-extrabold">Rechercher par photo</h1>
       <p className="mt-2 text-sm leading-6 text-neutral-600">Prends une photo avec ton téléphone ou importe une image pour préparer une recherche visuelle.</p>
       <label className="mt-6 flex min-h-48 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-300 bg-white p-6 text-center hover:border-neutral-500">
-        {preview ? <img src={preview} alt="Aperçu de la photo sélectionnée" className="max-h-64 w-full rounded-xl object-contain" /> : <><span className="text-4xl" aria-hidden="true">◎</span><span className="mt-3 font-semibold">Prendre une photo ou importer</span><span className="mt-1 text-xs text-neutral-500">JPEG, PNG ou WebP · 8 Mo maximum</span></>}
+        {preview ? <>
+          {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local depuis une blob URL */}
+          <img src={preview} alt="Aperçu de la photo sélectionnée" className="max-h-64 w-full rounded-xl object-contain" />
+        </> : <><span className="text-4xl" aria-hidden="true">◎</span><span className="mt-3 font-semibold">Prendre une photo ou importer</span><span className="mt-1 text-xs text-neutral-500">JPEG, PNG ou WebP · 8 Mo maximum</span></>}
         <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" onChange={(event) => selectPhoto(event.target.files?.[0])} className="sr-only" />
       </label>
       {fileName && <p className="mt-3 break-words text-xs text-neutral-600">{fileName}</p>}
