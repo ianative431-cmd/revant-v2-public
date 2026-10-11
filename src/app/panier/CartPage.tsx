@@ -43,6 +43,8 @@ export default function CartPage() {
               Number.isInteger(item.quantity) &&
               item.quantity > 0,
           );
+          // Browser storage is read after mount to avoid server/client hydration mismatch.
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setItems(valid);
         }
       }
