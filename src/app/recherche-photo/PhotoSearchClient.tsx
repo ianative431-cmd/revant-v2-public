@@ -1,27 +1,56 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { savePendingProductImage } from "@/lib/pending-product-image";
 
 export default function PhotoSearchClient() {
+  const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
+  const [handoffError, setHandoffError] = useState("");
+  const [openingForm, setOpeningForm] = useState(false);
+
+  useEffect(() => () => {
+    if (preview) URL.revokeObjectURL(preview);
+  }, [preview]);
 
   function selectPhoto(file?: File) {
     if (!file) return;
     if (preview) URL.revokeObjectURL(preview);
+    setHandoffError("");
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       setPreview(null);
+      setSelectedFile(null);
       setFileName("Format non pris en charge. Choisis une image JPEG, PNG ou WebP.");
       return;
     }
     if (file.size > 8 * 1024 * 1024) {
       setPreview(null);
+      setSelectedFile(null);
       setFileName("Image trop volumineuse : maximum 8 Mo.");
       return;
     }
+    setSelectedFile(file);
     setPreview(URL.createObjectURL(file));
     setFileName(file.name);
+  }
+
+  async function continueToProductForm() {
+    setHandoffError("");
+    if (!selectedFile) {
+      router.push("/compte/boutique/produits/nouveau");
+      return;
+    }
+    setOpeningForm(true);
+    try {
+      await savePendingProductImage(selectedFile);
+      router.push("/compte/boutique/produits/nouveau");
+    } catch {
+      setHandoffError("Impossible de garder cette photo sur cet appareil. Réessaie ou sélectionne-la directement dans le formulaire.");
+      setOpeningForm(false);
+    }
   }
 
   return <>
@@ -35,7 +64,8 @@ export default function PhotoSearchClient() {
       <input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" onChange={(event) => selectPhoto(event.target.files?.[0])} className="sr-only" />
     </label>
     {fileName && <p className="mt-3 break-words text-xs text-neutral-600">{fileName}</p>}
-    <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950"><strong>À savoir :</strong> le moteur qui compare cette image aux produits du catalogue n’est pas encore connecté. Pour l’instant, l’image reste sur ton appareil et n’est ni envoyée ni publiée.</div>
-    <Link href="/compte/boutique/produits/nouveau" className="mt-5 flex w-full items-center justify-center rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white">Ajouter un produit à ma boutique</Link>
+    <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950"><strong>À savoir :</strong> la recherche automatique parmi les produits n’est pas encore connectée. La photo reste sur cet appareil jusqu’à ce que tu choisisses de publier une annonce ; elle n’est pas envoyée par cette page.</div>
+    {handoffError && <p role="alert" className="mt-3 text-sm text-red-700">{handoffError}</p>}
+    <button type="button" onClick={continueToProductForm} disabled={openingForm} className="mt-5 flex w-full items-center justify-center rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white disabled:opacity-60">{openingForm ? "Préparation…" : "Ajouter un produit à ma boutique"}</button>
   </>;
 }

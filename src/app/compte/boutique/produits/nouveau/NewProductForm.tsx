@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -11,6 +11,7 @@ import {
   compressProductImage,
 } from "@/lib/product-image";
 import type { Category } from "@/server/catalog/categories";
+import { consumePendingProductImage } from "@/lib/pending-product-image";
 
 type Status =
   | "idle"
@@ -40,6 +41,21 @@ export default function NewProductForm({
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
+  const [photoPrefilled, setPhotoPrefilled] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    consumePendingProductImage().then((pendingFile) => {
+      if (!active || !pendingFile) return;
+      if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(pendingFile.type) || pendingFile.size > PRODUCT_IMAGE_MAX_BYTES) return;
+      setFile(pendingFile);
+      setPreviewUrl(URL.createObjectURL(pendingFile));
+      setPhotoPrefilled(true);
+    }).catch(() => {
+      // L'annonce reste utilisable : l'utilisateur peut choisir la photo directement ici.
+    });
+    return () => { active = false; };
+  }, []);
 
   function handleFileSelected(selected: File | undefined) {
     if (!selected) return;
@@ -149,6 +165,9 @@ export default function NewProductForm({
           alt="Aperçu de l'annonce"
           className="rounded-xl w-full aspect-square object-cover"
         />
+      )}
+      {photoPrefilled && file && (
+        <p className="text-xs text-green-700">Photo préremplie depuis la recherche par photo. Vérifie les informations avant de publier.</p>
       )}
 
       <input
