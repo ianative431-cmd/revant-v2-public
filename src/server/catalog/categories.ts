@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export type Category = { id: string; name: string; slug: string };
+export type Category = { id: string; name: string; slug: string; description: string | null };
 
 /**
  * Catégories réelles (table categories, gérée pour l'instant en base
@@ -11,7 +11,7 @@ export type Category = { id: string; name: string; slug: string };
 export async function getActiveCategories(supabase: SupabaseClient): Promise<Category[]> {
   const { data } = await supabase
     .from("categories")
-    .select("id, name, slug")
+    .select("id, name, slug, description")
     .eq("is_active", true)
     .order("sort_order");
 
