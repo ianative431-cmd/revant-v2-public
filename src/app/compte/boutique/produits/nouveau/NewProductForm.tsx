@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -41,6 +41,26 @@ export default function NewProductForm({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
 
+  useEffect(() => {
+    if (typeof window === "undefined" || sessionStorage.getItem("revant-photo-action") !== "add") return;
+    const dataUrl = sessionStorage.getItem("revant-photo-prefill");
+    sessionStorage.removeItem("revant-photo-action");
+    sessionStorage.removeItem("revant-photo-prefill");
+    if (!dataUrl) return;
+    fetch(dataUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const selected = new File([blob], "revant-product-photo.jpg", { type: blob.type || "image/jpeg" });
+        if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type) || selected.size > PRODUCT_IMAGE_MAX_BYTES) {
+          setStatus(selected.size > PRODUCT_IMAGE_MAX_BYTES ? "error-size" : "error-type");
+          return;
+        }
+        setFile(selected);
+        setPreviewUrl(URL.createObjectURL(selected));
+      })
+      .catch(() => setStatus("error-generic"));
+  }, []);
+
   function handleFileSelected(selected: File | undefined) {
     if (!selected) return;
 
@@ -67,9 +87,23 @@ export default function NewProductForm({
     const description = String(formData.get("description") ?? "").trim();
     const priceRaw = String(formData.get("price") ?? "").trim();
     const categoryId = String(formData.get("categoryId") ?? "");
+    const productType = String(formData.get("productType") ?? "other");
+    const perfumeVolumeRaw = String(formData.get("perfumeVolumeMl") ?? "").trim();
+    const perfumeVolumeMl = perfumeVolumeRaw ? Number(perfumeVolumeRaw) : null;
+    const sizeLines = String(formData.get("sizeStock") ?? "").split("\n").map((line) => line.trim()).filter(Boolean);
+    const sizeStock: Record<string, number> = {};
+    for (const line of sizeLines) {
+      const match = line.match(/^([^:]{1,20}):\s*(\d+)$/);
+      if (match) sizeStock[match[1].trim().toUpperCase()] = Number(match[2]);
+    }
     const price = Number(priceRaw);
 
-    if (name.length < 2 || name.length > 120 || !Number.isFinite(price) || price <= 0 || !file) {
+    if (
+      name.length < 2 || name.length > 120 || !Number.isFinite(price) || price <= 0 || !file ||
+      !["clothing", "perfume", "other"].includes(productType) ||
+      (productType === "perfume" && perfumeVolumeMl !== null && (!Number.isInteger(perfumeVolumeMl) || perfumeVolumeMl < 1 || perfumeVolumeMl > 5000)) ||
+      (productType === "clothing" && (sizeLines.length === 0 || Object.keys(sizeStock).length !== sizeLines.length || Object.values(sizeStock).some((qty) => !Number.isInteger(qty) || qty < 0)))
+    ) {
       setStatus("error-validation");
       return;
     }
@@ -102,6 +136,10 @@ export default function NewProductForm({
           description: description.length > 0 ? description : null,
           base_price: Math.round(price),
           category_id: categoryId.length > 0 ? categoryId : null,
+          product_type: productType,
+          size_stock: productType === "clothing" ? sizeStock : {},
+          perfume_volume_ml: productType === "perfume" ? perfumeVolumeMl : null,
+          stock_quantity: productType === "clothing" ? Object.values(sizeStock).reduce((sum, qty) => sum + qty, 0) : Math.max(0, Number(formData.get("stockQuantity") ?? 0)),
           slug: `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60)}-${Date.now().toString(36)}`,
         })
         .select("id")
@@ -176,6 +214,24 @@ export default function NewProductForm({
           </option>
         ))}
       </select>
+
+      <label className="grid gap-1 text-sm font-medium">Type de produit
+        <select name="productType" defaultValue="other" className="border rounded-xl px-4 py-3 text-sm bg-white">
+          <option value="clothing">Vêtement (tailles et stock par taille)</option>
+          <option value="perfume">Parfum (volume en ml)</option>
+          <option value="other">Autre produit</option>
+        </select>
+      </label>
+      <label className="grid gap-1 text-sm font-medium">Stock total (parfum et autres produits)
+        <input name="stockQuantity" type="number" min={0} step={1} defaultValue={1} className="border rounded-xl px-4 py-3 text-sm" />
+      </label>
+      <label className="grid gap-1 text-sm font-medium">Tailles et quantités (vêtements)
+        <textarea name="sizeStock" rows={3} placeholder={"S: 5\nM: 8\nL: 3"} className="border rounded-xl px-4 py-3 text-sm resize-y" />
+        <span className="text-xs font-normal text-neutral-500">Une taille par ligne, au format Taille : quantité. Les quantités peuvent être 0.</span>
+      </label>
+      <label className="grid gap-1 text-sm font-medium">Volume du parfum (ml, facultatif)
+        <input name="perfumeVolumeMl" type="number" min={1} max={5000} step={1} placeholder="Ex. 100" className="border rounded-xl px-4 py-3 text-sm" />
+      </label>
 
       <input
         name="price"

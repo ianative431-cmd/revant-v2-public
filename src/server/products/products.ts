@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Product } from "@/types/product";
 
 const PRODUCT_SELECT =
-  "id, shop_id, name, description, base_price, currency, stock_quantity, status, slug, category_id, created_at, updated_at, categories(name), product_images(image_url, sort_order)";
+  "id, shop_id, name, description, base_price, currency, stock_quantity, product_type, size_stock, perfume_volume_ml, status, slug, category_id, created_at, updated_at, categories(name), product_images(image_url, sort_order)";
 
 type ProductRow = {
   id: string;
@@ -13,6 +13,9 @@ type ProductRow = {
   base_price: number;
   currency: string;
   stock_quantity: number;
+  product_type: string;
+  size_stock: Record<string, number> | null;
+  perfume_volume_ml: number | null;
   status: Product["status"];
   slug: string;
   category_id: string | null;
@@ -35,6 +38,9 @@ function mapRow(row: ProductRow): Product {
     base_price: row.base_price,
     currency: row.currency,
     stock_quantity: row.stock_quantity,
+    product_type: row.product_type ?? "other",
+    size_stock: row.size_stock ?? {},
+    perfume_volume_ml: row.perfume_volume_ml,
     status: row.status,
     slug: row.slug,
     category_id: row.category_id,
@@ -47,17 +53,25 @@ function mapRow(row: ProductRow): Product {
 
 export async function getActiveProducts(
   supabase: SupabaseClient,
-  options?: { categoryId?: string; limit?: number }
+  options?: { categoryId?: string; productType?: "clothing" | "perfume"; limit?: number; offset?: number; searchTerm?: string }
 ): Promise<Product[]> {
   let query = supabase
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("status", "active")
     .order("created_at", { ascending: false })
-    .limit(options?.limit ?? 24);
+    .order("id", { ascending: false })
+    .range(options?.offset ?? 0, (options?.offset ?? 0) + (options?.limit ?? 24) - 1);
 
   if (options?.categoryId) {
     query = query.eq("category_id", options.categoryId);
+  }
+  if (options?.productType) {
+    query = query.eq("product_type", options.productType);
+  }
+  if (options?.searchTerm) {
+    const safeTerm = options.searchTerm.replace(/[%,()]/g, " ").trim();
+    if (safeTerm) query = query.or(`name.ilike.%${safeTerm}%,description.ilike.%${safeTerm}%`);
   }
 
   const { data } = await query.returns<ProductRow[]>();

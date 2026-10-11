@@ -12,6 +12,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      external_destination_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+          updated_by: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       addresses: {
         Row: {
           address_line: string
@@ -971,6 +1010,9 @@ export type Database = {
           id: string
           is_featured: boolean
           name: string
+          product_type: string
+          size_stock: Json
+          perfume_volume_ml: number | null
           shop_id: string
           slug: string
           status: Database["public"]["Enums"]["product_status"]
@@ -987,6 +1029,9 @@ export type Database = {
           id?: string
           is_featured?: boolean
           name: string
+          product_type?: string
+          size_stock?: Json
+          perfume_volume_ml?: number | null
           shop_id: string
           slug: string
           status?: Database["public"]["Enums"]["product_status"]
@@ -1003,6 +1048,9 @@ export type Database = {
           id?: string
           is_featured?: boolean
           name?: string
+          product_type?: string
+          size_stock?: Json
+          perfume_volume_ml?: number | null
           shop_id?: string
           slug?: string
           status?: Database["public"]["Enums"]["product_status"]

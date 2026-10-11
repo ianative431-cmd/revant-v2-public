@@ -1,0 +1,12 @@
+import Link from "next/link";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+export const dynamic = "force-dynamic";
+type Destination = { id: string; title: string; url: string; description: string | null; sort_order: number };
+export default async function MaisonPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.from("external_destination_links").select("id,title,url,description,sort_order,created_at").eq("is_active", true).order("sort_order", { ascending: true }).order("created_at", { ascending: false });
+  const destinations = error ? [] : (data ?? []) as Destination[];
+  return <main className="min-h-screen bg-[#f7f7f7] px-4 py-8 text-neutral-900"><div className="mx-auto max-w-2xl"><Link href="/" className="text-sm text-neutral-500 hover:text-black">← Accueil</Link><section className="mt-5 rounded-2xl bg-white p-6 shadow-sm"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#803e2f]">Revant Mega</p><h1 className="mt-3 text-2xl font-black">Maison & immobilier</h1><p className="mt-3 text-sm leading-relaxed text-neutral-600">Retrouve des sites immobiliers externes sélectionnés. Revant ne vend pas directement des maisons dans cette rubrique.</p>
+    {destinations.length > 0 ? <div className="mt-5 space-y-3">{destinations.map((destination) => <a key={destination.id} href={destination.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-black/10 p-4 transition hover:border-[#803e2f] hover:bg-neutral-50"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f3e9e5] text-[#803e2f]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-5 w-5"><path d="M14 3h7v7M21 3 11 13M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6" strokeLinecap="round" strokeLinejoin="round"/></svg></span><span className="min-w-0 flex-1"><span className="block text-sm font-bold">{destination.title}</span>{destination.description && <span className="mt-1 block text-xs leading-relaxed text-neutral-500">{destination.description}</span>}<span className="mt-1 block truncate text-[11px] text-[#803e2f]">{destination.url}</span></span></a>)}</div> : <p className="mt-5 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">Les destinations immobilières sont en cours de configuration. Reviens bientôt pour découvrir les liens sélectionnés par Revant.</p>}
+    </section></div></main>;
+}

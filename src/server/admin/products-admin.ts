@@ -12,6 +12,9 @@ type RawRow = {
   base_price: number;
   currency: string;
   stock_quantity: number;
+  product_type: Product["product_type"];
+  size_stock: Product["size_stock"];
+  perfume_volume_ml: Product["perfume_volume_ml"];
   status: Product["status"];
   slug: string;
   category_id: string | null;
@@ -34,7 +37,7 @@ export async function getAllProductsForAdmin(
   const { data } = await supabase
     .from("products")
     .select(
-      `id, shop_id, name, description, base_price, currency, stock_quantity, status, slug,
+      `id, shop_id, name, description, base_price, currency, stock_quantity, product_type, size_stock, perfume_volume_ml, status, slug,
        category_id, created_at, updated_at,
        categories ( name ),
        product_images ( image_url, sort_order ),
@@ -51,6 +54,9 @@ export async function getAllProductsForAdmin(
     base_price: row.base_price,
     currency: row.currency,
     stock_quantity: row.stock_quantity,
+    product_type: row.product_type,
+    size_stock: row.size_stock,
+    perfume_volume_ml: row.perfume_volume_ml,
     status: row.status,
     slug: row.slug,
     category_id: row.category_id,
