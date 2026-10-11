@@ -7,6 +7,7 @@ import ProductCard from "@/components/products/ProductCard";
 import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import RevantMegaShortcuts from "@/components/layout/RevantMegaShortcuts";
+import InfiniteProductFeed from "@/components/products/InfiniteProductFeed";
 
 type Props = { searchParams: Promise<{ categorie?: string; q?: string }> };
 
@@ -40,7 +41,7 @@ export default async function Home({ searchParams }: Props) {
     categories = await getActiveCategories(supabase);
     const categoryId = categories.find((c) => c.slug === categorie)?.id;
     [loadedProducts, shops] = await Promise.all([
-      getActiveProducts(supabase, { categoryId, limit: 24 }),
+      getActiveProducts(supabase, { categoryId, limit: 24, searchTerm: q?.trim() || undefined }),
       getActiveShops(supabase, { limit: 8 }),
     ]);
   } catch {
@@ -51,10 +52,7 @@ export default async function Home({ searchParams }: Props) {
     shops = [];
   }
   const activeCategory = categories.find((c) => c.slug === categorie);
-  const term = q?.trim().toLocaleLowerCase("fr");
-  const products = term
-    ? loadedProducts.filter((p) => `${p.name} ${p.description ?? ""} ${p.categoryName ?? ""}`.toLocaleLowerCase("fr").includes(term))
-    : loadedProducts;
+  const term = q?.trim();
 
   return (
     <div className="min-h-screen bg-[#f7f7f7] text-[#111] pb-28">
@@ -130,16 +128,14 @@ export default async function Home({ searchParams }: Props) {
 
       <main id="produits" className="px-4 pt-7">
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? `Résultats pour « ${q} »` : activeCategory ? activeCategory.name : "Produits populaires"}</h2><a href="#produits" className="text-xs font-medium">Voir tout →</a></div>
-        {products.length === 0 ? (
+        {loadedProducts.length === 0 ? (
           <div className="rounded-xl border border-neutral-200 bg-white px-5 py-10 text-center">
             <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : "Les premières annonces arrivent bientôt."}</p>
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-neutral-500">{term ? "Essaie un autre mot ou explore les catégories." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
             <Link href="/boutiques/creer" className="mt-4 inline-flex rounded-full bg-black px-5 py-3 text-xs font-bold text-white">Ouvrir une boutique</Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {products.slice(0, 10).map((product) => <ProductCard key={product.id} product={product} />)}
-          </div>
+          <InfiniteProductFeed initialProducts={loadedProducts} category={categorie ?? ""} search={term ?? ""} />
         )}
       </main>
 

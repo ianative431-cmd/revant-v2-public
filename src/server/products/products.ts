@@ -53,17 +53,22 @@ function mapRow(row: ProductRow): Product {
 
 export async function getActiveProducts(
   supabase: SupabaseClient,
-  options?: { categoryId?: string; limit?: number }
+  options?: { categoryId?: string; limit?: number; offset?: number; searchTerm?: string }
 ): Promise<Product[]> {
   let query = supabase
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("status", "active")
     .order("created_at", { ascending: false })
-    .limit(options?.limit ?? 24);
+    .order("id", { ascending: false })
+    .range(options?.offset ?? 0, (options?.offset ?? 0) + (options?.limit ?? 24) - 1);
 
   if (options?.categoryId) {
     query = query.eq("category_id", options.categoryId);
+  }
+  if (options?.searchTerm) {
+    const safeTerm = options.searchTerm.replace(/[%,()]/g, " ").trim();
+    if (safeTerm) query = query.or(`name.ilike.%${safeTerm}%,description.ilike.%${safeTerm}%`);
   }
 
   const { data } = await query.returns<ProductRow[]>();
