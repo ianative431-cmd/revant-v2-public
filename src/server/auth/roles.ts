@@ -2,6 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
+import { getCurrentUser } from "@/server/auth/session";
 import type { Enums } from "@/types/database";
 
 export type AppRole = Enums<"user_role">;
@@ -51,13 +52,14 @@ export async function getCurrentUserRole(): Promise<AppRole> {
 
 /**
  * Garde-fou serveur pour toute page ou Server Action réservée à
- * l'administration (tous rôles admin confondus). La vérification
- * interroge la base à chaque appel — jamais un état mis en cache côté
- * client. Redirige silencieusement vers l'accueil plutôt que
- * d'afficher un espace admin partiellement chargé à quelqu'un qui n'y
- * a pas droit.
+ * l'administration. Les visiteurs non connectés sont dirigés vers
+ * la connexion admin dédiée, puis le rôle est relu en base à chaque
+ * requête. Le rôle ne vient jamais des métadonnées modifiables du client.
  */
 export async function requireAdmin() {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) redirect("/admin-connexion");
+
   const user = await requireUserWithLegalConsent();
   const roles = await getCurrentUserRoles();
 
@@ -69,13 +71,12 @@ export async function requireAdmin() {
 }
 
 /**
- * Garde-fou réservé au super administrateur (ex. intégration Meta
- * WhatsApp Business : la connexion d'un compte professionnel entier
- * ne doit pas être accessible à un rôle admin plus restreint).
- * Redirige vers le tableau de bord admin plutôt que d'afficher la
- * page à quelqu'un qui n'a pas ce rôle précis.
+ * Garde-fou réservé au super administrateur.
  */
 export async function requireSuperAdmin() {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) redirect("/admin-connexion");
+
   const user = await requireUserWithLegalConsent();
   const roles = await getCurrentUserRoles();
 
