@@ -11,18 +11,18 @@ import type { Database } from "@/types/database";
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
 
-  // Prefer server-only runtime variables; fall back to existing public names
-  // for compatibility with current deployments.
+  // Utiliser les mêmes variables publiques que le navigateur en priorité :
+  // une ancienne SUPABASE_ANON_KEY peut être obsolète ou pointer ailleurs.
   const supabaseUrl =
-    process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
   const supabaseKey =
-    process.env.SUPABASE_ANON_KEY ??
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error(
-      "Configuration Supabase serveur manquante : vérifier SUPABASE_URL et SUPABASE_ANON_KEY dans l'environnement du service."
+      "Configuration Supabase serveur manquante : vérifier NEXT_PUBLIC_SUPABASE_URL et la clé publique Supabase dans l'environnement du service."
     );
   }
 
