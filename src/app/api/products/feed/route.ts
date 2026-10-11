@@ -13,14 +13,17 @@ export async function GET(request: NextRequest) {
   const limit = Number.isFinite(rawLimit)
     ? Math.min(PAGE_SIZE, Math.max(1, Math.floor(rawLimit)))
     : PAGE_SIZE;
-  const categorySlug = (searchParams.get("categories") ?? "").trim();
+  const categorySlug = (searchParams.get("categorie") ?? searchParams.get("categories") ?? "").trim();
   const searchTerm = (searchParams.get("q") ?? "").trim();
 
   try {
     const supabase = await createSupabaseServerClient();
     let categoryId: string | undefined;
+    let productType: "clothing" | "perfume" | undefined;
 
-    if (categorySlug) {
+    if (categorySlug === "mode") productType = "clothing";
+    else if (categorySlug === "parfums") productType = "perfume";
+    else if (categorySlug) {
       const categories = await getActiveCategories(supabase);
       const category = categories.find((item) => item.slug === categorySlug);
       if (!category) {
@@ -31,6 +34,7 @@ export async function GET(request: NextRequest) {
 
     const products = await getActiveProducts(supabase, {
       categoryId,
+      productType,
       offset,
       limit,
       searchTerm: searchTerm || undefined,

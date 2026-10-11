@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const shortcuts = [
-  { label: "Mode", href: "/?categorie=vetements-homme#produits", icon: "mode" },
+  { label: "Mode", href: "/?categorie=mode#produits", icon: "mode" },
   { label: "Parfums", href: "/?categorie=parfums#produits", icon: "perfume" },
   { label: "Accessoires", href: "/?categorie=sacs-accessoires#produits", icon: "bag" },
   { label: "Maison", href: "/maison", icon: "home" },

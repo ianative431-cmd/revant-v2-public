@@ -53,7 +53,7 @@ function mapRow(row: ProductRow): Product {
 
 export async function getActiveProducts(
   supabase: SupabaseClient,
-  options?: { categoryId?: string; limit?: number; offset?: number; searchTerm?: string }
+  options?: { categoryId?: string; productType?: "clothing" | "perfume"; limit?: number; offset?: number; searchTerm?: string }
 ): Promise<Product[]> {
   let query = supabase
     .from("products")
@@ -65,6 +65,9 @@ export async function getActiveProducts(
 
   if (options?.categoryId) {
     query = query.eq("category_id", options.categoryId);
+  }
+  if (options?.productType) {
+    query = query.eq("product_type", options.productType);
   }
   if (options?.searchTerm) {
     const safeTerm = options.searchTerm.replace(/[%,()]/g, " ").trim();

@@ -40,8 +40,9 @@ export default async function Home({ searchParams }: Props) {
     const supabase = await createSupabaseServerClient();
     categories = await getActiveCategories(supabase);
     const categoryId = categories.find((c) => c.slug === categorie)?.id;
+    const productType = categorie === "mode" ? "clothing" : categorie === "parfums" ? "perfume" : undefined;
     [loadedProducts, shops] = await Promise.all([
-      getActiveProducts(supabase, { categoryId, limit: 24, searchTerm: q?.trim() || undefined }),
+      getActiveProducts(supabase, { categoryId, productType, limit: 24, searchTerm: q?.trim() || undefined }),
       getActiveShops(supabase, { limit: 8 }),
     ]);
   } catch {
@@ -52,6 +53,7 @@ export default async function Home({ searchParams }: Props) {
     shops = [];
   }
   const activeCategory = categories.find((c) => c.slug === categorie);
+  const shortcutCategoryTitle = categorie === "mode" ? "Mode" : categorie === "parfums" ? "Parfums" : null;
   const term = q?.trim();
 
   return (
@@ -127,7 +129,7 @@ export default async function Home({ searchParams }: Props) {
       </section>
 
       <main id="produits" className="px-4 pt-7">
-        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? `Résultats pour « ${q} »` : activeCategory ? activeCategory.name : "Produits populaires"}</h2><a href="#produits" className="text-xs font-medium">Voir tout →</a></div>
+        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? `Résultats pour « ${q} »` : shortcutCategoryTitle ?? (activeCategory ? activeCategory.name : "Produits populaires")}</h2><a href="#produits" className="text-xs font-medium">Voir tout →</a></div>
         {loadedProducts.length === 0 ? (
           <div className="rounded-xl border border-neutral-200 bg-white px-5 py-10 text-center">
             <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : "Les premières annonces arrivent bientôt."}</p>
