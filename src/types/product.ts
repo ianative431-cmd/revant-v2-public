@@ -18,6 +18,9 @@ export type Product = {
   base_price: number;
   currency: string;
   stock_quantity: number;
+  size_stock: Record<string, number>;
+  brand: string | null;
+  volume_ml: number | null;
   status: ProductStatus;
   slug: string;
   category_id: string | null;

@@ -12,6 +12,8 @@ import {
 } from "@/lib/product-image";
 import type { Category } from "@/server/catalog/categories";
 
+const CLOTHING_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "36", "38", "40", "42", "44", "46"];
+
 type Status =
   | "idle"
   | "submitting"
@@ -40,6 +42,11 @@ export default function NewProductForm({
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
+  const [categoryId, setCategoryId] = useState("");
+  const [sizeStock, setSizeStock] = useState<Record<string, string>>({});
+  const slug = categories.find((c) => c.id === categoryId)?.slug.toLowerCase() ?? "";
+  const isClothing = /vetement|vêtement|clothing|habit/.test(slug);
+  const isPerfume = /parfum|perfume|fragrance/.test(slug);
 
   function handleFileSelected(selected: File | undefined) {
     if (!selected) return;
@@ -66,10 +73,17 @@ export default function NewProductForm({
     const name = String(formData.get("name") ?? "").trim();
     const description = String(formData.get("description") ?? "").trim();
     const priceRaw = String(formData.get("price") ?? "").trim();
-    const categoryId = String(formData.get("categoryId") ?? "");
+    const categoryIdFromForm = String(formData.get("categoryId") ?? "");
+    const brand = String(formData.get("brand") ?? "").trim();
+    const volumeRaw = String(formData.get("volumeMl") ?? "").trim();
+    const volumeMl = volumeRaw ? Number(volumeRaw) : null;
+    const manualStock = Number(formData.get("stockQuantity") ?? 0);
+    const sizes: Record<string, number> = {};
+    if (isClothing) for (const [size, raw] of Object.entries(sizeStock)) { const n = Number(raw || 0); if (Number.isInteger(n) && n > 0) sizes[size] = n; }
+    const stockQuantity = isClothing ? Object.values(sizes).reduce((a, b) => a + b, 0) : manualStock;
     const price = Number(priceRaw);
 
-    if (name.length < 2 || name.length > 120 || !Number.isFinite(price) || price <= 0 || !file) {
+    if (name.length < 2 || name.length > 120 || !Number.isFinite(price) || price <= 0 || !file || !categoryIdFromForm || !Number.isInteger(stockQuantity) || stockQuantity < 0 || (isClothing && stockQuantity < 1) || (isPerfume && volumeMl !== null && (!Number.isInteger(volumeMl) || volumeMl < 1 || volumeMl > 10000))) {
       setStatus("error-validation");
       return;
     }
@@ -101,7 +115,11 @@ export default function NewProductForm({
           name,
           description: description.length > 0 ? description : null,
           base_price: Math.round(price),
-          category_id: categoryId.length > 0 ? categoryId : null,
+          category_id: categoryIdFromForm.length > 0 ? categoryIdFromForm : null,
+          stock_quantity: stockQuantity,
+          size_stock: isClothing ? sizes : {},
+          brand: brand || null,
+          volume_ml: isPerfume && volumeMl ? volumeMl : null,
           slug: `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60)}-${Date.now().toString(36)}`,
         })
         .select("id")
@@ -164,7 +182,8 @@ export default function NewProductForm({
       <select
         name="categoryId"
         required
-        defaultValue=""
+        value={categoryId}
+        onChange={(e) => { setCategoryId(e.target.value); setSizeStock({}); }}
         className="border rounded-xl px-4 py-3 text-sm bg-white"
       >
         <option value="" disabled>
@@ -187,7 +206,11 @@ export default function NewProductForm({
         className="border rounded-xl px-4 py-3 text-sm"
       />
 
-      <textarea
+            {isClothing ? <fieldset className="rounded-xl border p-3"><legend className="px-1 text-sm font-semibold">Stock par taille</legend><p className="mb-3 text-xs text-neutral-500">Le stock total est calculé à partir des tailles disponibles.</p><div className="grid grid-cols-3 gap-2">{CLOTHING_SIZES.map((size) => <label key={size} className="text-xs font-semibold">{size}<input type="number" min={0} max={100000} step={1} inputMode="numeric" value={sizeStock[size] ?? ""} onChange={(e) => setSizeStock((old) => ({ ...old, [size]: e.target.value }))} placeholder="0" className="mt-1 w-full rounded-lg border px-2 py-2 text-sm" /></label>)}</div></fieldset> : <input name="stockQuantity" type="number" required min={0} max={100000} step={1} defaultValue={1} inputMode="numeric" placeholder="Quantité disponible" className="w-full rounded-xl border px-4 py-3 text-sm" />}
+      {(!isClothing || isPerfume) && <input name="brand" maxLength={100} placeholder="Marque (facultatif)" className="w-full rounded-xl border px-4 py-3 text-sm" />}
+      {isPerfume && <input name="volumeMl" type="number" min={1} max={10000} step={1} inputMode="numeric" placeholder="Volume du parfum en ml (facultatif)" className="w-full rounded-xl border px-4 py-3 text-sm" />}
+
+<textarea
         name="description"
         maxLength={2000}
         rows={4}

@@ -32,6 +32,9 @@ export default async function ProductPage({ params }: Props) {
             {product.categoryName && <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">{product.categoryName}</p>}
             <h1 className="mt-2 text-2xl font-black">{product.name}</h1>
             <p className="mt-3 text-2xl font-extrabold">{product.base_price.toLocaleString("fr-FR")} {product.currency}</p>
+            {product.brand && <p className="mt-3 text-sm text-neutral-600">Marque : <strong>{product.brand}</strong></p>}
+            {product.volume_ml && <p className="mt-1 text-sm text-neutral-600">Volume : <strong>{product.volume_ml} ml</strong></p>}
+            {Object.keys(product.size_stock).length > 0 && <section className="mt-5 w-full"><h2 className="text-sm font-bold">Tailles et quantités disponibles</h2><div className="mt-2 flex flex-wrap gap-2">{Object.entries(product.size_stock).map(([size, count]) => <span key={size} className={`rounded-lg border px-3 py-2 text-xs ${count > 0 ? "border-neutral-300 bg-white" : "bg-neutral-100 text-neutral-400 line-through"}`}>{size} · {count}</span>)}</div></section>}
             {product.description && <p className="mt-5 whitespace-pre-line text-sm leading-relaxed text-neutral-700">{product.description}</p>}
             {shop && <Link href={`/shop/${shop.slug}`} className="mt-6 text-sm font-semibold underline">Voir la boutique {shop.name}</Link>}
             {isOwner ? <p className="mt-6 rounded-lg bg-neutral-100 p-3 text-sm">C’est ton annonce. Tu ne peux pas acheter ton propre produit.</p> : outOfStock ? <p className="mt-6 rounded-lg bg-neutral-100 p-3 text-sm">Ce produit est actuellement épuisé.</p> : <Link href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`} className="mt-7 block w-full rounded-full bg-black px-6 py-4 text-center text-sm font-bold text-white hover:bg-neutral-800">Commander sans créer de compte</Link>}

@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Product } from "@/types/product";
 
 const PRODUCT_SELECT =
-  "id, shop_id, name, description, base_price, currency, stock_quantity, status, slug, category_id, created_at, updated_at, categories(name), product_images(image_url, sort_order)";
+  "id, shop_id, name, description, base_price, currency, stock_quantity, size_stock, brand, volume_ml, status, slug, category_id, created_at, updated_at, categories(name), product_images(image_url, sort_order)";
 
 type ProductRow = {
   id: string;
@@ -13,6 +13,9 @@ type ProductRow = {
   base_price: number;
   currency: string;
   stock_quantity: number;
+  size_stock: Record<string, number> | null;
+  brand: string | null;
+  volume_ml: number | null;
   status: Product["status"];
   slug: string;
   category_id: string | null;
@@ -35,6 +38,9 @@ function mapRow(row: ProductRow): Product {
     base_price: row.base_price,
     currency: row.currency,
     stock_quantity: row.stock_quantity,
+    size_stock: row.size_stock ?? {},
+    brand: row.brand,
+    volume_ml: row.volume_ml,
     status: row.status,
     slug: row.slug,
     category_id: row.category_id,

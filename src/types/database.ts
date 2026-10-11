@@ -963,6 +963,9 @@ export type Database = {
       products: {
         Row: {
           base_price: number
+          size_stock: Json
+          brand: string | null
+          volume_ml: number | null
           brand_id: string | null
           category_id: string | null
           created_at: string
@@ -979,6 +982,9 @@ export type Database = {
         }
         Insert: {
           base_price?: number
+          size_stock?: Json
+          brand?: string | null
+          volume_ml?: number | null
           brand_id?: string | null
           category_id?: string | null
           created_at?: string
