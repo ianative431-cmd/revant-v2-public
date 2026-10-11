@@ -11,10 +11,10 @@ export default function CartPage() {
     catch { setItems([]); }
   }, []);
   useEffect(() => {
-    refresh();
+    const initialRefresh = window.setTimeout(refresh, 0);
     window.addEventListener("storage", refresh);
     window.addEventListener("revant-cart-updated", refresh);
-    return () => { window.removeEventListener("storage", refresh); window.removeEventListener("revant-cart-updated", refresh); };
+    return () => { window.clearTimeout(initialRefresh); window.removeEventListener("storage", refresh); window.removeEventListener("revant-cart-updated", refresh); };
   }, [refresh]);
   function remove(id: string) {
     const next = items.filter((item) => item.id !== id);

@@ -10,9 +10,11 @@ export default function PhotoSearchPage() {
   const router = useRouter();
   useEffect(() => {
     if (sessionStorage.getItem("revant-photo-action") !== "search") return;
-    setPhoto(sessionStorage.getItem("revant-photo-prefill"));
+    const selectedPhoto = sessionStorage.getItem("revant-photo-prefill");
     sessionStorage.removeItem("revant-photo-action");
     sessionStorage.removeItem("revant-photo-prefill");
+    const timer = window.setTimeout(() => setPhoto(selectedPhoto), 0);
+    return () => window.clearTimeout(timer);
   }, []);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
