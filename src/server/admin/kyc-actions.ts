@@ -65,7 +65,7 @@ export async function updateKycStatusAction(formData: FormData): Promise<void> {
   const { error } = await supabase.rpc("admin_update_kyc", {
     p_kyc_id: id,
     p_action: action,
-    p_reason: action === "reject" ? reason : null,
+    p_reason: action === "reject" ? reason : undefined,
   });
 
   if (error) {
