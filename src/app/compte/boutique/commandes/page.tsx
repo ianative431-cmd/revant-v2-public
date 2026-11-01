@@ -5,7 +5,18 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { getOrdersForShop } from "@/server/orders/orders";
 import { ConfirmOrderButton, CancelOrderButton } from "./OrderActions";
+import RequestDeliveryButton from "./RequestDeliveryButton";
 import type { OrderStatus } from "@/types/order";
+
+const DELIVERY_STATUS_LABEL: Record<string, string> = {
+  unassigned: "En attente d’un livreur",
+  assigned: "Livreur assigné",
+  picked_up: "Commande récupérée",
+  in_transit: "En route",
+  delivered: "Livrée",
+  failed: "Échec de livraison",
+  cancelled: "Livraison annulée",
+};
 
 const STATUS_LABEL: Record<OrderStatus, string> = {
   pending: "En attente",
@@ -76,6 +87,15 @@ export default async function BoutiqueCommandesPage() {
                       <CancelOrderButton orderId={order.id} />
                     </div>
                   )}
+                  {(order.delivery || order.status === "confirmed") && <div className="mt-3 rounded-xl bg-brand-bg/70 p-3 text-xs text-brand-text/70">
+                    {order.delivery && <p className="font-semibold">Livraison : {DELIVERY_STATUS_LABEL[order.delivery.status] ?? order.delivery.status}</p>}
+                    {order.delivery?.delivery_address && <p className="mt-1">Destination : {order.delivery.delivery_address}</p>}
+                    {order.status === "confirmed" && (!order.delivery || (order.delivery.status === "unassigned" && !order.delivery.requested_at)) && <div className="mt-2"><RequestDeliveryButton orderId={order.id} /></div>}
+                    {order.delivery?.status === "unassigned" && order.delivery.requested_at && <p className="mt-1">Demande envoyée aux livreurs actifs.</p>}
+                    {order.delivery?.status === "assigned" && <p className="mt-1">Un livreur a accepté la course.</p>}
+                    {order.delivery?.status === "in_transit" && <p className="mt-1">Le colis est en route vers l’acheteur.</p>}
+                    {order.delivery?.status === "failed" && <p className="mt-1">Le support doit examiner cet incident.</p>}
+                  </div>}
                   {order.status === "delivered" && (
                     <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>
                   )}

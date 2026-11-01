@@ -2,11 +2,18 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { signOutAction } from "../(auth)/actions";
 import Link from "next/link";
 import AvatarUploader from "@/components/profile/AvatarUploader";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function ComptePage() {
   // Vérification côté serveur — inaccessible sans session valide, et
   // sans consentement légal à jour, quelle que soit l'URL tapée directement.
   const user = await requireUserWithLegalConsent();
+  const supabase = await createSupabaseServerClient();
+  const [{ data: driver }, unreadResult] = await Promise.all([
+    supabase.from("drivers").select("id,status").eq("user_id", user.id).maybeSingle(),
+    supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).is("read_at", null),
+  ]);
+  const unreadCount = unreadResult.count ?? 0;
 
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
@@ -61,6 +68,22 @@ export default async function ComptePage() {
         >
           Mes commandes
         </Link>
+
+        <Link
+          href="/compte/notifications"
+          className="block text-center text-sm underline mt-2 text-brand-text/70"
+        >
+          Notifications {unreadCount > 0 ? `(${unreadCount} non lues)` : ""}
+        </Link>
+
+        {driver && (
+          <Link
+            href="/compte/livraisons"
+            className="block text-center text-sm underline mt-2 text-brand-text/70"
+          >
+            Espace livreur {driver.status !== "active" ? "(activation en attente)" : ""}
+          </Link>
+        )}
 
         <Link
           href="/compte/confidentialite"

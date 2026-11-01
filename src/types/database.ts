@@ -335,8 +335,6 @@ export type Database = {
           created_at: string
           delivered_at: string | null
           delivery_address: string | null
-          delivery_code_hash: string | null
-          delivery_code_hint: string | null
           driver_id: string | null
           failure_reason: string | null
           id: string
@@ -344,6 +342,7 @@ export type Database = {
           picked_up_at: string | null
           pickup_address: string | null
           proof_photo_url: string | null
+          requested_at: string | null
           status: Database["public"]["Enums"]["delivery_status"]
           updated_at: string
         }
@@ -354,8 +353,6 @@ export type Database = {
           created_at?: string
           delivered_at?: string | null
           delivery_address?: string | null
-          delivery_code_hash?: string | null
-          delivery_code_hint?: string | null
           driver_id?: string | null
           failure_reason?: string | null
           id?: string
@@ -363,6 +360,7 @@ export type Database = {
           picked_up_at?: string | null
           pickup_address?: string | null
           proof_photo_url?: string | null
+          requested_at?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
           updated_at?: string
         }
@@ -373,8 +371,6 @@ export type Database = {
           created_at?: string
           delivered_at?: string | null
           delivery_address?: string | null
-          delivery_code_hash?: string | null
-          delivery_code_hint?: string | null
           driver_id?: string | null
           failure_reason?: string | null
           id?: string
@@ -382,6 +378,7 @@ export type Database = {
           picked_up_at?: string | null
           pickup_address?: string | null
           proof_photo_url?: string | null
+          requested_at?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
           updated_at?: string
         }

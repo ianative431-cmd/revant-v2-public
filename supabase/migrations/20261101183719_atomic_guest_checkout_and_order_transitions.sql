@@ -122,7 +122,8 @@ begin
     raise exception 'rate limit exceeded';
   end if;
 
-  select p.id, p.name, p.base_price, p.currency, p.stock_quantity, p.shop_id, s.owner_id
+  select p.id, p.name, p.base_price, p.currency, p.stock_quantity, p.shop_id,
+    s.owner_id, s.name as shop_name, s.city as shop_city, s.phone as shop_phone
     into v_product
   from public.products p
   join public.shops s on s.id = p.shop_id
@@ -161,6 +162,14 @@ begin
   ) values (
     v_order_id, v_product.id, v_product.shop_id, v_product.name, 1,
     v_product.base_price, v_product.base_price, v_product.currency
+  );
+
+  insert into public.deliveries(order_id, status, delivery_address, pickup_address)
+  values (
+    v_order_id,
+    'unassigned',
+    concat_ws(' · ', trim(p_guest_name), v_phone, trim(p_guest_address), trim(p_guest_city)),
+    concat_ws(' · ', v_product.shop_name, v_product.shop_city, v_product.shop_phone)
   );
 
   return jsonb_build_object('order_id', v_order_id, 'order_number', v_order_number);

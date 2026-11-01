@@ -5,6 +5,16 @@ import { getOrdersForBuyer } from "@/server/orders/orders";
 import BuyerOrderActions from "./BuyerOrderActions";
 import type { OrderStatus } from "@/types/order";
 
+const DELIVERY_STATUS_LABEL: Record<string, string> = {
+  unassigned: "Recherche d’un livreur",
+  assigned: "Livreur assigné",
+  picked_up: "Commande récupérée",
+  in_transit: "En route",
+  delivered: "Livrée",
+  failed: "Incident de livraison",
+  cancelled: "Livraison annulée",
+};
+
 const STATUS_LABEL: Record<OrderStatus, string> = {
   pending: "En attente de confirmation du vendeur",
   confirmed: "Confirmée par le vendeur",
@@ -50,6 +60,7 @@ export default async function MesCommandesPage() {
                   ))}
                 </div>
                 <p className="mt-3 text-sm font-bold">Total : {Number(order.total_amount).toLocaleString("fr-FR")} {order.currency.trim()}</p>
+                {order.delivery && <p className="mt-2 text-xs text-brand-text/55">Livraison : {DELIVERY_STATUS_LABEL[order.delivery.status] ?? order.delivery.status}</p>}
                 {order.status === "pending" && <div className="mt-3"><BuyerOrderActions orderId={order.id} /></div>}
                 {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
               </article>

@@ -3,7 +3,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requirePermission } from "@/server/auth/roles";
 import type { Tables } from "@/types/database";
 
-type DeliveryRow = Pick<Tables<"deliveries">, "id" | "order_id" | "driver_id" | "company_id" | "status" | "assigned_at" | "picked_up_at" | "delivered_at" | "failure_reason" | "created_at">;
+type DeliveryRow = Pick<Tables<"deliveries">, "id" | "order_id" | "driver_id" | "company_id" | "status" | "requested_at" | "assigned_at" | "picked_up_at" | "delivered_at" | "failure_reason" | "created_at">;
 type DriverRow = Pick<Tables<"drivers">, "id" | "full_name" | "vehicle_type">;
 type CompanyRow = Pick<Tables<"delivery_companies">, "id" | "name">;
 type OrderRow = Pick<Tables<"orders">, "id" | "order_number">;
@@ -13,7 +13,7 @@ export async function getAdminDeliveryOperations() {
   const admin = createSupabaseAdminClient();
   const { data: deliveries, error } = await admin
     .from("deliveries")
-    .select("id,order_id,driver_id,company_id,status,assigned_at,picked_up_at,delivered_at,failure_reason,created_at")
+    .select("id,order_id,driver_id,company_id,status,requested_at,assigned_at,picked_up_at,delivered_at,failure_reason,created_at")
     .order("created_at", { ascending: false })
     .limit(100);
   if (error) throw new Error("Impossible de charger les livraisons.");
