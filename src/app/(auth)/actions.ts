@@ -70,11 +70,10 @@ export async function signUpWithEmail(
   }
 
   const ip = await getClientIdentifier();
-  const [allowedByEmail, allowedByIp] = await Promise.all([
-    checkRateLimit(`signup:email:${email}`, 5, 3600),
-    checkRateLimit(`signup:ip:${ip}`, 15, 3600),
-  ]);
-  if (!allowedByEmail || !allowedByIp) {
+  const checks = [checkRateLimit(`signup:email:${email.toLowerCase()}`, 5, 3600)];
+  if (ip !== "unknown") checks.push(checkRateLimit(`signup:ip:${ip}`, 15, 3600));
+  const allowed = await Promise.all(checks);
+  if (allowed.some((isAllowed) => !isAllowed)) {
     return { error: RATE_LIMIT_ERROR_MESSAGE };
   }
 
@@ -109,11 +108,10 @@ export async function signInWithEmail(
   }
 
   const ip = await getClientIdentifier();
-  const [allowedByEmail, allowedByIp] = await Promise.all([
-    checkRateLimit(`signin:email:${email}`, 10, 900),
-    checkRateLimit(`signin:ip:${ip}`, 30, 900),
-  ]);
-  if (!allowedByEmail || !allowedByIp) {
+  const checks = [checkRateLimit(`signin:email:${email.toLowerCase()}`, 10, 900)];
+  if (ip !== "unknown") checks.push(checkRateLimit(`signin:ip:${ip}`, 30, 900));
+  const allowed = await Promise.all(checks);
+  if (allowed.some((isAllowed) => !isAllowed)) {
     return { error: RATE_LIMIT_ERROR_MESSAGE };
   }
 
@@ -143,11 +141,10 @@ export async function sendPhoneOtp(
   // Fenêtre courte et seuil bas : chaque SMS envoyé a un coût réel
   // (Twilio), contrairement aux autres limites de cette page.
   const ip = await getClientIdentifier();
-  const [allowedByPhone, allowedByIp] = await Promise.all([
-    checkRateLimit(`sms:phone:${phone}`, 3, 600),
-    checkRateLimit(`sms:ip:${ip}`, 8, 600),
-  ]);
-  if (!allowedByPhone || !allowedByIp) {
+  const checks = [checkRateLimit(`sms:phone:${phone}`, 3, 600)];
+  if (ip !== "unknown") checks.push(checkRateLimit(`sms:ip:${ip}`, 8, 600));
+  const allowed = await Promise.all(checks);
+  if (allowed.some((isAllowed) => !isAllowed)) {
     return { error: RATE_LIMIT_ERROR_MESSAGE };
   }
 

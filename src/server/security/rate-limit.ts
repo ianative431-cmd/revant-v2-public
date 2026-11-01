@@ -1,4 +1,6 @@
 import "server-only";
+import { createHash } from "node:crypto";
+import { isIP } from "node:net";
 import { headers } from "next/headers";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -22,38 +24,38 @@ export async function checkRateLimit(
   windowSeconds: number
 ): Promise<boolean> {
   const supabase = createSupabaseAdminClient();
+  // Hash every key so e-mail addresses, phone numbers and IP addresses
+  // are never stored in plaintext in the rate-limit table.
+  const hashedKey = createHash("sha256").update(key).digest("hex");
   const { data, error } = await supabase.rpc("check_rate_limit", {
-    p_key: key,
+    p_key: hashedKey,
     p_max_attempts: maxAttempts,
     p_window_seconds: windowSeconds,
   });
 
   if (error) {
-    // Si la vérification elle-même échoue (ex. panne base), on choisit
-    // de laisser passer plutôt que de bloquer tout le monde — une
-    // panne de rate limiting ne doit pas devenir un déni de service.
-    // L'erreur reste journalisée côté serveur pour diagnostic.
+    // Fail closed: si la protection partagée ne répond plus, on refuse
+    // temporairement les opérations sensibles plutôt que de désactiver
+    // la défense contre le brute force.
     console.error("[rate-limit] vérification impossible :", error.message);
-    return true;
+    return false;
   }
 
   return data === true;
 }
 
 /**
- * Identifiant réseau du visiteur, pour les clés de rate limit qui ne
- * dépendent pas d'un compte (ex. tentatives de connexion avant
- * authentification). x-forwarded-for peut contenir plusieurs IP
- * (proxy, CDN) : on garde la première, celle du client d'origine.
- * Valeur de repli si l'en-tête est absent (jamais de clé vide).
+ * Identifiant réseau de confiance pour les limites anti-abus sur Render.
+ * On privilégie CF-Connecting-IP (défini par le proxy Cloudflare de Render)
+ * et on ignore X-Forwarded-For : une valeur fournie par le client peut y
+ * rester en tête de liste et permettre de contourner les limites IP.
+ * Si l'en-tête de confiance manque, les limites par compte/téléphone restent
+ * actives et aucune clé IP globale "unknown" n'est créée.
  */
 export async function getClientIdentifier(): Promise<string> {
   const headerList = await headers();
-  const forwardedFor = headerList.get("x-forwarded-for");
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0]?.trim() || "unknown";
-  }
-  return headerList.get("x-real-ip") ?? "unknown";
+  const cloudflareIp = headerList.get("cf-connecting-ip")?.trim() ?? "";
+  return isIP(cloudflareIp) ? cloudflareIp : "unknown";
 }
 
 /** Message d'erreur générique affiché à l'utilisateur en cas de blocage
