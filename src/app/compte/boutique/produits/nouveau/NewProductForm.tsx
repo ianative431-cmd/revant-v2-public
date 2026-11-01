@@ -58,7 +58,7 @@ export default function NewProductForm({
       sessionStorage.removeItem("revant-photo-action");
       sessionStorage.removeItem("revant-photo-prefill");
     } catch {
-      setStatus("error-generic");
+      queueMicrotask(() => setStatus("error-generic"));
       return;
     }
 
