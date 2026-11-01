@@ -85,6 +85,13 @@ export default async function MaBoutiquePage() {
           Commandes
         </Link>
 
+        <Link
+          href="/compte/boutique/reseaux"
+          className="block text-center w-full border border-brand-accent rounded-full py-3 text-sm font-medium mb-3"
+        >
+          Calendrier des réseaux sociaux
+        </Link>
+
         <div className="mt-6 border-t pt-4">
           <Link
             href="/compte/boutique/personnaliser"

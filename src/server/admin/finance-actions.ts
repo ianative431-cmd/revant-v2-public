@@ -38,6 +38,7 @@ export async function updatePayoutStatus(
   }
 
   revalidatePath("/admin/finance");
+  revalidatePath("/admin/retraits");
   return { error: null };
 }
 

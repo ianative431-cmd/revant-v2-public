@@ -3,18 +3,42 @@
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { consumePendingProductImage } from "@/lib/pending-product-image";
 
 export default function PhotoSearchPage() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const router = useRouter();
   useEffect(() => {
-    if (sessionStorage.getItem("revant-photo-action") !== "search") return;
-    const selectedPhoto = sessionStorage.getItem("revant-photo-prefill");
-    sessionStorage.removeItem("revant-photo-action");
-    sessionStorage.removeItem("revant-photo-prefill");
-    const timer = window.setTimeout(() => setPhoto(selectedPhoto), 0);
-    return () => window.clearTimeout(timer);
+    let action: string | null = null;
+    let legacyPhoto: string | null = null;
+    try {
+      action = sessionStorage.getItem("revant-photo-action");
+      if (action !== "search") return;
+      legacyPhoto = sessionStorage.getItem("revant-photo-prefill");
+      sessionStorage.removeItem("revant-photo-action");
+      sessionStorage.removeItem("revant-photo-prefill");
+    } catch {
+      return;
+    }
+
+    let active = true;
+    let objectUrl: string | null = null;
+    consumePendingProductImage().then((file) => {
+      if (!active) return;
+      if (file) {
+        objectUrl = URL.createObjectURL(file);
+        setPhoto(objectUrl);
+      } else if (legacyPhoto) {
+        setPhoto(legacyPhoto);
+      }
+    }).catch(() => {
+      if (active && legacyPhoto) setPhoto(legacyPhoto);
+    });
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, []);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

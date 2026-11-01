@@ -29,7 +29,7 @@ export default function BottomNav() {
       <Item href="/categories" label="Catégorie" active={pathname === "/categories"} icon={<CategoryIcon/>}/>
       <Item href="/messages" label="Message" active={pathname === "/messages" || pathname.startsWith("/messages/")} icon={<MessageIcon/>}/>
       <Item href="/panier" label="Panier" active={pathname === "/panier"} icon={<CartIcon/>}/>
-      <Item href="/compte" label="Mon Revant" active={pathname === "/compte" || pathname.startsWith("/compte/")} icon={<ProfileIcon/>}/>
+      <Item href="/compte" label="Mon Revante" active={pathname === "/compte" || pathname.startsWith("/compte/")} icon={<ProfileIcon/>}/>
     </nav>
   );
 }

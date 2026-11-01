@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -11,6 +11,9 @@ import {
   compressProductImage,
 } from "@/lib/product-image";
 import type { Category } from "@/server/catalog/categories";
+import { consumePendingProductImage } from "@/lib/pending-product-image";
+
+const MAX_PRODUCT_IMAGES = 5;
 
 type Status =
   | "idle"
@@ -19,14 +22,16 @@ type Status =
   | "error-size"
   | "error-network"
   | "error-generic"
-  | "error-validation";
+  | "error-validation"
+  | "error-count";
 
 const ERROR_MESSAGES: Record<string, string> = {
   "error-type": "Cette image n'est pas valide (JPEG, PNG ou WebP attendus).",
-  "error-size": "L'image dépasse la taille maximale autorisée (8 Mo).",
+  "error-size": "Une image dépasse la taille maximale autorisée (8 Mo).",
   "error-network": "L'envoi a échoué. Vérifie ta connexion et réessaie.",
   "error-generic": "Une erreur est survenue. Réessaie dans un instant.",
-  "error-validation": "Vérifie le titre, le prix et la photo avant de publier.",
+  "error-validation": "Vérifie le titre, le prix et ajoute au moins une photo.",
+  "error-count": "Tu peux ajouter jusqu'à 5 photos par produit.",
 };
 
 export default function NewProductForm({
@@ -37,45 +42,97 @@ export default function NewProductForm({
   categories: Category[];
 }) {
   const router = useRouter();
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const previewUrlsRef = useRef<string[]>([]);
   const [status, setStatus] = useState<Status>("idle");
 
   useEffect(() => {
-    if (typeof window === "undefined" || sessionStorage.getItem("revant-photo-action") !== "add") return;
-    const dataUrl = sessionStorage.getItem("revant-photo-prefill");
-    sessionStorage.removeItem("revant-photo-action");
-    sessionStorage.removeItem("revant-photo-prefill");
-    if (!dataUrl) return;
-    fetch(dataUrl)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const selected = new File([blob], "revant-product-photo.jpg", { type: blob.type || "image/jpeg" });
+    if (typeof window === "undefined") return;
+    let action: string | null = null;
+    let legacyDataUrl: string | null = null;
+    try {
+      action = sessionStorage.getItem("revant-photo-action");
+      if (action !== "add") return;
+      legacyDataUrl = sessionStorage.getItem("revant-photo-prefill");
+      sessionStorage.removeItem("revant-photo-action");
+      sessionStorage.removeItem("revant-photo-prefill");
+    } catch {
+      setStatus("error-generic");
+      return;
+    }
+
+    let active = true;
+    async function restorePhoto() {
+      try {
+        let selected: File | null = null;
+        try {
+          selected = await consumePendingProductImage();
+        } catch {
+          if (!legacyDataUrl) throw new Error("Photo temporaire indisponible.");
+        }
+        if (!selected && legacyDataUrl) {
+          const response = await fetch(legacyDataUrl);
+          const blob = await response.blob();
+          selected = new File([blob], "revant-product-photo.jpg", { type: blob.type || "image/jpeg" });
+        }
+        if (!active || !selected) return;
         if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type) || selected.size > PRODUCT_IMAGE_MAX_BYTES) {
           setStatus(selected.size > PRODUCT_IMAGE_MAX_BYTES ? "error-size" : "error-type");
           return;
         }
-        setFile(selected);
-        setPreviewUrl(URL.createObjectURL(selected));
-      })
-      .catch(() => setStatus("error-generic"));
+        const previewUrl = URL.createObjectURL(selected);
+        previewUrlsRef.current = [previewUrl];
+        setFiles([selected]);
+        setPreviewUrls([previewUrl]);
+      } catch {
+        if (active) setStatus("error-generic");
+      }
+    }
+    void restorePhoto();
+    return () => { active = false; };
   }, []);
 
-  function handleFileSelected(selected: File | undefined) {
-    if (!selected) return;
+  useEffect(() => {
+    return () => previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+  }, []);
 
-    if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type)) {
-      setStatus("error-type");
-      return;
-    }
-    if (selected.size > PRODUCT_IMAGE_MAX_BYTES) {
-      setStatus("error-size");
-      return;
+  function handleFilesSelected(selectedFiles: File[]) {
+    if (selectedFiles.length === 0) return;
+    const remaining = MAX_PRODUCT_IMAGES - files.length;
+    if (remaining <= 0 || selectedFiles.length > remaining) {
+      setStatus("error-count");
+      if (remaining <= 0) return;
     }
 
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setFile(selected);
-    setPreviewUrl(URL.createObjectURL(selected));
+    const accepted: File[] = [];
+    for (const selected of selectedFiles.slice(0, Math.max(0, remaining))) {
+      if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type)) {
+        setStatus("error-type");
+        return;
+      }
+      if (selected.size > PRODUCT_IMAGE_MAX_BYTES) {
+        setStatus("error-size");
+        return;
+      }
+      accepted.push(selected);
+    }
+
+    if (accepted.length > 0) {
+      const newPreviewUrls = accepted.map((selected) => URL.createObjectURL(selected));
+      previewUrlsRef.current = [...previewUrlsRef.current, ...newPreviewUrls];
+      setFiles((current) => [...current, ...accepted].slice(0, MAX_PRODUCT_IMAGES));
+      setPreviewUrls((current) => [...current, ...newPreviewUrls].slice(0, MAX_PRODUCT_IMAGES));
+      setStatus("idle");
+    }
+  }
+
+  function removeImage(index: number) {
+    const removedUrl = previewUrls[index];
+    if (removedUrl) URL.revokeObjectURL(removedUrl);
+    previewUrlsRef.current = previewUrlsRef.current.filter((url) => url !== removedUrl);
+    setFiles((current) => current.filter((_, i) => i !== index));
+    setPreviewUrls((current) => current.filter((_, i) => i !== index));
     setStatus("idle");
   }
 
@@ -99,7 +156,8 @@ export default function NewProductForm({
     const price = Number(priceRaw);
 
     if (
-      name.length < 2 || name.length > 120 || !Number.isFinite(price) || price <= 0 || !file ||
+      name.length < 2 || name.length > 120 || !Number.isFinite(price) || price <= 0 || files.length === 0 ||
+      files.length > MAX_PRODUCT_IMAGES ||
       !["clothing", "perfume", "other"].includes(productType) ||
       (productType === "perfume" && perfumeVolumeMl !== null && (!Number.isInteger(perfumeVolumeMl) || perfumeVolumeMl < 1 || perfumeVolumeMl > 5000)) ||
       (productType === "clothing" && (sizeLines.length === 0 || Object.keys(sizeStock).length !== sizeLines.length || Object.values(sizeStock).some((qty) => !Number.isInteger(qty) || qty < 0)))
@@ -109,24 +167,25 @@ export default function NewProductForm({
     }
 
     setStatus("submitting");
+    const supabase = createSupabaseBrowserClient();
+    const uploadedPaths: string[] = [];
 
     try {
-      const compressed = await compressProductImage(file);
-      const supabase = createSupabaseBrowserClient();
-      const path = buildProductImagePath(shopId);
+      for (let index = 0; index < files.length; index += 1) {
+        const compressed = await compressProductImage(files[index]);
+        const basePath = buildProductImagePath(shopId);
+        const path = basePath.replace(/\.jpg$/, "-" + index + ".jpg");
+        const { error: uploadError } = await supabase.storage
+          .from(PRODUCT_IMAGE_BUCKET)
+          .upload(path, compressed, { contentType: "image/jpeg", upsert: false });
 
-      const { error: uploadError } = await supabase.storage
-        .from(PRODUCT_IMAGE_BUCKET)
-        .upload(path, compressed, { contentType: "image/jpeg", upsert: false });
-
-      if (uploadError) {
-        setStatus("error-network");
-        return;
+        if (uploadError) {
+          if (uploadedPaths.length > 0) await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
+          setStatus("error-network");
+          return;
+        }
+        uploadedPaths.push(path);
       }
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
 
       const { data: product, error: insertError } = await supabase
         .from("products")
@@ -140,26 +199,31 @@ export default function NewProductForm({
           size_stock: productType === "clothing" ? sizeStock : {},
           perfume_volume_ml: productType === "perfume" ? perfumeVolumeMl : null,
           stock_quantity: productType === "clothing" ? Object.values(sizeStock).reduce((sum, qty) => sum + qty, 0) : Math.max(0, Number(formData.get("stockQuantity") ?? 0)),
-          slug: `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60)}-${Date.now().toString(36)}`,
+          slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60) + "-" + Date.now().toString(36),
         })
         .select("id")
         .single();
 
       if (insertError || !product) {
-        // Image envoyée mais annonce non enregistrée : on nettoie le
-        // fichier orphelin plutôt que de le laisser traîner en stockage.
-        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
+        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
         setStatus("error-generic");
         return;
       }
 
-      const { error: imageError } = await supabase.from("product_images").insert({
-        product_id: product.id,
-        image_url: publicUrl,
-        sort_order: 0,
+      const imageRows = uploadedPaths.map((path, index) => {
+        const { data } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
+        return {
+          product_id: product.id,
+          image_url: data.publicUrl,
+          sort_order: index,
+        };
       });
 
+      const { error: imageError } = await supabase.from("product_images").insert(imageRows);
+
       if (imageError) {
+        await supabase.from("products").delete().eq("id", product.id);
+        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
         setStatus("error-generic");
         return;
       }
@@ -167,26 +231,54 @@ export default function NewProductForm({
       router.push("/compte/boutique/produits");
       router.refresh();
     } catch {
+      if (uploadedPaths.length > 0) {
+        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
+      }
       setStatus("error-generic");
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <input
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        onChange={(e) => handleFileSelected(e.target.files?.[0])}
-        className="text-sm"
-      />
-
-      {previewUrl && (
-        // eslint-disable-next-line @next/next/no-img-element -- aperçu local (blob URL), pas une image distante à optimiser
-        <img
-          src={previewUrl}
-          alt="Aperçu de l'annonce"
-          className="rounded-xl w-full aspect-square object-cover"
+      <label className="grid gap-2 text-sm font-medium">
+        Photos du produit (jusqu&apos;à 5)
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          onChange={(event) => {
+            handleFilesSelected(Array.from(event.currentTarget.files ?? []));
+            event.currentTarget.value = "";
+          }}
+          className="text-sm"
         />
+        <span className="text-xs font-normal text-neutral-500">
+          Tu peux prendre une photo avec ton téléphone ou choisir plusieurs images dans la galerie.
+        </span>
+      </label>
+
+      {previewUrls.length > 0 && (
+        <div className="grid grid-cols-3 gap-2">
+          {previewUrls.map((url, index) => (
+            <div key={url} className="relative aspect-square overflow-hidden rounded-xl bg-neutral-100">
+              {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local (blob URL) */}
+              <img src={url} alt={"Aperçu photo " + (index + 1)} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeImage(index)}
+                aria-label={"Retirer la photo " + (index + 1)}
+                className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-sm text-white"
+              >
+                ×
+              </button>
+              {index === 0 && (
+                <span className="absolute bottom-1 left-1 rounded bg-black/70 px-2 py-1 text-[10px] text-white">
+                  Principale
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
       )}
 
       <input
