@@ -52,7 +52,7 @@ export async function submitKycDocument(formData: FormData): Promise<void> {
   if (!isPdf && !isJpeg && !isPng) redirect("/compte/boutique/verification?error=format");
 
   const path = user.id + "/" + Date.now() + "-" + crypto.randomUUID() + "." + extension;
-  const { error: uploadError } = await admin.storage
+  const { error: uploadError } = await supabase.storage
     .from("kyc-documents")
     .upload(path, fileBytes, {
       contentType: file.type,
