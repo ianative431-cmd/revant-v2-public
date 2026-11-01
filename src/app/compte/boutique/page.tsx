@@ -72,6 +72,13 @@ export default async function MaBoutiquePage() {
         </Link>
 
         <Link
+          href="/compte/boutique/verification"
+          className="block text-center w-full border border-brand-accent rounded-full py-3 text-sm font-medium mb-3"
+        >
+          Vérifier mon identité
+        </Link>
+
+        <Link
           href="/compte/boutique/commandes"
           className="block text-center w-full border border-brand-accent rounded-full py-3 text-sm font-medium mb-3"
         >
