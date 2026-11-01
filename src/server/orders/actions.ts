@@ -6,154 +6,64 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 
 export type OrderActionState = { error: string | null; success?: boolean };
 
-function generateOrderNumber(): string {
-  return `RVT-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)
-    .toString()
-    .padStart(3, "0")}`;
+type OrderTransitionRpc = {
+  rpc: (name: string, args: { p_order_id: string }) => Promise<{
+    data: unknown;
+    error: { message: string } | null;
+  }>;
+};
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function messageForOrderError(message: string, fallback: string) {
+  if (message.includes("forbidden")) return "Tu n’es pas autorisé à modifier cette commande.";
+  if (message.includes("invalid_order_transition")) return "Cette commande ne peut plus être modifiée à ce stade.";
+  if (message.includes("product_unavailable_or_insufficient_stock")) return "Le produit n’est plus disponible en quantité suffisante. La commande reste en attente.";
+  if (message.includes("invalid_order_shop_scope")) return "Cette commande doit être traitée par boutique. Contacte le support.";
+  if (message.includes("order_not_found")) return "Commande introuvable.";
+  return fallback;
 }
 
-/**
- * Place une commande. Le prix et le nom ne sont JAMAIS pris depuis le
- * formulaire : on relit le vrai produit en base au moment de l'achat,
- * exactement comme le reste du projet ne fait jamais confiance à une
- * valeur envoyée par le client. La policy RLS sur orders/order_items
- * revérifie de toute façon la même chose en base, indépendamment.
- *
- * Schéma actuel : une commande (orders) contient un ou plusieurs
- * articles (order_items) — ici toujours un seul pour l'instant, le
- * panier multi-articles n'est pas encore construit.
- */
-export async function createOrder(
-  _prevState: OrderActionState,
-  formData: FormData
+async function runOrderTransition(
+  formData: FormData,
+  rpcName: "seller_confirm_order" | "seller_cancel_order" | "buyer_cancel_order",
+  fallback: string
 ): Promise<OrderActionState> {
-  const user = await requireUserWithLegalConsent();
+  await requireUserWithLegalConsent();
+  const orderId = String(formData.get("orderId") ?? "").trim();
+  if (!UUID_PATTERN.test(orderId)) return { error: "Référence de commande invalide." };
+
   const supabase = await createSupabaseServerClient();
+  const rpc = supabase as unknown as OrderTransitionRpc;
+  const { error } = await rpc.rpc(rpcName, { p_order_id: orderId });
+  if (error) return { error: messageForOrderError(error.message, fallback) };
 
-  const productId = String(formData.get("productId") ?? "");
-
-  const { data: product } = await supabase
-    .from("products")
-    .select("id, name, base_price, currency, status, stock_quantity, shop_id, shops(name, owner_id)")
-    .eq("id", productId)
-    .maybeSingle();
-
-  if (!product) {
-    return { error: "Produit introuvable." };
-  }
-  if (product.status !== "active" || product.stock_quantity <= 0) {
-    return { error: "Ce produit n'est plus disponible." };
-  }
-  const shop = Array.isArray(product.shops) ? product.shops[0] : product.shops;
-  if (!shop) {
-    return { error: "Boutique introuvable." };
-  }
-  if (shop.owner_id === user.id) {
-    return { error: "Vous ne pouvez pas commander votre propre produit." };
-  }
-
-  const { data: order, error: orderError } = await supabase
-    .from("orders")
-    .insert({
-      buyer_id: user.id,
-      order_number: generateOrderNumber(),
-      status: "pending",
-      currency: product.currency,
-      subtotal: product.base_price,
-      delivery_fee: 0,
-      total_amount: product.base_price,
-      placed_at: new Date().toISOString(),
-    })
-    .select("id")
-    .single();
-
-  if (orderError || !order) {
-    return { error: "Impossible de créer la commande." };
-  }
-
-  const { error: itemError } = await supabase.from("order_items").insert({
-    order_id: order.id,
-    product_id: product.id,
-    shop_id: product.shop_id,
-    product_name: product.name,
-    quantity: 1,
-    unit_price: product.base_price,
-    line_total: product.base_price,
-    currency: product.currency,
-  });
-
-  if (itemError) {
-    // La commande ne doit jamais exister sans son article — on nettoie
-    // plutôt que de laisser une commande vide et trompeuse.
-    await supabase.from("orders").delete().eq("id", order.id);
-    return { error: "Impossible de créer la commande." };
-  }
-
-  revalidatePath(`/produit/${productId}`);
+  revalidatePath("/compte/boutique/commandes");
   revalidatePath("/compte/commandes");
+  revalidatePath(`/compte/commandes/${orderId}/recu`);
   return { error: null, success: true };
 }
 
-/**
- * Confirme une commande : le vendeur atteste avoir réellement reçu le
- * paiement (hors app) et livré. Décrémente le stock des produits
- * commandés dans la foulée — jamais une seconde écriture qui pourrait
- * diverger si l'une des deux échoue silencieusement.
- */
+/** Seller confirms order acceptance only. This does not mark a payment paid or a delivery completed. */
 export async function confirmOrder(
-  _prevState: OrderActionState,
+  _previousState: OrderActionState,
   formData: FormData
 ): Promise<OrderActionState> {
-  await requireUserWithLegalConsent();
-  const supabase = await createSupabaseServerClient();
-
-  const orderId = String(formData.get("orderId") ?? "");
-
-  const { data: items } = await supabase
-    .from("order_items")
-    .select("product_id, quantity")
-    .eq("order_id", orderId);
-
-  const { error } = await supabase
-    .from("orders")
-    .update({ status: "delivered", delivered_at: new Date().toISOString() })
-    .eq("id", orderId)
-    .eq("status", "pending");
-
-  if (error) {
-    return { error: "Impossible de confirmer cette commande." };
-  }
-
-  for (const item of items ?? []) {
-    await supabase.rpc("decrement_product_stock", {
-      p_product_id: item.product_id,
-      p_quantity: item.quantity,
-    });
-  }
-
-  revalidatePath("/compte/boutique/commandes");
-  revalidatePath("/compte/commandes");
-  return { error: null, success: true };
+  return runOrderTransition(formData, "seller_confirm_order", "Impossible de confirmer cette commande.");
 }
 
+/** Seller may cancel only an order that has not progressed beyond confirmation. */
 export async function cancelOrder(
-  _prevState: OrderActionState,
+  _previousState: OrderActionState,
   formData: FormData
 ): Promise<OrderActionState> {
-  await requireUserWithLegalConsent();
-  const supabase = await createSupabaseServerClient();
+  return runOrderTransition(formData, "seller_cancel_order", "Impossible d’annuler cette commande.");
+}
 
-  const orderId = String(formData.get("orderId") ?? "");
-  const { error } = await supabase
-    .from("orders")
-    .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
-    .eq("id", orderId);
-
-  if (error) {
-    return { error: "Impossible d'annuler cette commande." };
-  }
-
-  revalidatePath("/compte/boutique/commandes");
-  revalidatePath("/compte/commandes");
-  return { error: null, success: true };
+/** A buyer may cancel only their own order while it is still pending. */
+export async function cancelBuyerOrder(
+  _previousState: OrderActionState,
+  formData: FormData
+): Promise<OrderActionState> {
+  return runOrderTransition(formData, "buyer_cancel_order", "Impossible d’annuler cette commande.");
 }

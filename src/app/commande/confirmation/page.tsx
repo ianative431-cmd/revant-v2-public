@@ -11,6 +11,18 @@ type GuestOrderLookup = {
 
 type Props = { searchParams: Promise<{ numero?: string }> };
 
+const STATUS_LABEL: Record<string, string> = {
+  pending: "En attente de confirmation",
+  confirmed: "Confirmée par le vendeur",
+  processing: "En préparation",
+  ready_for_delivery: "Prête à livrer",
+  shipped: "En livraison",
+  delivered: "Livrée",
+  cancelled: "Annulée",
+  refunded: "Remboursée",
+  disputed: "En litige",
+};
+
 export default async function GuestOrderConfirmation({ searchParams }: Props) {
   const { numero } = await searchParams;
   if (!numero || !/^RVT-[A-Z0-9-]{8,40}$/.test(numero)) notFound();
@@ -35,7 +47,7 @@ export default async function GuestOrderConfirmation({ searchParams }: Props) {
           <p className="text-sm font-bold">{data.product_name}</p>
           <p className="mt-1 text-xs text-neutral-500">Boutique : {data.shop_name}</p>
           <p className="mt-3 text-lg font-black">{Number(data.total_amount).toLocaleString("fr-FR")} {data.currency}</p>
-          <p className="mt-2 text-xs text-neutral-500">Statut : {data.status}</p>
+          <p className="mt-2 text-xs text-neutral-500">Statut : {STATUS_LABEL[data.status] ?? data.status}</p>
         </div>
         <p className="mt-4 text-xs leading-relaxed text-neutral-500">Aucun compte n’a été créé. Le suivi de cette commande est protégé sur cet appareil.</p>
         <Link href="/" className="mt-6 inline-flex rounded-full bg-black px-6 py-3 text-sm font-bold text-white">Retour à l’accueil</Link>

@@ -1,48 +1,36 @@
 "use client";
 
 import { useActionState } from "react";
-import { confirmOrder, cancelOrder } from "@/server/orders/actions";
+import { confirmOrder, cancelOrder, type OrderActionState } from "@/server/orders/actions";
+
+const initialState: OrderActionState = { error: null };
 
 export function ConfirmOrderButton({ orderId }: { orderId: string }) {
-  const [state, formAction, pending] = useActionState(confirmOrder, { error: null });
+  const [state, formAction, pending] = useActionState(confirmOrder, initialState);
   return (
-    <form
-      action={formAction}
-      onSubmit={(e) => {
-        if (!confirm("Confirmer avoir reçu le paiement et livré cet article ?")) e.preventDefault();
-      }}
-    >
+    <form action={formAction} onSubmit={(event) => {
+      if (!confirm("Confirmer la prise en charge de cette commande ? Cela ne marque pas le paiement comme effectué.")) event.preventDefault();
+    }}>
       <input type="hidden" name="orderId" value={orderId} />
-      <button
-        type="submit"
-        disabled={pending}
-        className="text-xs bg-black text-white rounded-full px-3 py-1.5 font-medium disabled:opacity-50"
-      >
-        {pending ? "..." : "Confirmer (payé + livré)"}
+      <button type="submit" disabled={pending} className="rounded-full bg-black px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">
+        {pending ? "..." : "Confirmer la commande"}
       </button>
-      {state.error && <p className="text-red-600 text-[10px] mt-1">{state.error}</p>}
+      {state.error && <p role="alert" className="mt-1 text-[10px] text-red-600">{state.error}</p>}
     </form>
   );
 }
 
 export function CancelOrderButton({ orderId }: { orderId: string }) {
-  const [state, formAction, pending] = useActionState(cancelOrder, { error: null });
+  const [state, formAction, pending] = useActionState(cancelOrder, initialState);
   return (
-    <form
-      action={formAction}
-      onSubmit={(e) => {
-        if (!confirm("Annuler cette commande ?")) e.preventDefault();
-      }}
-    >
+    <form action={formAction} onSubmit={(event) => {
+      if (!confirm("Annuler cette commande et remettre le stock réservé en disponibilité ?")) event.preventDefault();
+    }}>
       <input type="hidden" name="orderId" value={orderId} />
-      <button
-        type="submit"
-        disabled={pending}
-        className="text-xs border border-red-600 text-red-600 rounded-full px-3 py-1.5 font-medium disabled:opacity-50"
-      >
+      <button type="submit" disabled={pending} className="rounded-full border border-red-600 px-3 py-2 text-xs font-semibold text-red-600 disabled:opacity-50">
         {pending ? "..." : "Annuler"}
       </button>
-      {state.error && <p className="text-red-600 text-[10px] mt-1">{state.error}</p>}
+      {state.error && <p role="alert" className="mt-1 text-[10px] text-red-600">{state.error}</p>}
     </form>
   );
 }

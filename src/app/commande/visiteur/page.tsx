@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { randomUUID } from "node:crypto";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getProductById } from "@/server/products/products";
 import { createGuestOrder } from "@/server/orders/guest-actions";
@@ -12,6 +13,7 @@ export default async function GuestCheckoutPage({ searchParams }: Props) {
   const supabase = await createSupabaseServerClient();
   const product = await getProductById(supabase, productId);
   if (!product || product.status !== "active" || product.stock_quantity <= 0) notFound();
+  const idempotencyKey = randomUUID();
 
   return (
     <main className="min-h-screen bg-[#f7f7f7] px-4 py-8 text-[#111]">
@@ -28,6 +30,7 @@ export default async function GuestCheckoutPage({ searchParams }: Props) {
           {erreur && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{erreur === "validation" ? "Vérifie les informations saisies." : "La commande n’a pas pu être créée. Vérifie les informations et réessaie."}</p>}
           <form action={createGuestOrder} className="mt-6 grid gap-4">
             <input type="hidden" name="productId" value={product.id} />
+            <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
             <div><label htmlFor="guest-name" className="mb-1 block text-xs font-semibold">Nom complet</label><input id="guest-name" name="name" required minLength={2} maxLength={100} autoComplete="name" className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm outline-none focus:border-black" placeholder="Ton nom complet" /></div>
             <div><label htmlFor="guest-phone" className="mb-1 block text-xs font-semibold">Téléphone</label><input id="guest-phone" name="phone" required minLength={8} maxLength={24} autoComplete="tel" inputMode="tel" className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm outline-none focus:border-black" placeholder="+227 ..." /></div>
             <div><label htmlFor="guest-city" className="mb-1 block text-xs font-semibold">Ville</label><input id="guest-city" name="city" required minLength={2} maxLength={100} autoComplete="address-level2" className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm outline-none focus:border-black" placeholder="Niamey, Maradi..." /></div>

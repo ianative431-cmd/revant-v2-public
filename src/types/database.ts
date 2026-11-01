@@ -764,49 +764,73 @@ export type Database = {
       }
       orders: {
         Row: {
-          buyer_id: string
+          buyer_id: string | null
           cancelled_at: string | null
+          confirmed_at: string | null
           created_at: string
           currency: string
           delivered_at: string | null
           delivery_fee: number
+          guest_address: string | null
+          guest_city: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          guest_tracking_token_hash: string | null
           id: string
+          idempotency_key: string | null
           order_number: string
           placed_at: string | null
           shipping_address_id: string | null
           status: Database["public"]["Enums"]["order_status"]
+          stock_reserved: boolean
           subtotal: number
           total_amount: number
           updated_at: string
         }
         Insert: {
-          buyer_id: string
+          buyer_id?: string | null
           cancelled_at?: string | null
+          confirmed_at?: string | null
           created_at?: string
           currency?: string
           delivered_at?: string | null
           delivery_fee?: number
+          guest_address?: string | null
+          guest_city?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          guest_tracking_token_hash?: string | null
           id?: string
+          idempotency_key?: string | null
           order_number: string
           placed_at?: string | null
           shipping_address_id?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_reserved?: boolean
           subtotal?: number
           total_amount?: number
           updated_at?: string
         }
         Update: {
-          buyer_id?: string
+          buyer_id?: string | null
           cancelled_at?: string | null
+          confirmed_at?: string | null
           created_at?: string
           currency?: string
           delivered_at?: string | null
           delivery_fee?: number
+          guest_address?: string | null
+          guest_city?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          guest_tracking_token_hash?: string | null
           id?: string
+          idempotency_key?: string | null
           order_number?: string
           placed_at?: string | null
           shipping_address_id?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_reserved?: boolean
           subtotal?: number
           total_amount?: number
           updated_at?: string
