@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - "fix/**"
+      - "security/**"
 permissions:
   contents: read
 jobs:
@@ -14,7 +15,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: build-only-placeholder
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
-      SUPABASE_SERVICE_ROLE_KEY: build-only-placeholder
+      SUPARASE_SERVICE_ROLE_KEY: build-only-placeholder
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,6 +26,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Test
+        run: npm test
       - name: Lint
         run: npm run lint
       - name: Build
