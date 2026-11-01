@@ -25,7 +25,7 @@ export async function updateAdminReport(
   const { error } = await supabase.rpc("admin_update_report", {
     p_report_id: reportId,
     p_action: action,
-    p_note: note || null,
+    p_note: note || undefined,
   });
   if (error) return { error: "Impossible de mettre à jour le signalement. Vérifie son statut et réessaie." };
 
