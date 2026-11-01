@@ -8,6 +8,7 @@ export type AdminNavItem = {
 export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Tableau de bord", href: "/admin", ready: true },
   { label: "Utilisateurs", href: "/admin/utilisateurs", ready: true },
+  { label: "Vérification KYC", href: "/admin/kyc", ready: true },
   { label: "Vendeurs", href: "/admin/vendeurs", ready: true },
   { label: "Boutiques", href: "/admin/boutiques", ready: true },
   { label: "Produits", href: "/admin/produits", ready: true },

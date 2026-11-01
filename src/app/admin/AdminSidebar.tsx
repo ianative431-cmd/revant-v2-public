@@ -21,6 +21,7 @@ import {
   MessageCircle,
   ExternalLink,
   ShieldCheck,
+  FileCheck,
   Settings,
   LogOut,
   type LucideIcon,
@@ -46,6 +47,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin/whatsapp": MessageCircle,
   "/admin/maison": ExternalLink,
   "/admin/securite": ShieldCheck,
+  "/admin/kyc": FileCheck,
   "/admin/parametres": Settings,
 };
 
