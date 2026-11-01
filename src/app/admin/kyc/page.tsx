@@ -38,10 +38,10 @@ function formatDate(value: string | null) {
 export default async function AdminKycPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; error?: string }>;
+  searchParams: Promise<{ status?: string; error?: string; notice?: string }>;
 }) {
   await requirePermission("kyc.manage");
-  const [{ status: requestedStatus, error }, records] = await Promise.all([searchParams, getAdminKycQueue()]);
+  const [{ status: requestedStatus, error, notice }, records] = await Promise.all([searchParams, getAdminKycQueue()]);
   const filter: Filter = FILTERS.includes(requestedStatus as Filter) ? (requestedStatus as Filter) : "pending";
   const counts = {
     pending: records.filter((item) => item.status === "pending").length,
@@ -68,10 +68,10 @@ export default async function AdminKycPage({
       {error && ERROR_LABEL[error] && (
         <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{ERROR_LABEL[error]}</p>
       )}
-      {requestedStatus === "approved" && (
+      {notice === "approved" && (
         <p role="status" className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">Le dossier a été approuvé.</p>
       )}
-      {requestedStatus === "rejected" && (
+      {notice === "rejected" && (
         <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Le dossier a été refusé et le motif a été enregistré.</p>
       )}
 
@@ -121,7 +121,7 @@ export default async function AdminKycPage({
                   </div>
                   <p className="mt-1 break-all text-sm text-black/60">{item.email ?? "E-mail non renseigné"}</p>
                   <p className="mt-1 text-xs text-black/50">
-                    {item.phone ? "+" + item.phone : "Téléphone non renseigné"} · {item.city ?? "Ville non renseignée"} · {item.countryCode}
+                    {item.phone ? (item.phone.startsWith("+") ? item.phone : "+" + item.phone) : "Téléphone non renseigné"} · {item.city ?? "Ville non renseignée"} · {item.countryCode}
                   </p>
                 </div>
                 <div className="text-right text-xs text-black/45">

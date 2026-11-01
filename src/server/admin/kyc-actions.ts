@@ -77,5 +77,5 @@ export async function updateKycStatusAction(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/admin/kyc");
-  redirect("/admin/kyc?status=" + (action === "approve" ? "approved" : "rejected"));
+  redirect("/admin/kyc?status=" + (action === "approve" ? "approved" : "rejected") + "&notice=" + (action === "approve" ? "approved" : "rejected"));
 }
