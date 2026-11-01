@@ -45,17 +45,20 @@ export async function checkRateLimit(
 }
 
 /**
- * Identifiant réseau de confiance pour les limites anti-abus sur Render.
- * On privilégie CF-Connecting-IP (défini par le proxy Cloudflare de Render)
- * et on ignore X-Forwarded-For : une valeur fournie par le client peut y
- * rester en tête de liste et permettre de contourner les limites IP.
- * Si l'en-tête de confiance manque, les limites par compte/téléphone restent
- * actives et aucune clé IP globale "unknown" n'est créée.
+ * Identifiant réseau de confiance pour Render.
+ * Préfère CF-Connecting-IP, ajouté par Cloudflare, puis utilise le premier
+ * X-Forwarded-For valide conformément à la documentation Render.
+ * Si aucun en-tête exploitable n'est présent, les limites par compte/téléphone
+ * restent actives sans créer une clé IP globale "unknown".
  */
 export async function getClientIdentifier(): Promise<string> {
   const headerList = await headers();
   const cloudflareIp = headerList.get("cf-connecting-ip")?.trim() ?? "";
-  return isIP(cloudflareIp) ? cloudflareIp : "unknown";
+  if (isIP(cloudflareIp)) return cloudflareIp;
+
+  const forwardedFor = headerList.get("x-forwarded-for") ?? "";
+  const firstForwardedIp = forwardedFor.split(",")[0]?.trim() ?? "";
+  return isIP(firstForwardedIp) ? firstForwardedIp : "unknown";
 }
 
 /** Message d'erreur générique affiché à l'utilisateur en cas de blocage
