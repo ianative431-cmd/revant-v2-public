@@ -75,11 +75,11 @@ export async function requireAdmin() {
  * Les rôles sont relus depuis la base à chaque requête : aucune
  * permission ne provient des métadonnées modifiables du client.
  */
-export async function requirePermission(permissionKey: string) {
-  const user = await requireAdmin();
+export async function hasPermission(permissionKey: string): Promise<boolean> {
   const roles = await getCurrentUserRoles();
-  const supabase = await createSupabaseServerClient();
+  if (roles.length === 0) return false;
 
+  const supabase = await createSupabaseServerClient();
   const { data: assignments, error: assignmentsError } = await supabase
     .from("role_permissions")
     .select("permission_id")
@@ -90,7 +90,7 @@ export async function requirePermission(permissionKey: string) {
   }
 
   const permissionIds = [...new Set((assignments ?? []).map((row) => row.permission_id))];
-  if (permissionIds.length === 0) redirect("/admin");
+  if (permissionIds.length === 0) return false;
 
   const { data: permissions, error: permissionsError } = await supabase
     .from("permissions")
@@ -101,10 +101,12 @@ export async function requirePermission(permissionKey: string) {
     throw new Error("Impossible de vérifier les permissions administrateur.");
   }
 
-  if (!permissions?.some((permission) => permission.key === permissionKey)) {
-    redirect("/admin");
-  }
+  return Boolean(permissions?.some((permission) => permission.key === permissionKey));
+}
 
+export async function requirePermission(permissionKey: string) {
+  const user = await requireAdmin();
+  if (!(await hasPermission(permissionKey))) redirect("/admin");
   return user;
 }
 
