@@ -41,7 +41,7 @@ export async function submitKycDocument(formData: FormData): Promise<void> {
     .maybeSingle();
 
   if (existingError) redirect("/compte/boutique/verification?error=load");
-  if (existing?.status === "approved" || existing?.status === "pending") {
+  if (existing?.status === "approved" || (existing?.status === "pending" && existing.document_path)) {
     redirect("/compte/boutique/verification?error=locked");
   }
 

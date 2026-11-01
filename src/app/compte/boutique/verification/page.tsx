@@ -55,7 +55,7 @@ export default async function VerificationBoutiquePage({
     .eq("user_id", user.id)
     .maybeSingle();
   const status = kyc?.status ?? "not_started";
-  const canSubmit = status === "not_started" || status === "rejected" || status === "expired";
+  const canSubmit = status === "not_started" || status === "rejected" || status === "expired" || (status === "pending" && !kyc?.document_path);
 
   return (
     <main className="min-h-screen bg-brand-bg px-4 py-10">
