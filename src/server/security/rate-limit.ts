@@ -6,7 +6,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 /**
  * Limitation de taux côté serveur, adossée à la fonction Postgres
- * atomique check_rate_limit() (migration 0011_rate_limiting.sql).
+ * atomique check_rate_limit() (archive supabase/legacy_migrations_archive/0011_rate_limiting.sql).
  *
  * Pourquoi en base plutôt qu'en mémoire : Render peut faire tourner
  * plusieurs instances et redémarre régulièrement (déploiements,

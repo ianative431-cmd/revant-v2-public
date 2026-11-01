@@ -8,8 +8,8 @@ export type ProductCategory = {
  * que src/content/shops/color-palettes.ts) — l'administration pourra
  * plus tard les gérer elle-même (sections 11 et 39 du prompt maître,
  * pas encore construites). Toute modification ici doit être reportée
- * dans la contrainte "products_category_allowed" de la migration
- * 0004_products.sql.
+ * dans la contrainte "products_category_allowed" de la archive
+ * supabase/legacy_migrations_archive/0004_products.sql.
  */
 export const PRODUCT_CATEGORIES: ProductCategory[] = [
   { slug: "vetements-homme", label: "Vêtements homme" },

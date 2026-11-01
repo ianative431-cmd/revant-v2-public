@@ -5,7 +5,7 @@
  * Ces fonctions sont purement indicatives côté application (pour
  * l'ergonomie du formulaire) — la contrainte réelle, celle qui compte
  * pour la sécurité et l'intégrité des données, est appliquée en base
- * de données (voir supabase/migrations/0002_shops.sql, contrainte
+ * de données (voir supabase/legacy_migrations_archive/0002_shops.sql, contrainte
  * "shops_slug_format"). Ne jamais faire confiance uniquement à cette
  * validation côté serveur applicatif.
  */
