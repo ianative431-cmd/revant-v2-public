@@ -81,6 +81,9 @@ function EmailLoginForm() {
           {showPassword ? "Masquer" : "Afficher"}
         </button>
       </div>
+      <div className="flex justify-end -mt-1">
+        <Link href="/mot-de-passe-oublie" className="text-xs font-medium underline text-black/60">Mot de passe oublié ?</Link>
+      </div>
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}
       <button
         type="submit"

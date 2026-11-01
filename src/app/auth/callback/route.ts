@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const ALLOWED_DESTINATIONS = new Set(["/compte", "/compte/boutique", "/admin"]);
+const ALLOWED_DESTINATIONS = new Set(["/compte", "/compte/boutique", "/admin", "/reinitialiser-mot-de-passe"]);
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -9,9 +9,10 @@ export async function GET(request: Request) {
   const requestedNext = requestUrl.searchParams.get("next") ?? "/compte";
   const next = ALLOWED_DESTINATIONS.has(requestedNext) ? requestedNext : "/compte";
   const isAdminFlow = next === "/admin";
+  const isPasswordResetFlow = next === "/reinitialiser-mot-de-passe";
 
   const errorUrl = new URL("/auth/erreur", requestUrl.origin);
-  errorUrl.searchParams.set("flow", isAdminFlow ? "admin" : "seller");
+  errorUrl.searchParams.set("flow", isAdminFlow ? "admin" : isPasswordResetFlow ? "password" : "seller");
 
   if (!code) {
     errorUrl.searchParams.set("reason", "callback");

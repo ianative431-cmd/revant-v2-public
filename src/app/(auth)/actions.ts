@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { env } from "@/lib/env";
 import { getRequiredConsentVersions } from "@/server/legal/consent";
 import {
   checkRateLimit,
@@ -9,7 +10,7 @@ import {
   RATE_LIMIT_ERROR_MESSAGE,
 } from "@/server/security/rate-limit";
 
-export type AuthActionState = { error: string | null };
+export type AuthActionState = { error: string | null; success?: boolean };
 
 // --- Validation serveur (jamais seulement côté formulaire) ---
 
@@ -18,7 +19,7 @@ function isValidEmail(value: string): boolean {
 }
 
 function isValidPassword(value: string): boolean {
-  return value.length >= 8 && value.length <= 128;
+  return value.length >= 10 && value.length <= 128;
 }
 
 // Numéro Niger : +227 suivi de 8 chiffres.
@@ -66,7 +67,7 @@ export async function signUpWithEmail(
     return { error: "Adresse e-mail invalide." };
   }
   if (!isValidPassword(password)) {
-    return { error: "Le mot de passe doit contenir au moins 8 caractères." };
+    return { error: "Le mot de passe doit contenir au moins 10 caractères." };
   }
 
   const ip = await getClientIdentifier();
@@ -198,6 +199,53 @@ export async function verifyPhoneOtp(
 
   if (error) {
     return { error: "Code incorrect ou expiré." };
+  }
+
+  redirect("/compte");
+}
+
+export async function sendPasswordReset(
+  _prevState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const email = String(formData.get("email") ?? "").trim();
+  if (!isValidEmail(email)) return { error: "Adresse e-mail invalide." };
+
+  const ip = await getClientIdentifier();
+  const checks = [checkRateLimit(`password-reset:email:${email.toLowerCase()}`, 3, 3600)];
+  if (ip !== "unknown") checks.push(checkRateLimit(`password-reset:ip:${ip}`, 10, 3600));
+  const allowed = await Promise.all(checks);
+  if (allowed.some((isAllowed) => !isAllowed)) return { error: RATE_LIMIT_ERROR_MESSAGE };
+
+  const callback = new URL("/auth/callback", env.siteUrl());
+  callback.searchParams.set("next", "/reinitialiser-mot-de-passe");
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: callback.toString() });
+  if (error) return { error: "Impossible d'envoyer l'e-mail pour le moment. Réessaie plus tard." };
+
+  // Réponse identique que l'adresse existe ou non : pas d'énumération de comptes.
+  return { error: null, success: true };
+}
+
+export async function updatePassword(
+  _prevState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const password = String(formData.get("password") ?? "");
+  const confirmation = String(formData.get("confirmation") ?? "");
+  if (!isValidPassword(password)) return { error: "Le mot de passe doit contenir au moins 10 caractères." };
+  if (password !== confirmation) return { error: "Les deux mots de passe ne correspondent pas." };
+
+  const supabase = await createSupabaseServerClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) return { error: "Le lien de réinitialisation est invalide ou expiré. Demande un nouveau lien." };
+
+  const { error: updateError } = await supabase.auth.updateUser({ password });
+  if (updateError) return { error: "Impossible de modifier le mot de passe. Demande un nouveau lien et réessaie." };
+
+  const { error: sessionsError } = await supabase.auth.signOut({ scope: "others" });
+  if (sessionsError) {
+    return { error: "Ton mot de passe a été modifié, mais la fermeture des autres sessions n’a pas pu être confirmée. Reconnecte-toi pour vérifier." };
   }
 
   redirect("/compte");

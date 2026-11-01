@@ -99,9 +99,9 @@ function EmailSignupForm() {
           name="password"
           type={showPassword ? "text" : "password"}
           required
-          minLength={8}
+          minLength={10}
           maxLength={128}
-          placeholder="Mot de passe (8 caractères min.)"
+          placeholder="Mot de passe (10 caractères min.)"
           className="w-full border rounded-xl px-4 py-3 pr-20 text-sm"
         />
         <button
