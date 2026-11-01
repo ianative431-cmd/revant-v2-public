@@ -5,13 +5,14 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   checkRateLimit,
   getClientIdentifier,
 } from "@/server/security/rate-limit";
 
 type GuestOrderRpc = {
-  rpc: (name: string, args: Record<string, string>) => Promise<{
+  rpc: (name: string, args: Record<string, string | null>) => Promise<{
     data: { order_id: string; order_number: string } | null;
     error: { message: string } | null;
   }>;
@@ -55,7 +56,11 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
   // locks the product row and applies a per-phone limit on successful orders.
   const token = randomBytes(32).toString("hex");
   const tokenHash = createHash("sha256").update(token).digest("hex");
-  const supabase = await createSupabaseServerClient();
+  // Resolve the optional buyer identity from the verified server session.
+  // The privileged RPC is never called directly by browser/mobile clients.
+  const sessionSupabase = await createSupabaseServerClient();
+  const { data: { user } } = await sessionSupabase.auth.getUser();
+  const supabase = createSupabaseAdminClient();
   const guestRpc = supabase as unknown as GuestOrderRpc;
   const { data, error } = await guestRpc.rpc("create_guest_order", {
     p_product_id: productId,
@@ -65,6 +70,7 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
     p_guest_address: address,
     p_tracking_token_hash: tokenHash,
     p_website: website,
+    p_buyer_id: user?.id ?? null,
   });
 
   if (error || !data?.order_number) {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createHash } from "node:crypto";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type GuestOrderSummary = { order_number: string; status: string; total_amount: number; currency: string; product_name: string; shop_name: string; created_at: string };
 type GuestOrderLookup = {
@@ -18,7 +18,7 @@ export default async function GuestOrderConfirmation({ searchParams }: Props) {
   const token = cookieStore.get(`revant_guest_${numero}`)?.value;
   if (!token) notFound();
   const tokenHash = createHash("sha256").update(token).digest("hex");
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
   const guestRpc = supabase as unknown as GuestOrderLookup;
   const { data, error } = await guestRpc.rpc("get_guest_order", { p_order_number: numero, p_tracking_token_hash: tokenHash });
   if (error || !data) notFound();
