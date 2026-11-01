@@ -1,4 +1,5 @@
 import { getAdminUserDirectory } from "@/server/admin/user-directory";
+import { requirePermission } from "@/server/auth/roles";
 
 const ROLE_LABEL: Record<string, string> = {
   admin: "Admin",
@@ -7,6 +8,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 export default async function AdminUtilisateursPage() {
+  await requirePermission("users.view");
   const users = await getAdminUserDirectory();
 
   return (

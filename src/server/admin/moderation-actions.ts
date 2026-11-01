@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/server/auth/roles";
+import { requirePermission } from "@/server/auth/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { PRODUCT_IMAGE_BUCKET } from "@/lib/product-image";
 
@@ -12,14 +12,14 @@ export type AdminModerationState = { error: string | null };
  * (migration 0002) refuse ce changement à quiconque n'est pas
  * "service_role" — même un compte admin authentifié classique. Le
  * client service role est donc la seule voie possible ici, mais
- * requireAdmin() reste la garde qui décide QUI a le droit d'appeler
+ * requirePermission() reste la garde qui décide QUI a le droit d'appeler
  * cette fonction.
  */
 export async function setShopStatus(
   _prevState: AdminModerationState,
   formData: FormData
 ): Promise<AdminModerationState> {
-  await requireAdmin();
+  await requirePermission("shops.manage");
 
   const shopId = String(formData.get("shopId") ?? "");
   const nextStatus = String(formData.get("nextStatus") ?? "");
@@ -49,7 +49,7 @@ export async function deleteProductAsAdmin(
   _prevState: AdminModerationState,
   formData: FormData
 ): Promise<AdminModerationState> {
-  await requireAdmin();
+  await requirePermission("products.manage");
 
   const productId = String(formData.get("productId") ?? "");
   const imageUrlsRaw = String(formData.get("imageUrls") ?? "");

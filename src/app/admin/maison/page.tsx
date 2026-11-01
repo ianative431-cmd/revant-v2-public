@@ -1,2 +1,6 @@
 import MaisonAdminPage from "./MaisonAdminPage";
-export default function Page({ searchParams }: { searchParams: Promise<{ status?: string }> }) { return <MaisonAdminPage searchParams={searchParams} />; }
+import { requireSuperAdmin } from "@/server/auth/roles";
+export default async function Page({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  await requireSuperAdmin();
+  return <MaisonAdminPage searchParams={searchParams} />;
+}

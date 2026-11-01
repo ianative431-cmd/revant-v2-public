@@ -146,6 +146,8 @@ export default function FinanceDashboard({
   payments,
   payouts,
   commissionPercent,
+  canManageSettings,
+  canManagePayouts,
   shops,
 }: {
   summary: FinanceSummary;
@@ -154,6 +156,8 @@ export default function FinanceDashboard({
   payments: Payment[];
   payouts: Payout[];
   commissionPercent: number;
+  canManageSettings: boolean;
+  canManagePayouts: boolean;
   shops: ShopLite[];
 }) {
   const [range, setRange] = useState<TimeRange>("30d");
@@ -515,7 +519,11 @@ export default function FinanceDashboard({
       {/* Commission, règle de retrait, fournisseurs — fonctionnalités existantes conservées */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
         <Panel title="Commission Revant">
-          <CommissionForm initialValue={commissionPercent} />
+          {canManageSettings ? (
+            <CommissionForm initialValue={commissionPercent} />
+          ) : (
+            <p className="text-xs text-white/40">Consultation uniquement. La modification est réservée aux rôles autorisés.</p>
+          )}
         </Panel>
 
         {rule && (
@@ -576,7 +584,7 @@ export default function FinanceDashboard({
                     {p.failureReason ? ` · ${p.failureReason}` : ""}
                   </p>
                 </div>
-                {p.status === "pending" ? (
+                {p.status === "pending" && canManagePayouts ? (
                   <PayoutActions payoutId={p.id} />
                 ) : (
                   <span className="text-[11px] shrink-0 rounded-full px-2 py-1 bg-white/5 text-white/50">

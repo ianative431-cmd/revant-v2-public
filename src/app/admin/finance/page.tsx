@@ -1,6 +1,7 @@
 import { getAdminFinanceSnapshot, getCommissionPercent } from "@/server/admin/finance";
 import { getAllShopsForAdmin } from "@/server/admin/shops-admin";
 import FinanceDashboard from "./FinanceDashboard";
+import { hasPermission, requirePermission } from "@/server/auth/roles";
 
 /**
  * Page serveur : ne fait que charger les vraies données (aucune donnée
@@ -10,6 +11,11 @@ import FinanceDashboard from "./FinanceDashboard";
  * classiques, rendues par FinanceDashboard.
  */
 export default async function AdminFinancePage() {
+  await requirePermission("finance.view");
+  const [canManageSettings, canManagePayouts] = await Promise.all([
+    hasPermission("settings.manage"),
+    hasPermission("payouts.manage"),
+  ]);
   const [snapshot, commissionPercent, shops] = await Promise.all([
     getAdminFinanceSnapshot(),
     getCommissionPercent(),
@@ -24,6 +30,8 @@ export default async function AdminFinancePage() {
       payments={snapshot.payments}
       payouts={snapshot.payouts}
       commissionPercent={commissionPercent}
+      canManageSettings={canManageSettings}
+      canManagePayouts={canManagePayouts}
       shops={shops.map((s) => ({ status: s.status, createdAt: s.created_at }))}
     />
   );

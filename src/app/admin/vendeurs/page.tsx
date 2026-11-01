@@ -2,8 +2,11 @@ import Link from "next/link";
 import { getAdminUserDirectory } from "@/server/admin/user-directory";
 import { getAllShopsForAdmin } from "@/server/admin/shops-admin";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
+import { requirePermission } from "@/server/auth/roles";
 
 export default async function AdminVendeursPage() {
+  await requirePermission("users.view");
+  await requirePermission("shops.view");
   const [users, shops] = await Promise.all([getAdminUserDirectory(), getAllShopsForAdmin()]);
 
   const shopByOwnerId = new Map(shops.map((s) => [s.owner_id, s]));

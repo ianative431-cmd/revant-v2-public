@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/server/auth/roles";
+import { requirePermission } from "@/server/auth/roles";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type FinanceActionState = { error: string | null };
@@ -17,7 +17,7 @@ export async function updatePayoutStatus(
   _prevState: FinanceActionState,
   formData: FormData
 ): Promise<FinanceActionState> {
-  await requireAdmin();
+  await requirePermission("payouts.manage");
 
   const payoutId = String(formData.get("payoutId") ?? "");
   const action = String(formData.get("action") ?? "");
@@ -50,7 +50,7 @@ export async function updateCommissionPercent(
   _prevState: FinanceActionState,
   formData: FormData
 ): Promise<FinanceActionState> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("settings.manage");
 
   const raw = String(formData.get("commissionPercent") ?? "");
   const value = Number(raw.replace(",", "."));
