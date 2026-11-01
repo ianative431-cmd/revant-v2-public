@@ -15,7 +15,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: build-only-placeholder
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
-      SUPARASE_SERVICE_ROLE_KEY: build-only-placeholder
+      SUPABASE_SERVICE_ROLE_KEY: build-only-placeholder
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
