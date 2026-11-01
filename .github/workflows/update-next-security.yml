@@ -26,6 +26,8 @@ jobs:
           cache: npm
       - name: Update patched Next.js packages and lockfile
         run: npm install --package-lock-only --save-exact next@16.4.3 eslint-config-next@16.4.3 --ignore-scripts --no-audit --no-fund
+      - name: Apply non-breaking npm security fixes
+        run: npm audit fix --package-lock-only --ignore-scripts --no-fund --no-audit
       - name: Report remaining npm advisories
         run: |
           npm audit --json > /tmp/npm-audit.json || true
