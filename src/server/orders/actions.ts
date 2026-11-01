@@ -20,6 +20,7 @@ function messageForOrderError(message: string, fallback: string) {
   if (message.includes("invalid_order_transition")) return "Cette commande ne peut plus être modifiée à ce stade.";
   if (message.includes("product_unavailable_or_insufficient_stock")) return "Le produit n’est plus disponible en quantité suffisante. La commande reste en attente.";
   if (message.includes("invalid_order_shop_scope")) return "Cette commande doit être traitée par boutique. Contacte le support.";
+  if (message.includes("payment_action_required")) return "Un paiement est en cours ou confirmé. Passe par le processus d’annulation/remboursement sécurisé.";
   if (message.includes("order_not_found")) return "Commande introuvable.";
   return fallback;
 }

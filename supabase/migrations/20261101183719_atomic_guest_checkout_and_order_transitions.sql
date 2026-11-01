@@ -76,7 +76,7 @@ begin
     raise exception 'invalid request';
   end if;
 
-  v_phone := regexp_replace(trim(p_guest_phone), '[^0-9+]', '', 'g');
+  v_phone := regexp_replace(trim(p_guest_phone), '[^0-9]', '', 'g');
 
   -- Serialize repeated submissions using the same key before checking the existing order.
   perform pg_advisory_xact_lock(hashtextextended(p_idempotency_key::text, 0));
@@ -301,6 +301,13 @@ begin
   for update;
   if not found then raise exception 'order_not_found'; end if;
   if v_status not in ('pending', 'confirmed') then raise exception 'invalid_order_transition'; end if;
+  if exists (
+    select 1 from public.payments pay
+    where pay.order_id = p_order_id
+      and pay.status in ('pending', 'authorized', 'paid', 'partially_refunded')
+  ) then
+    raise exception 'payment_action_required';
+  end if;
   if (select count(distinct oi.shop_id) from public.order_items oi where oi.order_id = p_order_id) <> 1 then
     raise exception 'invalid_order_shop_scope';
   end if;
@@ -346,6 +353,13 @@ begin
     raise exception 'forbidden' using errcode = '42501';
   end if;
   if v_status <> 'pending' then raise exception 'invalid_order_transition'; end if;
+  if exists (
+    select 1 from public.payments pay
+    where pay.order_id = p_order_id
+      and pay.status in ('pending', 'authorized', 'paid', 'partially_refunded')
+  ) then
+    raise exception 'payment_action_required';
+  end if;
 
   update public.orders
   set status = 'cancelled', cancelled_at = now(), stock_reserved = false, updated_at = now()
