@@ -5,6 +5,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+} from "@/server/security/rate-limit";
 
 type GuestOrderRpc = {
   rpc: (name: string, args: Record<string, string>) => Promise<{
@@ -25,8 +29,30 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
     redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=validation`);
   }
 
+  // Protect the public guest checkout against repeated submissions from
+  // one network and phone number. Hash identifiers before storing them
+  // in the shared rate-limit table; never persist raw IPs or phone numbers.
+  const normalizedPhone = phone.replace(/[^0-9]/g, "");
+  const phoneKey = createHash("sha256").update(normalizedPhone).digest("hex");
+  const ip = await getClientIdentifier();
+  const checks: Promise<boolean>[] = [
+    checkRateLimit(`guest-checkout:phone:${phoneKey}`, 3, 3600),
+  ];
+
+  // Some hosting/proxy setups may not provide a client IP. Do not put all
+  // visitors behind one shared "unknown" key in that case.
+  if (ip && ip !== "unknown") {
+    const ipKey = createHash("sha256").update(ip).digest("hex");
+    checks.push(checkRateLimit(`guest-checkout:ip:${ipKey}`, 10, 900));
+  }
+
+  const allowed = await Promise.all(checks);
+  if (allowed.some((isAllowed) => !isAllowed)) {
+    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=commande`);
+  }
+
   // The database RPC also validates every field, re-reads the product price,
-  // locks the product row and applies a per-phone rate limit.
+  // locks the product row and applies a per-phone limit on successful orders.
   const token = randomBytes(32).toString("hex");
   const tokenHash = createHash("sha256").update(token).digest("hex");
   const supabase = await createSupabaseServerClient();
