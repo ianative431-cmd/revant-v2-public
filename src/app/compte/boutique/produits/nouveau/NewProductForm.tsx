@@ -44,7 +44,6 @@ export default function NewProductForm({
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const previewUrlsRef = useRef<string[]>([]);
-  const previewUrlsRef = useRef<string[]>([]);
   const [status, setStatus] = useState<Status>("idle");
 
   useEffect(() => {
