@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/server/auth/roles";
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "En attente",
@@ -23,6 +24,7 @@ type OrderRow = {
 };
 
 export default async function AdminCommandesPage() {
+  await requirePermission("users.view");
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from("orders")

@@ -2,8 +2,10 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAllProductsForAdmin } from "@/server/admin/products-admin";
 import DeleteProductButton from "./DeleteProductButton";
+import { requirePermission } from "@/server/auth/roles";
 
 export default async function AdminProduitsPage() {
+  await requirePermission("products.view");
   const supabase = await createSupabaseServerClient();
   const products = await getAllProductsForAdmin(supabase);
 

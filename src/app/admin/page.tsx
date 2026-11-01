@@ -1,4 +1,5 @@
 import { getAdminOverviewStats } from "@/server/admin/stats";
+import { requirePermission } from "@/server/auth/roles";
 
 function StatCard({ label, value, sub }: { label: string; value: number; sub?: string }) {
   return (
@@ -11,6 +12,7 @@ function StatCard({ label, value, sub }: { label: string; value: number; sub?: s
 }
 
 export default async function AdminDashboardPage() {
+  await requirePermission("users.view");
   const stats = await getAdminOverviewStats();
 
   return (

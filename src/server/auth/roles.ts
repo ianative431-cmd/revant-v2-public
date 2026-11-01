@@ -71,6 +71,44 @@ export async function requireAdmin() {
 }
 
 /**
+ * Vérifie une permission métier issue de role_permissions.
+ * Les rôles sont relus depuis la base à chaque requête : aucune
+ * permission ne provient des métadonnées modifiables du client.
+ */
+export async function requirePermission(permissionKey: string) {
+  const user = await requireAdmin();
+  const roles = await getCurrentUserRoles();
+  const supabase = await createSupabaseServerClient();
+
+  const { data: assignments, error: assignmentsError } = await supabase
+    .from("role_permissions")
+    .select("permission_id")
+    .in("role", roles);
+
+  if (assignmentsError) {
+    throw new Error("Impossible de vérifier les permissions administrateur.");
+  }
+
+  const permissionIds = [...new Set((assignments ?? []).map((row) => row.permission_id))];
+  if (permissionIds.length === 0) redirect("/admin");
+
+  const { data: permissions, error: permissionsError } = await supabase
+    .from("permissions")
+    .select("key")
+    .in("id", permissionIds);
+
+  if (permissionsError) {
+    throw new Error("Impossible de vérifier les permissions administrateur.");
+  }
+
+  if (!permissions?.some((permission) => permission.key === permissionKey)) {
+    redirect("/admin");
+  }
+
+  return user;
+}
+
+/**
  * Garde-fou réservé au super administrateur.
  */
 export async function requireSuperAdmin() {

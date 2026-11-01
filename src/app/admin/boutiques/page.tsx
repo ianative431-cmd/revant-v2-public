@@ -2,8 +2,10 @@ import Link from "next/link";
 import { getAllShopsForAdmin } from "@/server/admin/shops-admin";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 import ShopStatusToggle from "./ShopStatusToggle";
+import { requirePermission } from "@/server/auth/roles";
 
 export default async function AdminBoutiquesPage() {
+  await requirePermission("shops.view");
   const shops = await getAllShopsForAdmin();
 
   return (
