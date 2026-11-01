@@ -39,6 +39,7 @@ const cspDirectives = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  experimental: { serverActions: { bodySizeLimit: "9mb" } },
   images: {
     remotePatterns: supabaseHostname
       ? [

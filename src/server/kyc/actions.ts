@@ -45,10 +45,16 @@ export async function submitKycDocument(formData: FormData): Promise<void> {
     redirect("/compte/boutique/verification?error=locked");
   }
 
+  const fileBytes = new Uint8Array(await file.arrayBuffer());
+  const isPdf = file.type === "application/pdf" && new TextDecoder().decode(fileBytes.slice(0, 5)) === "%PDF-";
+  const isJpeg = file.type === "image/jpeg" && fileBytes[0] === 0xff && fileBytes[1] === 0xd8 && fileBytes[2] === 0xff;
+  const isPng = file.type === "image/png" && fileBytes.length >= 8 && [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => fileBytes[index] === byte);
+  if (!isPdf && !isJpeg && !isPng) redirect("/compte/boutique/verification?error=format");
+
   const path = user.id + "/" + Date.now() + "-" + crypto.randomUUID() + "." + extension;
   const { error: uploadError } = await admin.storage
     .from("kyc-documents")
-    .upload(path, await file.arrayBuffer(), {
+    .upload(path, fileBytes, {
       contentType: file.type,
       cacheControl: "3600",
       upsert: false,
