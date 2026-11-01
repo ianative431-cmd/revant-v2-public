@@ -31,12 +31,11 @@ export async function signInSuperAdmin(
   }
 
   const ip = await getClientIdentifier();
-  const [allowedByEmail, allowedByIp] = await Promise.all([
-    checkRateLimit(`admin-signin:email:${email}`, 5, 900),
-    checkRateLimit(`admin-signin:ip:${ip}`, 15, 900),
-  ]);
+  const checks = [checkRateLimit(`admin-signin:email:${email}`, 5, 900)];
+  if (ip !== "unknown") checks.push(checkRateLimit(`admin-signin:ip:${ip}`, 15, 900));
+  const allowed = await Promise.all(checks);
 
-  if (!allowedByEmail || !allowedByIp) {
+  if (allowed.some((isAllowed) => !isAllowed)) {
     return { error: RATE_LIMIT_ERROR_MESSAGE };
   }
 
