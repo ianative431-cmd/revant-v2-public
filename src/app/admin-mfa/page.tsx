@@ -23,7 +23,7 @@ export default async function AdminMfaPage({ searchParams }: Props) {
     return <main className="flex min-h-screen items-center justify-center bg-[#0B0B10] px-4 py-10 text-white"><section className="w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.04] p-6"><h1 className="text-xl font-bold">Vérification de sécurité indisponible</h1><p className="mt-3 text-sm text-white/65">Supabase Auth n’a pas pu vérifier la configuration MFA. Réessaie plus tard ou demande à l’administrateur technique de vérifier les paramètres MFA du projet.</p>{error === "verification" && <p className="mt-3 text-xs text-amber-200">L’accès à l’administration reste bloqué tant que la vérification ne fonctionne pas.</p>}</section></main>;
   }
 
-  const verifiedFactor = factors.totp[0];
+  const verifiedFactor = factors.totp.find((factor) => factor.status === "verified");
   if (verifiedFactor && assurance.currentLevel === "aal2" && assurance.nextLevel === "aal2") {
     redirect("/admin");
   }
