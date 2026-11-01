@@ -59,7 +59,7 @@ export default async function AdminKycPage({
           <p className="text-xs font-bold uppercase tracking-[.18em] text-[#803e2f]">Conformité & sécurité</p>
           <h1 className="mt-2 text-2xl font-black tracking-tight">Vérification des identités</h1>
           <p className="mt-2 max-w-2xl text-sm text-black/60">
-            Examine les justificatifs privés des vendeurs et enregistre chaque décision dans le journal d'administration.
+            Examine les justificatifs privés des vendeurs et enregistre chaque décision dans le journal d&apos;administration.
           </p>
         </div>
         <Link href="/admin" className="text-sm font-semibold text-[#803e2f] underline">Retour au tableau de bord</Link>
@@ -105,7 +105,7 @@ export default async function AdminKycPage({
               {filter === "pending" ? "Aucun dossier à examiner" : "Aucun dossier dans cette catégorie"}
             </h2>
             <p className="mx-auto mt-2 max-w-lg text-sm text-black/50">
-              Les demandes KYC réelles apparaîtront ici dès qu'un utilisateur aura soumis son dossier. Aucun dossier fictif n'est affiché.
+              Les demandes KYC réelles apparaîtront ici dès qu&apos;un utilisateur aura soumis son dossier. Aucun dossier fictif n&apos;est affiché.
             </p>
           </div>
         ) : (
@@ -174,7 +174,7 @@ export default async function AdminKycPage({
           ))
         )}
       </section>
-      <p className="text-xs text-black/40">Les documents sont conservés dans un bucket privé. L'accès est généré à la demande pour 60 secondes et réservé aux rôles disposant de la permission KYC.</p>
+      <p className="text-xs text-black/40">Les documents sont conservés dans un bucket privé. L&apos;accès est généré à la demande pour 60 secondes et réservé aux rôles disposant de la permission KYC.</p>
     </div>
   );
 }
