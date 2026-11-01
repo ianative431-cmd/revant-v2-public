@@ -41,7 +41,7 @@ export default async function VerificationBoutiquePage({
       <main className="min-h-screen bg-brand-bg px-4 py-10">
         <div className="mx-auto max-w-xl rounded-2xl bg-white p-6 shadow-sm">
           <h1 className="text-xl font-bold">Vérification de la boutique</h1>
-          <p className="mt-3 text-sm text-brand-text/70">Crée d'abord ta boutique pour déposer tes justificatifs.</p>
+          <p className="mt-3 text-sm text-brand-text/70">Crée d&apos;abord ta boutique pour déposer tes justificatifs.</p>
           <Link href="/boutiques/creer" className="mt-5 inline-block rounded-full bg-brand-accent px-5 py-3 text-sm text-white">Créer ma boutique</Link>
         </div>
       </main>
@@ -82,7 +82,7 @@ export default async function VerificationBoutiquePage({
             <label className="block text-sm font-medium">Type de justificatif
               <select name="documentType" required defaultValue="" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-3">
                 <option value="" disabled>Choisir un document</option>
-                <option value="national_id">Carte nationale d'identité</option>
+                <option value="national_id">Carte nationale d&apos;identité</option>
                 <option value="passport">Passeport</option>
                 <option value="driver_license">Permis de conduire</option>
               </select>
@@ -95,7 +95,7 @@ export default async function VerificationBoutiquePage({
             </label>
             <label className="block text-sm font-medium">Photo ou scan du document
               <input name="document" type="file" required accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" className="mt-1 block w-full text-sm" />
-              <span className="mt-1 block text-xs text-brand-text/60">PDF, JPG ou PNG · 8 Mo maximum. N'envoie jamais ton mot de passe ni tes coordonnées bancaires.</span>
+              <span className="mt-1 block text-xs text-brand-text/60">PDF, JPG ou PNG · 8 Mo maximum. N&apos;envoie jamais ton mot de passe ni tes coordonnées bancaires.</span>
             </label>
             <button type="submit" className="w-full rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white">Envoyer pour vérification</button>
           </form>
