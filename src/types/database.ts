@@ -566,6 +566,7 @@ export type Database = {
           created_at: string
           document_country: string | null
           document_last4: string | null
+          document_path: string | null
           document_type: string | null
           expires_at: string | null
           id: string
@@ -582,6 +583,7 @@ export type Database = {
           created_at?: string
           document_country?: string | null
           document_last4?: string | null
+          document_path?: string | null
           document_type?: string | null
           expires_at?: string | null
           id?: string
@@ -598,6 +600,7 @@ export type Database = {
           created_at?: string
           document_country?: string | null
           document_last4?: string | null
+          document_path?: string | null
           document_type?: string | null
           expires_at?: string | null
           id?: string
