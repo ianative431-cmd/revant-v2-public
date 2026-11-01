@@ -86,6 +86,7 @@ export async function getProductsForShop(
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("shop_id", shopId)
+    .eq("status", "active")
     .order("created_at", { ascending: false })
     .returns<ProductRow[]>();
 
