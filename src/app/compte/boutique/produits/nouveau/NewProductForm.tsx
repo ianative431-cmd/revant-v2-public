@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -43,6 +43,7 @@ export default function NewProductForm({
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const previewUrlsRef = useRef<string[]>([]);
   const [status, setStatus] = useState<Status>("idle");
 
   useEffect(() => {
@@ -59,15 +60,17 @@ export default function NewProductForm({
           setStatus(selected.size > PRODUCT_IMAGE_MAX_BYTES ? "error-size" : "error-type");
           return;
         }
+        const previewUrl = URL.createObjectURL(selected);
+        previewUrlsRef.current = [previewUrl];
         setFiles([selected]);
-        setPreviewUrls([URL.createObjectURL(selected)]);
+        setPreviewUrls([previewUrl]);
       })
       .catch(() => setStatus("error-generic"));
   }, []);
 
   useEffect(() => {
-    return () => previewUrls.forEach((url) => URL.revokeObjectURL(url));
-  }, [previewUrls]);
+    return () => previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+  }, []);
 
   function handleFilesSelected(selectedFiles: File[]) {
     if (selectedFiles.length === 0) return;
@@ -91,16 +94,18 @@ export default function NewProductForm({
     }
 
     if (accepted.length > 0) {
+      const newPreviewUrls = accepted.map((selected) => URL.createObjectURL(selected));
+      previewUrlsRef.current = [...previewUrlsRef.current, ...newPreviewUrls];
       setFiles((current) => [...current, ...accepted].slice(0, MAX_PRODUCT_IMAGES));
-      setPreviewUrls((current) => [
-        ...current,
-        ...accepted.map((selected) => URL.createObjectURL(selected)),
-      ].slice(0, MAX_PRODUCT_IMAGES));
+      setPreviewUrls((current) => [...current, ...newPreviewUrls].slice(0, MAX_PRODUCT_IMAGES));
       setStatus("idle");
     }
   }
 
   function removeImage(index: number) {
+    const removedUrl = previewUrls[index];
+    if (removedUrl) URL.revokeObjectURL(removedUrl);
+    previewUrlsRef.current = previewUrlsRef.current.filter((url) => url !== removedUrl);
     setFiles((current) => current.filter((_, i) => i !== index));
     setPreviewUrls((current) => current.filter((_, i) => i !== index));
     setStatus("idle");
@@ -157,10 +162,6 @@ export default function NewProductForm({
         uploadedPaths.push(path);
       }
 
-      const {
-        data: { publicUrl: supabaseUrl },
-      } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(uploadedPaths[0]);
-
       const { data: product, error: insertError } = await supabase
         .from("products")
         .insert({
@@ -215,7 +216,7 @@ export default function NewProductForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <label className="grid gap-2 text-sm font-medium">
-        Photos du produit (jusqu'à 5)
+        Photos du produit (jusqu&apos;à 5)
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp"
