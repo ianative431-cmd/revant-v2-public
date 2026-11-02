@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const ALLOWED_DESTINATIONS = new Set(["/compte", "/compte/boutique", "/admin"]);
+const ALLOWED_DESTINATIONS = new Set(["/compte", "/compte/boutique", "/admin", "/reinitialiser-mot-de-passe"]);
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);

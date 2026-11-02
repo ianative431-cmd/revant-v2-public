@@ -19,5 +19,5 @@ export default async function AdminMessagesPage() {
     créée: new Date(item.created_at).toLocaleString("fr-FR"),
     activité: new Date(item.updated_at).toLocaleString("fr-FR"),
   }));
-  return <section className="space-y-4"><header><h1 className="text-xl font-bold">Messagerie — conversations</h1><p className="mt-1 text-sm text-black/55">Vue de suivi des conversations réelles. Le contenu privé des messages n'est pas exposé dans cet écran et aucune réponse administrative n'est envoyée ici.</p></header><AdminDataTable rows={rows} columns={[{key:"id",label:"Conversation"},{key:"acheteur",label:"Acheteur"},{key:"vendeur",label:"Vendeur"},{key:"boutique",label:"Boutique"},{key:"créée",label:"Créée le"},{key:"activité",label:"Dernière activité"}]} /></section>;
+  return <section className="space-y-4"><header><h1 className="text-xl font-bold">Messagerie — conversations</h1><p className="mt-1 text-sm text-black/55">Vue de suivi des conversations réelles. Le contenu privé des messages n&apos;est pas exposé dans cet écran et aucune réponse administrative n&apos;est envoyée ici.</p></header><AdminDataTable rows={rows} columns={[{key:"id",label:"Conversation"},{key:"acheteur",label:"Acheteur"},{key:"vendeur",label:"Vendeur"},{key:"boutique",label:"Boutique"},{key:"créée",label:"Créée le"},{key:"activité",label:"Dernière activité"}]} /></section>;
 }

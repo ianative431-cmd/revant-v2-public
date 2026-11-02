@@ -203,6 +203,52 @@ export async function verifyPhoneOtp(
   redirect("/compte");
 }
 
+
+export async function requestPasswordReset(
+  _prevState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  if (!isValidEmail(email)) return { error: "Adresse e-mail invalide." };
+
+  const ip = await getClientIdentifier();
+  const checks = [checkRateLimit(`password-reset:email:${email}`, 3, 3600)];
+  if (ip !== "unknown") checks.push(checkRateLimit(`password-reset:ip:${ip}`, 10, 3600));
+  const allowed = await Promise.all(checks);
+  if (allowed.some((isAllowed) => !isAllowed)) return { error: RATE_LIMIT_ERROR_MESSAGE };
+
+  const supabase = await createSupabaseServerClient();
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://revant-v2-ui-premium.onrender.com").replace(/\/+$/, "");
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/callback?next=%2Freinitialiser-mot-de-passe`,
+  });
+
+  // Réponse identique que le compte existe ou non : ne pas révéler les comptes inscrits.
+  return { error: null };
+}
+
+export async function updatePassword(
+  _prevState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const password = String(formData.get("password") ?? "");
+  const confirmation = String(formData.get("confirmation") ?? "");
+  if (!isValidPassword(password)) {
+    return { error: "Le mot de passe doit contenir entre 8 et 128 caractères." };
+  }
+  if (password !== confirmation) return { error: "Les deux mots de passe ne correspondent pas." };
+
+  const supabase = await createSupabaseServerClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) return { error: "Le lien de réinitialisation est invalide ou a expiré. Demande un nouveau lien." };
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: "Impossible de modifier le mot de passe. Demande un nouveau lien et réessaie." };
+
+  await supabase.auth.signOut();
+  redirect("/connexion?password=updated");
+}
+
 export async function signOutAction() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();

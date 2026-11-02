@@ -69,6 +69,7 @@ function EmailLoginForm() {
         placeholder="Mot de passe"
         className="border rounded-xl px-4 py-3 text-sm"
       />
+      <div className="flex justify-end"><Link href="/mot-de-passe-oublie" className="text-xs text-black/55 underline">Mot de passe oublié ?</Link></div>
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}
       <button
         type="submit"
