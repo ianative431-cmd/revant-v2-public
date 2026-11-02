@@ -2,11 +2,11 @@ import Link from "next/link";
 import { getAllShopsForAdmin } from "@/server/admin/shops-admin";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 import ShopStatusToggle from "./ShopStatusToggle";
-import { requirePermission } from "@/server/auth/roles";
+import { hasPermission, requirePermission } from "@/server/auth/roles";
 
 export default async function AdminBoutiquesPage() {
   await requirePermission("shops.view");
-  const shops = await getAllShopsForAdmin();
+  const [shops, canManageShops] = await Promise.all([getAllShopsForAdmin(), hasPermission("shops.manage")]);
 
   return (
     <div>
@@ -39,7 +39,7 @@ export default async function AdminBoutiquesPage() {
                 <Link href={`/shop/${shop.slug}`} className="text-xs underline text-black/50">
                   Voir
                 </Link>
-                <ShopStatusToggle shopId={shop.id} status={shop.status} />
+                {canManageShops && <ShopStatusToggle shopId={shop.id} status={shop.status} />}
               </div>
             </div>
           ))}
