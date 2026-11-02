@@ -31,7 +31,7 @@ export default async function AbonnementBoutiquePage() {
     return (
       <section className="mx-auto max-w-lg rounded-2xl bg-white p-6">
         <h1 className="text-xl font-bold">Abonnement boutique</h1>
-        <p className="mt-2 text-sm text-black/60">Crée d'abord ta boutique pour consulter son abonnement.</p>
+        <p className="mt-2 text-sm text-black/60">Crée d&apos;abord ta boutique pour consulter son abonnement.</p>
         <Link href="/boutiques/creer" className="mt-4 inline-block underline">Créer ma boutique</Link>
       </section>
     );
@@ -81,13 +81,13 @@ export default async function AbonnementBoutiquePage() {
       ) : (
         <div className="rounded-2xl border border-black/10 bg-white p-5">
           <p className="font-semibold">Aucun abonnement enregistré</p>
-          <p className="mt-2 text-sm text-black/60">Aucun contrat actif ou historique n'est actuellement associé à cette boutique.</p>
+          <p className="mt-2 text-sm text-black/60">Aucun contrat actif ou historique n&apos;est actuellement associé à cette boutique.</p>
         </div>
       )}
 
       <div className="rounded-2xl bg-black/5 p-4 text-sm text-black/65">
         <p className="font-semibold text-black">Information importante</p>
-        <p className="mt-1">Le tarif de référence prévu est de 5 000 XOF par mois. Le paiement, le renouvellement automatique et l'activation de l'offre ne sont pas encore disponibles. Cette page est uniquement consultative : aucun prélèvement ni changement de statut n'est effectué ici.</p>
+        <p className="mt-1">Le tarif de référence prévu est de 5 000 XOF par mois. Le paiement, le renouvellement automatique et l&apos;activation de l&apos;offre ne sont pas encore disponibles. Cette page est uniquement consultative : aucun prélèvement ni changement de statut n'est effectué ici.</p>
       </div>
     </section>
   );
