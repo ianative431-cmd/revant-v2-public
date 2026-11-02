@@ -28,7 +28,7 @@ export async function transitionPromotion(
   const admin = createSupabaseAdminClient();
   const { data: promotion, error: readError } = await admin
     .from("store_promotions")
-    .select("id,status,budget,start_at,end_at")
+    .select("id,shop_id,status,budget,start_at,end_at")
     .eq("id", promotionId)
     .maybeSingle();
   if (readError || !promotion) return { error: "Campagne introuvable." };
@@ -36,6 +36,12 @@ export async function transitionPromotion(
   const allowed = TRANSITIONS[promotion.status] ?? [];
   if (!allowed.includes(nextStatus)) return { error: "Cette transition n’est pas autorisée pour cette campagne." };
   if (nextStatus === "active") {
+    const { data: shop, error: shopError } = await admin
+      .from("shops")
+      .select("status")
+      .eq("id", promotion.shop_id)
+      .maybeSingle();
+    if (shopError || !shop || shop.status !== "active") return { error: "La boutique doit être active avant d’activer sa campagne." };
     if (Number(promotion.budget) <= 0) return { error: "Une campagne doit avoir un budget positif avant activation." };
     if (!promotion.start_at) return { error: "Définis une date de début avant activation." };
     if (promotion.end_at && new Date(promotion.end_at).getTime() <= new Date(promotion.start_at).getTime()) {
@@ -43,12 +49,14 @@ export async function transitionPromotion(
     }
   }
 
-  const { error: updateError } = await admin
+  const { data: updatedPromotion, error: updateError } = await admin
     .from("store_promotions")
     .update({ status: nextStatus, updated_at: new Date().toISOString() })
     .eq("id", promotionId)
-    .eq("status", promotion.status);
-  if (updateError) return { error: "Impossible de mettre à jour cette campagne." };
+    .eq("status", promotion.status)
+    .select("id")
+    .maybeSingle();
+  if (updateError || !updatedPromotion) return { error: "La campagne a changé entre-temps ou n’a pas pu être mise à jour. Recharge la page." };
 
   const metadata: Json = { before: { status: promotion.status }, after: { status: nextStatus } };
   const { error: auditError } = await admin.from("audit_logs").insert({
