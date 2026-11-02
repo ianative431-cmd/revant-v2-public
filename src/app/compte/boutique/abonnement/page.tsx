@@ -87,7 +87,7 @@ export default async function AbonnementBoutiquePage() {
 
       <div className="rounded-2xl bg-black/5 p-4 text-sm text-black/65">
         <p className="font-semibold text-black">Information importante</p>
-        <p className="mt-1">Le tarif de référence prévu est de 5 000 XOF par mois. Le paiement, le renouvellement automatique et l&apos;activation de l&apos;offre ne sont pas encore disponibles. Cette page est uniquement consultative : aucun prélèvement ni changement de statut n'est effectué ici.</p>
+        <p className="mt-1">Le tarif de référence prévu est de 5 000 XOF par mois. Le paiement, le renouvellement automatique et l&apos;activation de l&apos;offre ne sont pas encore disponibles. Cette page est uniquement consultative : aucun prélèvement ni changement de statut n&apos;est effectué ici.</p>
       </div>
     </section>
   );
