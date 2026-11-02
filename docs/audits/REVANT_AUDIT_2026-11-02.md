@@ -1,6 +1,6 @@
 # Revant — audit technique de suivi
 Date: 2026-11-02
-Base: main @ 5f409b9b07c2bdc61dc8877a0b60f62ff61359df
+Base: main @ 48b51fa13d405e46a757288217e02771d454846f
 Branche de suivi: fix/associate-rpc-sync-20261102
 
 ## État Git
@@ -41,9 +41,34 @@ Branche de suivi: fix/associate-rpc-sync-20261102
 2. Écrire des tests SQL couvrant double exécution, remboursements, litiges, annulation et disponibilité des fonds.
 3. Concevoir le cycle complet d'abonnement (création, paiement, renouvellement, échéance, annulation, suspension et réactivation).
 4. Auditer les parcours commande/livraison et les rubriques admin encore en attente.
-5. Synchroniser les migrations appliquées à distance avec les fichiers du dépôt.
+5. Vérifier que toutes les migrations restaurées correspondent exactement à l'historique distant, puis maintenir le dépôt synchronisé.
 
 ## Garde-fous
 - Pas de paiement réel, retrait réel ou ouverture publique avant validation.
 - Pas de changement financier directement sur la base active sans migration testée et plan de retour arrière.
 - Pas de déploiement automatique; Render reste le fournisseur cible.
+
+## Contrôle complémentaire — rôle associé et sécurité RPC
+
+- Le type `public.user_role` inclut `associate`.
+- Le rôle associé reçoit exclusivement `shops.view` et `products.view`; aucun droit de consultation des utilisateurs, commandes, finances, retraits, KYC, support, paramètres ou journaux.
+- L'attribution/révocation est réservée à `super_admin` par RPC et journalisée dans `admin_actions` et `audit_logs`.
+- Le menu associé ne présente que le tableau de bord, boutiques et produits. Les pages boutiques et produits appliquent également `requirePermission` côté serveur.
+- `has_any_admin_role()` n'inclut volontairement pas `associate`, afin de ne pas lui accorder les autorisations RLS générales de l'administration.
+- Les fonctions privées de gestion du rôle et de modération d'avis ne sont pas exécutables par `authenticated` ni `anon`. Les wrappers publics sont `SECURITY DEFINER`, avec `search_path` vide, et gardent les contrôles métier.
+- Le contrôle SQL de la base confirme l'exécution authentifiée des wrappers publics et le refus d'exécution directe des fonctions privées.
+
+## Calendrier social vendeur
+
+- Page de calendrier ajoutée à Ma boutique; les posts sont filtrés par boutique et propriétaire avec RLS.
+- Planification, annulation, fuseau Africa/Niamey et partage manuel natif/copie sont présents.
+- La publication automatique n'est pas connectée; aucune publication n'est prétendue comme effectuée.
+- La migration `social_posts` était déjà appliquée dans Supabase; son fichier source a été restauré dans le dépôt. Ne pas la réappliquer sur le projet actif.
+
+## Synchronisation et livraison
+
+- Les migrations d'index FK et de suppression de l'index dupliqué ont été restaurées dans le dépôt par la PR #26.
+- La PR #26 a été fusionnée dans `main` au commit `48b51fa13d405e46a757288217e02771d454846f`.
+- La PR de suivi contient les migrations de création du type `associate` et de correction des wrappers RPC.
+- Le run GitHub Actions `41482339263` sur le commit `7124c699` a terminé avec lint et build réussis. Le nouveau lot doit passer son propre run avant fusion.
+- Aucun déploiement Render du code de la branche de suivi n'a été lancé.
