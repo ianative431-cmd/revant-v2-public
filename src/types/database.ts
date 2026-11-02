@@ -1527,6 +1527,51 @@ export type Database = {
         }
         Relationships: []
       }
+      social_posts: {
+        Row: {
+          caption: string
+          created_at: string
+          id: string
+          media_url: string | null
+          owner_id: string
+          platforms: string[]
+          product_url: string | null
+          scheduled_at: string
+          shop_id: string
+          status: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          caption: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          owner_id: string
+          platforms?: string[]
+          product_url?: string | null
+          scheduled_at: string
+          shop_id: string
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          owner_id?: string
+          platforms?: string[]
+          product_url?: string | null
+          scheduled_at?: string
+          shop_id?: string
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       support_messages: {
         Row: {
           body: string
@@ -1857,6 +1902,14 @@ export type Database = {
         Args: { p_action: string; p_note?: string; p_report_id: string }
         Returns: undefined
       }
+      admin_moderate_review: {
+        Args: { p_note?: string; p_publish: boolean; p_review_id: string }
+        Returns: undefined
+      }
+      admin_set_associate_role: {
+        Args: { p_enabled: boolean; p_note?: string; p_user_id: string }
+        Returns: undefined
+      }
       check_rate_limit: {
         Args: {
           p_key: string
@@ -2014,6 +2067,7 @@ export type Database = {
         | "support_admin"
         | "kyc_admin"
         | "catalog_admin"
+        | "associate"
         | "seller"
         | "buyer"
       wallet_status: "active" | "frozen" | "closed"

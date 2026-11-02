@@ -1,5 +1,6 @@
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getAdminOverviewStats } from "@/server/admin/stats";
-import { requirePermission } from "@/server/auth/roles";
+import { getCurrentUserRole, requirePermission } from "@/server/auth/roles";
 
 function StatCard({ label, value, sub }: { label: string; value: number; sub?: string }) {
   return (
@@ -12,6 +13,27 @@ function StatCard({ label, value, sub }: { label: string; value: number; sub?: s
 }
 
 export default async function AdminDashboardPage() {
+  const role = await getCurrentUserRole();
+  if (role === "associate") {
+    await requirePermission("shops.view");
+    await requirePermission("products.view");
+    const admin = createSupabaseAdminClient();
+    const [{ count: shops }, { count: products }] = await Promise.all([
+      admin.from("shops").select("id", { count: "exact", head: true }),
+      admin.from("products").select("id", { count: "exact", head: true }),
+    ]);
+    return (
+      <div>
+        <h1 className="text-xl font-bold mb-1">Espace associé</h1>
+        <p className="text-sm text-black/60 mb-6">Accès limité à la consultation des boutiques et du catalogue. Les données financières, commandes nominatives, paiements, retraits et KYC ne sont pas accessibles.</p>
+        <div className="grid grid-cols-2 gap-3">
+          <StatCard label="Boutiques" value={shops ?? 0} />
+          <StatCard label="Produits" value={products ?? 0} />
+        </div>
+      </div>
+    );
+  }
+
   await requirePermission("users.view");
   const stats = await getAdminOverviewStats();
 

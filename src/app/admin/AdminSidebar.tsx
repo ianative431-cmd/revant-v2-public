@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   FileCheck,
   Settings,
+  Repeat,
   LogOut,
   type LucideIcon,
 } from "lucide-react";
@@ -49,6 +50,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin/securite": ShieldCheck,
   "/admin/kyc": FileCheck,
   "/admin/parametres": Settings,
+  "/admin/abonnements": Repeat,
 };
 
 const ROLE_LABEL: Record<string, string> = {
@@ -59,6 +61,7 @@ const ROLE_LABEL: Record<string, string> = {
   support_admin: "Support",
   kyc_admin: "Administrateur KYC",
   catalog_admin: "Administrateur catalogue",
+  associate: "Associé — accès limité",
 };
 
 export default function AdminSidebar({
@@ -70,6 +73,9 @@ export default function AdminSidebar({
   adminRole: string;
 }) {
   const pathname = usePathname();
+  const navItems = adminRole === "associate"
+    ? ADMIN_NAV.filter((item) => ["/admin", "/admin/boutiques", "/admin/produits"].includes(item.href))
+    : ADMIN_NAV;
 
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";
@@ -80,7 +86,7 @@ export default function AdminSidebar({
     <>
       {/* Mobile / tablette : rangée horizontale défilante */}
       <nav className="md:hidden bg-[#0B0B10] px-4 py-3 flex gap-2 overflow-x-auto">
-        {ADMIN_NAV.map((item) => (
+        {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
@@ -109,7 +115,7 @@ export default function AdminSidebar({
           Administration
         </p>
         <div className="flex-1 overflow-y-auto flex flex-col gap-0.5">
-          {ADMIN_NAV.map((item) => {
+          {navItems.map((item) => {
             const Icon = NAV_ICONS[item.href] ?? Settings;
             const active = isActive(item.href);
             return (
