@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Product } from "@/types/product";
 
 export default function ProductManageRow({ product }: { product: Product }) {
-  const router = useRouter();
   const [status, setStatus] = useState(product.status);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
