@@ -1,13 +1,13 @@
 # Revant — audit technique de suivi
 Date: 2026-11-02
 Base: main @ 5f409b9b07c2bdc61dc8877a0b60f62ff61359df
-Branche: audit/finance-and-subscriptions-followup
+Branche de suivi: fix/associate-rpc-sync-20261102
 
 ## État Git
 - Branche de travail créée avec le compte GitHub connecté; permission effective admin vérifiée.
 - Le présent document a été écrit puis relu depuis GitHub.
-- Aucun changement sur main.
-- Aucun déploiement déclenché.
+- La PR #26 a été fusionnée dans main au commit `48b51fa13d405e46a757288217e02771d454846f`.
+- Aucun déploiement Render de cette version n'a été déclenché.
 
 ## Constats confirmés
 
