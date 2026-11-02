@@ -122,7 +122,7 @@ export async function updateProductModeration(
 
   const { error: auditError } = await admin.from("audit_logs").insert({
     actor_id: actor.id,
-    action: "update",
+    action: nextStatus === "active" ? "approve" : "reject",
     entity_type: "product",
     entity_id: productId,
     description: nextStatus === "active" ? "Annonce approuvée et publiée" : "Annonce refusée",
