@@ -173,17 +173,18 @@ export default function NewProductForm({
     const uploadedPaths: string[] = [];
 
     try {
-      supabase = createSupabaseBrowserClient();
+      const client = createSupabaseBrowserClient();
+      supabase = client;
       for (let index = 0; index < files.length; index += 1) {
         const compressed = await compressProductImage(files[index]);
         const basePath = buildProductImagePath(ownerId, shopId);
         const path = basePath.replace(/\.jpg$/, "-" + index + ".jpg");
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await client.storage
           .from(PRODUCT_IMAGE_BUCKET)
           .upload(path, compressed, { contentType: "image/jpeg", upsert: false });
 
         if (uploadError) {
-          if (uploadedPaths.length > 0) await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
+          if (uploadedPaths.length > 0) await client.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
           setStatus("error-network");
           return;
         }
@@ -208,13 +209,13 @@ export default function NewProductForm({
         .single();
 
       if (insertError || !product) {
-        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
+        await client.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
         setStatus("error-generic");
         return;
       }
 
       const imageRows = uploadedPaths.map((path, index) => {
-        const { data } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
+        const { data } = client.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
         return {
           product_id: product.id,
           image_url: data.publicUrl,
@@ -222,11 +223,11 @@ export default function NewProductForm({
         };
       });
 
-      const { error: imageError } = await supabase.from("product_images").insert(imageRows);
+      const { error: imageError } = await client.from("product_images").insert(imageRows);
 
       if (imageError) {
-        await supabase.from("products").delete().eq("id", product.id);
-        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
+        await client.from("products").delete().eq("id", product.id);
+        await client.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
         setStatus("error-generic");
         return;
       }
