@@ -71,4 +71,15 @@ Branche de suivi: fix/associate-rpc-sync-20261102
 - La PR #26 a été fusionnée dans `main` au commit `48b51fa13d405e46a757288217e02771d454846f`.
 - La PR de suivi contient les migrations de création du type `associate` et de correction des wrappers RPC.
 - Le run GitHub Actions `41482339263` sur le commit `7124c699` a terminé avec lint et build réussis. Le nouveau lot doit passer son propre run avant fusion.
-- Aucun déploiement Render du lot de suivi PR #28 n'a été lancé.
+- La PR #28 a été fusionnée au commit `7f3fc44299bfcd6e5c08a62d566a101dddafb089`; le déploiement Render `dep-dbkbs94s728c73cndf5g` est terminé avec statut `live` le 2026-11-02 à 16:47 UTC.
+
+## Contrôles après déploiement final — 02/11/2026
+
+- Commit main déployé : `7f3fc44299bfcd6e5c08a62d566a101dddafb089`.
+- Render : `dep-dbkbs94s728c73cndf5g`, statut `live`; le nouveau conteneur Next.js a démarré et a affiché `Ready`.
+- Le build Render a compilé Next.js, terminé TypeScript et généré les 51 pages statiques.
+- `npm install` a signalé 18 vulnérabilités dans l'arbre de dépendances : 16 modérées, 1 élevée et 1 critique. Aucun `npm audit fix --force` n'a été exécuté; il faut identifier les paquets précis et appliquer des mises à jour ciblées sur une branche séparée.
+- L'advisor Supabase signale toujours la protection contre les mots de passe compromis désactivée; le connecteur utilisé ne permet pas de modifier ce paramètre Auth.
+- L'advisor Supabase signale 12 fonctions SECURITY DEFINER accessibles aux comptes authentifiés. Les 10 fonctions métier préexistantes ont été auditées avec leurs contrôles d'identité/propriété; les 2 nouvelles RPC admin vérifient respectivement `super_admin` et `support.manage`. Le linter reste volontairement signalé car ces RPC doivent être appelables par les sessions authentifiées.
+- `private.delivery_code_secrets` conserve RLS activé sans policy, intentionnellement.
+- Aucun événement OAuth Google/callback n'a été enregistré dans les logs Supabase après le déploiement. La correction des variables Render est en place, mais la connexion Google ne peut pas être déclarée validée avant un essai réel avec un compte utilisateur.
