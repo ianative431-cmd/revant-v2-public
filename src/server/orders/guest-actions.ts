@@ -1,6 +1,6 @@
 "use server";
 
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -20,13 +20,14 @@ type GuestOrderRpc = {
 
 export async function createGuestOrder(formData: FormData): Promise<never> {
   const productId = String(formData.get("productId") ?? "").trim();
+  const idempotencyKey = String(formData.get("idempotencyKey") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const city = String(formData.get("city") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim();
   const website = String(formData.get("website") ?? "").trim();
 
-  if (!productId || name.length < 2 || name.length > 100 || phone.length < 8 || phone.length > 24 || city.length < 2 || city.length > 100 || address.length < 5 || address.length > 300) {
+  if (!productId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idempotencyKey) || name.length < 2 || name.length > 100 || phone.length < 8 || phone.length > 24 || city.length < 2 || city.length > 100 || address.length < 5 || address.length > 300) {
     redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=validation`);
   }
 
@@ -54,7 +55,15 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
 
   // The database RPC also validates every field, re-reads the product price,
   // locks the product row and applies a per-phone limit on successful orders.
-  const token = randomBytes(32).toString("hex");
+  const tokenSecret = process.env.GUEST_ORDER_TOKEN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!tokenSecret || tokenSecret.length < 32) {
+    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=commande`);
+  }
+  // Derive the same tracking token from the same checkout key so duplicate
+  // submissions resolve to the original order instead of creating a second one.
+  const token = createHmac("sha256", tokenSecret)
+    .update(`revant-guest-order:${idempotencyKey}`)
+    .digest("hex");
   const tokenHash = createHash("sha256").update(token).digest("hex");
   // Resolve the optional buyer identity from the verified server session.
   // The privileged RPC is never called directly by browser/mobile clients.
@@ -70,6 +79,7 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
     p_guest_address: address,
     p_tracking_token_hash: tokenHash,
     p_website: website,
+    p_idempotency_key: idempotencyKey,
     p_buyer_id: user?.id ?? null,
   });
 
