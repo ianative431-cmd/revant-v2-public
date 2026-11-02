@@ -7,14 +7,17 @@ export default function FeatureToggle({
   feature,
   label,
   initialEnabled,
+  disabledReason,
 }: {
   feature: WhatsAppFeature;
   label: string;
   initialEnabled: boolean;
+  disabledReason?: string;
 }) {
   const [enabled, setEnabled] = useState(initialEnabled);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const locked = Boolean(disabledReason) && !enabled;
 
   function handleToggle() {
     const next = !enabled;
@@ -30,27 +33,29 @@ export default function FeatureToggle({
   }
 
   return (
-    <div className="flex items-center justify-between py-2 border-b border-black/5 last:border-0">
-      <span className="text-sm">{label}</span>
-      <div className="flex items-center gap-2">
-        {error && <span className="text-red-600 text-[10px]">{error}</span>}
-        <button
-          type="button"
-          role="switch"
-          aria-checked={enabled}
-          onClick={handleToggle}
-          disabled={pending}
-          className={`w-11 h-6 rounded-full relative transition-colors disabled:opacity-50 ${
-            enabled ? "bg-black" : "bg-black/20"
-          }`}
-        >
-          <span
-            className={`absolute top-0.5 left-0.5 block w-5 h-5 bg-white rounded-full transition-transform ${
-              enabled ? "translate-x-5" : ""
-            }`}
-          />
-        </button>
+    <div className="flex items-center justify-between gap-3 py-2 border-b border-black/5 last:border-0">
+      <div className="min-w-0 flex-1">
+        <span className="text-sm">{label}</span>
+        {disabledReason && <p className="mt-1 text-xs text-neutral-500">{disabledReason}</p>}
+        {error && <p role="alert" className="mt-1 text-xs text-red-600">{error}</p>}
       </div>
+      <button
+        type="button"
+        role="switch"
+        aria-label={label}
+        aria-checked={enabled}
+        onClick={handleToggle}
+        disabled={pending || locked}
+        className={`h-6 w-11 shrink-0 rounded-full relative transition-colors disabled:opacity-50 ${
+          enabled ? "bg-black" : "bg-black/20"
+        }`}
+      >
+        <span
+          className={`absolute top-0.5 left-0.5 block h-5 w-5 rounded-full bg-white transition-transform ${
+            enabled ? "translate-x-5" : ""
+          }`}
+        />
+      </button>
     </div>
   );
 }

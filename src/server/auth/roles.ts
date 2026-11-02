@@ -41,13 +41,16 @@ export async function getCurrentUserRoles(): Promise<AppRole[]> {
  * Rôle "principal" pour l'affichage simple (ex. annuaire utilisateurs).
  * Priorité : rôle admin le plus élevé, sinon vendeur, sinon acheteur.
  */
-export async function getCurrentUserRole(): Promise<AppRole> {
-  const roles = await getCurrentUserRoles();
+export function getPrimaryRole(roles: AppRole[]): AppRole {
   for (const role of ADMIN_ROLES) {
     if (roles.includes(role)) return role;
   }
   if (roles.includes("seller")) return "seller";
   return "buyer";
+}
+
+export async function getCurrentUserRole(): Promise<AppRole> {
+  return getPrimaryRole(await getCurrentUserRoles());
 }
 
 /**
@@ -56,6 +59,29 @@ export async function getCurrentUserRole(): Promise<AppRole> {
  * la connexion admin dédiée, puis le rôle est relu en base à chaque
  * requête. Le rôle ne vient jamais des métadonnées modifiables du client.
  */
+async function enforceSuperAdminMfa(roles: AppRole[]) {
+  if (!roles.includes("super_admin")) return;
+
+  const supabase = await createSupabaseServerClient();
+  const [assuranceResult, factorsResult] = await Promise.all([
+    supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+    supabase.auth.mfa.listFactors(),
+  ]);
+
+  if (assuranceResult.error || factorsResult.error || !assuranceResult.data || !factorsResult.data) {
+    redirect("/admin-mfa?error=verification");
+  }
+
+  const hasVerifiedTotp = factorsResult.data.totp.some((factor) => factor.status === "verified");
+  if (
+    !hasVerifiedTotp ||
+    assuranceResult.data.currentLevel !== "aal2" ||
+    assuranceResult.data.nextLevel !== "aal2"
+  ) {
+    redirect("/admin-mfa");
+  }
+}
+
 export async function requireAdmin() {
   const currentUser = await getCurrentUser();
   if (!currentUser) redirect("/admin-connexion");
@@ -67,6 +93,7 @@ export async function requireAdmin() {
     redirect("/");
   }
 
+  await enforceSuperAdminMfa(roles);
   return user;
 }
 
@@ -75,22 +102,22 @@ export async function requireAdmin() {
  * Les rôles sont relus depuis la base à chaque requête : aucune
  * permission ne provient des métadonnées modifiables du client.
  */
-export async function hasPermission(permissionKey: string): Promise<boolean> {
-  const roles = await getCurrentUserRoles();
-  if (roles.length === 0) return false;
+export async function getCurrentUserPermissions(roles?: AppRole[]): Promise<string[]> {
+  const activeRoles = roles ?? await getCurrentUserRoles();
+  if (activeRoles.length === 0) return [];
 
   const supabase = await createSupabaseServerClient();
   const { data: assignments, error: assignmentsError } = await supabase
     .from("role_permissions")
     .select("permission_id")
-    .in("role", roles);
+    .in("role", activeRoles);
 
   if (assignmentsError) {
     throw new Error("Impossible de vérifier les permissions administrateur.");
   }
 
   const permissionIds = [...new Set((assignments ?? []).map((row) => row.permission_id))];
-  if (permissionIds.length === 0) return false;
+  if (permissionIds.length === 0) return [];
 
   const { data: permissions, error: permissionsError } = await supabase
     .from("permissions")
@@ -101,7 +128,12 @@ export async function hasPermission(permissionKey: string): Promise<boolean> {
     throw new Error("Impossible de vérifier les permissions administrateur.");
   }
 
-  return Boolean(permissions?.some((permission) => permission.key === permissionKey));
+  return [...new Set((permissions ?? []).map((permission) => permission.key))];
+}
+
+export async function hasPermission(permissionKey: string): Promise<boolean> {
+  const permissions = await getCurrentUserPermissions();
+  return permissions.includes(permissionKey);
 }
 
 export async function requirePermission(permissionKey: string) {
@@ -124,5 +156,6 @@ export async function requireSuperAdmin() {
     redirect("/admin");
   }
 
+  await enforceSuperAdminMfa(roles);
   return user;
 }

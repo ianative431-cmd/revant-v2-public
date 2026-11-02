@@ -1,11 +1,13 @@
 "use server";
 
-import { createHash, randomBytes } from "node:crypto";
+import { createHash } from "node:crypto";
+import { createGuestTrackingToken, hashGuestTrackingToken } from "@/server/orders/guest-token.mjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import {
   checkRateLimit,
   getClientIdentifier,
@@ -20,13 +22,14 @@ type GuestOrderRpc = {
 
 export async function createGuestOrder(formData: FormData): Promise<never> {
   const productId = String(formData.get("productId") ?? "").trim();
+  const idempotencyKey = String(formData.get("idempotencyKey") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const city = String(formData.get("city") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim();
   const website = String(formData.get("website") ?? "").trim();
 
-  if (!productId || name.length < 2 || name.length > 100 || phone.length < 8 || phone.length > 24 || city.length < 2 || city.length > 100 || address.length < 5 || address.length > 300) {
+  if (!productId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idempotencyKey) || name.length < 2 || name.length > 100 || phone.length < 8 || phone.length > 24 || city.length < 2 || city.length > 100 || address.length < 5 || address.length > 300) {
     redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=validation`);
   }
 
@@ -54,12 +57,19 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
 
   // The database RPC also validates every field, re-reads the product price,
   // locks the product row and applies a per-phone limit on successful orders.
-  const token = randomBytes(32).toString("hex");
-  const tokenHash = createHash("sha256").update(token).digest("hex");
+  // The same checkout key always produces the same tracking token. This lets
+  // a repeated submission return the original order and restore its cookie.
+  const tokenSecret = process.env.GUEST_ORDER_TOKEN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!tokenSecret) {
+    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=commande`);
+  }
+  const token = createGuestTrackingToken(idempotencyKey, tokenSecret);
+  const tokenHash = hashGuestTrackingToken(token);
   // Resolve the optional buyer identity from the verified server session.
   // The privileged RPC is never called directly by browser/mobile clients.
   const sessionSupabase = await createSupabaseServerClient();
   const { data: { user } } = await sessionSupabase.auth.getUser();
+  if (user) await requireUserWithLegalConsent();
   const supabase = createSupabaseAdminClient();
   const guestRpc = supabase as unknown as GuestOrderRpc;
   const { data, error } = await guestRpc.rpc("create_guest_order", {
@@ -70,6 +80,7 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
     p_guest_address: address,
     p_tracking_token_hash: tokenHash,
     p_website: website,
+    p_idempotency_key: idempotencyKey,
     p_buyer_id: user?.id ?? null,
   });
 

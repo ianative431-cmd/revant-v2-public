@@ -62,6 +62,12 @@ export default async function MaBoutiquePage() {
           initialName={shop.name}
           initialDescription={shop.description ?? ""}
           initialSlug={shop.slug}
+          initialCity={shop.city ?? ""}
+          initialPhone={shop.phone ?? ""}
+          initialWhatsapp={shop.whatsapp ?? ""}
+          initialInstagram={shop.instagram ?? ""}
+          initialTiktok={shop.tiktok ?? ""}
+          initialSnapchat={shop.snapchat ?? ""}
         />
 
         <Link
@@ -83,6 +89,13 @@ export default async function MaBoutiquePage() {
           className="block text-center w-full border border-brand-accent rounded-full py-3 text-sm font-medium mb-3"
         >
           Commandes
+        </Link>
+
+        <Link
+          href="/compte/boutique/reseaux"
+          className="block text-center w-full border border-brand-accent rounded-full py-3 text-sm font-medium mb-3"
+        >
+          Calendrier des réseaux sociaux
         </Link>
 
         <div className="mt-6 border-t pt-4">

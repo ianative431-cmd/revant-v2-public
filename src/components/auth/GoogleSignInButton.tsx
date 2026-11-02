@@ -22,7 +22,8 @@ export default function GoogleSignInButton({ nextPath = "/compte", variant = "li
 
     try {
       const supabase = createSupabaseBrowserClient();
-      const callback = new URL("/auth/callback", window.location.origin);
+      const canonicalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      const callback = new URL("/auth/callback", canonicalSiteUrl);
       callback.searchParams.set("next", nextPath);
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({

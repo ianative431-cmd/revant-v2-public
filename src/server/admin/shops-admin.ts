@@ -6,7 +6,7 @@ import type { Shop } from "@/types/shop";
  * Toutes les boutiques, tous statuts et types confondus — les RLS
  * normales (shops_public_read_active / shops_owner_read_own) ne
  * donnent volontairement pas cette vue à un compte authentifié
- * classique, y compris admin (voir migration 0002_shops.sql).
+ * classique, y compris admin (voir supabase/legacy_migrations_archive/0002_shops.sql).
  */
 export async function getAllShopsForAdmin(): Promise<Shop[]> {
   const admin = createSupabaseAdminClient();

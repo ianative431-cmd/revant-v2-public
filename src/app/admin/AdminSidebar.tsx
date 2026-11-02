@@ -26,7 +26,7 @@ import {
   LogOut,
   type LucideIcon,
 } from "lucide-react";
-import { ADMIN_NAV } from "@/content/admin/nav";
+import type { AdminNavItem } from "@/content/admin/nav";
 import { signOutAction } from "@/app/(auth)/actions";
 
 const NAV_ICONS: Record<string, LucideIcon> = {
@@ -64,10 +64,12 @@ const ROLE_LABEL: Record<string, string> = {
 export default function AdminSidebar({
   adminEmail,
   adminRole,
+  navItems,
 }: {
   /** Identité réelle de l'admin connecté (Supabase auth), jamais une donnée d'exemple. */
   adminEmail: string;
   adminRole: string;
+  navItems: AdminNavItem[];
 }) {
   const pathname = usePathname();
 
@@ -80,7 +82,7 @@ export default function AdminSidebar({
     <>
       {/* Mobile / tablette : rangée horizontale défilante */}
       <nav className="md:hidden bg-[#0B0B10] px-4 py-3 flex gap-2 overflow-x-auto">
-        {ADMIN_NAV.map((item) => (
+        {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
@@ -109,7 +111,7 @@ export default function AdminSidebar({
           Administration
         </p>
         <div className="flex-1 overflow-y-auto flex flex-col gap-0.5">
-          {ADMIN_NAV.map((item) => {
+          {navItems.map((item) => {
             const Icon = NAV_ICONS[item.href] ?? Settings;
             const active = isActive(item.href);
             return (

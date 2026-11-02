@@ -5,7 +5,7 @@ import { requirePermission } from "@/server/auth/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { PRODUCT_IMAGE_BUCKET } from "@/lib/product-image";
 
-export type AdminModerationState = { error: string | null };
+export type AdminModerationState = { error: string | null; success?: boolean; warning?: string };
 
 /**
  * Suspend/réactive une boutique. Le trigger shops_protect_admin_columns
@@ -74,4 +74,71 @@ export async function deleteProductAsAdmin(
 
   revalidatePath("/admin/produits");
   return { error: null };
+}
+
+
+/** Approuve ou refuse une annonce en attente, avec trace d'audit. */
+export async function updateProductModeration(
+  _previousState: AdminModerationState,
+  formData: FormData
+): Promise<AdminModerationState> {
+  const actor = await requirePermission("products.manage");
+  const productId = String(formData.get("productId") ?? "").trim();
+  const nextStatus = String(formData.get("nextStatus") ?? "");
+  const reason = String(formData.get("reason") ?? "").trim().slice(0, 500);
+  const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+  if (!UUID_PATTERN.test(productId)) return { error: "Référence d’annonce invalide." };
+  if (nextStatus !== "active" && nextStatus !== "rejected") return { error: "Décision de modération invalide." };
+  if (nextStatus === "rejected" && reason.length < 3) return { error: "Ajoute un motif de refus (3 caractères minimum)." };
+
+  const admin = createSupabaseAdminClient();
+  const { data: product, error: readError } = await admin
+    .from("products")
+    .select("id,shop_id,status")
+    .eq("id", productId)
+    .maybeSingle();
+  if (readError || !product) return { error: "Annonce introuvable." };
+  if (product.status !== "pending") return { error: "Cette annonce n’est plus en attente de validation." };
+
+  const { data: shop, error: shopError } = await admin
+    .from("shops")
+    .select("status,slug")
+    .eq("id", product.shop_id)
+    .maybeSingle();
+  if (shopError || !shop) return { error: "Boutique associée introuvable." };
+  if (nextStatus === "active" && shop.status !== "active") {
+    return { error: "La boutique doit être active avant de publier ses produits." };
+  }
+
+  const { data: updated, error: updateError } = await admin
+    .from("products")
+    .update({ status: nextStatus })
+    .eq("id", productId)
+    .eq("status", "pending")
+    .select("id")
+    .maybeSingle();
+  if (updateError || !updated) return { error: "L’annonce a changé entre-temps. Recharge la page." };
+
+  const { error: auditError } = await admin.from("audit_logs").insert({
+    actor_id: actor.id,
+    action: nextStatus === "active" ? "approve" : "reject",
+    entity_type: "product",
+    entity_id: productId,
+    description: nextStatus === "active" ? "Annonce approuvée et publiée" : "Annonce refusée",
+    metadata: {
+      before: { status: "pending" },
+      after: { status: nextStatus },
+      reason: reason || null,
+    },
+  });
+
+  revalidatePath("/admin/produits");
+  revalidatePath("/compte/boutique/produits");
+  revalidatePath(`/shop/${shop.slug}`);
+  return {
+    error: null,
+    success: true,
+    warning: auditError ? "Annonce mise à jour, mais la trace d’audit n’a pas pu être confirmée." : undefined,
+  };
 }

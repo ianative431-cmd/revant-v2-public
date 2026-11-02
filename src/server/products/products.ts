@@ -86,6 +86,27 @@ export async function getProductsForShop(
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("shop_id", shopId)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .returns<ProductRow[]>();
+
+  return (data ?? []).map(mapRow);
+}
+
+/**
+ * Catalogue privé du vendeur : inclut les annonces actives et archivées
+ * afin qu'il puisse les remettre en vente. La policy RLS "owners can
+ * manage their products" limite les résultats au propriétaire de la boutique.
+ * Ne pas utiliser sur la vitrine publique, qui doit rester active-only.
+ */
+export async function getManageableProductsForShop(
+  supabase: SupabaseClient,
+  shopId: string
+): Promise<Product[]> {
+  const { data } = await supabase
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .eq("shop_id", shopId)
     .order("created_at", { ascending: false })
     .returns<ProductRow[]>();
 

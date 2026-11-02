@@ -4,7 +4,7 @@ import type { Shop } from "@/types/shop";
 
 /**
  * Boutique associée à un compte, s'il en existe une (un seul compte =
- * une seule boutique pour l'instant, voir migration 0002_shops.sql).
+ * une seule boutique pour l'instant, voir supabase/legacy_migrations_archive/0002_shops.sql).
  */
 export async function getShopByOwnerId(
   supabase: SupabaseClient,
@@ -38,6 +38,7 @@ export async function resolveShopBySlug(
     .from("shops")
     .select("*")
     .eq("slug", slug)
+    .eq("status", "active")
     .maybeSingle();
 
   if (shop) return { kind: "found", shop: shop as Shop };

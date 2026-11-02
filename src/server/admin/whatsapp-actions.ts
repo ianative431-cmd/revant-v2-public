@@ -17,11 +17,6 @@ export type WhatsAppActionState = { error: string | null; info?: string | null }
 
 type AuditAction = Database["public"]["Enums"]["audit_action"];
 
-/**
- * Trace un événement de connexion Meta dans audit_logs — jamais de
- * token ni de secret dans metadata, uniquement des informations
- * utiles au suivi (cf. exigence de journalisation sans secrets).
- */
 async function logWhatsAppEvent(
   admin: Awaited<ReturnType<typeof requireSuperAdmin>>,
   action: AuditAction,
@@ -38,14 +33,6 @@ async function logWhatsAppEvent(
   });
 }
 
-/**
- * Reçoit le `code` renvoyé par l'Embedded Signup (côté client, après
- * FB.login) et termine la connexion côté serveur : échange du code,
- * repérage du WABA et du numéro existants, écriture de l'état non
- * sensible dans whatsapp_connection et du token dans whatsapp_secret
- * (jamais exposé au client). Ne crée jamais de nouveau compte/numéro
- * — se contente de lire ce qui existe déjà sur le Business Meta.
- */
 export async function exchangeMetaCode(
   code: string,
   metaBusinessId: string
@@ -58,7 +45,7 @@ export async function exchangeMetaCode(
     const { wabaId, businessName } = await getFirstOwnedWaba(accessToken, metaBusinessId);
     const phone = await getFirstPhoneNumber(accessToken, wabaId);
 
-    await supabase
+    const { error: secretError } = await supabase
       .from("whatsapp_secret")
       .update({
         access_token: accessToken,
@@ -66,8 +53,9 @@ export async function exchangeMetaCode(
         updated_at: new Date().toISOString(),
       })
       .eq("id", 1);
+    if (secretError) throw new Error("Impossible d'enregistrer l'autorisation WhatsApp.");
 
-    await supabase
+    const { error: connectionError } = await supabase
       .from("whatsapp_connection")
       .update({
         status: "connected",
@@ -85,6 +73,7 @@ export async function exchangeMetaCode(
         updated_at: new Date().toISOString(),
       })
       .eq("id", 1);
+    if (connectionError) throw new Error("Impossible d'enregistrer l'état de la connexion WhatsApp.");
 
     await logWhatsAppEvent(admin, "create", "Connexion Meta WhatsApp Business réussie", {
       event: "meta_connect_success",
@@ -108,11 +97,6 @@ export async function exchangeMetaCode(
   }
 }
 
-/**
- * Vérification réelle côté serveur auprès de Meta (pas juste
- * "une variable existe") : confirme que le token stocké fonctionne
- * encore en interrogeant le WABA.
- */
 export async function verifyConnection(): Promise<WhatsAppActionState> {
   const admin = await requireSuperAdmin();
   const supabase = createSupabaseAdminClient();
@@ -159,10 +143,6 @@ export async function verifyConnection(): Promise<WhatsAppActionState> {
   return { error: `Connexion invalide ou expirée : ${result.error}` };
 }
 
-/**
- * Test réel du webhook : confirme auprès de Meta (subscribed_apps)
- * que l'app Revant est bien abonnée aux événements de ce WABA.
- */
 export async function testWebhook(): Promise<WhatsAppActionState> {
   const admin = await requireSuperAdmin();
   const supabase = createSupabaseAdminClient();
@@ -197,7 +177,7 @@ export async function testWebhook(): Promise<WhatsAppActionState> {
       .eq("id", 1);
     await logWhatsAppEvent(
       admin,
-      subscribed ? "update" : "update",
+      "update",
       subscribed ? "Webhook vérifié auprès de Meta" : "Webhook non abonné côté Meta",
       { event: subscribed ? "webhook_verified" : "webhook_error" }
     );
@@ -212,12 +192,6 @@ export async function testWebhook(): Promise<WhatsAppActionState> {
   }
 }
 
-/**
- * Déconnexion : révoque le token stocké et repasse l'état à
- * "disconnected". Ne supprime jamais les autres données Revant.
- * La confirmation explicite est gérée côté client (window.confirm)
- * avant l'appel.
- */
 export async function disconnectWhatsApp(): Promise<WhatsAppActionState> {
   const admin = await requireSuperAdmin();
   const supabase = createSupabaseAdminClient();
@@ -257,11 +231,6 @@ const TOGGLE_COLUMNS = {
 
 export type WhatsAppFeature = keyof typeof TOGGLE_COLUMNS;
 
-/**
- * Active/désactive séparément une fonctionnalité WhatsApp. Le super
- * admin garde le contrôle complet, y compris pour couper
- * immédiatement l'assistant IA sans toucher au code.
- */
 export async function toggleWhatsAppFeature(
   feature: WhatsAppFeature,
   enabled: boolean
@@ -270,6 +239,12 @@ export async function toggleWhatsAppFeature(
   const column = TOGGLE_COLUMNS[feature];
   if (!column) return { error: "Fonctionnalité inconnue." };
 
+  if (feature === "whatsappLogin" && enabled) {
+    return {
+      error: "La connexion WhatsApp n'est pas encore implémentée ; son activation est bloquée jusqu'à la recette du flux sécurisé.",
+    };
+  }
+
   const supabase = createSupabaseAdminClient();
   const update = {
     [column]: enabled,
@@ -277,7 +252,7 @@ export async function toggleWhatsAppFeature(
   } as Database["public"]["Tables"]["whatsapp_connection"]["Update"];
   const { error } = await supabase.from("whatsapp_connection").update(update).eq("id", 1);
 
-  if (error) return { error: `Impossible de modifier ce réglage : ${error.message}` };
+  if (error) return { error: "Impossible de modifier ce réglage." };
 
   await logWhatsAppEvent(admin, "config_change", `Réglage ${feature} : ${enabled ? "activé" : "désactivé"}`, {
     event: "feature_toggle",

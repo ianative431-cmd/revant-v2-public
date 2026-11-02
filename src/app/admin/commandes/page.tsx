@@ -40,8 +40,7 @@ export default async function AdminCommandesPage() {
     <div>
       <h1 className="text-xl font-bold mb-1">Commandes</h1>
       <p className="text-sm text-black/60 mb-6">
-        {orders.length} commande{orders.length > 1 ? "s" : ""} (200 plus récentes) — paiement réglé
-        hors app, confirmé par le vendeur.
+        {orders.length} commande{orders.length > 1 ? "s" : ""} (200 plus récentes). La confirmation vendeur ne marque jamais un paiement comme payé.
       </p>
 
       {orders.length === 0 ? (

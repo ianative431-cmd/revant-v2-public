@@ -6,13 +6,13 @@ export const PRODUCT_IMAGE_MAX_DIMENSION = 1600; // px, plus grand côté après
 export const PRODUCT_IMAGE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 /**
- * Chemin de stockage isolé par boutique : {shop_id}/{timestamp}.jpg. Le
- * préfixe {shop_id}/ est ce qui permet aux règles RLS Supabase Storage
- * (migration 0005) de garantir qu'un vendeur ne peut écrire que dans SA
- * PROPRE boutique.
+ * Chemin de stockage : {owner_id}/{shop_id}/{timestamp}.jpg.
+ * La policy Storage actuellement déployée vérifie que le premier dossier
+ * correspond à auth.uid(); le dossier boutique conserve ensuite le rangement
+ * par boutique sans contourner le contrôle de propriété.
  */
-export function buildProductImagePath(shopId: string): string {
-  return `${shopId}/${Date.now()}.jpg`;
+export function buildProductImagePath(ownerId: string, shopId: string): string {
+  return `${ownerId}/${shopId}/${Date.now()}.jpg`;
 }
 
 /** URL publique déterministe, sans appel réseau (bucket public). */

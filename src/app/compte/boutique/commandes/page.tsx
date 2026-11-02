@@ -5,78 +5,103 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { getOrdersForShop } from "@/server/orders/orders";
 import { ConfirmOrderButton, CancelOrderButton } from "./OrderActions";
+import RequestDeliveryButton from "./RequestDeliveryButton";
+import type { OrderStatus } from "@/types/order";
 
-const STATUS_LABEL: Record<string, string> = {
-  en_attente: "En attente",
-  confirmee: "Confirmée",
-  annulee: "Annulée",
+const DELIVERY_STATUS_LABEL: Record<string, string> = {
+  unassigned: "En attente d’un livreur",
+  assigned: "Livreur assigné",
+  picked_up: "Commande récupérée",
+  in_transit: "En route",
+  delivered: "Livrée",
+  failed: "Échec de livraison",
+  cancelled: "Livraison annulée",
+};
+
+const STATUS_LABEL: Record<OrderStatus, string> = {
+  pending: "En attente",
+  confirmed: "Confirmée par le vendeur",
+  processing: "En préparation",
+  ready_for_delivery: "Prête à livrer",
+  shipped: "En livraison",
+  delivered: "Livrée",
+  cancelled: "Annulée",
+  refunded: "Remboursée",
+  disputed: "En litige",
 };
 
 export default async function BoutiqueCommandesPage() {
   const user = await requireUserWithLegalConsent();
   const supabase = await createSupabaseServerClient();
   const shop = await getShopByOwnerId(supabase, user.id);
-
   if (!shop) redirect("/compte/boutique");
 
   const orders = await getOrdersForShop(supabase, shop.id);
 
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-md">
-        <Link href="/compte/boutique" className="text-sm underline text-brand-text/60">
-          ← Ma boutique
-        </Link>
-        <h1 className="text-xl font-bold mt-4 mb-1">Commandes</h1>
-        <p className="text-sm text-brand-text/60 mb-6">
-          Paiement réglé directement avec l&apos;acheteur (hors app) — confirme ici une fois reçu et
-          l&apos;article livré.
+      <div className="w-full max-w-2xl">
+        <Link href="/compte/boutique" className="text-sm underline text-brand-text/60">← Ma boutique</Link>
+        <h1 className="mt-4 mb-1 text-xl font-bold">Commandes</h1>
+        <p className="mb-6 text-sm text-brand-text/60">
+          Confirme la prise en charge ou annule une commande avant son départ. Cette action ne valide ni le paiement ni la livraison.
         </p>
 
         {orders.length === 0 ? (
-          <p className="text-sm text-brand-text/60 text-center py-10">
-            Aucune commande pour l&apos;instant.
-          </p>
+          <p className="py-10 text-center text-sm text-brand-text/60">Aucune commande pour l’instant.</p>
         ) : (
           <div className="flex flex-col gap-3">
-            {orders.map((order) => (
-              <div key={order.id} className="bg-white rounded-2xl p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{order.product_title}</p>
-                    <p className="text-xs text-brand-text/50 mt-0.5">
-                      {order.price_fcfa.toLocaleString("fr-FR")} FCFA ·{" "}
-                      {new Date(order.created_at).toLocaleDateString("fr-FR")}
-                    </p>
+            {orders.map((order) => {
+              const sellerTotal = order.items.reduce((sum, item) => sum + Number(item.line_total), 0);
+              const currency = order.items[0]?.currency.trim() || order.currency.trim();
+              return (
+                <article key={order.id} className="rounded-2xl bg-white p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold">Commande {order.order_number}</p>
+                      <p className="mt-1 text-xs text-brand-text/50">{new Date(order.created_at).toLocaleDateString("fr-FR")}</p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-brand-text/5 px-2.5 py-1 text-[11px] text-brand-text/70">{STATUS_LABEL[order.status]}</span>
                   </div>
-                  <span
-                    className={`text-[11px] shrink-0 rounded-full px-2 py-1 ${
-                      order.status === "confirmee"
-                        ? "bg-brand-accent text-white"
-                        : order.status === "annulee"
-                          ? "bg-red-50 text-red-600"
-                          : "bg-brand-text/5 text-brand-text/60"
-                    }`}
-                  >
-                    {STATUS_LABEL[order.status]}
-                  </span>
-                </div>
-                {order.status === "en_attente" && (
-                  <div className="flex gap-2 mt-3">
-                    <ConfirmOrderButton orderId={order.id} />
-                    <CancelOrderButton orderId={order.id} />
+                  <div className="mt-3 space-y-2 border-t border-brand-text/10 pt-3">
+                    {order.items.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between gap-3 text-sm">
+                        <span className="min-w-0 truncate">{item.product_name} × {item.quantity}</span>
+                        <span className="shrink-0 font-semibold">{Number(item.line_total).toLocaleString("fr-FR")} {item.currency.trim()}</span>
+                      </div>
+                    ))}
                   </div>
-                )}
-                {order.status === "confirmee" && (
-                  <Link
-                    href={`/compte/commandes/${order.id}/recu`}
-                    className="inline-block text-xs underline text-brand-text/60 mt-2"
-                  >
-                    Voir le reçu
-                  </Link>
-                )}
-              </div>
-            ))}
+                  <p className="mt-3 text-sm font-bold">Total de tes articles : {sellerTotal.toLocaleString("fr-FR")} {currency}</p>
+                  {(order.guest_name || order.guest_phone || order.guest_city || order.guest_address) && (
+                    <div className="mt-3 rounded-xl bg-brand-bg/70 p-3 text-xs text-brand-text/70">
+                      <p className="font-semibold">Coordonnées de livraison</p>
+                      {order.guest_name && <p className="mt-1">{order.guest_name}</p>}
+                      {order.guest_phone && <p>{order.guest_phone}</p>}
+                      {order.guest_city && <p>{order.guest_city}</p>}
+                      {order.guest_address && <p className="whitespace-pre-line">{order.guest_address}</p>}
+                    </div>
+                  )}
+                  {(order.status === "pending" || order.status === "confirmed") && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {order.status === "pending" && <ConfirmOrderButton orderId={order.id} />}
+                      <CancelOrderButton orderId={order.id} />
+                    </div>
+                  )}
+                  {(order.delivery || order.status === "confirmed") && <div className="mt-3 rounded-xl bg-brand-bg/70 p-3 text-xs text-brand-text/70">
+                    {order.delivery && <p className="font-semibold">Livraison : {DELIVERY_STATUS_LABEL[order.delivery.status] ?? order.delivery.status}</p>}
+                    {order.delivery?.delivery_address && <p className="mt-1">Destination : {order.delivery.delivery_address}</p>}
+                    {order.status === "confirmed" && (!order.delivery || (order.delivery.status === "unassigned" && !order.delivery.requested_at)) && <div className="mt-2"><RequestDeliveryButton orderId={order.id} /></div>}
+                    {order.delivery?.status === "unassigned" && order.delivery.requested_at && <p className="mt-1">Demande envoyée aux livreurs actifs.</p>}
+                    {order.delivery?.status === "assigned" && <p className="mt-1">Un livreur a accepté la course.</p>}
+                    {order.delivery?.status === "in_transit" && <p className="mt-1">Le colis est en route vers l’acheteur.</p>}
+                    {order.delivery?.status === "failed" && <p className="mt-1">Le support doit examiner cet incident.</p>}
+                  </div>}
+                  {order.status === "delivered" && (
+                    <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>
+                  )}
+                </article>
+              );
+            })}
           </div>
         )}
       </div>
