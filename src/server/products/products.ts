@@ -107,7 +107,6 @@ export async function getManageableProductsForShop(
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("shop_id", shopId)
-    .in("status", ["active", "archived"])
     .order("created_at", { ascending: false })
     .returns<ProductRow[]>();
 

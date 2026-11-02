@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAllProductsForAdmin } from "@/server/admin/products-admin";
 import DeleteProductButton from "./DeleteProductButton";
+import ProductModerationActions from "./ProductModerationActions";
 import { requirePermission } from "@/server/auth/roles";
 
 export default async function AdminProduitsPage() {
@@ -39,6 +40,7 @@ export default async function AdminProduitsPage() {
                 </Link>
                 <DeleteProductButton productId={p.id} imageUrls={p.images} />
               </div>
+              {p.status === "pending" && <ProductModerationActions productId={p.id} />}
             </div>
           ))}
         </div>

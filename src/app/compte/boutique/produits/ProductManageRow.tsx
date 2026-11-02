@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Product } from "@/types/product";
+import SubmitProductButton from "./SubmitProductButton";
 
 export default function ProductManageRow({ product }: { product: Product }) {
   const [status, setStatus] = useState(product.status);
@@ -52,19 +53,28 @@ export default function ProductManageRow({ product }: { product: Product }) {
           {product.base_price.toLocaleString("fr-FR")} {product.currency}
         </p>
 
-        <div className="flex gap-2 mt-2">
-          <button
-            type="button"
-            onClick={toggleStatus}
-            disabled={pending}
-            className="text-xs border border-black rounded-full px-3 py-1 disabled:opacity-50"
-          >
-            {status === "active" ? "Retirer de la vente" : "Remettre en vente"}
-          </button>
-
-          <span className={`self-center text-[11px] ${status === "active" ? "text-emerald-700" : "text-neutral-500"}`}>
-            {status === "active" ? "En vente" : "Archivée"}
-          </span>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {(status === "active" || status === "archived") ? (
+            <>
+              <button
+                type="button"
+                onClick={toggleStatus}
+                disabled={pending}
+                className="rounded-full border border-black px-3 py-1 text-xs disabled:opacity-50"
+              >
+                {status === "active" ? "Retirer de la vente" : "Remettre en vente"}
+              </button>
+              <span className={`self-center text-[11px] ${status === "active" ? "text-emerald-700" : "text-neutral-500"}`}>
+                {status === "active" ? "En vente" : "Archivée"}
+              </span>
+            </>
+          ) : status === "draft" ? (
+            <SubmitProductButton productId={product.id} />
+          ) : status === "pending" ? (
+            <span className="text-[11px] text-amber-700">En attente de validation</span>
+          ) : (
+            <span className="text-[11px] text-red-700">Annonce refusée — contacte le support</span>
+          )}
         </div>
 
         {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
