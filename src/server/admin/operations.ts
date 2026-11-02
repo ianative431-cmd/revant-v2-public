@@ -86,14 +86,14 @@ export async function getAdminReviewAndReportData() {
   };
 }
 
-type TicketRow = Pick<Tables<"support_tickets">, "id" | "subject" | "description" | "status" | "priority" | "assigned_to" | "created_at" | "updated_at">;
+type TicketRow = Pick<Tables<"support_tickets">, "id" | "user_id" | "subject" | "description" | "status" | "priority" | "assigned_to" | "created_at" | "updated_at">;
 type SupportMessageRow = Pick<Tables<"support_messages">, "id" | "ticket_id" | "body" | "sender_id" | "created_at">;
 export async function getAdminSupportInbox() {
   await requirePermission("support.manage");
   const admin = createSupabaseAdminClient();
   const { data: tickets, error } = await admin
     .from("support_tickets")
-    .select("id,subject,description,status,priority,assigned_to,created_at,updated_at")
+    .select("id,user_id,subject,description,status,priority,assigned_to,created_at,updated_at")
     .order("updated_at", { ascending: false })
     .limit(100);
   if (error) throw new Error("Impossible de charger les tickets support.");
@@ -103,11 +103,14 @@ export async function getAdminSupportInbox() {
     ? await admin.from("support_messages").select("id,ticket_id,body,sender_id,created_at").in("ticket_id", ticketIds).order("created_at", { ascending: false }).limit(500)
     : { data: [], error: null };
   if (messagesResult.error) throw new Error("Impossible de charger les messages support.");
-  const latestByTicket = new Map<string, SupportMessageRow>();
+  const messagesByTicket = new Map<string, SupportMessageRow[]>();
   for (const message of (messagesResult.data ?? []) as SupportMessageRow[]) {
-    if (!latestByTicket.has(message.ticket_id)) latestByTicket.set(message.ticket_id, message);
+    const current = messagesByTicket.get(message.ticket_id) ?? [];
+    current.push(message);
+    messagesByTicket.set(message.ticket_id, current);
   }
-  return { tickets: rows, latestMessages: latestByTicket };
+  for (const messages of messagesByTicket.values()) messages.reverse();
+  return { tickets: rows, messagesByTicket };
 }
 
 type AuditRow = Pick<Tables<"audit_logs">, "id" | "action" | "entity_type" | "entity_id" | "description" | "created_at">;
