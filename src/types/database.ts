@@ -1527,6 +1527,51 @@ export type Database = {
         }
         Relationships: []
       }
+      social_posts: {
+        Row: {
+          caption: string
+          created_at: string
+          id: string
+          media_url: string | null
+          owner_id: string
+          platforms: string[]
+          product_url: string | null
+          scheduled_at: string
+          shop_id: string
+          status: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          caption: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          owner_id: string
+          platforms?: string[]
+          product_url?: string | null
+          scheduled_at: string
+          shop_id: string
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          owner_id?: string
+          platforms?: string[]
+          product_url?: string | null
+          scheduled_at?: string
+          shop_id?: string
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       support_messages: {
         Row: {
           body: string
