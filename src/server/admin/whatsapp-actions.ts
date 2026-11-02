@@ -269,6 +269,11 @@ export async function toggleWhatsAppFeature(
   const admin = await requireSuperAdmin();
   const column = TOGGLE_COLUMNS[feature];
   if (!column) return { error: "Fonctionnalité inconnue." };
+  if (feature === "whatsappLogin" && enabled) {
+    return {
+      error: "La connexion WhatsApp ne peut pas être activée avant le branchement du hook SMS Supabase et l'approbation du modèle OTP Authentication dans Meta.",
+    };
+  }
 
   const supabase = createSupabaseAdminClient();
   const update = {

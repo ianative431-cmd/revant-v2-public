@@ -7,10 +7,14 @@ export default function FeatureToggle({
   feature,
   label,
   initialEnabled,
+  disabled = false,
+  disabledReason,
 }: {
   feature: WhatsAppFeature;
   label: string;
   initialEnabled: boolean;
+  disabled?: boolean;
+  disabledReason?: string;
 }) {
   const [enabled, setEnabled] = useState(initialEnabled);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +35,10 @@ export default function FeatureToggle({
 
   return (
     <div className="flex items-center justify-between py-2 border-b border-black/5 last:border-0">
-      <span className="text-sm">{label}</span>
+      <div className="min-w-0 pr-3">
+        <span className="text-sm">{label}</span>
+        {disabledReason && <p className="mt-1 max-w-sm text-xs text-black/45">{disabledReason}</p>}
+      </div>
       <div className="flex items-center gap-2">
         {error && <span className="text-red-600 text-[10px]">{error}</span>}
         <button
@@ -39,7 +46,7 @@ export default function FeatureToggle({
           role="switch"
           aria-checked={enabled}
           onClick={handleToggle}
-          disabled={pending}
+          disabled={pending || disabled}
           className={`w-11 h-6 rounded-full relative transition-colors disabled:opacity-50 ${
             enabled ? "bg-black" : "bg-black/20"
           }`}
