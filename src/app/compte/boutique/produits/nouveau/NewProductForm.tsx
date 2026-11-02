@@ -36,9 +36,11 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 export default function NewProductForm({
   shopId,
+  ownerId,
   categories,
 }: {
   shopId: string;
+  ownerId: string;
   categories: Category[];
 }) {
   const router = useRouter();
@@ -173,7 +175,7 @@ export default function NewProductForm({
     try {
       for (let index = 0; index < files.length; index += 1) {
         const compressed = await compressProductImage(files[index]);
-        const basePath = buildProductImagePath(shopId);
+        const basePath = buildProductImagePath(ownerId, shopId);
         const path = basePath.replace(/\.jpg$/, "-" + index + ".jpg");
         const { error: uploadError } = await supabase.storage
           .from(PRODUCT_IMAGE_BUCKET)
