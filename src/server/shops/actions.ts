@@ -157,7 +157,7 @@ export async function updateShop(
   if (city.length > 80 || /[\u0000-\u001F]/.test(city)) {
     return { error: "La ville ne peut pas dépasser 80 caractères." };
   }
-  const validPhone = (value: string) => !value || (/^[+0-9()\s.-]{7,30}$/.test(value) && value.replace(/\D/g, "").length >= 7);
+  const validPhone = (value: string) => !value || (/^\+?[0-9()\s.-]{7,29}$/.test(value) && value.replace(/\D/g, "").length >= 7);
   if (!validPhone(phone) || !validPhone(whatsapp)) {
     return { error: "Vérifie les numéros de téléphone et WhatsApp (au moins 7 chiffres)." };
   }
