@@ -53,13 +53,10 @@ export default function ShopMediaForm({
       if (uploadError) throw uploadError;
 
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(uploadedPath);
-      const column = kind === "logo" ? "logo_url" : "banner_url";
-      const { error: updateError } = await supabase
-        .from("shops")
-        .update({ [column]: data.publicUrl })
-        .eq("id", shopId)
-        .eq("owner_id", ownerId);
-      if (updateError) throw updateError;
+      const updateResult = kind === "logo"
+        ? await supabase.from("shops").update({ logo_url: data.publicUrl }).eq("id", shopId).eq("owner_id", ownerId)
+        : await supabase.from("shops").update({ banner_url: data.publicUrl }).eq("id", shopId).eq("owner_id", ownerId);
+      if (updateResult.error) throw updateResult.error;
 
       setMessage(kind === "logo" ? "Logo mis à jour." : "Bannière mise à jour.");
       router.refresh();
