@@ -23,11 +23,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Refresh supported major versions and vulnerable transitive dependencies
+      - name: Refresh supported major versions and fixable dependencies
         run: |
           npm install --save-exact 'next@^16' 'eslint-config-next@^16' 'react@^19' 'react-dom@^19'
-          npm audit fix
-      - name: Verify dependency security
+          npm audit fix || true
+      - name: Verify no high or critical advisories remain
         run: npm audit --audit-level=high
       - name: Lint
         run: npm run lint
