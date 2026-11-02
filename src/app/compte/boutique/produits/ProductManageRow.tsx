@@ -10,7 +10,6 @@ export default function ProductManageRow({ product }: { product: Product }) {
   const router = useRouter();
   const [status, setStatus] = useState(product.status);
   const [pending, setPending] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function toggleStatus() {
@@ -30,21 +29,6 @@ export default function ProductManageRow({ product }: { product: Product }) {
       return;
     }
     setStatus(nextStatus);
-  }
-
-  async function handleDelete() {
-    setPending(true);
-    setError(null);
-    const supabase = createSupabaseBrowserClient();
-
-    const { error: deleteError } = await supabase.from("products").delete().eq("id", product.id);
-
-    setPending(false);
-    if (deleteError) {
-      setError("Impossible de supprimer l'annonce.");
-      return;
-    }
-    router.refresh();
   }
 
   const imageUrl = product.images[0] ?? null;
@@ -80,24 +64,9 @@ export default function ProductManageRow({ product }: { product: Product }) {
             {status === "active" ? "Retirer de la vente" : "Remettre en vente"}
           </button>
 
-          {confirmDelete ? (
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={pending}
-              className="text-xs bg-red-600 text-white rounded-full px-3 py-1 disabled:opacity-50"
-            >
-              Confirmer
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setConfirmDelete(true)}
-              className="text-xs text-red-600 underline"
-            >
-              Supprimer
-            </button>
-          )}
+          <span className={`self-center text-[11px] ${status === "active" ? "text-emerald-700" : "text-neutral-500"}`}>
+            {status === "active" ? "En vente" : "Archivée"}
+          </span>
         </div>
 
         {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
