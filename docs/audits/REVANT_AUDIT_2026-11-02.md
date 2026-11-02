@@ -7,7 +7,7 @@ Branche de suivi: fix/associate-rpc-sync-20261102
 - Branche de travail créée avec le compte GitHub connecté; permission effective admin vérifiée.
 - Le présent document a été écrit puis relu depuis GitHub.
 - La PR #26 a été fusionnée dans main au commit `48b51fa13d405e46a757288217e02771d454846f`.
-- Aucun déploiement Render de cette version n'a été déclenché.
+- Le commit `48b51fa13d405e46a757288217e02771d454846f` est déployé sur le service public Render; déploiement `dep-dbkbngmc6qcc73e49aag` terminé avec statut `live` le 2026-11-02 à 16:37 UTC. L'auto-déploiement reste désactivé.
 
 ## Constats confirmés
 
@@ -71,4 +71,4 @@ Branche de suivi: fix/associate-rpc-sync-20261102
 - La PR #26 a été fusionnée dans `main` au commit `48b51fa13d405e46a757288217e02771d454846f`.
 - La PR de suivi contient les migrations de création du type `associate` et de correction des wrappers RPC.
 - Le run GitHub Actions `41482339263` sur le commit `7124c699` a terminé avec lint et build réussis. Le nouveau lot doit passer son propre run avant fusion.
-- Aucun déploiement Render du code de la branche de suivi n'a été lancé.
+- Aucun déploiement Render du lot de suivi PR #28 n'a été lancé.
