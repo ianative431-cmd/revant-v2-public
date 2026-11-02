@@ -6,12 +6,15 @@ const ALLOWED_DESTINATIONS = new Set(["/compte", "/compte/boutique", "/admin", "
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  // Use the configured canonical origin for redirects instead of trusting
+  // the incoming Host header. Render must define NEXT_PUBLIC_SITE_URL.
+  const redirectOrigin = new URL(process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin).origin;
   const requestedNext = requestUrl.searchParams.get("next") ?? "/compte";
   const next = ALLOWED_DESTINATIONS.has(requestedNext) ? requestedNext : "/compte";
   const isAdminFlow = next === "/admin";
   const isPasswordResetFlow = next === "/reinitialiser-mot-de-passe";
 
-  const errorUrl = new URL("/auth/erreur", requestUrl.origin);
+  const errorUrl = new URL("/auth/erreur", redirectOrigin);
   errorUrl.searchParams.set("flow", isAdminFlow ? "admin" : isPasswordResetFlow ? "password" : "seller");
 
   if (!code) {
@@ -73,5 +76,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(new URL(next, requestUrl.origin));
+  return NextResponse.redirect(new URL(next, redirectOrigin));
 }
