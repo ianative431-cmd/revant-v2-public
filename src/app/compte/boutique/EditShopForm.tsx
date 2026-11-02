@@ -101,8 +101,8 @@ export default function EditShopForm({
         />
       </label>
       <p className="text-xs text-black/40 -mt-2">
-        Si tu changes l&apos;adresse, l&apos;ancienne continuera de rediriger automatiquement vers
-        la nouvelle.
+        Si tu changes l&apos;adresse, l&apos;ancien lien ne fonctionnera plus : pense à partager
+        la nouvelle adresse.
       </p>
 
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}
