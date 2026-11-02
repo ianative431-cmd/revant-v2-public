@@ -55,7 +55,7 @@ export default async function AdminWhatsAppPage() {
     ["Messagerie API", isConnected],
     ["Assistant IA", status.features.aiAssistantEnabled],
     ["Notifications", status.features.notificationsEnabled],
-    ["Authentification WhatsApp", status.features.whatsappLoginEnabled],
+    ["Connexion WhatsApp (à développer)", false],
   ];
 
   return (
@@ -155,6 +155,7 @@ export default async function AdminWhatsAppPage() {
           feature="whatsappLogin"
           label="Connexion WhatsApp des utilisateurs"
           initialEnabled={status.features.whatsappLoginEnabled}
+          disabledReason="Indisponible : le flux sécurisé de vérification et de création de session n'est pas encore développé. Tu peux désactiver un ancien réglage, mais pas l'activer."
         />
         <FeatureToggle
           feature="verificationCodes"
