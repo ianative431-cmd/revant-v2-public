@@ -1,6 +1,4 @@
-type UnknownRecord = Record<string, unknown>;
-
-function isRecord(value: unknown): value is UnknownRecord {
+function isRecord(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
@@ -9,14 +7,7 @@ function isRecord(value: unknown): value is UnknownRecord {
  * phone numbers, message text, media references and other personal data;
  * none of those values belong in the general audit log.
  */
-export function summarizeWhatsAppWebhook(payload: unknown): {
-  event: "webhook_received";
-  object: "whatsapp_business_account" | "unknown";
-  entry_count: number;
-  change_count: number;
-  message_count: number;
-  status_count: number;
-} {
+export function summarizeWhatsAppWebhook(payload) {
   const root = isRecord(payload) ? payload : {};
   const entries = Array.isArray(root.entry) ? root.entry : [];
   let changeCount = 0;
