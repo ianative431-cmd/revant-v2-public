@@ -22,6 +22,11 @@ export async function GET(request: Request) {
   const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
   if (exchangeError) {
+    console.error("[auth-callback] exchangeCodeForSession failed", {
+      code: exchangeError.code,
+      status: exchangeError.status,
+      message: exchangeError.message,
+    });
     errorUrl.searchParams.set("reason", "exchange");
     return NextResponse.redirect(errorUrl);
   }
@@ -29,6 +34,7 @@ export async function GET(request: Request) {
   if (isAdminFlow) {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
+      console.error("[auth-callback] session missing after OAuth exchange", userError?.message);
       await supabase.auth.signOut();
       errorUrl.searchParams.set("reason", "session");
       return NextResponse.redirect(errorUrl);
@@ -40,6 +46,7 @@ export async function GET(request: Request) {
       .eq("user_id", user.id);
 
     if (roleError || !assignments?.some((assignment) => assignment.role === "super_admin")) {
+      console.error("[auth-callback] super-admin role check failed", roleError?.message);
       await supabase.auth.signOut();
       errorUrl.searchParams.set("reason", "not_admin");
       return NextResponse.redirect(errorUrl);

@@ -6,9 +6,13 @@ export default async function AuthErrorPage({ searchParams }: Props) {
   const { flow, reason } = await searchParams;
   const isAdmin = flow === "admin";
   const destination = isAdmin ? "/admin-connexion" : "/connexion";
-  const message = reason === "not_admin"
-    ? "Ce compte Google n'est pas autorisé à ouvrir l'espace super-administrateur."
-    : "La connexion Google n'a pas abouti. Vérifie que Google est activé dans Supabase et que l'adresse de retour est autorisée.";
+  const messages: Record<string, string> = {
+    not_admin: "Ce compte Google n'est pas autorisé à ouvrir l'espace super-administrateur.",
+    callback: "Google n'a pas renvoyé le code de connexion à Revant. Vérifie l'adresse de retour configurée dans Google et Supabase.",
+    exchange: "Google a répondu, mais Supabase n'a pas pu créer la session. Vérifie les variables Supabase et la configuration OAuth.",
+    session: "Le code Google a été reçu, mais la session utilisateur n'a pas pu être créée.",
+  };
+  const message = messages[reason ?? ""] ?? "La connexion Google n'a pas abouti. Vérifie que le fournisseur Google est activé et que l'adresse de retour est autorisée.";
 
   return (
     <main className={isAdmin ? "min-h-screen bg-[#0B0B10] px-5 py-10 text-white flex items-center justify-center" : "min-h-screen bg-brand-bg px-5 py-10 flex items-center justify-center"}>
