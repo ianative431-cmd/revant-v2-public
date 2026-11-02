@@ -25,20 +25,22 @@ export default async function AdminProduitsPage() {
       ) : (
         <div className="flex flex-col gap-3">
           {products.map((p) => (
-            <div key={p.id} className="bg-white rounded-2xl p-4 flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-sm font-medium truncate">{p.name}</p>
-                <p className="text-xs text-black/50 mt-0.5">
-                  {p.shop?.name ?? "Boutique supprimée"}
-                  {p.categoryName ? ` · ${p.categoryName}` : ""} ·{" "}
-                  {p.base_price.toLocaleString("fr-FR")} {p.currency} · {p.status}
-                </p>
-              </div>
-              <div className="shrink-0 flex items-center gap-2">
-                <Link href={`/produit/${p.id}`} className="text-xs underline text-black/50">
-                  Voir
-                </Link>
-                <DeleteProductButton productId={p.id} imageUrls={p.images} />
+            <div key={p.id} className="flex flex-col gap-3 rounded-2xl bg-white p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{p.name}</p>
+                  <p className="mt-0.5 text-xs text-black/50">
+                    {p.shop?.name ?? "Boutique supprimée"}
+                    {p.categoryName ? ` · ${p.categoryName}` : ""} ·{" "}
+                    {p.base_price.toLocaleString("fr-FR")} {p.currency} · {p.status}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Link href={`/produit/${p.id}`} className="text-xs text-black/50 underline">
+                    Voir
+                  </Link>
+                  <DeleteProductButton productId={p.id} imageUrls={p.images} />
+                </div>
               </div>
               {p.status === "pending" && <ProductModerationActions productId={p.id} />}
             </div>
