@@ -7,8 +7,13 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   // Use the configured canonical origin for redirects instead of trusting
-  // the incoming Host header. Render must define NEXT_PUBLIC_SITE_URL.
-  const redirectOrigin = new URL(process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin).origin;
+  // the incoming Host header. Production must define NEXT_PUBLIC_SITE_URL.
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!configuredSiteUrl && process.env.NODE_ENV === "production") {
+    console.error("[auth-callback] canonical_site_url_missing");
+    return NextResponse.json({ error: "Configuration de connexion indisponible." }, { status: 500 });
+  }
+  const redirectOrigin = new URL(configuredSiteUrl || requestUrl.origin).origin;
   const requestedNext = requestUrl.searchParams.get("next") ?? "/compte";
   const next = ALLOWED_DESTINATIONS.has(requestedNext) ? requestedNext : "/compte";
   const isAdminFlow = next === "/admin";
