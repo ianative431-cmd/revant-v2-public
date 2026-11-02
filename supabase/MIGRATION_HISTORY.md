@@ -1,12 +1,10 @@
 # Réconciliation de l'historique Supabase Revant
 
-État vérifié le 1 novembre 2026 sur le projet Revant (`xugcmpnrigqfszyfufoc`). Cette note documente la correspondance entre des fichiers historiques du dépôt et les versions réellement enregistrées dans Supabase.
+État vérifié le 2 novembre 2026 sur le projet Revant (`xugcmpnrigqfszyfufoc`). Les versions listées ci-dessous ont été comparées à l'historique réel de `supabase_migrations.schema_migrations`.
 
-## Fichiers renommés pour correspondre aux versions déjà appliquées
+## Fichiers renommés pour correspondre aux versions déjà appliquées dans Supabase
 
-Les fichiers ci-dessous ont été renommés pour utiliser la version présente dans `supabase_migrations.schema_migrations`. Leur SQL n'a pas été modifié par cette opération.
-
-| Ancien préfixe local | Version déjà appliquée dans Supabase | Migration |
+| Ancien préfixe local | Version enregistrée dans Supabase | Migration |
 |---|---|---|
 | `20261010213000` | `20261010211419` | `guest_checkout` |
 | `20261011093000` | `20261011150630` | `product_variants_and_perfumes` |
@@ -24,18 +22,29 @@ Les fichiers ci-dessous ont été renommés pour utiliser la version présente d
 | `20261101140500` | `20261101115400` | `preserve_kyc_history` |
 | `20261101143000` | `20261101115735` | `admin_actions_append_only` |
 
-## Fichiers archivés
+## Migrations historiques archivées
 
 Les migrations historiques `0001` à `0011` ont été déplacées vers `supabase/legacy_migrations_archive/`. Elles ne figurent pas dans l'historique actuel de Supabase et ne doivent pas être rejouées sur le projet existant.
 
-## Migrations présentes dans le dépôt mais pas encore enregistrées dans l'historique Supabase
+## Migrations appliquées et vérifiées le 2 novembre 2026
 
-À la date de vérification, les migrations suivantes restent en attente de revue et ne sont **pas appliquées** au projet :
+| Version enregistrée | Migration | Vérification |
+|---|---|---|
+| `20261102060639` | `secure_user_notification_inbox` | RPC de lecture accessibles aux utilisateurs connectés ; écriture directe retirée aux rôles `anon` et `authenticated`. |
+| `20261102060740` | `atomic_guest_checkout_and_order_transitions` | Colonnes d'idempotence et de réservation présentes ; RPC de commande invité réservé à `service_role`. |
+| `20261102060742` | `secure_delivery_driver_workflow` | Codes de remise déplacés dans `private.delivery_code_secrets` ; anciennes colonnes publiques supprimées ; RPC livreur contrôlés. |
 
-- `20261027190000_social_publishing_calendar.sql`
-- `20261101172017_require_aal2_for_super_admin.sql`
-- `20261101183719_atomic_guest_checkout_and_order_transitions.sql`
-- `20261101184508_secure_delivery_driver_workflow.sql`
-- `20261101185053_secure_user_notification_inbox.sql`
+Les tables de commandes, lignes de commande et livraisons étaient vides avant ces changements et le sont toujours après vérification.
 
-Ne pas lancer `supabase db push` ni appliquer ces migrations avant une revue de leurs dépendances, des fonctions/RLS existantes et de l'ordre d'application. Aucune migration de ce lot n'a été exécutée pendant cette réconciliation.
+## Migrations encore en attente
+
+- `20261027190000_social_publishing_calendar.sql` : à examiner et appliquer séparément après vérification de ses dépendances.
+- `20261101172017_require_aal2_for_super_admin.sql` : **ne pas appliquer avant l'inscription et la vérification du facteur TOTP du super-administrateur**. Le compte super-admin actuel ne possède pas de facteur TOTP vérifié ; l'application immédiate pourrait donc bloquer l'accès à l'administration.
+
+## Écart à résoudre : migration KYC
+
+Supabase enregistre déjà la version `20261101130806` (`kyc_document_review_workflow`), mais le fichier SQL correspondant n'a pas été retrouvé dans les fichiers suivis de la branche contrôlée. Ne pas recréer ni rejouer cette migration à l'aveugle. Il faut récupérer son SQL historique ou reconstituer un fichier de référence à partir du schéma réel, sans réappliquer ses changements.
+
+## Règle d'exploitation
+
+Ne pas lancer `supabase db push` sur le projet de production sans comparaison préalable des versions locales et distantes. Toute migration doit être revue, appliquée dans l'ordre, puis vérifiée par la présence de sa version, de ses objets et de ses privilèges.
