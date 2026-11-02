@@ -19,7 +19,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Retraits détaillés", href: "/admin/retraits", ready: true },
   { label: "Promotions boutique", href: "/admin/promotions", ready: true },
   { label: "Parrainages", href: "/admin/parrainages", ready: true },
-  { label: "Avis & signalements", href: "/admin/avis", ready: false },
+  { label: "Avis & signalements", href: "/admin/avis", ready: true },
   { label: "Messages", href: "/admin/messages", ready: true },
   { label: "WhatsApp", href: "/admin/whatsapp", ready: true },
   { label: "Liens Maison", href: "/admin/maison", ready: true },
@@ -28,6 +28,4 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Abonnements boutiques", href: "/admin/abonnements", ready: true },
 ];
 
-export const ADMIN_STUB_REQUIREMENTS: Record<string, string> = {
-  "/admin/avis": "un système d'avis vérifiés relié aux commandes réellement livrées, avec anti-doublon et modération",
-};
+export const ADMIN_STUB_REQUIREMENTS: Record<string, string> = {};
