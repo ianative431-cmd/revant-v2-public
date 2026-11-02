@@ -1906,6 +1906,10 @@ export type Database = {
         Args: { p_note?: string; p_publish: boolean; p_review_id: string }
         Returns: undefined
       }
+      admin_set_associate_role: {
+        Args: { p_enabled: boolean; p_note?: string; p_user_id: string }
+        Returns: undefined
+      }
       check_rate_limit: {
         Args: {
           p_key: string
@@ -2063,6 +2067,7 @@ export type Database = {
         | "support_admin"
         | "kyc_admin"
         | "catalog_admin"
+        | "associate"
         | "seller"
         | "buyer"
       wallet_status: "active" | "frozen" | "closed"

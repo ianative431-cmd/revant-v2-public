@@ -8,6 +8,7 @@ export type AdminUserRow = {
   phone: string | null;
   created_at: string;
   role: AppRole;
+  roles: AppRole[];
 };
 
 /**
@@ -28,6 +29,7 @@ const ROLE_PRIORITY: AppRole[] = [
   "support_admin",
   "kyc_admin",
   "catalog_admin",
+  "associate",
   "seller",
   "buyer",
 ];
@@ -61,5 +63,6 @@ export async function getAdminUserDirectory(perPage = 200): Promise<AdminUserRow
     phone: u.phone ?? null,
     created_at: u.created_at,
     role: primaryRole(u.id),
+    roles: rolesById.get(u.id) ?? [],
   }));
 }

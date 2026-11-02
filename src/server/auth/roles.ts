@@ -15,6 +15,7 @@ const ADMIN_ROLES: AppRole[] = [
   "support_admin",
   "kyc_admin",
   "catalog_admin",
+  "associate",
 ];
 
 /**
