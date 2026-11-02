@@ -229,7 +229,7 @@ export default function SocialCalendarClient({
       <section className="grid gap-3">
         <div>
           <h2 className="text-base font-semibold">Mon calendrier</h2>
-          <p className="text-xs text-neutral-500">Les dates sont affichées à l'heure de Niamey.</p>
+          <p className="text-xs text-neutral-500">Les dates sont affichées à l&apos;heure de Niamey.</p>
         </div>
         {posts.length === 0 ? (
           <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-neutral-500">
@@ -272,7 +272,7 @@ export default function SocialCalendarClient({
         )}
       </section>
       <p className="text-xs leading-relaxed text-neutral-500">
-        Important : l'enregistrement d'une date ne déclenche pas encore l'envoi automatique sur Instagram, Facebook, TikTok, Snapchat ou WhatsApp. Cette étape nécessite les autorisations officielles de chaque plateforme et un service de publication sécurisé.
+        Important : l&apos;enregistrement d&apos;une date ne déclenche pas encore l&apos;envoi automatique sur Instagram, Facebook, TikTok, Snapchat ou WhatsApp. Cette étape nécessite les autorisations officielles de chaque plateforme et un service de publication sécurisé.
       </p>
     </div>
   );
