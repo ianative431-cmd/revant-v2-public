@@ -28,6 +28,16 @@ const FARM_PHOTOS = [
 
 const HERO_PHOTO = "https://images.unsplash.com/photo-1514435116008-a80913c597af?auto=format&fit=crop&w=1800&q=85";
 
+function safePublicImageUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function Home({ searchParams }: Props) {
   const { categorie, q } = await searchParams;
   // Le catalogue public ne doit jamais être bloqué par l'absence de session
@@ -91,13 +101,16 @@ export default async function Home({ searchParams }: Props) {
       <section id="categories" className="px-4 pt-7">
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">Catégories</h2><a href="#categories" className="text-xs font-medium">Voir tout →</a></div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {categories.map((category, index) => (
+          {categories.map((category, index) => {
+            const categoryImage = safePublicImageUrl(category.image_url) ?? CATEGORY_PHOTOS[index % CATEGORY_PHOTOS.length];
+            return (
             <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-neutral-300">
-              <div className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105" style={{ backgroundImage: `url("${CATEGORY_PHOTOS[index % CATEGORY_PHOTOS.length]}")` }} />
+              <div className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105" style={{ backgroundImage: `url("${categoryImage}")` }} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
               <span className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white">{category.name}</span>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </section>
 

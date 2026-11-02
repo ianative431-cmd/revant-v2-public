@@ -62,6 +62,12 @@ export default async function MaBoutiquePage() {
           initialName={shop.name}
           initialDescription={shop.description ?? ""}
           initialSlug={shop.slug}
+          initialCity={shop.city ?? ""}
+          initialPhone={shop.phone ?? ""}
+          initialWhatsapp={shop.whatsapp ?? ""}
+          initialInstagram={shop.instagram ?? ""}
+          initialTiktok={shop.tiktok ?? ""}
+          initialSnapchat={shop.snapchat ?? ""}
         />
 
         <Link

@@ -1,5 +1,5 @@
 -- Atomic guest checkout, idempotency, inventory reservation and guarded order transitions.
--- This migration is prepared for review; it is not applied to the live Supabase project here.
+-- Applied to the Revant Supabase project as migration version 20261102060740.
 
 alter table public.orders
   add column if not exists idempotency_key uuid,

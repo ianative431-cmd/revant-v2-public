@@ -24,7 +24,7 @@ export default async function NouveauProduitPage() {
           ← Mes annonces
         </Link>
         <h1 className="text-xl font-bold mt-4 mb-6">Nouvelle annonce</h1>
-        <NewProductForm shopId={shop.id} categories={categories} />
+        <NewProductForm shopId={shop.id} ownerId={user.id} categories={categories} />
       </div>
     </div>
   );

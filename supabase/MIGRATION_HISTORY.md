@@ -1,12 +1,10 @@
 # Réconciliation de l'historique Supabase Revant
 
-État vérifié le 1 novembre 2026 sur le projet Revant (`xugcmpnrigqfszyfufoc`). Cette note documente la correspondance entre des fichiers historiques du dépôt et les versions réellement enregistrées dans Supabase.
+État vérifié le 2 novembre 2026 sur le projet Revant (`xugcmpnrigqfszyfufoc`). Les versions locales ont été alignées sur les versions réellement enregistrées dans `supabase_migrations.schema_migrations`.
 
-## Fichiers renommés pour correspondre aux versions déjà appliquées
+## Fichiers renommés pour correspondre aux versions déjà appliquées dans Supabase
 
-Les fichiers ci-dessous ont été renommés pour utiliser la version présente dans `supabase_migrations.schema_migrations`. Leur SQL n'a pas été modifié par cette opération.
-
-| Ancien préfixe local | Version déjà appliquée dans Supabase | Migration |
+| Ancien préfixe local | Version enregistrée dans Supabase | Migration |
 |---|---|---|
 | `20261010213000` | `20261010211419` | `guest_checkout` |
 | `20261011093000` | `20261011150630` | `product_variants_and_perfumes` |
@@ -24,18 +22,46 @@ Les fichiers ci-dessous ont été renommés pour utiliser la version présente d
 | `20261101140500` | `20261101115400` | `preserve_kyc_history` |
 | `20261101143000` | `20261101115735` | `admin_actions_append_only` |
 
-## Fichiers archivés
+## Migrations historiques archivées
 
 Les migrations historiques `0001` à `0011` ont été déplacées vers `supabase/legacy_migrations_archive/`. Elles ne figurent pas dans l'historique actuel de Supabase et ne doivent pas être rejouées sur le projet existant.
 
-## Migrations présentes dans le dépôt mais pas encore enregistrées dans l'historique Supabase
+## Migrations appliquées et vérifiées sur Supabase
 
-À la date de vérification, les migrations suivantes restent en attente de revue et ne sont **pas appliquées** au projet :
+Les noms de fichiers locaux ci-dessous correspondent maintenant exactement aux versions enregistrées côté Supabase. Ne pas rejouer ces migrations.
 
-- `20261027190000_social_publishing_calendar.sql`
-- `20261101172017_require_aal2_for_super_admin.sql`
-- `20261101183719_atomic_guest_checkout_and_order_transitions.sql`
-- `20261101184508_secure_delivery_driver_workflow.sql`
-- `20261101185053_secure_user_notification_inbox.sql`
+| Version locale et distante | Fichier |
+|---|---|
+| `20261101130806` | `20261101130806_kyc_document_review_workflow.sql` |
+| `20261102060639` | `20261102060639_secure_user_notification_inbox.sql` |
+| `20261102060740` | `20261102060740_atomic_guest_checkout_and_order_transitions.sql` |
+| `20261102060742` | `20261102060742_secure_delivery_driver_workflow.sql` |
+| `20261102062731` | `20261102062731_lock_down_admin_finance_summary.sql` |
+| `20261102062938` | `20261102062938_revoke_anon_existing_public_writes.sql` |
+| `20261102065549` | `20261102065549_secure_social_publishing_calendar.sql` |
 
-Ne pas lancer `supabase db push` ni appliquer ces migrations avant une revue de leurs dépendances, des fonctions/RLS existantes et de l'ordre d'application. Aucune migration de ce lot n'a été exécutée pendant cette réconciliation.
+Vérifications effectuées :
+- Les RPC de notification sont disponibles aux utilisateurs connectés ; l'écriture directe est retirée aux rôles `anon` et `authenticated`.
+- Les colonnes d'idempotence et de réservation des commandes sont présentes ; le RPC de commande invité est réservé à `service_role`.
+- Les codes de remise sont conservés dans `private.delivery_code_secrets`, pas dans les anciennes colonnes publiques ; les RPC livreur sont contrôlés.
+- La vue `public.admin_finance_summary` est une vue `security_invoker`. Ses droits directs ont été retirés à `anon` et `authenticated` ; le RPC d'administration continue de l'utiliser sous son propriétaire.
+- Les privilèges `INSERT`, `UPDATE` et `DELETE` d'`anon` ont été retirés des tables existantes du schéma `public`. Le compte anonyme conserve la lecture publique prévue des boutiques et produits actifs.
+- Après migration, il reste 0 privilège direct d'écriture `anon` sur les objets existants du schéma `public`.
+- La table `social_posts` possède RLS activé et trois politiques limitées au propriétaire de la boutique. Les seuls droits API accordés sont `SELECT/INSERT/UPDATE` à `authenticated` ; aucun droit direct n'est accordé à `anon` ou `PUBLIC`. La fonction trigger est `SECURITY INVOKER` et n'est pas exécutable directement par les rôles API.
+- Après application, l'advisor Supabase n'a signalé aucun nouveau finding lié à `social_posts`.
+
+Les tables de commandes, lignes de commande et livraisons étaient vides avant les migrations du 2 novembre et le sont toujours après vérification.
+
+## Limite de privilèges par défaut
+
+La tentative de retirer les privilèges par défaut `INSERT/UPDATE/DELETE` pour `anon` aux rôles créateurs `postgres` et `supabase_admin` a été refusée par Supabase (`permission denied to change default privileges`). La migration non appliquée a été supprimée du dépôt ; aucune modification de privilèges par défaut n'a été faite.
+
+En conséquence, toute nouvelle migration créant une table dans `public` doit explicitement retirer les privilèges d'écriture d'`anon` et activer RLS dans la même migration. Il faudra traiter le réglage global des privilèges par défaut avec un accès propriétaire autorisé avant de considérer cette protection comme définitive.
+
+## Migrations encore en attente
+
+- `20261101172017_require_aal2_for_super_admin.sql` : **ne pas appliquer avant l'inscription et la vérification du facteur TOTP du super-administrateur**. Le compte super-admin actuel ne possède pas de facteur TOTP vérifié ; l'application immédiate pourrait donc bloquer l'accès à l'administration.
+
+## Règle d'exploitation
+
+Ne pas lancer `supabase db push` sur le projet de production sans comparaison préalable des versions locales et distantes. Toute migration doit être revue, appliquée dans l'ordre, puis vérifiée par la présence de sa version, de ses objets et de ses privilèges.

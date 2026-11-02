@@ -7,12 +7,24 @@ type Props = {
   initialName: string;
   initialDescription: string;
   initialSlug: string;
+  initialCity: string;
+  initialPhone: string;
+  initialWhatsapp: string;
+  initialInstagram: string;
+  initialTiktok: string;
+  initialSnapchat: string;
 };
 
 export default function EditShopForm({
   initialName,
   initialDescription,
   initialSlug,
+  initialCity,
+  initialPhone,
+  initialWhatsapp,
+  initialInstagram,
+  initialTiktok,
+  initialSnapchat,
 }: Props) {
   const [state, formAction, pending] = useActionState(updateShop, { error: null });
 
@@ -42,6 +54,39 @@ export default function EditShopForm({
         />
       </label>
 
+      <div className="mt-2 border-t border-black/10 pt-3">
+        <p className="mb-3 text-xs font-semibold text-black/80">Coordonnées publiques</p>
+        <label className="mb-3 block text-xs text-black/60">
+          Ville
+          <input name="city" type="text" maxLength={80} defaultValue={initialCity} placeholder="Ex. Niamey" className="mt-1 w-full rounded-xl border px-4 py-3 text-sm" />
+        </label>
+        <label className="mb-3 block text-xs text-black/60">
+          Téléphone
+          <input name="phone" type="tel" maxLength={30} defaultValue={initialPhone} placeholder="+227 ..." className="mt-1 w-full rounded-xl border px-4 py-3 text-sm" />
+        </label>
+        <label className="mb-3 block text-xs text-black/60">
+          WhatsApp
+          <input name="whatsapp" type="tel" maxLength={30} defaultValue={initialWhatsapp} placeholder="+227 ..." className="mt-1 w-full rounded-xl border px-4 py-3 text-sm" />
+        </label>
+      </div>
+
+      <div className="mt-1 border-t border-black/10 pt-3">
+        <p className="mb-3 text-xs font-semibold text-black/80">Réseaux sociaux</p>
+        <label className="mb-3 block text-xs text-black/60">
+          Instagram
+          <input name="instagram" type="text" maxLength={160} defaultValue={initialInstagram} placeholder="@ma_boutique ou lien Instagram" className="mt-1 w-full rounded-xl border px-4 py-3 text-sm" />
+        </label>
+        <label className="mb-3 block text-xs text-black/60">
+          TikTok
+          <input name="tiktok" type="text" maxLength={160} defaultValue={initialTiktok} placeholder="@ma_boutique ou lien TikTok" className="mt-1 w-full rounded-xl border px-4 py-3 text-sm" />
+        </label>
+        <label className="mb-3 block text-xs text-black/60">
+          Snapchat
+          <input name="snapchat" type="text" maxLength={160} defaultValue={initialSnapchat} placeholder="Nom d’utilisateur ou lien Snapchat" className="mt-1 w-full rounded-xl border px-4 py-3 text-sm" />
+        </label>
+        <p className="text-[11px] text-black/45">Tu peux saisir un nom d’utilisateur ou un lien HTTPS officiel.</p>
+      </div>
+
       <label className="text-xs text-black/60">
         Adresse de la boutique (revant.app/shop/...)
         <input
@@ -56,8 +101,8 @@ export default function EditShopForm({
         />
       </label>
       <p className="text-xs text-black/40 -mt-2">
-        Si tu changes l&apos;adresse, l&apos;ancienne continuera de rediriger automatiquement vers
-        la nouvelle.
+        Si tu changes l&apos;adresse, l&apos;ancien lien ne fonctionnera plus : pense à partager
+        la nouvelle adresse.
       </p>
 
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}

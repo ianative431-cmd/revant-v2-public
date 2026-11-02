@@ -3,7 +3,7 @@ import Link from "next/link";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
-import { getProductsForShop } from "@/server/products/products";
+import { getManageableProductsForShop } from "@/server/products/products";
 import ProductManageRow from "./ProductManageRow";
 
 export default async function MesProduitsPage() {
@@ -15,7 +15,7 @@ export default async function MesProduitsPage() {
     redirect("/boutiques/creer");
   }
 
-  const products = await getProductsForShop(supabase, shop.id);
+  const products = await getManageableProductsForShop(supabase, shop.id);
 
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
