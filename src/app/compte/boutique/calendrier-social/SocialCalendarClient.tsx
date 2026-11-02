@@ -9,9 +9,9 @@ type SocialPost = {
   caption: string;
   media_url: string | null;
   product_url: string | null;
-  platforms: Platform[];
+  platforms: string[];
   scheduled_at: string;
-  status: "scheduled" | "cancelled";
+  status: string;
 };
 
 const PLATFORMS: { value: Platform; label: string }[] = [
