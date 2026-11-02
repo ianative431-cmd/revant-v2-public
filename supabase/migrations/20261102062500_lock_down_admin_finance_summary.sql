@@ -1,7 +1,5 @@
--- Protect the legacy finance snapshot table.
--- The admin RPC reads this table under its SECURITY DEFINER owner; the
--- browser-facing roles must not read or mutate the summary directly.
-ALTER TABLE public.admin_finance_summary ENABLE ROW LEVEL SECURITY;
-
+-- The legacy finance summary is a security-invoker view, not a table.
+-- The admin snapshot RPC reads it as its SECURITY DEFINER owner. Browser
+-- roles should not query or mutate this view directly.
 REVOKE ALL PRIVILEGES ON TABLE public.admin_finance_summary
   FROM PUBLIC, anon, authenticated;
