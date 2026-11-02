@@ -47,3 +47,26 @@ Branche: audit/finance-and-subscriptions-followup
 - Pas de paiement réel, retrait réel ou ouverture publique avant validation.
 - Pas de changement financier directement sur la base active sans migration testée et plan de retour arrière.
 - Pas de déploiement automatique; Render reste le fournisseur cible.
+
+## Contrôle complémentaire — espace associé et modération (02/11/2026)
+
+### Rôle associé
+- Le type public.user_role inclut désormais `associate`.
+- Le rôle ne reçoit que `shops.view` et `products.view`; aucun droit users, commandes, finance, retraits, KYC, support, paramètres ou sécurité.
+- L'attribution/révocation est réservée à un utilisateur ayant le rôle `super_admin`, par RPC dédiée; les changements sont consignés dans `admin_actions` et `audit_logs`.
+- Le menu associé n'affiche que le tableau de bord, boutiques et produits. Le tableau de bord associé n'affiche que les nombres de boutiques et produits.
+- Les pages boutiques et produits vérifient respectivement `shops.view` et `products.view` côté serveur; les autres pages admin vérifient leur permission dédiée ou `super_admin`. Le masquage du menu n'est donc pas la seule protection.
+- `has_any_admin_role()` conserve volontairement sa liste de rôles historiques et n'inclut pas `associate`, pour ne pas accorder au rôle limité les droits RLS généraux de l'administration.
+- Les RPC publiques d'attribution du rôle et de modération d'avis sont des wrappers SECURITY DEFINER avec search_path vide; les fonctions privées restent non exécutables directement par authenticated.
+
+### Calendrier social
+- La page calendrier vendeur est ajoutée dans Ma boutique; accès aux posts filtré par shop_id et owner_id avec RLS.
+- Création et annulation de posts planifiés, fuseau Africa/Niamey et partage manuel natif/copie.
+- Aucune publication automatique n'est activée; aucun token Meta/TikTok/Snapchat n'est simulé.
+- La migration `secure_social_publishing_calendar` est un fichier source restauré; la table existe déjà sur Supabase. Ne pas la réappliquer sur le projet actif.
+
+### Synchronisation migrations et CI
+- Les migrations d'index FK et de suppression d'index dupliqué doivent encore être ajoutées au dépôt avec leur SQL exact; leur exécution distante a déjà été faite.
+- Les migrations rôle associé et correction SECURITY DEFINER doivent être suivies dans le dépôt.
+- GitHub Actions run 41482339263, commit 7124c699a633e47a5995fda82c7ee2bd6461df10: lint et build réussis.
+- Aucun merge; aucun déploiement Render de la branche de travail.
