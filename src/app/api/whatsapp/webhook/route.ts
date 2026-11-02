@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { verifyWebhookSignature } from "@/server/integrations/meta-whatsapp";
-import type { Json } from "@/types/database";
+import { summarizeWhatsAppWebhook } from "@/server/integrations/whatsapp-webhook-summary.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -40,14 +40,12 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * Événements WhatsApp réels (messages, statuts de livraison, etc.).
- * Signature HMAC vérifiée avant tout traitement — un webhook non
- * signé correctement est rejeté, jamais traité.
+ * Les événements WhatsApp sont authentifiés par HMAC avant traitement.
+ * Le journal d'audit ne conserve que des compteurs : jamais le corps
+ * du message, les numéros, les identifiants Meta ou les données média.
  *
- * Note pour la suite : ce point d'entrée journalise l'événement reçu
- * mais ne déclenche pas encore la logique métier (notifications,
- * commandes, assistant IA) — c'est la prochaine étape, pas encore
- * construite, pour ne rien faire semblant de fonctionner.
+ * Note : les événements sont journalisés, mais la logique métier
+ * (notifications, commandes, assistant IA) n'est pas encore implémentée.
  */
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
@@ -57,21 +55,26 @@ export async function POST(request: NextRequest) {
     return new NextResponse("Invalid signature", { status: 403 });
   }
 
-  let payload: Json | null = null;
+  let payload: unknown;
   try {
-    payload = JSON.parse(rawBody) as Json;
+    payload = JSON.parse(rawBody) as unknown;
   } catch {
     return new NextResponse("Invalid JSON", { status: 400 });
   }
 
   const supabase = createSupabaseAdminClient();
-  await supabase.from("audit_logs").insert({
+  const { error } = await supabase.from("audit_logs").insert({
     actor_id: null,
     action: "create",
     entity_type: "whatsapp_webhook",
     description: "Événement webhook WhatsApp reçu",
-    metadata: { event: "webhook_received", payload },
+    metadata: summarizeWhatsAppWebhook(payload),
   });
+
+  if (error) {
+    console.error("[whatsapp-webhook] audit_write_failed", { code: error.code });
+    return new NextResponse("Temporary failure", { status: 500 });
+  }
 
   return new NextResponse("OK", { status: 200 });
 }
