@@ -14,7 +14,7 @@ export async function updateReportAction(formData: FormData): Promise<void> {
   if (!UUID_RE.test(reportId) || !["review", "resolve", "dismiss"].includes(action)) throw new Error("Demande de modération invalide.");
   if ((action === "resolve" || action === "dismiss") && (note.length < 5 || note.length > 500)) throw new Error("Le motif doit contenir entre 5 et 500 caractères.");
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc("admin_update_report", { p_report_id: reportId, p_action: action, p_note: note || null });
+  const { error } = await supabase.rpc("admin_update_report", { p_report_id: reportId, p_action: action, p_note: note || undefined });
   if (error) throw new Error("Impossible d'enregistrer la décision sur ce signalement.");
   revalidatePath("/admin/avis");
 }
