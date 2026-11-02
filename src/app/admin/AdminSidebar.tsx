@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   FileCheck,
   Settings,
+  Repeat,
   LogOut,
   type LucideIcon,
 } from "lucide-react";
@@ -49,6 +50,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin/securite": ShieldCheck,
   "/admin/kyc": FileCheck,
   "/admin/parametres": Settings,
+  "/admin/abonnements": Repeat,
 };
 
 const ROLE_LABEL: Record<string, string> = {
