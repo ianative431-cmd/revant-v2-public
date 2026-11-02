@@ -9,7 +9,7 @@ import {
   RATE_LIMIT_ERROR_MESSAGE,
 } from "@/server/security/rate-limit";
 
-export type AuthActionState = { error: string | null };
+export type AuthActionState = { error: string | null; success?: boolean };
 
 // --- Validation serveur (jamais seulement côté formulaire) ---
 
@@ -219,12 +219,13 @@ export async function requestPasswordReset(
 
   const supabase = await createSupabaseServerClient();
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://revant-v2-ui-premium.onrender.com").replace(/\/+$/, "");
-  await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${siteUrl}/auth/callback?next=%2Freinitialiser-mot-de-passe`,
   });
+  if (error) return { error: "Le service de réinitialisation est temporairement indisponible." };
 
   // Réponse identique que le compte existe ou non : ne pas révéler les comptes inscrits.
-  return { error: null };
+  return { error: null, success: true };
 }
 
 export async function updatePassword(
