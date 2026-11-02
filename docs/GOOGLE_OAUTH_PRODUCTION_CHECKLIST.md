@@ -17,7 +17,7 @@ Vérifier aussi que le client ID et le secret OAuth configurés dans Supabase pr
 Dans **Authentication → URL Configuration** :
 
 - Site URL : `https://revant-v2-ui-premium.onrender.com`
-- Redirect URL autorisée : `https://revant-v2-ui-premium.onrender.com/auth/callback`
+- Redirect URL autorisée : `https://revant-v2-ui-premium.onrender.com/auth/callback*` (le `*` couvre le paramètre `next` ajouté par le bouton Google).
 - Ajouter séparément les URL localhost uniquement pour le développement si nécessaire.
 
 Dans **Authentication → Providers → Google** :
