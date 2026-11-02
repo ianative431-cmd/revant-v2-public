@@ -14,7 +14,7 @@ export default async function CalendrierSocialPage() {
       <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
         <div className="w-full max-w-lg rounded-2xl bg-white p-6 text-center">
           <h1 className="text-xl font-bold mb-2">Calendrier social</h1>
-          <p className="text-sm text-neutral-600 mb-4">Crée d'abord ta boutique pour préparer tes publications.</p>
+          <p className="text-sm text-neutral-600 mb-4">Crée d&apos;abord ta boutique pour préparer tes publications.</p>
           <Link href="/boutiques/creer" className="inline-block rounded-full bg-brand-accent px-5 py-3 text-sm text-white">
             Créer ma boutique
           </Link>
