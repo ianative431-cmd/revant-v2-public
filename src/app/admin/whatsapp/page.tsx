@@ -155,6 +155,8 @@ export default async function AdminWhatsAppPage() {
           feature="whatsappLogin"
           label="Connexion WhatsApp des utilisateurs"
           initialEnabled={status.features.whatsappLoginEnabled}
+          disabled
+          disabledReason="En attente du branchement du hook SMS Supabase et de l’approbation du modèle OTP Authentication dans Meta."
         />
         <FeatureToggle
           feature="verificationCodes"
