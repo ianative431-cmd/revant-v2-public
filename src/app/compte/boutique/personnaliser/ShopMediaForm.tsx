@@ -27,7 +27,7 @@ export default function ShopMediaForm({
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  async function upload(kind: MediaKind, file: File | undefined, input: HTMLInputElement) {
+  async function upload(kind: MediaKind, file: File | undefined, input: HTMLInputElement, uniqueId: string) {
     input.value = "";
     setError(null);
     setMessage(null);
@@ -46,7 +46,7 @@ export default function ShopMediaForm({
     let uploadedPath: string | null = null;
     try {
       const compressed = await compressImageKeepingAspect(file, kind === "logo" ? 900 : 1800, 0.84);
-      uploadedPath = `${ownerId}/${shopId}/${kind}-${Date.now()}.jpg`;
+      uploadedPath = `${ownerId}/${shopId}/${kind}-${uniqueId}.jpg`;
       const { error: uploadError } = await supabase.storage
         .from(BUCKET)
         .upload(uploadedPath, compressed, { contentType: "image/jpeg", upsert: false });
@@ -72,7 +72,12 @@ export default function ShopMediaForm({
 
   function onChange(kind: MediaKind) {
     return (event: ChangeEvent<HTMLInputElement>) => {
-      void upload(kind, event.currentTarget.files?.[0], event.currentTarget);
+      const selected = event.currentTarget.files?.[0];
+      const input = event.currentTarget;
+      const uniqueId = selected && typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${selected?.lastModified ?? 0}-${selected?.size ?? 0}`;
+      void upload(kind, selected, input, uniqueId);
     };
   }
 
