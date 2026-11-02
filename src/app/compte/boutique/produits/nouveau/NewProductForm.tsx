@@ -31,9 +31,11 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 export default function NewProductForm({
   shopId,
+  shopStatus,
   categories,
 }: {
   shopId: string;
+  shopStatus: "draft" | "pending" | "active" | "suspended" | "closed";
   categories: Category[];
 }) {
   const router = useRouter();
@@ -110,10 +112,13 @@ export default function NewProductForm({
 
     setStatus("submitting");
 
+    let uploadedPath: string | null = null;
+    let createdProductId: string | null = null;
     try {
       const compressed = await compressProductImage(file);
       const supabase = createSupabaseBrowserClient();
       const path = buildProductImagePath(shopId);
+      uploadedPath = path;
 
       const { error: uploadError } = await supabase.storage
         .from(PRODUCT_IMAGE_BUCKET)
@@ -139,6 +144,7 @@ export default function NewProductForm({
           product_type: productType,
           size_stock: productType === "clothing" ? sizeStock : {},
           perfume_volume_ml: productType === "perfume" ? perfumeVolumeMl : null,
+          status: shopStatus === "active" ? "active" : "pending",
           stock_quantity: productType === "clothing" ? Object.values(sizeStock).reduce((sum, qty) => sum + qty, 0) : Math.max(0, Number(formData.get("stockQuantity") ?? 0)),
           slug: `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60)}-${Date.now().toString(36)}`,
         })
@@ -153,6 +159,7 @@ export default function NewProductForm({
         return;
       }
 
+      createdProductId = product.id;
       const { error: imageError } = await supabase.from("product_images").insert({
         product_id: product.id,
         image_url: publicUrl,
@@ -160,6 +167,8 @@ export default function NewProductForm({
       });
 
       if (imageError) {
+        await supabase.from("products").delete().eq("id", product.id);
+        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
         setStatus("error-generic");
         return;
       }
@@ -167,6 +176,13 @@ export default function NewProductForm({
       router.push("/compte/boutique/produits");
       router.refresh();
     } catch {
+      const supabase = createSupabaseBrowserClient();
+      if (createdProductId) {
+        await supabase.from("products").delete().eq("id", createdProductId);
+      }
+      if (uploadedPath) {
+        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([uploadedPath]);
+      }
       setStatus("error-generic");
     }
   }

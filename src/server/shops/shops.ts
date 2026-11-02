@@ -38,6 +38,7 @@ export async function resolveShopBySlug(
     .from("shops")
     .select("*")
     .eq("slug", slug)
+    .eq("status", "active")
     .maybeSingle();
 
   if (shop) return { kind: "found", shop: shop as Shop };

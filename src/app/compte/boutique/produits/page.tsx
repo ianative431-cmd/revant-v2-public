@@ -39,7 +39,7 @@ export default async function MesProduitsPage() {
         ) : (
           <div className="flex flex-col gap-3">
             {products.map((product) => (
-              <ProductManageRow key={product.id} product={product} />
+              <ProductManageRow key={product.id} product={product} shopStatus={shop.status} />
             ))}
           </div>
         )}

@@ -105,3 +105,20 @@ export async function getProductById(
 
   return data ? mapRow(data) : null;
 }
+
+
+/** Public storefront query: never return drafts, pending, rejected or archived listings. */
+export async function getActiveProductsForShop(
+  supabase: SupabaseClient,
+  shopId: string
+): Promise<Product[]> {
+  const { data } = await supabase
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .eq("shop_id", shopId)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .returns<ProductRow[]>();
+
+  return (data ?? []).map(mapRow);
+}
