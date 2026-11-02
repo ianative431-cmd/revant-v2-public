@@ -42,9 +42,10 @@ export default function ShopMediaForm({
     }
 
     setSaving(kind);
-    const supabase = createSupabaseBrowserClient();
+    let supabase: ReturnType<typeof createSupabaseBrowserClient> | null = null;
     let uploadedPath: string | null = null;
     try {
+      supabase = createSupabaseBrowserClient();
       const compressed = await compressImageKeepingAspect(file, kind === "logo" ? 900 : 1800, 0.84);
       uploadedPath = `${ownerId}/${shopId}/${kind}-${uniqueId}.jpg`;
       const { error: uploadError } = await supabase.storage
@@ -61,7 +62,7 @@ export default function ShopMediaForm({
       setMessage(kind === "logo" ? "Logo mis à jour." : "Bannière mise à jour.");
       router.refresh();
     } catch {
-      if (uploadedPath) {
+      if (supabase && uploadedPath) {
         await supabase.storage.from(BUCKET).remove([uploadedPath]).catch(() => undefined);
       }
       setError("L’envoi n’a pas abouti. Vérifie ta connexion et réessaie.");
