@@ -9,7 +9,7 @@ export default function MotDePasseOubliePage() {
   return (
     <section className="mx-auto max-w-md">
       <h1 className="text-xl font-bold">Mot de passe oublié</h1>
-      <p className="mt-2 text-sm text-black/60">Saisis l'adresse e-mail de ton compte. Si elle est associée à un compte, un lien sécurisé sera envoyé.</p>
+      <p className="mt-2 text-sm text-black/60">Saisis l&apos;adresse e-mail de ton compte. Si elle est associée à un compte, un lien sécurisé sera envoyé.</p>
       <form action={action} className="mt-5 flex flex-col gap-3">
         <input name="email" type="email" required maxLength={254} placeholder="Adresse e-mail" className="rounded-xl border px-4 py-3 text-sm" />
         {state.error && <p role="alert" className="text-sm text-red-600">{state.error}</p>}
