@@ -56,8 +56,7 @@ export default function EditShopForm({
         />
       </label>
       <p className="text-xs text-black/40 -mt-2">
-        Si tu changes l&apos;adresse, l&apos;ancienne continuera de rediriger automatiquement vers
-        la nouvelle.
+        Attention : les anciens liens ne seront plus redirigés après un changement d&apos;adresse.
       </p>
 
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}

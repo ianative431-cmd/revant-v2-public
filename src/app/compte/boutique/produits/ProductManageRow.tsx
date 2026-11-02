@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Product } from "@/types/product";
 
-export default function ProductManageRow({ product }: { product: Product }) {
+export default function ProductManageRow({ product, shopStatus }: { product: Product; shopStatus: "draft" | "pending" | "active" | "suspended" | "closed" }) {
   const router = useRouter();
   const [status, setStatus] = useState(product.status);
   const [pending, setPending] = useState(false);
@@ -18,6 +18,11 @@ export default function ProductManageRow({ product }: { product: Product }) {
     setError(null);
     const supabase = createSupabaseBrowserClient();
     const nextStatus = status === "active" ? "archived" : "active";
+    if (shopStatus !== "active" || status === "pending" || status === "rejected") {
+      setPending(false);
+      setError("Cette annonce ne peut pas être publiée avant la validation de la boutique ou après un refus.");
+      return;
+    }
 
     const { error: updateError } = await supabase
       .from("products")
@@ -36,6 +41,15 @@ export default function ProductManageRow({ product }: { product: Product }) {
     setPending(true);
     setError(null);
     const supabase = createSupabaseBrowserClient();
+    const { data: imageRows, error: imageQueryError } = await supabase
+      .from("product_images")
+      .select("image_url")
+      .eq("product_id", product.id);
+    if (imageQueryError) {
+      setPending(false);
+      setError("Impossible de préparer la suppression des photos.");
+      return;
+    }
 
     const { error: deleteError } = await supabase.from("products").delete().eq("id", product.id);
 
@@ -43,6 +57,17 @@ export default function ProductManageRow({ product }: { product: Product }) {
     if (deleteError) {
       setError("Impossible de supprimer l'annonce.");
       return;
+    }
+    const storagePrefix = `/storage/v1/object/public/product-images/`;
+    const imagePaths = (imageRows ?? []).flatMap((row) => {
+      const marker = row.image_url.indexOf(storagePrefix);
+      if (marker < 0) return [];
+      const path = decodeURIComponent(row.image_url.slice(marker + storagePrefix.length));
+      return path.startsWith(`${product.shop_id}/`) && !path.includes("..") ? [path] : [];
+    });
+    if (imagePaths.length > 0) {
+      const { error: storageError } = await supabase.storage.from("product-images").remove(imagePaths);
+      if (storageError) setError("Annonce supprimée, mais certaines photos n'ont pas pu être nettoyées.");
     }
     router.refresh();
   }
@@ -74,10 +99,10 @@ export default function ProductManageRow({ product }: { product: Product }) {
           <button
             type="button"
             onClick={toggleStatus}
-            disabled={pending}
+            disabled={pending || shopStatus !== "active" || status === "pending" || status === "rejected"}
             className="text-xs border border-black rounded-full px-3 py-1 disabled:opacity-50"
           >
-            {status === "active" ? "Retirer de la vente" : "Remettre en vente"}
+            {status === "active" ? "Retirer de la vente" : status === "archived" ? "Remettre en vente" : status === "pending" ? "En attente" : status === "rejected" ? "Refusée" : "Publier"}
           </button>
 
           {confirmDelete ? (
