@@ -1,6 +1,5 @@
--- Correct the wrapper execution context for private admin RPCs.
--- The public wrappers must execute as their owner so they can call private functions
--- whose EXECUTE privilege is intentionally revoked from authenticated users.
+-- Give the public RPC wrappers the owner context needed to invoke private implementations.
+-- Domain authorization remains enforced inside each private function.
 create or replace function public.admin_set_associate_role(
   p_user_id uuid,
   p_enabled boolean,
@@ -13,6 +12,9 @@ set search_path = ''
 as $function$
 begin
   if not exists (
+    select 1 from public.user_roles
+    where user_id = auth.uid() and role = 'associate'::public.user_role
+  ) and not exists (
     select 1 from public.user_roles
     where user_id = auth.uid() and role = 'super_admin'::public.user_role
   ) then
