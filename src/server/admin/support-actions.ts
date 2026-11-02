@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requirePermission } from "@/server/auth/roles";
+import type { Json } from "@/types/database";
 
 export type SupportActionState = {
   error: string | null;
@@ -19,7 +20,7 @@ async function writeSupportAudit(
   actorId: string,
   ticketId: string,
   description: string,
-  metadata: Record<string, unknown>
+  metadata: Json
 ) {
   const { error } = await admin.from("audit_logs").insert({
     actor_id: actorId,
