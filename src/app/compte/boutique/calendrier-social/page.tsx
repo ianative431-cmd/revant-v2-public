@@ -52,9 +52,9 @@ export default async function CalendrierSocialPage() {
             caption: string;
             media_url: string | null;
             product_url: string | null;
-            platforms: ("instagram" | "facebook" | "tiktok" | "snapchat" | "whatsapp" | "manual")[];
+            platforms: string[];
             scheduled_at: string;
-            status: "scheduled" | "cancelled";
+            status: string;
           }[]}
         />
       </div>
