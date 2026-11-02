@@ -22,6 +22,19 @@ function isValidName(value: string): boolean {
   return trimmed.length >= NAME_MIN && trimmed.length <= NAME_MAX;
 }
 
+function isValidSocialInput(value: string, host: string): boolean {
+  if (!value) return true;
+  if (/^https:\/\//i.test(value)) {
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:" && (url.hostname === host || url.hostname.endsWith(`.${host}`));
+    } catch {
+      return false;
+    }
+  }
+  return /^@?[a-zA-Z0-9._-]{1,60}$/.test(value);
+}
+
 type ServerSupabase = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 
 /**
@@ -123,6 +136,12 @@ export async function updateShop(
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const requestedSlug = slugify(String(formData.get("slug") ?? "").trim());
+  const city = String(formData.get("city") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  const whatsapp = String(formData.get("whatsapp") ?? "").trim();
+  const instagram = String(formData.get("instagram") ?? "").trim();
+  const tiktok = String(formData.get("tiktok") ?? "").trim();
+  const snapchat = String(formData.get("snapchat") ?? "").trim();
 
   if (!isValidName(name)) {
     return { error: `Le nom de la boutique doit contenir entre ${NAME_MIN} et ${NAME_MAX} caractères.` };
@@ -134,6 +153,21 @@ export async function updateShop(
     return {
       error: "Adresse de boutique invalide (3 à 40 caractères : lettres, chiffres, tirets).",
     };
+  }
+  if (city.length > 80 || /[\\u0000-\\u001F]/.test(city)) {
+    return { error: "La ville ne peut pas dépasser 80 caractères." };
+  }
+  const validPhone = (value: string) => !value || (/^[+0-9()\\s.-]{7,30}$/.test(value) && value.replace(/\\D/g, "").length >= 7);
+  if (!validPhone(phone) || !validPhone(whatsapp)) {
+    return { error: "Vérifie les numéros de téléphone et WhatsApp (au moins 7 chiffres)." };
+  }
+  if (
+    instagram.length > 160 || tiktok.length > 160 || snapchat.length > 160 ||
+    !isValidSocialInput(instagram, "instagram.com") ||
+    !isValidSocialInput(tiktok, "tiktok.com") ||
+    !isValidSocialInput(snapchat, "snapchat.com")
+  ) {
+    return { error: "Vérifie les noms d’utilisateur ou liens HTTPS de tes réseaux sociaux." };
   }
 
   let finalSlug = shop.slug;
@@ -162,6 +196,12 @@ export async function updateShop(
       name,
       description: description.length > 0 ? description : null,
       slug: finalSlug,
+      city: city || null,
+      phone: phone || null,
+      whatsapp: whatsapp || null,
+      instagram: instagram || null,
+      tiktok: tiktok || null,
+      snapchat: snapchat || null,
     })
     .eq("id", shop.id);
 
