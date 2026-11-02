@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { getPalettesForShopType } from "@/content/shops/color-palettes";
 import PaletteCard from "./PaletteCard";
+import ShopMediaForm from "./ShopMediaForm";
 
 export default async function PersonnaliserBoutiquePage() {
   const user = await requireUserWithLegalConsent();
@@ -39,20 +40,15 @@ export default async function PersonnaliserBoutiquePage() {
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl p-4 mt-6">
-          <p className="text-xs font-semibold text-brand-text/60 mb-3">Bientôt disponible</p>
-          <div className="flex flex-col gap-2">
-            {["Image d'arrière-plan personnalisée", "Logo et bannière", "Typographie"].map((label) => (
-              <button
-                key={label}
-                type="button"
-                disabled
-                className="text-left text-sm text-brand-text/40 border border-brand-text/10 rounded-xl px-4 py-3 cursor-not-allowed"
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+        <ShopMediaForm
+          shopId={shop.id}
+          userId={user.id}
+          logoUrl={shop.logo_url}
+          bannerUrl={shop.banner_url}
+        />
+        <div className="bg-white/70 rounded-2xl p-4 mt-4">
+          <p className="text-xs font-semibold text-brand-text/60 mb-1">Autres options</p>
+          <p className="text-xs text-brand-text/50">L'image d'arrière-plan personnalisée et la typographie seront ajoutées dans un prochain lot.</p>
         </div>
       </div>
     </div>
