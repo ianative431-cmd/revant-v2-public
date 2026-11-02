@@ -38,6 +38,7 @@ Les noms de fichiers locaux ci-dessous correspondent maintenant exactement aux v
 | `20261102060742` | `20261102060742_secure_delivery_driver_workflow.sql` |
 | `20261102062731` | `20261102062731_lock_down_admin_finance_summary.sql` |
 | `20261102062938` | `20261102062938_revoke_anon_existing_public_writes.sql` |
+| `20261102065549` | `20261102065549_secure_social_publishing_calendar.sql` |
 
 Vérifications effectuées :
 - Les RPC de notification sont disponibles aux utilisateurs connectés ; l'écriture directe est retirée aux rôles `anon` et `authenticated`.
@@ -46,6 +47,8 @@ Vérifications effectuées :
 - La vue `public.admin_finance_summary` est une vue `security_invoker`. Ses droits directs ont été retirés à `anon` et `authenticated` ; le RPC d'administration continue de l'utiliser sous son propriétaire.
 - Les privilèges `INSERT`, `UPDATE` et `DELETE` d'`anon` ont été retirés des tables existantes du schéma `public`. Le compte anonyme conserve la lecture publique prévue des boutiques et produits actifs.
 - Après migration, il reste 0 privilège direct d'écriture `anon` sur les objets existants du schéma `public`.
+- La table `social_posts` possède RLS activé et trois politiques limitées au propriétaire de la boutique. Les seuls droits API accordés sont `SELECT/INSERT/UPDATE` à `authenticated` ; aucun droit direct n'est accordé à `anon` ou `PUBLIC`. La fonction trigger est `SECURITY INVOKER` et n'est pas exécutable directement par les rôles API.
+- Après application, l'advisor Supabase n'a signalé aucun nouveau finding lié à `social_posts`.
 
 Les tables de commandes, lignes de commande et livraisons étaient vides avant les migrations du 2 novembre et le sont toujours après vérification.
 
@@ -57,7 +60,6 @@ En conséquence, toute nouvelle migration créant une table dans `public` doit e
 
 ## Migrations encore en attente
 
-- `20261027190000_social_publishing_calendar.sql` : revue effectuée ; la tentative d'application a été bloquée par un contrôle de sécurité. Aucune modification n'a été effectuée et la table `social_posts` n'existe pas encore.
 - `20261101172017_require_aal2_for_super_admin.sql` : **ne pas appliquer avant l'inscription et la vérification du facteur TOTP du super-administrateur**. Le compte super-admin actuel ne possède pas de facteur TOTP vérifié ; l'application immédiate pourrait donc bloquer l'accès à l'administration.
 
 ## Règle d'exploitation

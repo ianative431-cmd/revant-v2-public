@@ -1,4 +1,4 @@
 -- ARCHIVED, NOT FOR APPLICATION.
--- Replaced by 20261102065500_secure_social_publishing_calendar.sql.
+-- Replaced by 20261102065549_secure_social_publishing_calendar.sql.
 -- The old draft did not explicitly revoke PUBLIC/anon table privileges and
 -- did not explicitly constrain the trigger function execution context.
