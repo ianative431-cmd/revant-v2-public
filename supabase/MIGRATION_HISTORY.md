@@ -1,6 +1,6 @@
 # Réconciliation de l'historique Supabase Revant
 
-État vérifié le 2 novembre 2026 sur le projet Revant (`xugcmpnrigqfszyfufoc`). Les versions listées ci-dessous ont été comparées à l'historique réel de `supabase_migrations.schema_migrations`.
+État vérifié le 2 novembre 2026 sur le projet Revant (`xugcmpnrigqfszyfufoc`). Les versions locales ont été alignées sur les versions réellement enregistrées dans `supabase_migrations.schema_migrations`.
 
 ## Fichiers renommés pour correspondre aux versions déjà appliquées dans Supabase
 
@@ -28,18 +28,36 @@ Les migrations historiques `0001` à `0011` ont été déplacées vers `supabase
 
 ## Migrations appliquées et vérifiées sur Supabase
 
-| Version enregistrée | Fichier ou migration | Vérification |
-|---|---|---|
-| `20261101130806` | `20261101130806_kyc_document_review_workflow.sql` | Fichier retrouvé sur `main` et la branche d'intégration ; la version est enregistrée dans Supabase. Ne pas rejouer. |
-| `20261102060639` | `secure_user_notification_inbox` | RPC de lecture accessibles aux utilisateurs connectés ; écriture directe retirée aux rôles `anon` et `authenticated`. |
-| `20261102060740` | `atomic_guest_checkout_and_order_transitions` | Colonnes d'idempotence et de réservation présentes ; RPC de commande invité réservé à `service_role`. |
-| `20261102060742` | `secure_delivery_driver_workflow` | Codes de remise déplacés dans `private.delivery_code_secrets` ; anciennes colonnes publiques supprimées ; RPC livreur contrôlés. |
+Les noms de fichiers locaux ci-dessous correspondent maintenant exactement aux versions enregistrées côté Supabase. Ne pas rejouer ces migrations.
+
+| Version locale et distante | Fichier |
+|---|---|
+| `20261101130806` | `20261101130806_kyc_document_review_workflow.sql` |
+| `20261102060639` | `20261102060639_secure_user_notification_inbox.sql` |
+| `20261102060740` | `20261102060740_atomic_guest_checkout_and_order_transitions.sql` |
+| `20261102060742` | `20261102060742_secure_delivery_driver_workflow.sql` |
+| `20261102062731` | `20261102062731_lock_down_admin_finance_summary.sql` |
+| `20261102062938` | `20261102062938_revoke_anon_existing_public_writes.sql` |
+
+Vérifications effectuées :
+- Les RPC de notification sont disponibles aux utilisateurs connectés ; l'écriture directe est retirée aux rôles `anon` et `authenticated`.
+- Les colonnes d'idempotence et de réservation des commandes sont présentes ; le RPC de commande invité est réservé à `service_role`.
+- Les codes de remise sont conservés dans `private.delivery_code_secrets`, pas dans les anciennes colonnes publiques ; les RPC livreur sont contrôlés.
+- La vue `public.admin_finance_summary` est une vue `security_invoker`. Ses droits directs ont été retirés à `anon` et `authenticated` ; le RPC d'administration continue de l'utiliser sous son propriétaire.
+- Les privilèges `INSERT`, `UPDATE` et `DELETE` d'`anon` ont été retirés des tables existantes du schéma `public`. Le compte anonyme conserve la lecture publique prévue des boutiques et produits actifs.
+- Après migration, il reste 0 privilège direct d'écriture `anon` sur les objets existants du schéma `public`.
 
 Les tables de commandes, lignes de commande et livraisons étaient vides avant les migrations du 2 novembre et le sont toujours après vérification.
 
+## Limite de privilèges par défaut
+
+La tentative de retirer les privilèges par défaut `INSERT/UPDATE/DELETE` pour `anon` aux rôles créateurs `postgres` et `supabase_admin` a été refusée par Supabase (`permission denied to change default privileges`). La migration non appliquée a été supprimée du dépôt ; aucune modification de privilèges par défaut n'a été faite.
+
+En conséquence, toute nouvelle migration créant une table dans `public` doit explicitement retirer les privilèges d'écriture d'`anon` et activer RLS dans la même migration. Il faudra traiter le réglage global des privilèges par défaut avec un accès propriétaire autorisé avant de considérer cette protection comme définitive.
+
 ## Migrations encore en attente
 
-- `20261027190000_social_publishing_calendar.sql` : revue effectuée ; la tentative d'application a été bloquée par un contrôle de sécurité. Aucune modification de cette migration n'a été effectuée et la table `social_posts` n'existe pas encore.
+- `20261027190000_social_publishing_calendar.sql` : revue effectuée ; la tentative d'application a été bloquée par un contrôle de sécurité. Aucune modification n'a été effectuée et la table `social_posts` n'existe pas encore.
 - `20261101172017_require_aal2_for_super_admin.sql` : **ne pas appliquer avant l'inscription et la vérification du facteur TOTP du super-administrateur**. Le compte super-admin actuel ne possède pas de facteur TOTP vérifié ; l'application immédiate pourrait donc bloquer l'accès à l'administration.
 
 ## Règle d'exploitation
