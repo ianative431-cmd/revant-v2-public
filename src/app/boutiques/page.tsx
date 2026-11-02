@@ -1,4 +1,6 @@
 import Link from "next/link";
+import SiteHeader from "@/components/layout/SiteHeader";
+import BottomNav from "@/components/layout/BottomNav";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveShops } from "@/server/shops/shops";
 
@@ -7,8 +9,15 @@ export const metadata = {
   description: "Découvre les boutiques ouvertes sur Revant, sans compte obligatoire pour naviguer.",
 };
 
-const FALLBACK_PHOTO =
-  "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80";
+function safeImageUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
 
 export default async function BoutiquesPage() {
   let shops: Awaited<ReturnType<typeof getActiveShops>> = [];
@@ -27,17 +36,8 @@ export default async function BoutiquesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] text-[#111]">
-      <header className="bg-[#090909] text-white">
-        <div className="mx-auto flex min-h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-7">
-          <Link href="/" className="text-2xl font-black tracking-tight sm:text-3xl">REVANT</Link>
-          <nav aria-label="Navigation publique" className="flex items-center gap-4 text-xs font-medium text-white/85 sm:gap-6">
-            <Link href="/">Accueil</Link>
-            <Link href="/#categories">Catégories</Link>
-            <Link href="/#produits">Produits</Link>
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#f7f7f7] pb-24 text-[#111]">
+      <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
         <Link href="/" className="text-xs font-semibold text-neutral-600 hover:text-black">← Retour à l’accueil</Link>
@@ -51,27 +51,48 @@ export default async function BoutiquesPage() {
 
         {publicShops.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {publicShops.map((shop) => (
-              <Link
-                key={shop.id}
-                href={`/shop/${shop.slug}`}
-                aria-label={`Ouvrir la boutique ${shop.name}`}
-                className="group relative aspect-[1.15] overflow-hidden rounded-xl bg-neutral-200 outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black"
-              >
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
-                  style={{
-                    backgroundImage: `url("${shop.banner_url || FALLBACK_PHOTO}")`,
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                  <strong className="block text-sm">{shop.name}</strong>
-                  <span className="mt-1 block text-[11px] text-white/80">{shop.city ?? "Niger"}</span>
-                  <span className="mt-2 inline-block rounded bg-white px-2 py-1 text-[10px] font-bold text-black">OUVRIR →</span>
-                </div>
-              </Link>
-            ))}
+            {publicShops.map((shop) => {
+              const bannerUrl = safeImageUrl(shop.banner_url) ?? safeImageUrl(shop.background_image_url);
+              const logoUrl = safeImageUrl(shop.logo_url);
+              const shopColor = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
+                ? shop.background_color
+                : "#A79986";
+
+              return (
+                <Link
+                  key={shop.id}
+                  href={`/shop/${shop.slug}`}
+                  aria-label={`Ouvrir la boutique ${shop.name}`}
+                  className="group relative aspect-[1.15] overflow-hidden rounded-xl bg-neutral-200 outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black"
+                  style={{ backgroundColor: shopColor }}
+                >
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
+                    style={{ backgroundImage: bannerUrl ? `url("${bannerUrl}")` : undefined }}
+                  />
+                  {!bannerUrl && (
+                    <div aria-hidden="true" className="absolute inset-0 flex items-center justify-center text-6xl font-black text-white/35">
+                      {shop.name.slice(0, 1).toLocaleUpperCase()}
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+                  {logoUrl && (
+                    <div
+                      role="img"
+                      aria-label={`Logo de ${shop.name}`}
+                      className="absolute left-3 top-3 h-12 w-12 rounded-xl border-2 border-white bg-white bg-cover bg-center shadow"
+                      style={{ backgroundImage: `url("${logoUrl}")` }}
+                    />
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                    <strong className="block text-sm">{shop.name}</strong>
+                    <span className="mt-1 block text-[11px] text-white/80">{shop.city ?? "Niger"}</span>
+                    <span className="mt-2 inline-block rounded bg-white px-2 py-1 text-[10px] font-bold text-black">OUVRIR →</span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <section className="rounded-2xl border border-neutral-200 bg-white px-5 py-10 text-center sm:px-10">
@@ -88,6 +109,8 @@ export default async function BoutiquesPage() {
           </section>
         )}
       </main>
+
+      <BottomNav />
     </div>
   );
 }
