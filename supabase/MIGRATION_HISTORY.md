@@ -26,24 +26,21 @@
 
 Les migrations historiques `0001` à `0011` ont été déplacées vers `supabase/legacy_migrations_archive/`. Elles ne figurent pas dans l'historique actuel de Supabase et ne doivent pas être rejouées sur le projet existant.
 
-## Migrations appliquées et vérifiées le 2 novembre 2026
+## Migrations appliquées et vérifiées sur Supabase
 
-| Version enregistrée | Migration | Vérification |
+| Version enregistrée | Fichier ou migration | Vérification |
 |---|---|---|
+| `20261101130806` | `20261101130806_kyc_document_review_workflow.sql` | Fichier retrouvé sur `main` et la branche d'intégration ; la version est enregistrée dans Supabase. Ne pas rejouer. |
 | `20261102060639` | `secure_user_notification_inbox` | RPC de lecture accessibles aux utilisateurs connectés ; écriture directe retirée aux rôles `anon` et `authenticated`. |
 | `20261102060740` | `atomic_guest_checkout_and_order_transitions` | Colonnes d'idempotence et de réservation présentes ; RPC de commande invité réservé à `service_role`. |
 | `20261102060742` | `secure_delivery_driver_workflow` | Codes de remise déplacés dans `private.delivery_code_secrets` ; anciennes colonnes publiques supprimées ; RPC livreur contrôlés. |
 
-Les tables de commandes, lignes de commande et livraisons étaient vides avant ces changements et le sont toujours après vérification.
+Les tables de commandes, lignes de commande et livraisons étaient vides avant les migrations du 2 novembre et le sont toujours après vérification.
 
 ## Migrations encore en attente
 
-- `20261027190000_social_publishing_calendar.sql` : à examiner et appliquer séparément après vérification de ses dépendances.
+- `20261027190000_social_publishing_calendar.sql` : revue effectuée ; la tentative d'application a été bloquée par un contrôle de sécurité. Aucune modification de cette migration n'a été effectuée et la table `social_posts` n'existe pas encore.
 - `20261101172017_require_aal2_for_super_admin.sql` : **ne pas appliquer avant l'inscription et la vérification du facteur TOTP du super-administrateur**. Le compte super-admin actuel ne possède pas de facteur TOTP vérifié ; l'application immédiate pourrait donc bloquer l'accès à l'administration.
-
-## Écart à résoudre : migration KYC
-
-Supabase enregistre déjà la version `20261101130806` (`kyc_document_review_workflow`), mais le fichier SQL correspondant n'a pas été retrouvé dans les fichiers suivis de la branche contrôlée. Ne pas recréer ni rejouer cette migration à l'aveugle. Il faut récupérer son SQL historique ou reconstituer un fichier de référence à partir du schéma réel, sans réappliquer ses changements.
 
 ## Règle d'exploitation
 
