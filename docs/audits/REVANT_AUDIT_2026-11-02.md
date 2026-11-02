@@ -69,8 +69,8 @@ Branche de suivi: fix/associate-rpc-sync-20261102
 
 - Les migrations d'index FK et de suppression de l'index dupliqué ont été restaurées dans le dépôt par la PR #26.
 - La PR #26 a été fusionnée dans `main` au commit `48b51fa13d405e46a757288217e02771d454846f`.
-- La PR de suivi contient les migrations de création du type `associate` et de correction des wrappers RPC.
-- Le run GitHub Actions `41482339263` sur le commit `7124c699` a terminé avec lint et build réussis. Le nouveau lot doit passer son propre run avant fusion.
+- La PR #28 de suivi a synchronisé les migrations de création du type `associate` et de correction des wrappers RPC.
+- Le run GitHub Actions `41484027551` sur le commit `4e17d357` a terminé avec lint et build réussis; le commit suivant ne modifiait que ce rapport documentaire.
 - La PR #28 a été fusionnée au commit `7f3fc44299bfcd6e5c08a62d566a101dddafb089`; le déploiement Render `dep-dbkbs94s728c73cndf5g` est terminé avec statut `live` le 2026-11-02 à 16:47 UTC.
 
 ## Contrôles après déploiement final — 02/11/2026
