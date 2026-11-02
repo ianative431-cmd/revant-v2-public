@@ -11,13 +11,13 @@ export default function MotDePasseOubliePage() {
     <main>
       <h1 className="mb-1 text-xl font-bold">Mot de passe oublié ?</h1>
       <p className="mb-5 text-sm text-black/60">
-        Indique l'adresse e-mail associée à ton compte. Si un compte existe, Revant enverra un lien de réinitialisation.
+        Indique l’adresse e-mail associée à ton compte. Si un compte existe, Revant enverra un lien de réinitialisation.
       </p>
 
       {state.success ? (
         <div className="space-y-4" role="status" aria-live="polite">
           <p className="rounded-xl bg-green-50 p-4 text-sm text-green-900">
-            Si cette adresse est associée à un compte, un e-mail contenant un lien de réinitialisation vient d'être envoyé. Vérifie aussi tes courriers indésirables.
+            Si cette adresse est associée à un compte, un e-mail contenant un lien de réinitialisation vient d’être envoyé. Vérifie aussi tes courriers indésirables.
           </p>
           <Link href="/connexion" className="inline-flex rounded-full bg-black px-5 py-3 text-sm font-medium text-white">
             Retour à la connexion
