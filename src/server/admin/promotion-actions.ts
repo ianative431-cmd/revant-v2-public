@@ -3,11 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requirePermission } from "@/server/auth/roles";
-import type { Json } from "@/types/database";
+import type { Database, Json } from "@/types/database";
 
 export type PromotionActionState = { error: string | null; success?: boolean; warning?: string };
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const TRANSITIONS: Record<string, readonly string[]> = {
+type PromotionStatus = Database["public"]["Enums"]["promotion_status"];
+const PROMOTION_STATUSES: readonly PromotionStatus[] = ["draft", "pending", "active", "paused", "completed", "rejected"];
+const TRANSITIONS: Record<PromotionStatus, readonly PromotionStatus[]> = {
   draft: ["pending", "rejected"],
   pending: ["active", "rejected"],
   active: ["paused", "completed"],
@@ -22,7 +24,9 @@ export async function transitionPromotion(
 ): Promise<PromotionActionState> {
   const actor = await requirePermission("catalog.manage");
   const promotionId = String(formData.get("promotionId") ?? "").trim();
-  const nextStatus = String(formData.get("nextStatus") ?? "");
+  const requestedStatus = String(formData.get("nextStatus") ?? "");
+  if (!PROMOTION_STATUSES.includes(requestedStatus as PromotionStatus)) return { error: "Statut de campagne invalide." };
+  const nextStatus = requestedStatus as PromotionStatus;
   if (!UUID_PATTERN.test(promotionId)) return { error: "Référence de campagne invalide." };
 
   const admin = createSupabaseAdminClient();
