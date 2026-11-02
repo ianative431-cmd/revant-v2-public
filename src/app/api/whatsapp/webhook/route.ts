@@ -5,11 +5,13 @@ import type { Json } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 /**
- * Handshake de vérification Meta (appelé une fois, quand l'admin
- * configure l'URL du webhook dans Meta for Developers). Compare le
- * verify_token au secret généré en base — jamais une valeur en dur
- * dans le code.
+ * Handshake de vérification Meta. Le jeton attendu est conservé en
+ * base et n'est jamais codé en dur dans le dépôt.
  */
 export async function GET(request: NextRequest) {
   const mode = request.nextUrl.searchParams.get("hub.mode");
@@ -40,14 +42,12 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * Événements WhatsApp réels (messages, statuts de livraison, etc.).
- * Signature HMAC vérifiée avant tout traitement — un webhook non
- * signé correctement est rejeté, jamais traité.
+ * Vérifie la signature Meta puis journalise uniquement des métadonnées
+ * techniques. Le contenu des messages, les numéros et les profils ne
+ * sont jamais copiés dans audit_logs.
  *
- * Note pour la suite : ce point d'entrée journalise l'événement reçu
- * mais ne déclenche pas encore la logique métier (notifications,
- * commandes, assistant IA) — c'est la prochaine étape, pas encore
- * construite, pour ne rien faire semblant de fonctionner.
+ * Le traitement métier (notifications, commandes, assistant IA) reste
+ * désactivé tant que ses règles et permissions ne sont pas construites.
  */
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
@@ -57,21 +57,52 @@ export async function POST(request: NextRequest) {
     return new NextResponse("Invalid signature", { status: 403 });
   }
 
-  let payload: Json | null = null;
+  let payload: unknown;
   try {
-    payload = JSON.parse(rawBody) as Json;
+    payload = JSON.parse(rawBody) as unknown;
   } catch {
     return new NextResponse("Invalid JSON", { status: 400 });
   }
 
+  if (!isRecord(payload)) {
+    return new NextResponse("Invalid payload", { status: 400 });
+  }
+
+  const entries = Array.isArray(payload.entry) ? payload.entry : [];
+  const eventFields = new Set<string>();
+  let changeCount = 0;
+
+  for (const entry of entries) {
+    if (!isRecord(entry) || !Array.isArray(entry.changes)) continue;
+    for (const change of entry.changes) {
+      if (!isRecord(change)) continue;
+      changeCount += 1;
+      if (typeof change.field === "string" && /^[a-z_]{1,64}$/.test(change.field)) {
+        eventFields.add(change.field);
+      }
+    }
+  }
+
+  const metadata: Json = {
+    event: "webhook_received",
+    object: typeof payload.object === "string" ? payload.object.slice(0, 64) : null,
+    entry_count: entries.length,
+    change_count: changeCount,
+    event_fields: [...eventFields],
+  };
+
   const supabase = createSupabaseAdminClient();
-  await supabase.from("audit_logs").insert({
+  const { error } = await supabase.from("audit_logs").insert({
     actor_id: null,
     action: "create",
     entity_type: "whatsapp_webhook",
-    description: "Événement webhook WhatsApp reçu",
-    metadata: { event: "webhook_received", payload },
+    description: "Événement webhook WhatsApp reçu (contenu personnel masqué)",
+    metadata,
   });
+
+  if (error) {
+    return new NextResponse("Unable to record webhook event", { status: 500 });
+  }
 
   return new NextResponse("OK", { status: 200 });
 }
