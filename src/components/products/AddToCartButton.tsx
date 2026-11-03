@@ -2,15 +2,23 @@
 
 import { useState } from "react";
 
-type CartItem = { id: string; name: string; price: number; currency: string; image: string | null };
+type CartItem = { id: string; name: string; price: number; currency: string; image: string | null; quantity?: number };
 export default function AddToCartButton({ item, compact = false }: { item: CartItem; compact?: boolean }) {
   const [added, setAdded] = useState(false);
   function add() {
     try {
-      const existing = JSON.parse(localStorage.getItem("revant-cart") || "[]") as CartItem[];
+      const parsed: unknown = JSON.parse(localStorage.getItem("revant-cart") || "[]");
+      const existing: CartItem[] = Array.isArray(parsed) ? parsed.filter((candidate): candidate is CartItem =>
+        Boolean(candidate) && typeof candidate === "object" &&
+        typeof candidate.id === "string" && typeof candidate.name === "string" &&
+        typeof candidate.price === "number" && typeof candidate.currency === "string"
+      ) : [];
       const index = existing.findIndex((candidate) => candidate.id === item.id);
-      if (index >= 0) existing[index] = item;
-      else existing.push(item);
+      if (index >= 0) {
+        existing[index] = { ...item, quantity: Math.min(99, Math.max(1, Number(existing[index].quantity) || 1) + 1) };
+      } else {
+        existing.push({ ...item, quantity: 1 });
+      }
       localStorage.setItem("revant-cart", JSON.stringify(existing));
       window.dispatchEvent(new Event("revant-cart-updated"));
       setAdded(true);

@@ -12,7 +12,7 @@ import {
 } from "@/server/security/rate-limit";
 
 type GuestOrderRpc = {
-  rpc: (name: string, args: Record<string, string | null>) => Promise<{
+  rpc: (name: string, args: Record<string, string | number | null>) => Promise<{
     data: { order_id: string; order_number: string } | null;
     error: { message: string } | null;
   }>;
@@ -20,6 +20,7 @@ type GuestOrderRpc = {
 
 export async function createGuestOrder(formData: FormData): Promise<never> {
   const productId = String(formData.get("productId") ?? "").trim();
+  const quantity = Number(formData.get("quantity") ?? "1");
   const idempotencyKey = String(formData.get("idempotencyKey") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
@@ -27,46 +28,35 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
   const address = String(formData.get("address") ?? "").trim();
   const website = String(formData.get("website") ?? "").trim();
 
-  if (!productId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idempotencyKey) || name.length < 2 || name.length > 100 || phone.length < 8 || phone.length > 24 || city.length < 2 || city.length > 100 || address.length < 5 || address.length > 300) {
+  if (!productId || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 99 || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idempotencyKey) || name.length < 2 || name.length > 100 || phone.length < 8 || phone.length > 24 || city.length < 2 || city.length > 100 || address.length < 5 || address.length > 300) {
     redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=validation`);
   }
 
-  // Protect the public guest checkout against repeated submissions from
-  // one network and phone number. Hash identifiers before storing them
-  // in the shared rate-limit table; never persist raw IPs or phone numbers.
   const normalizedPhone = phone.replace(/[^0-9]/g, "");
   const phoneKey = createHash("sha256").update(normalizedPhone).digest("hex");
   const ip = await getClientIdentifier();
   const checks: Promise<boolean>[] = [
     checkRateLimit(`guest-checkout:phone:${phoneKey}`, 3, 3600),
   ];
-
-  // Some hosting/proxy setups may not provide a client IP. Do not put all
-  // visitors behind one shared "unknown" key in that case.
   if (ip && ip !== "unknown") {
     const ipKey = createHash("sha256").update(ip).digest("hex");
     checks.push(checkRateLimit(`guest-checkout:ip:${ipKey}`, 10, 900));
   }
-
   const allowed = await Promise.all(checks);
   if (allowed.some((isAllowed) => !isAllowed)) {
-    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=commande`);
+    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&quantity=${quantity}&erreur=commande`);
   }
 
-  // The database RPC also validates every field, re-reads the product price,
-  // locks the product row and applies a per-phone limit on successful orders.
   const tokenSecret = process.env.GUEST_ORDER_TOKEN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!tokenSecret || tokenSecret.length < 32) {
-    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=commande`);
+    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&quantity=${quantity}&erreur=commande`);
   }
-  // Derive the same tracking token from the same checkout key so duplicate
-  // submissions resolve to the original order instead of creating a second one.
+  // Bind the tracking token to the quantity so reusing an idempotency key
+  // with a different quantity is rejected by the database RPC.
   const token = createHmac("sha256", tokenSecret)
-    .update(`revant-guest-order:${idempotencyKey}`)
+    .update(`revant-guest-order:${idempotencyKey}:${quantity}`)
     .digest("hex");
   const tokenHash = createHash("sha256").update(token).digest("hex");
-  // Resolve the optional buyer identity from the verified server session.
-  // The privileged RPC is never called directly by browser/mobile clients.
   const sessionSupabase = await createSupabaseServerClient();
   const { data: { user } } = await sessionSupabase.auth.getUser();
   const supabase = createSupabaseAdminClient();
@@ -81,10 +71,12 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
     p_website: website,
     p_idempotency_key: idempotencyKey,
     p_buyer_id: user?.id ?? null,
+    p_quantity: quantity,
   });
 
   if (error || !data?.order_number) {
-    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=commande`);
+    const code = error?.message.includes("product unavailable") ? "stock" : "commande";
+    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&quantity=${quantity}&erreur=${code}`);
   }
 
   const cookieStore = await cookies();
