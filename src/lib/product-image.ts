@@ -21,9 +21,32 @@ export function productImagePublicUrl(supabaseUrl: string, imagePath: string): s
 }
 
 /**
+ * Accepte uniquement les URLs HTTPS du bucket public réellement autorisé
+ * par next.config.ts. Les anciennes valeurs invalides ou externes sont
+ * ignorées pour éviter une erreur de rendu Next/Image.
+ */
+export function safeProductImageUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const image = new URL(value);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!supabaseUrl) return null;
+    const configuredSupabase = new URL(supabaseUrl);
+    if (
+      image.protocol !== "https:" ||
+      image.origin !== configuredSupabase.origin ||
+      !image.pathname.startsWith(`/storage/v1/object/public/${PRODUCT_IMAGE_BUCKET}/`)
+    ) return null;
+    return image.toString();
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Redimensionne (sans recadrer) une image trop grande et la réencode en
  * JPEG pour limiter le poids envoyé/stocké. Contrairement à l'avatar
- * (carré forcé), une photo d'annonce garde ses proportions d'origine —
+ * (carré forcé), une photo d'annonce garde ses proportions d'origine — 
  * seule la taille maximale est bornée.
  */
 export function compressProductImage(file: File): Promise<Blob> {
