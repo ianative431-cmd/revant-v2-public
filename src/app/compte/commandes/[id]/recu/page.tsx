@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { getOrderById } from "@/server/orders/orders";
 import { generateQrCodeDataUrl } from "@/lib/qr";
@@ -11,24 +10,13 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function RecuPage({ params }: Props) {
   const { id } = await params;
-  await requireUserWithLegalConsent();
+  const user = await requireUserWithLegalConsent();
   const supabase = await createSupabaseServerClient();
   const order = await getOrderById(supabase, id);
 
-  // RLS allows only the buyer or a seller attached to one of the order lines.
-  // A receipt is available only after the delivery workflow has marked it delivered.
-  if (!order || order.status !== "delivered" || order.items.length === 0) notFound();
-
-  let buyerEmail: string | null = null;
-  if (order.buyer_id) {
-    try {
-      const admin = createSupabaseAdminClient();
-      const { data } = await admin.auth.admin.getUserById(order.buyer_id);
-      buyerEmail = data.user?.email ?? null;
-    } catch {
-      buyerEmail = null;
-    }
-  }
+  // The receipt is buyer-only: sellers can see only their own order lines,
+  // not the complete multi-shop order total or another buyer's account data.
+  if (!order || order.buyer_id !== user.id || order.status !== "delivered" || order.items.length === 0) notFound();
 
   const verifyUrl = `${env.siteUrl()}/compte/commandes/${order.id}/recu`;
   const qrCodeDataUrl = await generateQrCodeDataUrl(verifyUrl);
@@ -58,7 +46,6 @@ export default async function RecuPage({ params }: Props) {
           </div>
           <dl className="mb-6 space-y-1 text-xs text-brand-text/50">
             <div className="flex justify-between"><dt>Statut</dt><dd>Livrée</dd></div>
-            {buyerEmail && <div className="flex justify-between gap-3"><dt>Acheteur</dt><dd className="truncate">{buyerEmail}</dd></div>}
             <div className="flex justify-between"><dt>Référence</dt><dd className="font-mono">{order.id.slice(0, 8)}</dd></div>
           </dl>
           <div className="flex flex-col items-center border-t border-dashed border-brand-text/15 pt-4">

@@ -69,7 +69,6 @@ export default async function BoutiqueCommandesPage() {
                     {order.delivery?.status === "in_transit" && <p className="mt-1">Le colis est en route vers l’acheteur.</p>}
                     {order.delivery?.status === "failed" && <p className="mt-1">Le support doit examiner cet incident.</p>}
                   </div>}
-                  {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
                 </article>
               );
             })}
