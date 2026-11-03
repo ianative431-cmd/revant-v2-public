@@ -5,8 +5,8 @@
 ## Règles de sécurité
 
 - **Ne pas lancer `supabase db push` sur la production** tant que les sources manquantes ci-dessous ne sont pas retrouvées et réconciliées.
-- Cette PR ne change pas la base : elle renomme, archive et restaure des fichiers SQL déjà appliqués. Aucun SQL n'est exécuté.
-- Supabase enregistre 64 migrations. Après cette réconciliation, 35 migrations appliquées disposent d'un fichier source local dont le préfixe/version correspond exactement; 29 sources restent introuvables dans `main` et les branches historiques contrôlées.
+- La PR initiale de réconciliation n'a pas changé la base : elle a renommé, archivé et restauré des fichiers SQL déjà appliqués. Les migrations ajoutées ultérieurement dans ce journal ont été appliquées séparément via l'API de migration Supabase.
+- Supabase enregistre maintenant 67 migrations. Après les ajouts documentés dans ce journal, 38 migrations appliquées disposent d'un fichier source local dont le préfixe/version correspond exactement; 29 sources restent introuvables dans `main` et les branches historiques contrôlées.
 - Ne jamais recréer ces 29 fichiers à partir de suppositions ni les rejouer. Les noms distants sont listés plus bas pour faciliter une récupération future.
 - Les anciennes migrations `0001` à `0011` sont archivées car elles ne figurent pas dans l'historique distant actuel et décrivent un ancien modèle incompatible.
 
@@ -93,3 +93,11 @@ La base contient déjà le résultat de ces migrations. Cette liste est un inven
 - Source conservée dans `supabase/migrations/20261103175324_super_admin_local_first_20261103.sql`. Elle crée uniquement les tables `super_admin_identities` et `super_admin_devices`, leurs index et les privilèges de service ; aucune identité ni aucun appareil n'a été ajouté.
 - Vérification post-migration : RLS activé sur les deux tables ; `anon` et `authenticated` n'ont aucun droit `SELECT` ; `service_role` conserve l'accès requis ; les deux tables sont encore vides.
 - La migration AAL2 reste en attente : aucun facteur TOTP vérifié n'est encore enregistré pour le super-admin. Ne pas appliquer la migration AAL2 avant cet enrôlement.
+
+## Correction du stockage des photos produit — 3 novembre 2026
+
+- Version distante `20261103180358` (`fix_product_images_storage_owner_policy_20261103`) : première correction de la règle Storage, immédiatement supersédée par la version suivante après contrôle de la résolution de colonne PostgreSQL. Source conservée pour reproduire exactement l'historique ; ne pas la rejouer seule.
+- Version distante `20261103180416` (`fix_product_images_storage_owner_policy_v2_20261103`) : correction finale vérifiée. Les politiques INSERT/UPDATE/DELETE comparent explicitement le premier segment de `storage.objects.name` au `shops.id` et exigent `shops.owner_id = auth.uid()`.
+- Le chemin produit reste `{shop_id}/{fichier}.jpg`, conforme à `buildProductImagePath(shopId)`. Le bucket `product-images` est public, accepte JPEG/PNG/WebP, limite Supabase 10 Mo ; le formulaire limite chaque image à 8 Mo.
+- Vérification : les trois politiques utilisent maintenant le chemin de l'objet Storage et la propriété réelle de la boutique. La base n'a encore aucune boutique, aucun produit et aucun objet image ; la recette avec un vrai vendeur reste donc à faire.
+- Ne pas lancer `supabase db push` : les 29 sources historiques manquantes restent à réconcilier.
