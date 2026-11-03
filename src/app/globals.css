@@ -98,3 +98,56 @@ button, input, select, textarea, a {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Revant — micro-interactions sobres et économes en ressources. */
+:root {
+  --revant-motion-fast: 140ms;
+  --revant-motion-normal: 200ms;
+  --revant-motion-ease: cubic-bezier(.2,.7,.25,1);
+}
+
+a, button, [role="button"], summary {
+  transition:
+    color var(--revant-motion-normal) var(--revant-motion-ease),
+    background-color var(--revant-motion-normal) var(--revant-motion-ease),
+    border-color var(--revant-motion-normal) var(--revant-motion-ease),
+    box-shadow var(--revant-motion-normal) var(--revant-motion-ease),
+    transform var(--revant-motion-fast) var(--revant-motion-ease),
+    opacity var(--revant-motion-normal) var(--revant-motion-ease);
+}
+
+button:active, [role="button"]:active, summary:active {
+  transform: scale(.975);
+}
+
+/* La recherche reçoit un halo de focus accessible, sans saut de layout. */
+input[type="search"]:focus,
+input[placeholder*="Recherch"]:focus,
+input[aria-label*="Recherch"]:focus {
+  outline-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-accent) 20%, transparent);
+}
+
+/* Transitions des éléments de navigation sans imposer de structure HTML. */
+nav a[aria-current="page"] {
+  font-weight: 700;
+}
+nav a:active {
+  transform: scale(.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button:hover, [role="button"]:hover {
+    filter: brightness(1.035);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
