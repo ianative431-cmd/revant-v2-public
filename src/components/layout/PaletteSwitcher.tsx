@@ -16,10 +16,11 @@ export default function PaletteSwitcher({ current }: { current: SitePaletteId })
   }
 
   return (
-    <div className="flex items-center gap-1.5" role="group" aria-label="Palette de couleurs du site">
+    <div className="flex items-center gap-1.5" role="group" aria-label="Thème du site Revant">
       {ORDER.map((id) => {
         const p = SITE_PALETTES[id];
         const isActive = active === id;
+        const isDark = id === "slate-lilac";
         return (
           <button
             key={id}
@@ -28,11 +29,11 @@ export default function PaletteSwitcher({ current }: { current: SitePaletteId })
             aria-pressed={isActive}
             aria-label={p.label}
             title={p.label}
-            className={`h-6 w-6 rounded-full border-2 transition ${
-              isActive ? "border-brand-text scale-110" : "border-transparent opacity-70"
-            }`}
-            style={{ background: `linear-gradient(135deg, ${p.bg} 50%, ${p.accent} 50%)` }}
-          />
+            className={`flex h-8 items-center gap-1.5 rounded-full border px-2 text-[10px] font-semibold ${isActive ? "border-[var(--brand-accent)] bg-[var(--brand-surface)] opacity-100" : "border-[var(--brand-border)] opacity-70"}`}
+          >
+            <span className={`h-3 w-3 rounded-full border border-black/10 ${isDark ? "bg-neutral-950" : "bg-white"}`} />
+            <span className={`h-3 w-3 rounded-full ${isDark ? "bg-orange-500" : "bg-orange-500"}`} />
+          </button>
         );
       })}
     </div>

@@ -56,7 +56,7 @@ export default async function Home({ searchParams }: Props) {
   const term = q?.trim();
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] text-[#111] pb-28">
+    <div className="min-h-screen bg-brand-bg text-brand-text pb-28">
       <SiteHeader />
       <section className="relative mx-3 mt-1 overflow-hidden rounded-2xl bg-[#101010] text-white min-h-[330px] sm:min-h-[390px]">
         <div className="absolute inset-0 bg-cover bg-[center_35%] opacity-75" style={{ backgroundImage: `url("${HERO_PHOTO}")` }} />
@@ -66,7 +66,7 @@ export default async function Home({ searchParams }: Props) {
             <p className="mb-3 text-[11px] font-semibold tracking-[0.22em] text-white/70">MODE • MAISON • TERROIR</p>
             <h1 className="mb-4 text-3xl font-black leading-[1.04] tracking-tight sm:text-5xl">STYLE. QUALITÉ.<br />REVANT.</h1>
             <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/80">Des trouvailles du quotidien, des boutiques locales et des produits qui font avancer nos communautés.</p>
-            <Link href="#produits" className="inline-flex items-center gap-3 rounded-md bg-white px-5 py-3 text-xs font-bold text-black transition hover:bg-neutral-200">ACHETER MAINTENANT <span aria-hidden="true">→</span></Link>
+            <Link href="#produits" className="inline-flex items-center gap-3 rounded-md bg-brand-accent px-5 py-3 text-xs font-bold text-white transition hover:brightness-95">ACHETER MAINTENANT <span aria-hidden="true">→</span></Link>
           </div>
         </div>
         <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2" aria-hidden="true"><span className="h-2 w-2 rounded-full bg-white"/><span className="h-2 w-2 rounded-full border border-white/80"/><span className="h-2 w-2 rounded-full border border-white/80"/></div>
@@ -74,16 +74,16 @@ export default async function Home({ searchParams }: Props) {
 
       <RevantMegaShortcuts />
 
-      <section id="a-propos" className="grid grid-cols-2 gap-px border-b border-black/5 bg-[#e8e8e8] px-3 sm:grid-cols-4">
+      <section id="a-propos" className="grid grid-cols-2 gap-px border-b border-brand-border bg-brand-surface px-3 sm:grid-cols-4">
         {[
           ["↗", "LIVRAISON", "Options selon la boutique"],
           ["◇", "ACHAT SIMPLE", "Sans compte obligatoire"],
           ["□", "BOUTIQUES LOCALES", "Des vendeurs à découvrir"],
           ["○", "AIDE EN FRANÇAIS", "Un parcours clair"],
         ].map(([icon, title, detail]) => (
-          <div key={title} className="flex min-h-[76px] items-center gap-3 bg-[#f7f7f7] px-3 py-4 sm:px-5">
+          <div key={title} className="flex min-h-[76px] items-center gap-3 bg-brand-bg px-3 py-4 sm:px-5">
             <span className="text-2xl font-light" aria-hidden="true">{icon}</span>
-            <span><strong className="block text-[10px] font-extrabold tracking-wide">{title}</strong><span className="mt-1 block text-[10px] text-neutral-600">{detail}</span></span>
+            <span><strong className="block text-[10px] font-extrabold tracking-wide">{title}</strong><span className="mt-1 block text-[10px] text-brand-muted">{detail}</span></span>
           </div>
         ))}
       </section>
@@ -103,7 +103,7 @@ export default async function Home({ searchParams }: Props) {
 
       <section id="boutiques-paysannes" className="px-4 pt-7">
         <div className="mb-1 flex items-center justify-between"><h2 className="text-lg font-extrabold">Boutiques paysannes</h2><Link href="/boutiques/creer" className="text-xs font-medium">Vendre ici →</Link></div>
-        <p className="mb-3 text-xs text-neutral-600">Des produits frais, locaux et de qualité.</p>
+        <p className="mb-3 text-xs text-brand-muted">Des produits frais, locaux et de qualité.</p>
         {shops.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {shops.slice(0, 4).map((shop) => (
@@ -117,7 +117,7 @@ export default async function Home({ searchParams }: Props) {
         ) : (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {FARM_PHOTOS.map((farm) => (
-              <Link key={farm.title} href="/boutiques" aria-label={`Ouvrir le répertoire des boutiques — ${farm.title}`} className="group relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200 outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black">
+              <Link key={farm.title} href="/boutiques" aria-label={`Ouvrir le répertoire des boutiques — ${farm.title}`} className="group relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200 outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
                 <div className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105" style={{ backgroundImage: `url("${farm.photo}")` }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <div className="absolute bottom-3 left-3 right-3 text-white"><strong className="block text-sm">{farm.title}</strong><span className="text-[11px] text-white/80">{farm.subtitle}</span><span className="mt-2 inline-block rounded bg-white px-2 py-1 text-[10px] font-bold text-black">DÉCOUVRIR →</span></div>
@@ -130,10 +130,10 @@ export default async function Home({ searchParams }: Props) {
       <main id="produits" className="px-4 pt-7">
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? `Résultats pour « ${q} »` : shortcutCategoryTitle ?? (activeCategory ? activeCategory.name : "Produits populaires")}</h2><a href="#produits" className="text-xs font-medium">Voir tout →</a></div>
         {loadedProducts.length === 0 ? (
-          <div className="rounded-xl border border-neutral-200 bg-white px-5 py-10 text-center">
+          <div className="rounded-xl border border-brand-border bg-brand-surface px-5 py-10 text-center">
             <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : "Les premières annonces arrivent bientôt."}</p>
-            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-neutral-500">{term ? "Essaie un autre mot ou explore les catégories." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
-            <Link href="/boutiques/creer" className="mt-4 inline-flex rounded-full bg-black px-5 py-3 text-xs font-bold text-white">Ouvrir une boutique</Link>
+            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">{term ? "Essaie un autre mot ou explore les catégories." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
+            <Link href="/boutiques/creer" className="mt-4 inline-flex rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white">Ouvrir une boutique</Link>
           </div>
         ) : (
           <InfiniteProductFeed initialProducts={loadedProducts} category={categorie ?? ""} search={term ?? ""} />

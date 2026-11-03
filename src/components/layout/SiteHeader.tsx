@@ -27,43 +27,48 @@ const quickLinks = [
   { href: "/boutiques/creer", label: "Vendre sur Revant" },
   { href: "/compte", label: "Mon compte" },
 ];
+
 export default async function SiteHeader() {
   const palette = await getSitePalette();
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#090909] text-white shadow-sm">
+    <header className="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-[var(--brand-header)] text-[var(--brand-header-text)] shadow-sm">
       <div className="mx-auto flex min-h-[64px] max-w-[1500px] items-center justify-between gap-2 px-3 sm:px-7">
         <details className="relative md:hidden">
-          <summary aria-label="Ouvrir le menu principal" className="flex min-h-11 min-w-10 list-none cursor-pointer items-center justify-center rounded-xl hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"><MenuIcon/></summary>
-          <nav aria-label="Menu principal" className="absolute left-0 top-12 z-50 w-64 rounded-2xl border border-black/10 bg-white p-2 text-sm text-neutral-900 shadow-2xl">
-            <p className="px-3 pb-2 pt-3 text-[10px] font-bold uppercase tracking-[.18em] text-neutral-500">Explorer Revant</p>
-            {quickLinks.map((item) => <Link key={item.href + item.label} href={item.href} className="block rounded-xl px-3 py-3 font-medium hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black">{item.label}</Link>)}
+          <summary aria-label="Ouvrir le menu principal" className="flex min-h-11 min-w-10 list-none cursor-pointer items-center justify-center rounded-xl hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]"><MenuIcon/></summary>
+          <nav aria-label="Menu principal" className="absolute left-0 top-12 z-50 w-64 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-header)] p-2 text-sm text-[var(--brand-header-text)] shadow-2xl">
+            <p className="px-3 pb-2 pt-3 text-[10px] font-bold uppercase tracking-[.18em] opacity-60">Explorer Revant</p>
+            {quickLinks.map((item) => <Link key={item.href + item.label} href={item.href} className="block rounded-xl px-3 py-3 font-medium hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">{item.label}</Link>)}
           </nav>
         </details>
         <Link href="/" aria-label="Revant — accueil" className="shrink-0">
           <Image src="/images/logo-revant.svg" alt="Revant" width={52} height={52} priority className="h-10 w-10 rounded-md object-cover sm:h-12 sm:w-12" />
         </Link>
-        <nav className="hidden items-center gap-7 text-xs font-medium text-white/85 md:flex">
+        <nav className="hidden items-center gap-7 text-xs font-medium opacity-85 md:flex">
           <Link href="/">Accueil</Link><Link href="/boutiques">Boutiques</Link><Link href="/#categories">Catégories</Link><Link href="/restaurants">Restaurants</Link><Link href="/#a-propos">À propos</Link>
         </nav>
-        <div className="flex items-center gap-1 sm:gap-4">
-          <form action="/" method="get" className="hidden items-center gap-2 rounded-full border border-white/20 px-3 py-2 sm:flex"><SearchIcon/><input name="q" aria-label="Rechercher des produits" placeholder="Rechercher" className="w-24 bg-transparent text-xs text-white outline-none placeholder:text-white/50 sm:w-32"/></form>
+        <div className="flex items-center gap-1 sm:gap-3">
+          <form action="/" method="get" role="search" className="hidden items-center gap-2 rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-2 sm:flex">
+            <SearchIcon/><input name="q" aria-label="Rechercher des produits" placeholder="Rechercher" className="w-24 bg-transparent text-xs text-[var(--brand-text)] outline-none placeholder:opacity-60 sm:w-32"/>
+          </form>
           <PhotoActionMenu />
-          <Link href="/compte" aria-label="Mon compte" className="rounded-full p-1.5 hover:bg-white/10"><UserIcon/></Link>
-          <Link href="/boutiques" aria-label="Découvrir les boutiques" className="rounded-full p-1.5 hover:bg-white/10"><BagIcon/></Link>
+          <Link href="/compte" aria-label="Mon compte" className="rounded-full p-2 hover:bg-[var(--brand-surface)]"><UserIcon/></Link>
+          <Link href="/boutiques" aria-label="Découvrir les boutiques" className="rounded-full p-2 hover:bg-[var(--brand-surface)]"><BagIcon/></Link>
           <details className="relative">
-            <summary aria-label="Plus d’options" className="flex min-h-10 min-w-9 list-none cursor-pointer items-center justify-center rounded-full hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"><MoreIcon/></summary>
-            <nav aria-label="Plus d’options" className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-black/10 bg-white p-2 text-sm text-neutral-900 shadow-2xl">
-              {quickLinks.map((item) => <Link key={item.href + item.label} href={item.href} className="block rounded-xl px-3 py-3 font-medium hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black">{item.label}</Link>)}
+            <summary aria-label="Plus d’options" className="flex min-h-10 min-w-9 list-none items-center justify-center rounded-full hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]"><MoreIcon/></summary>
+            <nav aria-label="Plus d’options" className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-header)] p-2 text-sm text-[var(--brand-header-text)] shadow-2xl">
+              {quickLinks.map((item) => <Link key={item.href + item.label} href={item.href} className="block rounded-xl px-3 py-3 font-medium hover:bg-[var(--brand-surface)]">{item.label}</Link>)}
             </nav>
           </details>
           <div className="hidden lg:block"><PaletteSwitcher current={palette}/></div>
         </div>
       </div>
       <div className="px-3 pb-3 sm:hidden">
-        <form action="/" method="get" role="search" className="flex min-h-12 items-center gap-3 rounded-full border border-white/15 bg-white px-4 text-neutral-900 shadow-sm focus-within:ring-2 focus-within:ring-[#803e2f]">
-          <SearchIcon/><input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-neutral-500" />
-          <button type="submit" aria-label="Lancer la recherche" className="rounded-full bg-[#803e2f] px-3 py-2 text-xs font-bold text-white">OK</button>
+        <form action="/" method="get" role="search" className="flex min-h-12 items-center gap-3 rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 text-[var(--brand-text)] shadow-sm focus-within:ring-2 focus-within:ring-[var(--brand-accent)]">
+          <SearchIcon/>
+          <input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:opacity-60"/>
+          <button type="submit" aria-label="Lancer la recherche" className="rounded-full bg-[var(--brand-accent)] px-3 py-2 text-xs font-bold text-white">OK</button>
         </form>
+        <div className="mt-2 flex justify-end"><PaletteSwitcher current={palette}/></div>
       </div>
     </header>
   );

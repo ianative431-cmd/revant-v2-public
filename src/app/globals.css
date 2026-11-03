@@ -1,32 +1,33 @@
 @import "tailwindcss";
 
-/*
- * Charte Revant : deux palettes réelles, Terracotta (par défaut) et
- * Slate-Lilac, remplaçant l'ancienne charte beige/noir. La palette
- * active est posée en attribut sur <html> par le serveur (cookie,
- * voir src/server/theme/site-palette.ts) puis modifiable à tout
- * moment côté client (voir PaletteSwitcher) sans rechargement.
- *
- * --brand-surface est volontairement plus sombre que --brand-bg en
- * Terracotta et plus clair que --brand-bg en Slate-Lilac (valeurs
- * exactes fournies par Mourad) — --brand-on-surface compense pour
- * garder un texte lisible sur les cartes dans les deux cas.
- */
+/* Deux thèmes simples et cohérents : clair blanc/orange, sombre noir/orange. */
 :root,
 :root[data-site-palette="terracotta"] {
-  --brand-bg: #a79986;
-  --brand-surface: #3e3d38;
-  --brand-accent: #803e2f;
-  --brand-text: #1f1d20;
-  --brand-on-surface: #f3ede6;
+  color-scheme: light;
+  --brand-bg: #ffffff;
+  --brand-surface: #fff7ed;
+  --brand-accent: #f97316;
+  --brand-text: #171717;
+  --brand-on-surface: #292524;
+  --brand-header: #ffffff;
+  --brand-header-text: #171717;
+  --brand-border: #e7e5e4;
+  --brand-muted: #57534e;
+  --brand-nav: rgba(255, 255, 255, .96);
 }
 
 :root[data-site-palette="slate-lilac"] {
-  --brand-bg: #dedcdc;
-  --brand-surface: #c5bac4;
-  --brand-accent: #57707a;
-  --brand-text: #191d23;
-  --brand-on-surface: #191d23;
+  color-scheme: dark;
+  --brand-bg: #090909;
+  --brand-surface: #171717;
+  --brand-accent: #f97316;
+  --brand-text: #f5f5f5;
+  --brand-on-surface: #f5f5f5;
+  --brand-header: #090909;
+  --brand-header-text: #ffffff;
+  --brand-border: #303030;
+  --brand-muted: #a3a3a3;
+  --brand-nav: rgba(18, 18, 18, .97);
 }
 
 @theme inline {
@@ -56,25 +57,11 @@ body {
   overflow-wrap: anywhere;
 }
 
-img, video, canvas, svg {
-  max-width: 100%;
-}
-
-img, video {
-  height: auto;
-}
-
-button, input, select, textarea {
-  font: inherit;
-}
-
-button, [role="button"], a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-button, input, select, textarea, a {
-  touch-action: manipulation;
-}
+img, video, canvas, svg { max-width: 100%; }
+img, video { height: auto; }
+button, input, select, textarea { font: inherit; }
+button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
+button, input, select, textarea, a { touch-action: manipulation; }
 
 :focus-visible {
   outline: 3px solid var(--brand-accent);
@@ -85,11 +72,35 @@ button, input, select, textarea, a {
   html { scroll-padding-bottom: env(safe-area-inset-bottom, 0px); }
   body { padding-bottom: env(safe-area-inset-bottom, 0px); }
 }
+@media (min-width: 1600px) { body { font-size: 1.0625rem; } }
 
-@media (min-width: 1600px) {
-  body { font-size: 1.0625rem; }
+/* Micro-interactions discrètes, adaptées aux téléphones modestes. */
+:root {
+  --revant-motion-fast: 140ms;
+  --revant-motion-normal: 200ms;
+  --revant-motion-ease: cubic-bezier(.2,.7,.25,1);
 }
-
+a, button, [role="button"], summary {
+  transition:
+    color var(--revant-motion-normal) var(--revant-motion-ease),
+    background-color var(--revant-motion-normal) var(--revant-motion-ease),
+    border-color var(--revant-motion-normal) var(--revant-motion-ease),
+    box-shadow var(--revant-motion-normal) var(--revant-motion-ease),
+    transform var(--revant-motion-fast) var(--revant-motion-ease),
+    opacity var(--revant-motion-normal) var(--revant-motion-ease);
+}
+button:active, [role="button"]:active, summary:active { transform: scale(.975); }
+input[type="search"]:focus,
+input[placeholder*="Recherch"]:focus,
+input[aria-label*="Recherch"]:focus {
+  outline-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-accent) 20%, transparent);
+}
+nav a[aria-current="page"] { font-weight: 700; }
+nav a:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) {
+  button:hover, [role="button"]:hover { filter: brightness(1.035); }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;
