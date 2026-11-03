@@ -93,3 +93,11 @@ La base contient déjà le résultat de ces migrations. Cette liste est un inven
 - Source conservée dans `supabase/migrations/20261103175324_super_admin_local_first_20261103.sql`. Elle crée uniquement les tables `super_admin_identities` et `super_admin_devices`, leurs index et les privilèges de service ; aucune identité ni aucun appareil n'a été ajouté.
 - Vérification post-migration : RLS activé sur les deux tables ; `anon` et `authenticated` n'ont aucun droit `SELECT` ; `service_role` conserve l'accès requis ; les deux tables sont encore vides.
 - La migration AAL2 reste en attente : aucun facteur TOTP vérifié n'est encore enregistré pour le super-admin. Ne pas appliquer la migration AAL2 avant cet enrôlement.
+
+## Correction du stockage des photos produit — 3 novembre 2026
+
+- Version distante `20261103180358` (`fix_product_images_storage_owner_policy_20261103`) : première correction de la règle Storage, immédiatement supersédée par la version suivante après contrôle de la résolution de colonne PostgreSQL. Source conservée pour reproduire exactement l'historique ; ne pas la rejouer seule.
+- Version distante `20261103180416` (`fix_product_images_storage_owner_policy_v2_20261103`) : correction finale vérifiée. Les politiques INSERT/UPDATE/DELETE comparent explicitement le premier segment de `storage.objects.name` au `shops.id` et exigent `shops.owner_id = auth.uid()`.
+- Le chemin produit reste `{shop_id}/{fichier}.jpg`, conforme à `buildProductImagePath(shopId)`. Le bucket `product-images` est public, accepte JPEG/PNG/WebP, limite Supabase 10 Mo ; le formulaire limite chaque image à 8 Mo.
+- Vérification : les trois politiques utilisent maintenant le chemin de l'objet Storage et la propriété réelle de la boutique. La base n'a encore aucune boutique, aucun produit et aucun objet image ; la recette avec un vrai vendeur reste donc à faire.
+- Ne pas lancer `supabase db push` : les 29 sources historiques manquantes restent à réconcilier.
