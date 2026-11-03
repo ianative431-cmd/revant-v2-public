@@ -11,6 +11,7 @@ import {
   compressProductImage,
 } from "@/lib/product-image";
 import type { Category } from "@/server/catalog/categories";
+import { consumePendingProductImage } from "@/lib/pending-product-image";
 
 const MAX_PRODUCT_IMAGES = 5;
 
@@ -49,15 +50,35 @@ export default function NewProductForm({
   const [status, setStatus] = useState<Status>("idle");
 
   useEffect(() => {
-    if (typeof window === "undefined" || sessionStorage.getItem("revant-photo-action") !== "add") return;
-    const dataUrl = sessionStorage.getItem("revant-photo-prefill");
-    sessionStorage.removeItem("revant-photo-action");
-    sessionStorage.removeItem("revant-photo-prefill");
-    if (!dataUrl) return;
-    fetch(dataUrl)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const selected = new File([blob], "revant-product-photo.jpg", { type: blob.type || "image/jpeg" });
+    if (typeof window === "undefined") return;
+    let action: string | null = null;
+    let legacyDataUrl: string | null = null;
+    try {
+      action = sessionStorage.getItem("revant-photo-action");
+      if (action !== "add") return;
+      legacyDataUrl = sessionStorage.getItem("revant-photo-prefill");
+      sessionStorage.removeItem("revant-photo-action");
+      sessionStorage.removeItem("revant-photo-prefill");
+    } catch {
+      queueMicrotask(() => setStatus("error-generic"));
+      return;
+    }
+
+    let active = true;
+    async function restorePhoto() {
+      try {
+        let selected: File | null = null;
+        try {
+          selected = await consumePendingProductImage();
+        } catch {
+          if (!legacyDataUrl) throw new Error("Photo temporaire indisponible.");
+        }
+        if (!selected && legacyDataUrl) {
+          const response = await fetch(legacyDataUrl);
+          const blob = await response.blob();
+          selected = new File([blob], "revant-product-photo.jpg", { type: blob.type || "image/jpeg" });
+        }
+        if (!active || !selected) return;
         if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type) || selected.size > PRODUCT_IMAGE_MAX_BYTES) {
           setStatus(selected.size > PRODUCT_IMAGE_MAX_BYTES ? "error-size" : "error-type");
           return;
@@ -66,8 +87,12 @@ export default function NewProductForm({
         previewUrlsRef.current = [previewUrl];
         setFiles([selected]);
         setPreviewUrls([previewUrl]);
-      })
-      .catch(() => setStatus("error-generic"));
+      } catch {
+        if (active) setStatus("error-generic");
+      }
+    }
+    void restorePhoto();
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
