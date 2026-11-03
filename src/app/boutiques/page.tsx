@@ -1,4 +1,7 @@
 import Link from "next/link";
+import SiteHeader from "@/components/layout/SiteHeader";
+import BottomNav from "@/components/layout/BottomNav";
+import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveShops } from "@/server/shops/shops";
 
@@ -7,8 +10,15 @@ export const metadata = {
   description: "Découvre les boutiques ouvertes sur Revant, sans compte obligatoire pour naviguer.",
 };
 
-const FALLBACK_PHOTO =
-  "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80";
+function safeImageUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
 
 export default async function BoutiquesPage() {
   let shops: Awaited<ReturnType<typeof getActiveShops>> = [];
@@ -27,67 +37,110 @@ export default async function BoutiquesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text">
-      <header className="border-b border-brand-border bg-brand-surface text-brand-text">
-        <div className="mx-auto flex min-h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-7">
-          <Link href="/" className="text-2xl font-black tracking-tight sm:text-3xl">REVANT</Link>
-          <nav aria-label="Navigation publique" className="flex items-center gap-4 text-xs font-medium text-brand-text/80 sm:gap-6">
-            <Link href="/">Accueil</Link>
-            <Link href="/#categories">Catégories</Link>
-            <Link href="/#produits">Produits</Link>
-          </nav>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
-        <Link href="/" className="text-xs font-semibold text-brand-text/65 hover:text-brand-accent">← Retour à l’accueil</Link>
-        <div className="mb-6 mt-5">
-          <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Les boutiques Revant</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-brand-text/70">
-            Parcours les boutiques publiques et consulte leurs articles sans créer de compte.
-            La connexion est réservée aux actions qui nécessitent un compte.
-          </p>
+    <div className="min-h-screen bg-[#f5f3f0] pb-24 text-[#1f1d20]">
+      <SiteHeader />
+      <main className="mx-auto w-full max-w-[1440px] px-3 py-8 sm:px-6 sm:py-12">
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-neutral-500">Marketplace Revant</p>
+            <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">Les boutiques</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-neutral-600">
+              Découvre les boutiques publiques, leurs univers et leurs produits. Tu peux parcourir les vitrines sans créer de compte.
+            </p>
+          </div>
+          <span className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold text-neutral-600">
+            {publicShops.length} boutique{publicShops.length > 1 ? "s" : ""}
+          </span>
         </div>
 
         {publicShops.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {publicShops.map((shop) => (
-              <Link
-                key={shop.id}
-                href={`/shop/${shop.slug}`}
-                aria-label={`Ouvrir la boutique ${shop.name}`}
-                className="group relative aspect-[1.15] overflow-hidden rounded-xl bg-neutral-200 outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black"
-              >
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
-                  style={{
-                    backgroundImage: `url("${shop.banner_url || FALLBACK_PHOTO}")`,
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                  <strong className="block text-sm">{shop.name}</strong>
-                  <span className="mt-1 block text-[11px] text-white/80">{shop.city ?? "Niger"}</span>
-                  <span className="mt-2 inline-block rounded bg-white px-2 py-1 text-[10px] font-bold text-black">OUVRIR →</span>
-                </div>
-              </Link>
-            ))}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
+            {publicShops.map((shop) => {
+              const bannerUrl = safeImageUrl(shop.banner_url);
+              const logoUrl = safeImageUrl(shop.logo_url);
+              const typeLabel = getShopTypeLabel(shop);
+              const color = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
+                ? shop.background_color
+                : "#A79986";
+
+              return (
+                <Link
+                  key={shop.id}
+                  href={`/shop/${encodeURIComponent(shop.slug)}`}
+                  aria-label={`Ouvrir la boutique ${shop.name}`}
+                  className="group overflow-hidden rounded-[24px] border border-black/5 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+                >
+                  <div className="relative h-36 overflow-hidden sm:h-40" style={{ backgroundColor: color }}>
+                    {bannerUrl ? (
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105"
+                        style={{ backgroundImage: `linear-gradient(0deg, rgba(0,0,0,.28), transparent 65%), url("${bannerUrl}")` }}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-6xl font-black text-white/30">
+                        {shop.name.slice(0, 1).toLocaleUpperCase("fr")}
+                      </div>
+                    )}
+                    {shop.is_premium && (
+                      <span className="absolute right-3 top-3 rounded-full bg-amber-100 px-3 py-1 text-[10px] font-extrabold text-amber-900">
+                        PREMIUM
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="relative px-4 pb-5 pt-11">
+                    <div
+                      aria-hidden="true"
+                      className="absolute -top-9 left-4 flex h-[68px] w-[68px] items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white text-2xl font-black text-white shadow-md"
+                      style={{
+                        backgroundColor: color,
+                        backgroundImage: logoUrl ? `url("${logoUrl}")` : undefined,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    >
+                      {!logoUrl && shop.name.slice(0, 1).toLocaleUpperCase("fr")}
+                    </div>
+
+                    <div className="flex min-w-0 items-start justify-between gap-2">
+                      <h2 className="line-clamp-1 text-base font-black tracking-tight text-[#1f1d20]">
+                        {shop.name}
+                      </h2>
+                      <span className="shrink-0 rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">
+                        {typeLabel}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-neutral-500">{shop.city ?? "Niger"}</p>
+                    {shop.description && (
+                      <p className="mt-3 line-clamp-2 min-h-9 text-xs leading-relaxed text-neutral-600">
+                        {shop.description}
+                      </p>
+                    )}
+                    <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
+                      <span className="text-[11px] font-semibold text-neutral-500">Voir la vitrine</span>
+                      <span aria-hidden="true" className="text-sm font-black transition-transform group-hover:translate-x-1">→</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         ) : (
-          <section className="rounded-2xl border border-brand-border bg-brand-surface px-5 py-10 text-center sm:px-10">
-            <div aria-hidden="true" className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-bg text-2xl">⌂</div>
-            <h2 className="text-lg font-extrabold">Aucune boutique publique pour le moment</h2>
-            <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-brand-text/70">
-              Les vitrines de cette page s’ouvriront dès que des boutiques seront actives.
-              Tu peux déjà parcourir les produits publiés, sans te connecter.
+          <section className="rounded-[28px] border border-black/5 bg-white px-5 py-12 text-center shadow-sm sm:px-10">
+            <div aria-hidden="true" className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f5f3f0] text-2xl">🛍️</div>
+            <h2 className="mt-4 text-lg font-extrabold">Aucune boutique publique pour le moment</h2>
+            <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-neutral-600">
+              Les vitrines apparaîtront ici dès que des boutiques seront actives. Tu peux déjà parcourir les produits publiés.
             </p>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-              <Link href="/#produits" className="rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white hover:brightness-95">Explorer les produits</Link>
-              <Link href="/boutiques/creer" className="rounded-full border border-brand-border px-5 py-3 text-xs font-bold text-brand-text hover:bg-brand-bg">Ouvrir une boutique</Link>
+              <Link href="/#produits" className="rounded-full bg-[#803E2F] px-5 py-3 text-xs font-bold text-white hover:brightness-95">Explorer les produits</Link>
+              <Link href="/boutiques/creer" className="rounded-full border border-neutral-300 px-5 py-3 text-xs font-bold text-neutral-800 hover:bg-neutral-50">Ouvrir une boutique</Link>
             </div>
           </section>
         )}
       </main>
+      <BottomNav />
     </div>
   );
 }
