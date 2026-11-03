@@ -4,10 +4,10 @@ import { getCurrentUserRole, requirePermission } from "@/server/auth/roles";
 
 function StatCard({ label, value, sub }: { label: string; value: number; sub?: string }) {
   return (
-    <div className="bg-white rounded-2xl p-4">
-      <p className="text-xs text-black/50 mb-1">{label}</p>
-      <p className="text-2xl font-bold">{value.toLocaleString("fr-FR")}</p>
-      {sub && <p className="text-[11px] text-black/40 mt-1">{sub}</p>}
+    <div className="rounded-2xl border border-[#485330]/15 border-l-4 border-l-[#687650] bg-white p-4 shadow-sm">
+      <p className="mb-1 text-xs font-medium text-[#485330]/75">{label}</p>
+      <p className="text-2xl font-bold tracking-tight text-[#171013]">{value.toLocaleString("fr-FR")}</p>
+      {sub && <p className="mt-1 text-[11px] text-[#485330]/65">{sub}</p>}
     </div>
   );
 }
@@ -73,8 +73,8 @@ export default async function AdminDashboardPage() {
         <StatCard label="Tickets support ouverts" value={stats.openSupport} />
       </div>
 
-      <div className="bg-white rounded-2xl p-4">
-        <h2 className="text-sm font-semibold mb-3">Commandes récentes</h2>
+      <div className="rounded-2xl border border-[#485330]/15 bg-white p-4 shadow-sm">
+        <h2 className="mb-3 text-sm font-semibold text-[#203426]">Commandes récentes</h2>
         {stats.recentOrders.length === 0 ? (
           <p className="text-sm text-black/50">Aucune commande pour le moment.</p>
         ) : (

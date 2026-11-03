@@ -1,0 +1,4 @@
+const CACHE_NAME="revant-super-admin-shell-v1"; const OFFLINE_URL="/admin/offline.html"; const SHELL=[OFFLINE_URL,"/images/logo-super-admin-512.png"];
+self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())));
+self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith("revant-super-admin-shell-")&&k!==CACHE_NAME).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener("fetch",e=>{const r=e.request,u=new URL(r.url);if(r.method!=="GET"||u.origin!==self.location.origin)return;if(u.pathname.startsWith("/api/")||u.pathname.startsWith("/admin/api/"))return;if(r.mode==="navigate"&&u.pathname.startsWith("/admin"))e.respondWith(fetch(r).catch(async()=>await caches.match(OFFLINE_URL)||Response.error()));});

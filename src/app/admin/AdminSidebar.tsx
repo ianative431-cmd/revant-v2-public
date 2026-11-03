@@ -28,7 +28,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { ADMIN_NAV } from "@/content/admin/nav";
-import { signOutAction } from "@/app/(auth)/actions";
+import { signOutSuperAdminAction } from "@/app/admin-connexion/actions";
 
 const NAV_ICONS: Record<string, LucideIcon> = {
   "/admin": LayoutDashboard,
@@ -85,14 +85,14 @@ export default function AdminSidebar({
   return (
     <>
       {/* Mobile / tablette : rangée horizontale défilante */}
-      <nav className="md:hidden bg-[#0B0B10] px-4 py-3 flex gap-2 overflow-x-auto">
+      <nav className="md:hidden bg-[#171013] px-4 py-3 flex gap-2 overflow-x-auto">
         {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
             className={`shrink-0 text-xs font-medium rounded-full px-4 py-2 whitespace-nowrap ${
               isActive(item.href)
-                ? "bg-white text-[#0B0B10]"
+                ? "bg-[#687650] text-white"
                 : "bg-white/5 text-white/60"
             }`}
           >
@@ -103,9 +103,9 @@ export default function AdminSidebar({
       </nav>
 
       {/* Desktop : colonne fixe sombre */}
-      <aside className="hidden md:flex md:flex-col md:w-64 md:shrink-0 md:min-h-screen md:bg-[#0B0B10] md:py-6 md:px-3">
+      <aside className="hidden md:flex md:flex-col md:w-64 md:shrink-0 md:min-h-screen md:bg-[#171013] md:py-6 md:px-3">
         <Link href="/" className="flex items-center gap-2 px-3 mb-8">
-          <Image src="/images/logo-revant.svg" alt="Revant" width={32} height={32} className="rounded-lg" />
+          <Image src="/images/logo-super-admin-512.png" alt="Revant" width={32} height={32} className="rounded-lg" />
           <span className="text-white font-semibold text-base" style={{ fontFamily: "Georgia, serif" }}>
             Revant
           </span>
@@ -124,7 +124,7 @@ export default function AdminSidebar({
                 href={item.href}
                 className={`text-sm rounded-xl px-3 py-2.5 flex items-center gap-2.5 transition-colors ${
                   active
-                    ? "bg-white text-[#0B0B10] font-medium"
+                    ? "bg-[#687650] text-white font-medium"
                     : "text-white/60 hover:bg-white/5 hover:text-white"
                 }`}
               >
@@ -152,7 +152,7 @@ export default function AdminSidebar({
                 {ROLE_LABEL[adminRole] ?? adminRole}
               </p>
             </div>
-            <form action={signOutAction}>
+            <form action={signOutSuperAdminAction}>
               <button
                 type="submit"
                 title="Se déconnecter"
