@@ -6,7 +6,7 @@
 
 - **Ne pas lancer `supabase db push` sur la production** tant que les sources manquantes ci-dessous ne sont pas retrouvées et réconciliées.
 - La PR initiale de réconciliation n'a pas changé la base : elle a renommé, archivé et restauré des fichiers SQL déjà appliqués. Les migrations ajoutées ultérieurement dans ce journal ont été appliquées séparément via l'API de migration Supabase.
-- Supabase enregistre maintenant 67 migrations. Après les ajouts documentés dans ce journal, 38 migrations appliquées disposent d'un fichier source local dont le préfixe/version correspond exactement; 29 sources restent introuvables dans `main` et les branches historiques contrôlées.
+- Supabase enregistre maintenant 68 migrations. Après les ajouts documentés dans ce journal, 39 migrations appliquées disposent d'un fichier source local dont le préfixe/version correspond exactement; 29 sources restent introuvables dans `main` et les branches historiques contrôlées.
 - Ne jamais recréer ces 29 fichiers à partir de suppositions ni les rejouer. Les noms distants sont listés plus bas pour faciliter une récupération future.
 - Les anciennes migrations `0001` à `0011` sont archivées car elles ne figurent pas dans l'historique distant actuel et décrivent un ancien modèle incompatible.
 
@@ -51,6 +51,16 @@ Les fichiers `0001` à `0011` sont conservés dans `supabase/legacy_migrations_a
 
 Le fichier `supabase/migrations/20261102234204_20261102133000_shop_media_storage.sql` correspond à la ligne distante version `20261102234204`, nom `20261102133000_shop_media_storage`. Elle a déjà été appliquée et vérifiée; ne pas la rejouer.
 
+## Migration quantité commande invité — 3 novembre 2026
+
+- Migration distante version **20261103194734**, nom `guest_order_quantity_2026_11_03`, appliquée après fusion de la PR #52.
+- Source : `supabase/migrations/20261103194734_guest_order_quantity_2026_11_03.sql`.
+- Elle ajoute une surcharge du RPC `public.create_guest_order` avec `p_quantity`, limitée à `service_role`; l'ancien RPC à 9 paramètres reste disponible.
+- La nouvelle surcharge borne la quantité à 1–99, vérifie le stock sous verrou, lie l'idempotence à la quantité via le hash de suivi, puis met à jour la ligne et les totaux dans la même transaction.
+- Vérification distante : les deux signatures coexistent; `anon` et `authenticated` n'ont pas EXECUTE sur la nouvelle surcharge; `service_role` l'a. Le `search_path` est vide.
+- La migration est additive et ne déclenche aucun paiement. Aucun test avec commande réelle n'a été effectué : la base n'a pas de boutique ni de produit réel.
+- Ne pas lancer `supabase db push` : les 29 sources historiques manquantes restent à réconcilier.
+
 ## Sources SQL distantes non retrouvées
 
 Ces 29 versions figurent dans l'historique Supabase mais aucun fichier SQL correspondant n'a été trouvé dans `main` ou les branches historiques contrôlées :
@@ -86,18 +96,3 @@ Ces 29 versions figurent dans l'historique Supabase mais aucun fichier SQL corre
 - `20261101095900_p0_guards_no_admin_self_exemption.sql`
 
 La base contient déjà le résultat de ces migrations. Cette liste est un inventaire de récupération, pas une instruction d'exécution.
-
-## Migration Super Admin local-first — 3 novembre 2026
-
-- Migration appliquée au projet Supabase Revant via l'API de migration : version distante **20261103175324**, nom `super_admin_local_first_20261103`.
-- Source conservée dans `supabase/migrations/20261103175324_super_admin_local_first_20261103.sql`. Elle crée uniquement les tables `super_admin_identities` et `super_admin_devices`, leurs index et les privilèges de service ; aucune identité ni aucun appareil n'a été ajouté.
-- Vérification post-migration : RLS activé sur les deux tables ; `anon` et `authenticated` n'ont aucun droit `SELECT` ; `service_role` conserve l'accès requis ; les deux tables sont encore vides.
-- La migration AAL2 reste en attente : aucun facteur TOTP vérifié n'est encore enregistré pour le super-admin. Ne pas appliquer la migration AAL2 avant cet enrôlement.
-
-## Correction du stockage des photos produit — 3 novembre 2026
-
-- Version distante `20261103180358` (`fix_product_images_storage_owner_policy_20261103`) : première correction de la règle Storage, immédiatement supersédée par la version suivante après contrôle de la résolution de colonne PostgreSQL. Source conservée pour reproduire exactement l'historique ; ne pas la rejouer seule.
-- Version distante `20261103180416` (`fix_product_images_storage_owner_policy_v2_20261103`) : correction finale vérifiée. Les politiques INSERT/UPDATE/DELETE comparent explicitement le premier segment de `storage.objects.name` au `shops.id` et exigent `shops.owner_id = auth.uid()`.
-- Le chemin produit reste `{shop_id}/{fichier}.jpg`, conforme à `buildProductImagePath(shopId)`. Le bucket `product-images` est public, accepte JPEG/PNG/WebP, limite Supabase 10 Mo ; le formulaire limite chaque image à 8 Mo.
-- Vérification : les trois politiques utilisent maintenant le chemin de l'objet Storage et la propriété réelle de la boutique. La base n'a encore aucune boutique, aucun produit et aucun objet image ; la recette avec un vrai vendeur reste donc à faire.
-- Ne pas lancer `supabase db push` : les 29 sources historiques manquantes restent à réconcilier.
