@@ -56,7 +56,7 @@ export default async function BoutiquesPage() {
         {publicShops.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
             {publicShops.map((shop) => {
-              const bannerUrl = safeImageUrl(shop.banner_url);
+              const bannerUrl = safeImageUrl(shop.banner_url) ?? safeImageUrl(shop.background_image_url);
               const logoUrl = safeImageUrl(shop.logo_url);
               const typeLabel = getShopTypeLabel(shop);
               const color = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
