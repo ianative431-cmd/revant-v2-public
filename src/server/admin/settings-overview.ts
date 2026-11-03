@@ -20,9 +20,12 @@ export async function getAdminSettingsOverview() {
   if (settingsResult.error || publicValuesResult.error || providersResult.error || rulesResult.error) {
     throw new Error("Impossible de charger les paramètres de plateforme.");
   }
+  const safePublicValues = (publicValuesResult.data ?? []).filter(
+    (item) => !/(secret|token|password|private_key|api_key)/i.test(item.key)
+  );
   return {
     settings: (settingsResult.data ?? []) as SettingRow[],
-    publicValues: (publicValuesResult.data ?? []) as PublicSettingValue[],
+    publicValues: safePublicValues as PublicSettingValue[],
     providers: (providersResult.data ?? []) as ProviderRow[],
     withdrawalRules: (rulesResult.data ?? []) as WithdrawalRuleRow[],
   };
