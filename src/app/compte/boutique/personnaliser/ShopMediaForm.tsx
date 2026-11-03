@@ -27,6 +27,20 @@ function extensionFor(type: "image/jpeg" | "image/png" | "image/webp") {
   return type === "image/jpeg" ? "jpg" : type === "image/png" ? "png" : "webp";
 }
 
+function extractOwnedShopMediaPath(value: string | null, userId: string, shopId: string): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    const marker = "/storage/v1/object/public/shop-media/";
+    const index = url.pathname.indexOf(marker);
+    if (url.protocol !== "https:" || index < 0) return null;
+    const path = decodeURIComponent(url.pathname.slice(index + marker.length));
+    return path.startsWith(`${userId}/${shopId}/`) ? path : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState<MediaKind | null>(null);
@@ -51,10 +65,12 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
     setBusy(kind);
     try {
       const supabase = createSupabaseBrowserClient();
-      const path = userId + "/" + shopId + "/" + kind + "." + extensionFor(actualType);
+      // Un chemin unique évite qu'un cache CDN/navigateur réaffiche l'ancienne
+      // bannière ou le précédent logo après remplacement.
+      const path = userId + "/" + shopId + "/" + kind + "-" + Date.now() + "-" + crypto.randomUUID() + "." + extensionFor(actualType);
       const { error: uploadError } = await supabase.storage
         .from("shop-media")
-        .upload(path, file, { upsert: true, contentType: actualType, cacheControl: "3600" });
+        .upload(path, file, { upsert: false, contentType: actualType, cacheControl: "31536000" });
 
       if (uploadError) {
         setMessage("L'envoi a échoué. Vérifie ta connexion et réessaie.");
@@ -62,16 +78,26 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
       }
 
       const { data } = supabase.storage.from("shop-media").getPublicUrl(path);
+      const previousUrl = kind === "logo" ? logoUrl : bannerUrl;
+      const previousPath = extractOwnedShopMediaPath(previousUrl, userId, shopId);
       const update = kind === "logo" ? { logo_url: data.publicUrl } : { banner_url: data.publicUrl };
-      const { error: updateError } = await supabase
+      const { data: updatedShop, error: updateError } = await supabase
         .from("shops")
         .update(update)
         .eq("id", shopId)
-        .eq("owner_id", userId);
+        .eq("owner_id", userId)
+        .select("id")
+        .maybeSingle();
 
-      if (updateError) {
+      if (updateError || !updatedShop) {
+        await supabase.storage.from("shop-media").remove([path]);
         setMessage("Image envoyée, mais impossible de l'associer à la boutique. Réessaie.");
         return;
+      }
+
+      // On ne supprime l'ancienne image qu'après confirmation de la mise à jour.
+      if (previousPath && previousPath !== path) {
+        await supabase.storage.from("shop-media").remove([previousPath]);
       }
 
       setMessage(kind === "logo" ? "Logo mis à jour." : "Bannière mise à jour.");
