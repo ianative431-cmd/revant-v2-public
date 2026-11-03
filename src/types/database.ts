@@ -7,62 +7,13 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
-      super_admin_identities: {
-        Row: { access_key_digest: string; access_key_salt: string; created_at: string; first_name: string; first_name_normalized: string; last_name: string; last_name_normalized: string; updated_at: string; user_id: string }
-        Insert: { access_key_digest: string; access_key_salt: string; created_at?: string; first_name: string; first_name_normalized: string; last_name: string; last_name_normalized: string; updated_at?: string; user_id: string }
-        Update: { access_key_digest?: string; access_key_salt?: string; created_at?: string; first_name?: string; first_name_normalized?: string; last_name?: string; last_name_normalized?: string; updated_at?: string; user_id?: string }
-        Relationships: []
-      }
-      super_admin_devices: {
-        Row: { approved_at: string | null; created_at: string; device_name: string; device_token_digest: string; id: string; last_seen_at: string | null; revoked_at: string | null; status: string; user_id: string }
-        Insert: { approved_at?: string | null; created_at?: string; device_name: string; device_token_digest: string; id?: string; last_seen_at?: string | null; revoked_at?: string | null; status?: string; user_id: string }
-        Update: { approved_at?: string | null; created_at?: string; device_name?: string; device_token_digest?: string; id?: string; last_seen_at?: string | null; revoked_at?: string | null; status?: string; user_id?: string }
-        Relationships: []
-      }
-      external_destination_links: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          description: string | null
-          id: string
-          is_active: boolean
-          sort_order: number
-          title: string
-          updated_at: string
-          updated_by: string | null
-          url: string
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          sort_order?: number
-          title: string
-          updated_at?: string
-          updated_by?: string | null
-          url: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          sort_order?: number
-          title?: string
-          updated_at?: string
-          updated_by?: string | null
-          url?: string
-        }
-        Relationships: []
-      }
       addresses: {
         Row: {
           address_line: string
@@ -109,7 +60,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "addresses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       admin_actions: {
         Row: {
@@ -142,7 +101,15 @@ export type Database = {
           target_id?: string | null
           target_type?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "admin_actions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       admin_sections: {
         Row: {
@@ -172,7 +139,15 @@ export type Database = {
           route?: string
           sort_order?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "admin_sections_required_permission_fkey"
+            columns: ["required_permission"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       audit_logs: {
         Row: {
@@ -208,7 +183,15 @@ export type Database = {
           ip_hash?: string | null
           metadata?: Json
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       brands: {
         Row: {
@@ -274,7 +257,15 @@ export type Database = {
           slug?: string
           sort_order?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       certifications: {
         Row: {
@@ -310,7 +301,22 @@ export type Database = {
           status?: Database["public"]["Enums"]["certification_status"]
           type?: Database["public"]["Enums"]["certification_type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "certifications_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certifications_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       conversations: {
         Row: {
@@ -337,7 +343,29 @@ export type Database = {
           shop_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "conversations_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       deliveries: {
         Row: {
@@ -347,8 +375,6 @@ export type Database = {
           created_at: string
           delivered_at: string | null
           delivery_address: string | null
-          delivery_code_hash: string | null
-          delivery_code_hint: string | null
           driver_id: string | null
           failure_reason: string | null
           id: string
@@ -356,6 +382,7 @@ export type Database = {
           picked_up_at: string | null
           pickup_address: string | null
           proof_photo_url: string | null
+          requested_at: string | null
           status: Database["public"]["Enums"]["delivery_status"]
           updated_at: string
         }
@@ -366,8 +393,6 @@ export type Database = {
           created_at?: string
           delivered_at?: string | null
           delivery_address?: string | null
-          delivery_code_hash?: string | null
-          delivery_code_hint?: string | null
           driver_id?: string | null
           failure_reason?: string | null
           id?: string
@@ -375,6 +400,7 @@ export type Database = {
           picked_up_at?: string | null
           pickup_address?: string | null
           proof_photo_url?: string | null
+          requested_at?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
           updated_at?: string
         }
@@ -385,8 +411,6 @@ export type Database = {
           created_at?: string
           delivered_at?: string | null
           delivery_address?: string | null
-          delivery_code_hash?: string | null
-          delivery_code_hint?: string | null
           driver_id?: string | null
           failure_reason?: string | null
           id?: string
@@ -394,10 +418,33 @@ export type Database = {
           picked_up_at?: string | null
           pickup_address?: string | null
           proof_photo_url?: string | null
+          requested_at?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       delivery_companies: {
         Row: {
@@ -427,7 +474,15 @@ export type Database = {
           status?: Database["public"]["Enums"]["driver_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "delivery_companies_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       device_push_tokens: {
         Row: {
@@ -505,7 +560,29 @@ export type Database = {
           status?: Database["public"]["Enums"]["dispute_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "disputes_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_opened_by_fkey"
+            columns: ["opened_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       drivers: {
         Row: {
@@ -544,6 +621,60 @@ export type Database = {
           vehicle_reference?: string | null
           vehicle_type?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "drivers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drivers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      external_destination_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+          updated_by: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          url?: string
+        }
         Relationships: []
       }
       favorites: {
@@ -571,7 +702,36 @@ export type Database = {
           shop_id?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "favorites_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       kyc_profiles: {
         Row: {
@@ -625,7 +785,22 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "kyc_profiles_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kyc_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ledger_entries: {
         Row: {
@@ -667,7 +842,29 @@ export type Database = {
           type?: Database["public"]["Enums"]["ledger_entry_type"]
           wallet_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ledger_entries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ledger_entries_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ledger_entries_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
@@ -700,7 +897,36 @@ export type Database = {
           sender_id?: string
           type?: Database["public"]["Enums"]["message_type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -733,7 +959,15 @@ export type Database = {
           type?: Database["public"]["Enums"]["notification_type"]
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
@@ -772,58 +1006,119 @@ export type Database = {
           shop_id?: string
           unit_price?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {
-          buyer_id: string
+          buyer_id: string | null
           cancelled_at: string | null
+          confirmed_at: string | null
           created_at: string
           currency: string
           delivered_at: string | null
           delivery_fee: number
+          guest_address: string | null
+          guest_city: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          guest_tracking_token_hash: string | null
           id: string
+          idempotency_key: string | null
           order_number: string
           placed_at: string | null
           shipping_address_id: string | null
           status: Database["public"]["Enums"]["order_status"]
+          stock_reserved: boolean
           subtotal: number
           total_amount: number
           updated_at: string
         }
         Insert: {
-          buyer_id: string
+          buyer_id?: string | null
           cancelled_at?: string | null
+          confirmed_at?: string | null
           created_at?: string
           currency?: string
           delivered_at?: string | null
           delivery_fee?: number
+          guest_address?: string | null
+          guest_city?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          guest_tracking_token_hash?: string | null
           id?: string
+          idempotency_key?: string | null
           order_number: string
           placed_at?: string | null
           shipping_address_id?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_reserved?: boolean
           subtotal?: number
           total_amount?: number
           updated_at?: string
         }
         Update: {
-          buyer_id?: string
+          buyer_id?: string | null
           cancelled_at?: string | null
+          confirmed_at?: string | null
           created_at?: string
           currency?: string
           delivered_at?: string | null
           delivery_fee?: number
+          guest_address?: string | null
+          guest_city?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          guest_tracking_token_hash?: string | null
           id?: string
+          idempotency_key?: string | null
           order_number?: string
           placed_at?: string | null
           shipping_address_id?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_reserved?: boolean
           subtotal?: number
           total_amount?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_shipping_address_id_fkey"
+            columns: ["shipping_address_id"]
+            isOneToOne: false
+            referencedRelation: "addresses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_providers: {
         Row: {
@@ -907,7 +1202,22 @@ export type Database = {
           status?: Database["public"]["Enums"]["payment_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "payments_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payouts: {
         Row: {
@@ -964,7 +1274,22 @@ export type Database = {
           updated_at?: string
           wallet_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "payouts_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payouts_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       permissions: {
         Row: {
@@ -984,6 +1309,81 @@ export type Database = {
           description?: string | null
           id?: number
           key?: string
+        }
+        Relationships: []
+      }
+      phone_countries: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string
+          dial_code: string
+          enabled: boolean
+          id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string
+          dial_code: string
+          enabled?: boolean
+          id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          dial_code?: string
+          enabled?: boolean
+          id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      phone_country_settings: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string
+          dial_code: string
+          flag_emoji: string | null
+          id: string
+          is_active: boolean
+          sms_auth_enabled: boolean
+          sort_order: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string
+          dial_code: string
+          flag_emoji?: string | null
+          id?: string
+          is_active?: boolean
+          sms_auth_enabled?: boolean
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          dial_code?: string
+          flag_emoji?: string | null
+          id?: string
+          is_active?: boolean
+          sms_auth_enabled?: boolean
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -1012,11 +1412,20 @@ export type Database = {
           product_id?: string
           sort_order?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
           base_price: number
+          brand: string | null
           brand_id: string | null
           category_id: string | null
           created_at: string
@@ -1025,17 +1434,19 @@ export type Database = {
           id: string
           is_featured: boolean
           name: string
-          product_type: string
-          size_stock: Json
           perfume_volume_ml: number | null
+          product_type: string
           shop_id: string
+          size_stock: Json
           slug: string
           status: Database["public"]["Enums"]["product_status"]
           stock_quantity: number
           updated_at: string
+          volume_ml: number | null
         }
         Insert: {
           base_price?: number
+          brand?: string | null
           brand_id?: string | null
           category_id?: string | null
           created_at?: string
@@ -1044,17 +1455,19 @@ export type Database = {
           id?: string
           is_featured?: boolean
           name: string
-          product_type?: string
-          size_stock?: Json
           perfume_volume_ml?: number | null
+          product_type?: string
           shop_id: string
+          size_stock?: Json
           slug: string
           status?: Database["public"]["Enums"]["product_status"]
           stock_quantity?: number
           updated_at?: string
+          volume_ml?: number | null
         }
         Update: {
           base_price?: number
+          brand?: string | null
           brand_id?: string | null
           category_id?: string | null
           created_at?: string
@@ -1063,16 +1476,39 @@ export type Database = {
           id?: string
           is_featured?: boolean
           name?: string
-          product_type?: string
-          size_stock?: Json
           perfume_volume_ml?: number | null
+          product_type?: string
           shop_id?: string
+          size_stock?: Json
           slug?: string
           status?: Database["public"]["Enums"]["product_status"]
           stock_quantity?: number
           updated_at?: string
+          volume_ml?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -1119,6 +1555,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_attempts: {
+        Row: {
+          count: number
+          key: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          key: string
+          window_start?: string
+        }
+        Update: {
+          count?: number
+          key?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           created_at: string
@@ -1156,7 +1610,22 @@ export type Database = {
           rewarded_at?: string | null
           status?: Database["public"]["Enums"]["referral_status"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       refunds: {
         Row: {
@@ -1201,7 +1670,29 @@ export type Database = {
           status?: Database["public"]["Enums"]["refund_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "refunds_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refunds_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refunds_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reports: {
         Row: {
@@ -1246,7 +1737,22 @@ export type Database = {
           target_type?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reports_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       restaurants: {
         Row: {
@@ -1300,7 +1806,15 @@ export type Database = {
           status?: Database["public"]["Enums"]["restaurant_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "restaurants_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: true
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -1342,7 +1856,36 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       role_permissions: {
         Row: {
@@ -1357,7 +1900,15 @@ export type Database = {
           permission_id?: number
           role?: Database["public"]["Enums"]["user_role"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shops: {
         Row: {
@@ -1432,7 +1983,68 @@ export type Database = {
           updated_at?: string
           whatsapp?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "shops_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_posts: {
+        Row: {
+          caption: string
+          created_at: string
+          id: string
+          media_url: string | null
+          owner_id: string
+          platforms: string[]
+          product_url: string | null
+          scheduled_at: string
+          shop_id: string
+          status: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          caption: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          owner_id: string
+          platforms?: string[]
+          product_url?: string | null
+          scheduled_at: string
+          shop_id: string
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          owner_id?: string
+          platforms?: string[]
+          product_url?: string | null
+          scheduled_at?: string
+          shop_id?: string
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       store_promotions: {
         Row: {
@@ -1483,7 +2095,15 @@ export type Database = {
           views?: number
           visits?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "store_promotions_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       store_subscriptions: {
         Row: {
@@ -1537,50 +2157,92 @@ export type Database = {
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "store_subscriptions_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_subscriptions_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      social_posts: {
+      super_admin_devices: {
         Row: {
-          caption: string
+          approved_at: string | null
           created_at: string
+          device_name: string
+          device_token_digest: string
           id: string
-          media_url: string | null
-          owner_id: string
-          platforms: string[]
-          product_url: string | null
-          scheduled_at: string
-          shop_id: string
+          last_seen_at: string | null
+          revoked_at: string | null
           status: string
-          timezone: string
-          updated_at: string
+          user_id: string
         }
         Insert: {
-          caption: string
+          approved_at?: string | null
           created_at?: string
+          device_name: string
+          device_token_digest: string
           id?: string
-          media_url?: string | null
-          owner_id: string
-          platforms?: string[]
-          product_url?: string | null
-          scheduled_at: string
-          shop_id: string
+          last_seen_at?: string | null
+          revoked_at?: string | null
           status?: string
-          timezone?: string
-          updated_at?: string
+          user_id: string
         }
         Update: {
-          caption?: string
+          approved_at?: string | null
           created_at?: string
+          device_name?: string
+          device_token_digest?: string
           id?: string
-          media_url?: string | null
-          owner_id?: string
-          platforms?: string[]
-          product_url?: string | null
-          scheduled_at?: string
-          shop_id?: string
+          last_seen_at?: string | null
+          revoked_at?: string | null
           status?: string
-          timezone?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      super_admin_identities: {
+        Row: {
+          access_key_digest: string
+          access_key_salt: string
+          created_at: string
+          first_name: string
+          first_name_normalized: string
+          last_name: string
+          last_name_normalized: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_key_digest: string
+          access_key_salt: string
+          created_at?: string
+          first_name: string
+          first_name_normalized: string
+          last_name: string
+          last_name_normalized: string
           updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_key_digest?: string
+          access_key_salt?: string
+          created_at?: string
+          first_name?: string
+          first_name_normalized?: string
+          last_name?: string
+          last_name_normalized?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1606,7 +2268,22 @@ export type Database = {
           sender_id?: string
           ticket_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       support_tickets: {
         Row: {
@@ -1642,7 +2319,22 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       system_settings: {
         Row: {
@@ -1672,7 +2364,15 @@ export type Database = {
           value?: Json
           value_type?: Database["public"]["Enums"]["setting_value_type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "system_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -1732,55 +2432,15 @@ export type Database = {
           user_id?: string
           withdrawn_total?: number
         }
-        Relationships: []
-      }
-      withdrawal_rules: {
-        Row: {
-          created_at: string
-          currency: string
-          daily_limit: number | null
-          enabled: boolean
-          fee_amount: number
-          fee_percent: number
-          id: string
-          kyc_required: boolean
-          manual_approval_required: boolean
-          max_amount: number | null
-          min_amount: number
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          created_at?: string
-          currency?: string
-          daily_limit?: number | null
-          enabled?: boolean
-          fee_amount?: number
-          fee_percent?: number
-          id?: string
-          kyc_required?: boolean
-          manual_approval_required?: boolean
-          max_amount?: number | null
-          min_amount?: number
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          created_at?: string
-          currency?: string
-          daily_limit?: number | null
-          enabled?: boolean
-          fee_amount?: number
-          fee_percent?: number
-          id?: string
-          kyc_required?: boolean
-          manual_approval_required?: boolean
-          max_amount?: number | null
-          min_amount?: number
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "wallets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       whatsapp_connection: {
         Row: {
@@ -1872,6 +2532,62 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_rules: {
+        Row: {
+          created_at: string
+          currency: string
+          daily_limit: number | null
+          enabled: boolean
+          fee_amount: number
+          fee_percent: number
+          id: string
+          kyc_required: boolean
+          manual_approval_required: boolean
+          max_amount: number | null
+          min_amount: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          daily_limit?: number | null
+          enabled?: boolean
+          fee_amount?: number
+          fee_percent?: number
+          id?: string
+          kyc_required?: boolean
+          manual_approval_required?: boolean
+          max_amount?: number | null
+          min_amount?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          daily_limit?: number | null
+          enabled?: boolean
+          fee_amount?: number
+          fee_percent?: number
+          id?: string
+          kyc_required?: boolean
+          manual_approval_required?: boolean
+          max_amount?: number | null
+          min_amount?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawal_rules_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       admin_finance_summary: {
@@ -1887,9 +2603,17 @@ export type Database = {
       }
     }
     Functions: {
-      admin_finance_snapshot: { Args: Record<PropertyKey, never>; Returns: Json }
-      admin_operations_snapshot: { Args: Record<PropertyKey, never>; Returns: Json }
-      admin_overview_snapshot: { Args: Record<PropertyKey, never>; Returns: Json }
+      admin_finance_snapshot: { Args: never; Returns: Json }
+      admin_moderate_review: {
+        Args: { p_note?: string; p_publish: boolean; p_review_id: string }
+        Returns: undefined
+      }
+      admin_operations_snapshot: { Args: never; Returns: Json }
+      admin_overview_snapshot: { Args: never; Returns: Json }
+      admin_set_associate_role: {
+        Args: { p_enabled: boolean; p_note?: string; p_user_id: string }
+        Returns: undefined
+      }
       admin_set_setting: {
         Args: { p_actor: string; p_key: string; p_value: Json }
         Returns: undefined
@@ -1898,6 +2622,7 @@ export type Database = {
         Args: { p_reason?: string; p_suspended: boolean; p_user_id: string }
         Returns: undefined
       }
+      admin_shops_list: { Args: { p_limit?: number }; Returns: Json }
       admin_update_dispute: {
         Args: { p_action: string; p_dispute_id: string; p_note?: string }
         Returns: undefined
@@ -1914,14 +2639,8 @@ export type Database = {
         Args: { p_action: string; p_note?: string; p_report_id: string }
         Returns: undefined
       }
-      admin_moderate_review: {
-        Args: { p_note?: string; p_publish: boolean; p_review_id: string }
-        Returns: undefined
-      }
-      admin_set_associate_role: {
-        Args: { p_enabled: boolean; p_note?: string; p_user_id: string }
-        Returns: undefined
-      }
+      admin_user_directory: { Args: { p_limit?: number }; Returns: Json }
+      buyer_cancel_order: { Args: { p_order_id: string }; Returns: undefined }
       check_rate_limit: {
         Args: {
           p_key: string
@@ -1930,6 +2649,36 @@ export type Database = {
         }
         Returns: boolean
       }
+      create_guest_order:
+        | {
+            Args: {
+              p_buyer_id: string
+              p_guest_address: string
+              p_guest_city: string
+              p_guest_name: string
+              p_guest_phone: string
+              p_idempotency_key: string
+              p_product_id: string
+              p_tracking_token_hash: string
+              p_website: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_buyer_id: string
+              p_guest_address: string
+              p_guest_city: string
+              p_guest_name: string
+              p_guest_phone: string
+              p_idempotency_key: string
+              p_product_id: string
+              p_quantity: number
+              p_tracking_token_hash: string
+              p_website: string
+            }
+            Returns: Json
+          }
       create_payment_intent: {
         Args: {
           p_idempotency_key: string
@@ -1938,15 +2687,80 @@ export type Database = {
         }
         Returns: string
       }
+      current_user_has_permission: {
+        Args: { p_permission_key: string }
+        Returns: boolean
+      }
       decrement_product_stock: {
         Args: { p_product_id: string; p_quantity: number }
         Returns: undefined
       }
-      finance_totals: { Args: Record<PropertyKey, never>; Returns: Json }
-      has_any_admin_role: { Args: Record<PropertyKey, never>; Returns: boolean }
+      driver_claim_delivery: { Args: { p_delivery_id: string }; Returns: Json }
+      driver_confirm_delivery_code: {
+        Args: { p_code: string; p_delivery_id: string }
+        Returns: boolean
+      }
+      driver_list_assigned_deliveries: {
+        Args: never
+        Returns: {
+          assigned_at: string
+          created_at: string
+          delivered_at: string
+          delivery_address: string
+          delivery_code_hint: string
+          delivery_id: string
+          failure_reason: string
+          order_id: string
+          order_number: string
+          picked_up_at: string
+          pickup_address: string
+          status: Database["public"]["Enums"]["delivery_status"]
+        }[]
+      }
+      driver_list_available_deliveries: {
+        Args: never
+        Returns: {
+          created_at: string
+          delivery_id: string
+          order_id: string
+          order_number: string
+          pickup_address: string
+          requested_at: string
+        }[]
+      }
+      driver_update_delivery_status: {
+        Args: {
+          p_delivery_id: string
+          p_status: Database["public"]["Enums"]["delivery_status"]
+        }
+        Returns: boolean
+      }
+      finance_totals: { Args: never; Returns: Json }
+      get_guest_order: {
+        Args: { p_order_number: string; p_tracking_token_hash: string }
+        Returns: Json
+      }
+      has_any_admin_role: { Args: never; Returns: boolean }
       has_role: {
         Args: { required_role: Database["public"]["Enums"]["user_role"] }
         Returns: boolean
+      }
+      mark_all_notifications_read: { Args: never; Returns: number }
+      mark_notification_read: {
+        Args: { p_notification_id: string }
+        Returns: boolean
+      }
+      seller_cancel_order: { Args: { p_order_id: string }; Returns: undefined }
+      seller_confirm_order: { Args: { p_order_id: string }; Returns: undefined }
+      seller_request_delivery: {
+        Args: {
+          p_actor_id: string
+          p_code_ciphertext: string
+          p_code_hash: string
+          p_code_hint: string
+          p_order_id: string
+        }
+        Returns: number
       }
     }
     Enums: {
@@ -2002,14 +2816,6 @@ export type Database = {
         | "reserve"
         | "release"
       message_type: "text" | "order_link" | "product_link"
-      whatsapp_connection_status:
-        | "disconnected"
-        | "connecting"
-        | "connected"
-        | "expired"
-        | "error"
-        | "unavailable"
-      whatsapp_webhook_status: "operational" | "error" | "not_configured"
       notification_type:
         | "order"
         | "payment"
@@ -2083,6 +2889,14 @@ export type Database = {
         | "seller"
         | "buyer"
       wallet_status: "active" | "frozen" | "closed"
+      whatsapp_connection_status:
+        | "disconnected"
+        | "connecting"
+        | "connected"
+        | "expired"
+        | "error"
+        | "unavailable"
+      whatsapp_webhook_status: "operational" | "error" | "not_configured"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2091,16 +2905,266 @@ export type Database = {
 }
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-type DefaultSchema = DatabaseWithoutInternals["public"]
 
-export type Tables<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T]["Row"]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
-export type TablesInsert<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T]["Insert"]
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
-export type TablesUpdate<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T]["Update"]
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
-export type Enums<T extends keyof DefaultSchema["Enums"]> =
-  DefaultSchema["Enums"][T]
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      audit_action: [
+        "create",
+        "update",
+        "delete",
+        "approve",
+        "reject",
+        "freeze",
+        "unfreeze",
+        "login",
+        "logout",
+        "payment",
+        "refund",
+        "payout",
+        "role_change",
+        "config_change",
+        "block",
+        "unblock",
+        "permission_change",
+      ],
+      certification_status: ["pending", "approved", "rejected", "revoked"],
+      certification_type: ["business", "shop", "premium"],
+      delivery_status: [
+        "unassigned",
+        "assigned",
+        "picked_up",
+        "in_transit",
+        "delivered",
+        "failed",
+        "cancelled",
+      ],
+      dispute_status: [
+        "open",
+        "under_review",
+        "resolved_buyer",
+        "resolved_seller",
+        "rejected",
+        "closed",
+      ],
+      driver_status: ["pending", "active", "suspended", "inactive"],
+      kyc_status: ["not_started", "pending", "approved", "rejected", "expired"],
+      ledger_entry_type: [
+        "sale",
+        "commission",
+        "payment",
+        "refund",
+        "payout",
+        "adjustment",
+        "reserve",
+        "release",
+      ],
+      message_type: ["text", "order_link", "product_link"],
+      notification_type: [
+        "order",
+        "payment",
+        "payout",
+        "message",
+        "promotion",
+        "system",
+        "security",
+        "delivery",
+      ],
+      order_status: [
+        "pending",
+        "confirmed",
+        "processing",
+        "ready_for_delivery",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "refunded",
+        "disputed",
+      ],
+      payment_status: [
+        "pending",
+        "authorized",
+        "paid",
+        "failed",
+        "cancelled",
+        "refunded",
+        "partially_refunded",
+      ],
+      payout_status: [
+        "pending",
+        "approved",
+        "processing",
+        "paid",
+        "failed",
+        "cancelled",
+        "rejected",
+      ],
+      product_status: ["draft", "pending", "active", "rejected", "archived"],
+      promotion_status: [
+        "draft",
+        "pending",
+        "active",
+        "paused",
+        "completed",
+        "rejected",
+      ],
+      referral_status: [
+        "pending",
+        "qualified",
+        "rewarded",
+        "expired",
+        "rejected",
+      ],
+      refund_status: [
+        "requested",
+        "approved",
+        "processing",
+        "completed",
+        "failed",
+        "rejected",
+      ],
+      report_status: ["open", "reviewing", "resolved", "dismissed"],
+      restaurant_status: ["draft", "pending", "active", "suspended", "closed"],
+      setting_value_type: ["string", "number", "boolean", "json"],
+      shop_status: ["draft", "pending", "active", "suspended", "closed"],
+      subscription_status: ["active", "past_due", "cancelled", "expired"],
+      user_role: [
+        "super_admin",
+        "admin",
+        "moderator",
+        "finance_admin",
+        "support_admin",
+        "kyc_admin",
+        "catalog_admin",
+        "associate",
+        "seller",
+        "buyer",
+      ],
+      wallet_status: ["active", "frozen", "closed"],
+      whatsapp_connection_status: [
+        "disconnected",
+        "connecting",
+        "connected",
+        "expired",
+        "error",
+        "unavailable",
+      ],
+      whatsapp_webhook_status: ["operational", "error", "not_configured"],
+    },
+  },
+} as const
