@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/server/auth/session";
 import { getProductById } from "@/server/products/products";
 import AddToCartButton from "@/components/products/AddToCartButton";
+import ProductGallery from "@/components/products/ProductGallery";
 import { startConversationAboutProduct } from "@/app/messages/actions";
 
 type Props = { params: Promise<{ id: string }> };
@@ -26,10 +26,7 @@ export default async function ProductPage({ params }: Props) {
       <div className="mx-auto max-w-5xl">
         <Link href="/" className="text-sm text-[var(--brand-muted)] hover:text-black">← Retour aux produits</Link>
         <div className="mt-5 grid gap-8 rounded-2xl bg-[var(--brand-surface)] border border-[var(--brand-border)] p-4 shadow-sm sm:grid-cols-2 sm:p-7">
-          <div className="relative aspect-square overflow-hidden rounded-xl bg-[var(--brand-bg)]">
-            {imageUrl ? <Image src={imageUrl} alt={product.name} fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover" /> : <div className="absolute inset-0 flex items-center justify-center text-sm text-[var(--brand-muted)]">Photo indisponible</div>}
-            {outOfStock && <span className="absolute left-3 top-3 rounded-full bg-black px-3 py-1 text-xs text-white">Épuisé</span>}
-          </div>
+          <ProductGallery images={product.images} productName={product.name} outOfStock={outOfStock} />
           <div className="flex flex-col items-start">
             {product.categoryName && <p className="text-xs font-semibold uppercase tracking-wide text-[var(--brand-muted)]">{product.categoryName}</p>}
             <h1 className="mt-2 text-2xl font-black">{product.name}</h1>
