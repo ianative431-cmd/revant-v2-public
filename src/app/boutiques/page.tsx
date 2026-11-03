@@ -111,7 +111,7 @@ export default async function BoutiquesPage() {
                         {typeLabel}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-neutral-500">{shop.city ?? "Niger"}</p>
+                    <p className="mt-1 text-xs text-neutral-500">{shop.city ?? "Lieu non renseigné"}</p>
                     {shop.description && (
                       <p className="mt-3 line-clamp-2 min-h-9 text-xs leading-relaxed text-neutral-600">
                         {shop.description}
