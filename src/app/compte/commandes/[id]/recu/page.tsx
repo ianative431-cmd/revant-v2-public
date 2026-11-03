@@ -13,26 +13,21 @@ export default async function RecuPage({ params }: Props) {
   const { id } = await params;
   await requireUserWithLegalConsent();
   const supabase = await createSupabaseServerClient();
-
-  // getOrderById passe par la RLS orders_read : si l'utilisateur n'est
-  // ni l'acheteur, ni le vendeur, ni un admin, la ligne revient
-  // simplement vide — donc 404, jamais une fuite de données d'un tiers.
   const order = await getOrderById(supabase, id);
 
-  if (!order || order.status !== "confirmee") {
-    notFound();
-  }
+  // RLS allows only the buyer or a seller attached to one of the order lines.
+  // A receipt is available only after the delivery workflow has marked it delivered.
+  if (!order || order.status !== "delivered" || order.items.length === 0) notFound();
 
-  // E-mail de l'acheteur pour la version vendeur du reçu — nécessite le
-  // client service role (auth.users n'est lisible par personne d'autre
-  // que soi-même via le client normal).
   let buyerEmail: string | null = null;
-  try {
-    const admin = createSupabaseAdminClient();
-    const { data } = await admin.auth.admin.getUserById(order.buyer_id);
-    buyerEmail = data.user?.email ?? null;
-  } catch {
-    buyerEmail = null;
+  if (order.buyer_id) {
+    try {
+      const admin = createSupabaseAdminClient();
+      const { data } = await admin.auth.admin.getUserById(order.buyer_id);
+      buyerEmail = data.user?.email ?? null;
+    } catch {
+      buyerEmail = null;
+    }
   }
 
   const verifyUrl = `${env.siteUrl()}/compte/commandes/${order.id}/recu`;
@@ -41,64 +36,35 @@ export default async function RecuPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm">
-        <Link href="/compte/commandes" className="text-sm underline text-brand-text/60">
-          ← Mes commandes
-        </Link>
-
-        <div className="bg-white rounded-2xl p-6 mt-4 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <span className="text-lg font-bold" style={{ fontFamily: "Georgia, serif" }}>
-              Revant
-            </span>
-            <span className="text-xs text-brand-text/50">
-              {order.confirmed_at
-                ? new Date(order.confirmed_at).toLocaleDateString("fr-FR")
-                : new Date(order.created_at).toLocaleDateString("fr-FR")}
-            </span>
+        <Link href="/compte/commandes" className="text-sm underline text-brand-text/60">← Mes commandes</Link>
+        <div className="mt-4 rounded-2xl bg-white p-6 shadow-sm">
+          <div className="mb-6 flex items-center justify-between">
+            <span className="text-lg font-bold" style={{ fontFamily: "Georgia, serif" }}>Revant</span>
+            <span className="text-xs text-brand-text/50">{new Date(order.delivered_at ?? order.updated_at).toLocaleDateString("fr-FR")}</span>
           </div>
-
-          <div className="border-b border-dashed border-brand-text/15 pb-3 mb-3">
-            <div className="flex justify-between text-xs text-brand-text/40 uppercase mb-2">
-              <span>Description</span>
-              <span>Montant</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="pr-3">{order.product_title}</span>
-              <span className="font-medium whitespace-nowrap">
-                {order.price_fcfa.toLocaleString("fr-FR")} FCFA
-              </span>
-            </div>
-          </div>
-
-          <div className="flex justify-between text-sm font-semibold mb-6">
-            <span>Total</span>
-            <span>{order.price_fcfa.toLocaleString("fr-FR")} FCFA</span>
-          </div>
-
-          <dl className="text-xs text-brand-text/50 space-y-1 mb-6">
-            <div className="flex justify-between">
-              <dt>Vendu par</dt>
-              <dd>{order.shop_name}</dd>
-            </div>
-            {buyerEmail && (
-              <div className="flex justify-between">
-                <dt>Acheteur</dt>
-                <dd>{buyerEmail}</dd>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-text/45">Reçu de commande</p>
+          <p className="mt-1 text-sm font-semibold">{order.order_number}</p>
+          <div className="mb-4 mt-4 space-y-3 border-y border-dashed border-brand-text/15 py-4">
+            {order.items.map((item) => (
+              <div key={item.id} className="flex justify-between gap-3 text-sm">
+                <span className="min-w-0">{item.product_name} × {item.quantity}</span>
+                <span className="shrink-0 font-medium">{Number(item.line_total).toLocaleString("fr-FR")} {item.currency.trim()}</span>
               </div>
-            )}
-            <div className="flex justify-between">
-              <dt>Référence</dt>
-              <dd className="font-mono">{order.id.slice(0, 8)}</dd>
-            </div>
+            ))}
+          </div>
+          <div className="mb-6 flex justify-between text-sm font-bold">
+            <span>Total de la commande</span>
+            <span>{Number(order.total_amount).toLocaleString("fr-FR")} {order.currency.trim()}</span>
+          </div>
+          <dl className="mb-6 space-y-1 text-xs text-brand-text/50">
+            <div className="flex justify-between"><dt>Statut</dt><dd>Livrée</dd></div>
+            {buyerEmail && <div className="flex justify-between gap-3"><dt>Acheteur</dt><dd className="truncate">{buyerEmail}</dd></div>}
+            <div className="flex justify-between"><dt>Référence</dt><dd className="font-mono">{order.id.slice(0, 8)}</dd></div>
           </dl>
-
           <div className="flex flex-col items-center border-t border-dashed border-brand-text/15 pt-4">
             {/* eslint-disable-next-line @next/next/no-img-element -- data URL générée côté serveur */}
-            <img src={qrCodeDataUrl} alt="QR code de vérification du reçu" width={120} height={120} />
-            <p className="text-[10px] text-brand-text/40 mt-2 text-center">
-              Paiement réglé directement entre acheteur et vendeur — confirmé par le vendeur sur
-              Revant.
-            </p>
+            <img src={qrCodeDataUrl} alt="QR code de vérification du reçu de commande" width={120} height={120} />
+            <p className="mt-2 text-center text-[10px] text-brand-text/40">Ce reçu confirme l’existence de la commande et son statut de livraison. Il ne constitue pas une preuve de paiement électronique.</p>
           </div>
         </div>
       </div>
