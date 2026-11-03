@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -95,7 +94,7 @@ export default async function ShopPublicPage({ params }: Props) {
             </div>
             {shop.whatsapp && (
               <a
-                href={`https://wa.me/${shop.whatsapp.replace(/\\D/g, "")}`}
+                href={`https://wa.me/${shop.whatsapp.replace(/\D/g, "")}`}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--brand-accent)] px-5 py-3 text-sm font-bold text-white shadow-sm hover:brightness-95"
@@ -112,12 +111,12 @@ export default async function ShopPublicPage({ params }: Props) {
           {hasContact && (
             <div className="mt-5 flex flex-wrap gap-2">
               {shop.phone && (
-                <a className="rounded-full border border-[var(--brand-border)] px-4 py-2 text-xs font-semibold hover:border-[var(--brand-accent)]" href={`tel:${shop.phone.replace(/[^+\\d]/g, "")}`}>
+                <a className="rounded-full border border-[var(--brand-border)] px-4 py-2 text-xs font-semibold hover:border-[var(--brand-accent)]" href={`tel:${shop.phone.replace(/[^+\d]/g, "")}`}>
                   Téléphone
                 </a>
               )}
               {shop.whatsapp && (
-                <a className="rounded-full border border-[var(--brand-border)] px-4 py-2 text-xs font-semibold hover:border-[var(--brand-accent)]" href={`https://wa.me/${shop.whatsapp.replace(/\\D/g, "")}`} target="_blank" rel="noreferrer">
+                <a className="rounded-full border border-[var(--brand-border)] px-4 py-2 text-xs font-semibold hover:border-[var(--brand-accent)]" href={`https://wa.me/${shop.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">
                   WhatsApp
                 </a>
               )}
