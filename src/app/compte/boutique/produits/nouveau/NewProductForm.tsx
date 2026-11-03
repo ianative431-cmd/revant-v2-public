@@ -9,6 +9,7 @@ import {
   PRODUCT_IMAGE_BUCKET,
   buildProductImagePath,
   compressProductImage,
+  hasValidProductImageSignature,
 } from "@/lib/product-image";
 import type { Category } from "@/server/catalog/categories";
 import { consumePendingProductImage } from "@/lib/pending-product-image";
@@ -79,8 +80,12 @@ export default function NewProductForm({
           selected = new File([blob], "revant-product-photo.jpg", { type: blob.type || "image/jpeg" });
         }
         if (!active || !selected) return;
-        if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type) || selected.size > PRODUCT_IMAGE_MAX_BYTES) {
-          setStatus(selected.size > PRODUCT_IMAGE_MAX_BYTES ? "error-size" : "error-type");
+        if (selected.size > PRODUCT_IMAGE_MAX_BYTES) {
+          setStatus("error-size");
+          return;
+        }
+        if (!(await hasValidProductImageSignature(selected))) {
+          setStatus("error-type");
           return;
         }
         const previewUrl = URL.createObjectURL(selected);
@@ -99,7 +104,7 @@ export default function NewProductForm({
     return () => previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
   }, []);
 
-  function handleFilesSelected(selectedFiles: File[]) {
+  async function handleFilesSelected(selectedFiles: File[]) {
     if (selectedFiles.length === 0) return;
     const remaining = MAX_PRODUCT_IMAGES - files.length;
     if (remaining <= 0 || selectedFiles.length > remaining) {
@@ -109,12 +114,12 @@ export default function NewProductForm({
 
     const accepted: File[] = [];
     for (const selected of selectedFiles.slice(0, Math.max(0, remaining))) {
-      if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type)) {
-        setStatus("error-type");
-        return;
-      }
       if (selected.size > PRODUCT_IMAGE_MAX_BYTES) {
         setStatus("error-size");
+        return;
+      }
+      if (!(await hasValidProductImageSignature(selected))) {
+        setStatus("error-type");
         return;
       }
       accepted.push(selected);
@@ -258,7 +263,7 @@ export default function NewProductForm({
           accept="image/jpeg,image/png,image/webp"
           multiple
           onChange={(event) => {
-            handleFilesSelected(Array.from(event.currentTarget.files ?? []));
+            void handleFilesSelected(Array.from(event.currentTarget.files ?? []));
             event.currentTarget.value = "";
           }}
           className="text-sm"
