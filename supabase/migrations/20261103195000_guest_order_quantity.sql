@@ -1,5 +1,6 @@
 -- Allow guest checkout to request a quantity greater than one.
 -- The existing single-item RPC remains available for older clients.
+-- Quantity is capped at 99 units to bound checkout payloads.
 create or replace function public.create_guest_order(
   p_product_id uuid,
   p_guest_name text,
@@ -33,7 +34,6 @@ begin
     raise exception 'invalid request';
   end if;
 
-  -- Serialize requests sharing the same idempotency key.
   perform pg_advisory_xact_lock(hashtextextended(p_idempotency_key::text, 0));
 
   select oi.quantity
@@ -64,9 +64,6 @@ begin
     end if;
   end if;
 
-  -- The original implementation validates the guest details, honeypot,
-  -- buyer identity, product ownership, product state and all idempotency
-  -- fields, and creates the order atomically.
   v_result := private.create_guest_order_impl(
     p_product_id,
     p_guest_name,
