@@ -89,7 +89,6 @@ export default async function BoutiqueCommandesPage() {
                     <p className="font-semibold">Livraison : {DELIVERY_STATUS_LABEL[order.delivery.status] ?? order.delivery.status}</p>
                     {order.delivery.delivery_address && <p className="mt-1">Destination : {order.delivery.delivery_address}</p>}
                   </div>}
-                  {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
                 </article>
               );
             })}
