@@ -1,16 +1,38 @@
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requirePermission } from "@/server/auth/roles";
-import type { Tables } from "@/types/database";
 
-type DeliveryRow = Pick<Tables<"deliveries">, "id" | "order_id" | "driver_id" | "company_id" | "status" | "requested_at" | "assigned_at" | "picked_up_at" | "delivered_at" | "failure_reason" | "created_at">;
-type DriverRow = Pick<Tables<"drivers">, "id" | "full_name" | "vehicle_type">;
-type CompanyRow = Pick<Tables<"delivery_companies">, "id" | "name">;
-type OrderRow = Pick<Tables<"orders">, "id" | "order_number">;
+type DeliveryRow = {
+  id: string;
+  order_id: string;
+  driver_id: string | null;
+  company_id: string | null;
+  status: string;
+  requested_at: string | null;
+  assigned_at: string | null;
+  picked_up_at: string | null;
+  delivered_at: string | null;
+  failure_reason: string | null;
+  created_at: string;
+};
+type DriverRow = { id: string; full_name: string; vehicle_type: string | null };
+type CompanyRow = { id: string; name: string };
+type OrderRow = { id: string; order_number: string };
+
+type QueryResult = { data: unknown[] | null; error: { message: string } | null };
+type QueryBuilder = {
+  select(columns: string): QueryBuilder;
+  order(column: string, options?: { ascending?: boolean }): QueryBuilder;
+  limit(count: number): Promise<QueryResult>;
+  in(column: string, values: string[]): Promise<QueryResult>;
+};
+type AdminQueryClient = { from(table: string): QueryBuilder };
 
 export async function getAdminDeliveryOperations() {
   await requirePermission("support.manage");
-  const admin = createSupabaseAdminClient();
+  // The generated database types predate requested_at; keep this narrow read
+  // adapter isolated and explicitly type the selected production columns.
+  const admin = createSupabaseAdminClient() as unknown as AdminQueryClient;
   const { data: deliveries, error } = await admin
     .from("deliveries")
     .select("id,order_id,driver_id,company_id,status,requested_at,assigned_at,picked_up_at,delivered_at,failure_reason,created_at")
