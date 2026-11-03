@@ -18,8 +18,9 @@ const supabaseOrigin = supabaseHostname ? `https://${supabaseHostname}` : "";
 // Content-Security-Policy : volontairement stricte par défaut
 // ('self' partout), avec seulement les exceptions réellement utilisées
 // aujourd'hui dans le code — le SDK Meta (connexion WhatsApp Business
-// dans /admin, src/app/admin/whatsapp/ConnectButton.tsx) et Supabase
-// (API + Storage). unsafe-inline reste nécessaire pour style-src :
+// dans /admin, src/app/admin/whatsapp/ConnectButton.tsx), Supabase
+// (API + Storage) et Unsplash (photos éditoriales de la page d'accueil).
+// unsafe-inline reste nécessaire pour style-src :
 // Tailwind et Next.js injectent des styles inline légitimes, et le
 // risque (CSS) est bien moindre qu'un unsafe-inline sur script-src,
 // volontairement absent ici.
@@ -27,7 +28,7 @@ const cspDirectives = [
   `default-src 'self'`,
   `script-src 'self' https://connect.facebook.net`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' data: blob:${supabaseOrigin ? ` ${supabaseOrigin}` : ""} https://*.fbcdn.net`,
+  `img-src 'self' data: blob:${supabaseOrigin ? ` ${supabaseOrigin}` : ""} https://*.fbcdn.net https://images.unsplash.com`,
   `font-src 'self' data:`,
   `connect-src 'self'${supabaseOrigin ? ` ${supabaseOrigin} wss://${supabaseHostname}` : ""} https://connect.facebook.net https://graph.facebook.com`,
   `frame-src https://www.facebook.com`,
