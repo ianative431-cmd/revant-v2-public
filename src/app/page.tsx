@@ -115,7 +115,7 @@ export default async function Home({ searchParams }: Props) {
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {shops.slice(0, 4).map((shop) => (
               <Link key={shop.id} href={`/shop/${shop.slug}`} className="relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200">
-                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: shop.banner_url ? `url("${shop.banner_url}")` : `url("${FARM_PHOTOS[0].photo}")` }} />
+                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${safeShopBanner(shop.banner_url) ?? FARM_PHOTOS[0].photo}")` }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <div className="absolute bottom-3 left-3 text-white"><strong className="block text-sm">{shop.name}</strong><span className="text-[11px]">{shop.city ?? "Lieu non renseigné"}</span></div>
               </Link>
