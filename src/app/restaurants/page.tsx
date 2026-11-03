@@ -21,22 +21,38 @@ function safeImageUrl(value: string | null | undefined): string | null {
 }
 
 export default async function RestaurantsPage() {
-  const supabase = await createSupabaseServerClient();
-  const restaurants = await getActiveRestaurants(supabase);
+  let restaurants: Awaited<ReturnType<typeof getActiveRestaurants>> = [];
+
+  // La découverte publique reste accessible même si Supabase est indisponible.
+  try {
+    const supabase = await createSupabaseServerClient();
+    restaurants = await getActiveRestaurants(supabase);
+  } catch {
+    restaurants = [];
+  }
+
+  const publicRestaurants = restaurants.filter(
+    (shop) => typeof shop.slug === "string" && shop.slug.length > 0
+  );
 
   return (
     <div className="min-h-screen bg-[#f5f3f0] pb-24 text-[#1f1d20]">
       <SiteHeader />
       <main className="mx-auto w-full max-w-[1440px] px-3 py-8 sm:px-6 sm:py-12">
-        <div className="mb-7">
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-neutral-500">Marketplace Revant</p>
-          <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">Restaurants</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-neutral-600">
-            Découvre les restaurants présents sur Revant et ouvre leur vitrine pour consulter leurs offres.
-          </p>
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-neutral-500">Marketplace Revant</p>
+            <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">Restaurants</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-neutral-600">
+              Découvre les restaurants présents sur Revant et ouvre leur vitrine pour consulter leurs offres.
+            </p>
+          </div>
+          <span className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold text-neutral-600">
+            {publicRestaurants.length} restaurant{publicRestaurants.length > 1 ? "s" : ""}
+          </span>
         </div>
 
-        {restaurants.length === 0 ? (
+        {publicRestaurants.length === 0 ? (
           <section className="rounded-[28px] border border-black/5 bg-white px-5 py-12 text-center shadow-sm sm:px-10">
             <div aria-hidden="true" className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f5f3f0] text-2xl">🍽️</div>
             <h2 className="mt-4 text-lg font-extrabold">Aucun restaurant public pour le moment</h2>
@@ -52,7 +68,7 @@ export default async function RestaurantsPage() {
           </section>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
-            {restaurants.map((shop) => {
+            {publicRestaurants.map((shop) => {
               const bannerUrl = safeImageUrl(shop.banner_url) ?? safeImageUrl(shop.background_image_url);
               const logoUrl = safeImageUrl(shop.logo_url);
               const color = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
