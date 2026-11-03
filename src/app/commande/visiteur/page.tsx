@@ -14,7 +14,8 @@ export default async function GuestCheckoutPage({ searchParams }: Props) {
   const product = await getProductById(supabase, productId);
   if (!product || product.status !== "active" || product.stock_quantity <= 0) notFound();
   const quantity = rawQuantity === undefined ? 1 : Number(rawQuantity);
-  if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 99 || quantity > product.stock_quantity) notFound();
+  if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 99) notFound();
+  const stockUnavailable = quantity > product.stock_quantity || erreur === "stock";
   const idempotencyKey = randomUUID();
   const subtotal = product.base_price * quantity;
 
@@ -30,7 +31,8 @@ export default async function GuestCheckoutPage({ searchParams }: Props) {
             <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">{product.name}</p><p className="mt-1 text-xs text-neutral-500">Quantité : {quantity}</p></div>
             <div className="shrink-0 text-right"><p className="text-xs text-neutral-500">{product.base_price.toLocaleString("fr-FR")} × {quantity}</p><p className="text-sm font-black">{subtotal.toLocaleString("fr-FR")} {product.currency}</p></div>
           </div>
-          {erreur && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{erreur === "validation" ? "Vérifie les informations saisies." : erreur === "stock" ? "La quantité demandée n'est plus disponible. Modifie ton panier." : "La commande n’a pas pu être créée. Vérifie les informations et réessaie."}</p>}
+          {stockUnavailable && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">La quantité demandée dépasse le stock disponible. Retourne au panier pour la modifier.</p>}
+          {erreur && erreur !== "stock" && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{erreur === "validation" ? "Vérifie les informations saisies." : "La commande n’a pas pu être créée. Vérifie les informations et réessaie."}</p>}
           <form action={createGuestOrder} className="mt-6 grid gap-4">
             <input type="hidden" name="productId" value={product.id} />
             <input type="hidden" name="quantity" value={quantity} />
@@ -40,7 +42,7 @@ export default async function GuestCheckoutPage({ searchParams }: Props) {
             <div><label htmlFor="guest-city" className="mb-1 block text-xs font-semibold">Ville</label><input id="guest-city" name="city" required minLength={2} maxLength={100} autoComplete="address-level2" className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm outline-none focus:border-black" placeholder="Niamey, Maradi..." /></div>
             <div><label htmlFor="guest-address" className="mb-1 block text-xs font-semibold">Adresse ou point de repère</label><textarea id="guest-address" name="address" required minLength={5} maxLength={300} autoComplete="street-address" rows={3} className="w-full resize-y rounded-xl border border-neutral-300 px-4 py-3 text-sm outline-none focus:border-black" placeholder="Quartier, rue, repère proche..." /></div>
             <div aria-hidden="true" className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden"><label htmlFor="guest-website">Ne pas remplir</label><input id="guest-website" name="website" tabIndex={-1} autoComplete="off" /></div>
-            <button type="submit" className="mt-2 w-full rounded-full bg-black px-6 py-4 text-sm font-bold text-white hover:bg-neutral-800">Confirmer la commande</button>
+            <button type="submit" disabled={stockUnavailable} className="mt-2 w-full rounded-full bg-black px-6 py-4 text-sm font-bold text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50">Confirmer la commande</button>
             <p className="text-center text-xs text-neutral-500">Le montant est recalculé côté serveur. Aucun paiement n’est débité sur cette étape.</p>
           </form>
         </div>
