@@ -1,4 +1,6 @@
 import Link from "next/link";
+import SiteHeader from "@/components/layout/SiteHeader";
+import BottomNav from "@/components/layout/BottomNav";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveCategories } from "@/server/catalog/categories";
 import { getCategoryCoverImage } from "@/content/products/category-cover-images";
@@ -39,7 +41,9 @@ export default async function CategoriesPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-brand-bg px-4 py-8 pb-28 text-brand-text">
+    <div className="min-h-screen bg-brand-bg pb-28 text-brand-text">
+      <SiteHeader />
+      <main className="px-4 py-8">
       <div className="mx-auto max-w-5xl">
         <Link href="/" className="text-sm text-[var(--brand-muted)]">← Accueil</Link>
         <h1 className="mt-4 text-2xl font-black">Catégories</h1>
@@ -85,6 +89,8 @@ export default async function CategoriesPage() {
           </p>
         )}
       </div>
-    </main>
+      </main>
+      <BottomNav />
+    </div>
   );
 }

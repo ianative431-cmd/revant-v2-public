@@ -20,6 +20,16 @@ const FARM_PHOTOS = [
 
 const HERO_PHOTO = "https://images.unsplash.com/photo-1514435116008-a80913c597af?auto=format&fit=crop&w=1800&q=85";
 
+function safeShopBanner(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function Home({ searchParams }: Props) {
   const { categorie, q } = await searchParams;
   // Le catalogue public ne doit jamais être bloqué par l'absence de session
@@ -107,7 +117,7 @@ export default async function Home({ searchParams }: Props) {
               <Link key={shop.id} href={`/shop/${shop.slug}`} className="relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200">
                 <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: shop.banner_url ? `url("${shop.banner_url}")` : `url("${FARM_PHOTOS[0].photo}")` }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                <div className="absolute bottom-3 left-3 text-white"><strong className="block text-sm">{shop.name}</strong><span className="text-[11px]">{shop.city ?? "Niger"}</span></div>
+                <div className="absolute bottom-3 left-3 text-white"><strong className="block text-sm">{shop.name}</strong><span className="text-[11px]">{shop.city ?? "Lieu non renseigné"}</span></div>
               </Link>
             ))}
           </div>
