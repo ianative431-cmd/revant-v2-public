@@ -1,13 +1,5 @@
-/**
- * Les deux palettes du site Revant lui-même (header, pages publiques,
- * compte, etc.) — distinctes du catalogue de palettes "boutique"
- * (src/content/shops/color-palettes.ts) même si les couleurs
- * Terracotta/Ardoise y sont identiques : ici il n'y a que ces deux
- * choix, et ils remplacent entièrement l'ancienne charte beige/noir.
- *
- * Toute modification des valeurs hex doit être répercutée dans
- * src/app/globals.css (les blocs [data-site-palette="..."]).
- */
+/** Palettes globales du site Revant. Les identifiants historiques sont conservés
+ * pour ne pas invalider les cookies déjà enregistrés chez les utilisateurs. */
 export type SitePaletteId = "terracotta" | "slate-lilac";
 
 export const SITE_PALETTES: Record<
@@ -15,18 +7,18 @@ export const SITE_PALETTES: Record<
   { label: string; bg: string; surface: string; accent: string; text: string }
 > = {
   terracotta: {
-    label: "Terracotta",
-    bg: "#A79986",
-    surface: "#3E3D38",
-    accent: "#803E2F",
-    text: "#1F1D20",
+    label: "Clair — blanc & orange",
+    bg: "#FFFFFF",
+    surface: "#FFF7ED",
+    accent: "#F97316",
+    text: "#171717",
   },
   "slate-lilac": {
-    label: "Slate-Lilac",
-    bg: "#DEDCDC",
-    surface: "#C5BAC4",
-    accent: "#57707A",
-    text: "#191D23",
+    label: "Sombre — noir & orange",
+    bg: "#090909",
+    surface: "#171717",
+    accent: "#F97316",
+    text: "#F5F5F5",
   },
 };
 
@@ -37,8 +29,6 @@ export function isSitePaletteId(value: string | undefined | null): value is Site
   return value === "terracotta" || value === "slate-lilac";
 }
 
-/** Pose le cookie de palette côté client (fonction utilitaire hors composant,
- * voir le même motif dans src/lib/cookie-consent.ts). */
 export function setSitePaletteCookie(id: SitePaletteId) {
   document.cookie = `${SITE_PALETTE_COOKIE}=${id}; path=/; max-age=31536000; samesite=lax`;
 }
