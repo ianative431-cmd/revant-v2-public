@@ -7,8 +7,8 @@ import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
 function LegalSummaryAndConsent() {
   return (
-    <div className="bg-black/[0.03] rounded-xl p-3 mb-3">
-      <p className="text-xs text-black/70 mb-2">
+    <div className="bg-[var(--brand-bg)] rounded-xl p-3 mb-3">
+      <p className="text-xs text-[var(--brand-muted)] mb-2">
         En créant un compte, tu acceptes notamment : une commission Revant de 0,5 % sur chaque
         vente, la mise en séquestre des fonds jusqu&apos;à confirmation de la remise du produit, et
         le traitement de tes données décrit dans notre politique de confidentialité.
@@ -41,18 +41,18 @@ export default function InscriptionPage() {
   return (
     <div>
       <h1 className="text-xl font-bold mb-1">Créer un compte</h1>
-      <p className="text-sm text-black/60 mb-4">
+      <p className="text-sm text-[var(--brand-muted)] mb-4">
         Rejoins Revant — seconde vie, nouvelle valeur.
       </p>
       <GoogleSignInButton nextPath="/compte" />
-      <p className="my-4 text-center text-xs text-black/40">ou inscris-toi avec</p>
+      <p className="my-4 text-center text-xs text-[var(--brand-muted)]">ou inscris-toi avec</p>
 
       <div className="flex gap-2 mb-6">
         <button
           type="button"
           onClick={() => setMode("email")}
           className={`flex-1 py-2 rounded-full text-sm font-medium ${
-            mode === "email" ? "bg-black text-white" : "bg-black/5"
+            mode === "email" ? "bg-brand-accent text-white" : "bg-[var(--brand-bg)] border border-[var(--brand-border)]"
           }`}
         >
           E-mail
@@ -61,7 +61,7 @@ export default function InscriptionPage() {
           type="button"
           onClick={() => setMode("phone")}
           className={`flex-1 py-2 rounded-full text-sm font-medium ${
-            mode === "phone" ? "bg-black text-white" : "bg-black/5"
+            mode === "phone" ? "bg-brand-accent text-white" : "bg-[var(--brand-bg)] border border-[var(--brand-border)]"
           }`}
         >
           Téléphone
@@ -70,9 +70,9 @@ export default function InscriptionPage() {
 
       {mode === "email" ? <EmailSignupForm /> : <PhoneSignupForm />}
 
-      <p className="text-sm text-black/60 mt-6 text-center">
+      <p className="text-sm text-[var(--brand-muted)] mt-6 text-center">
         Déjà un compte ?{" "}
-        <Link href="/connexion" className="text-black font-medium underline">
+        <Link href="/connexion" className="text-brand-accent font-medium underline">
           Connecte-toi
         </Link>
       </p>
@@ -91,7 +91,7 @@ function EmailSignupForm() {
         required
         maxLength={254}
         placeholder="E-mail"
-        className="border rounded-xl px-4 py-3 text-sm"
+        className="border border-[var(--brand-border)] bg-[var(--brand-bg)] text-brand-text rounded-xl px-4 py-3 text-sm"
       />
       <input
         name="password"
@@ -100,14 +100,14 @@ function EmailSignupForm() {
         minLength={8}
         maxLength={128}
         placeholder="Mot de passe (8 caractères min.)"
-        className="border rounded-xl px-4 py-3 text-sm"
+        className="border border-[var(--brand-border)] bg-[var(--brand-bg)] text-brand-text rounded-xl px-4 py-3 text-sm"
       />
       <LegalSummaryAndConsent />
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}
       <button
         type="submit"
         disabled={pending}
-        className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
+        className="bg-brand-accent text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
       >
         {pending ? "Création..." : "Créer mon compte"}
       </button>
@@ -146,14 +146,14 @@ function PhoneSignupForm() {
           type="tel"
           required
           placeholder="+22790000000"
-          className="border rounded-xl px-4 py-3 text-sm"
+          className="border border-[var(--brand-border)] bg-[var(--brand-bg)] text-brand-text rounded-xl px-4 py-3 text-sm"
         />
         <LegalSummaryAndConsent />
         {sendError && <p className="text-red-600 text-sm">{sendError}</p>}
         <button
           type="submit"
           disabled={sending}
-          className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
+          className="bg-brand-accent text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
         >
           {sending ? "Envoi..." : "Recevoir un code par SMS"}
         </button>
@@ -164,7 +164,7 @@ function PhoneSignupForm() {
   return (
     <form action={verifyAction} className="flex flex-col gap-3">
       <input type="hidden" name="phone" value={phone} />
-      <p className="text-sm text-black/60">Code envoyé au {phone}</p>
+      <p className="text-sm text-[var(--brand-muted)]">Code envoyé au {phone}</p>
       <input
         name="code"
         type="text"
@@ -172,13 +172,13 @@ function PhoneSignupForm() {
         required
         maxLength={8}
         placeholder="Code reçu par SMS"
-        className="border rounded-xl px-4 py-3 text-sm"
+        className="border border-[var(--brand-border)] bg-[var(--brand-bg)] text-brand-text rounded-xl px-4 py-3 text-sm"
       />
       {verifyState.error && <p className="text-red-600 text-sm">{verifyState.error}</p>}
       <button
         type="submit"
         disabled={verifyPending}
-        className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
+        className="bg-brand-accent text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
       >
         {verifyPending ? "Vérification..." : "Valider le code"}
       </button>

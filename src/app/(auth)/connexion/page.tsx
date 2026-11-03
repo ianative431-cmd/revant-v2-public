@@ -11,16 +11,16 @@ export default function ConnexionPage() {
   return (
     <div>
       <h1 className="text-xl font-bold mb-1">Connexion</h1>
-      <p className="text-sm text-black/60 mb-4">Accède à ton compte Revant.</p>
+      <p className="text-sm text-[var(--brand-muted)] mb-4">Accède à ton compte Revant.</p>
       <GoogleSignInButton nextPath="/compte" />
-      <p className="my-4 text-center text-xs text-black/40">ou continue avec</p>
+      <p className="my-4 text-center text-xs text-[var(--brand-muted)]">ou continue avec</p>
 
       <div className="flex gap-2 mb-6">
         <button
           type="button"
           onClick={() => setMode("email")}
           className={`flex-1 py-2 rounded-full text-sm font-medium ${
-            mode === "email" ? "bg-black text-white" : "bg-black/5"
+            mode === "email" ? "bg-brand-accent text-white" : "bg-[var(--brand-bg)] border border-[var(--brand-border)]"
           }`}
         >
           E-mail
@@ -29,7 +29,7 @@ export default function ConnexionPage() {
           type="button"
           onClick={() => setMode("phone")}
           className={`flex-1 py-2 rounded-full text-sm font-medium ${
-            mode === "phone" ? "bg-black text-white" : "bg-black/5"
+            mode === "phone" ? "bg-brand-accent text-white" : "bg-[var(--brand-bg)] border border-[var(--brand-border)]"
           }`}
         >
           Téléphone
@@ -38,9 +38,9 @@ export default function ConnexionPage() {
 
       {mode === "email" ? <EmailLoginForm /> : <PhoneLoginForm />}
 
-      <p className="text-sm text-black/60 mt-6 text-center">
+      <p className="text-sm text-[var(--brand-muted)] mt-6 text-center">
         Pas encore de compte ?{" "}
-        <Link href="/inscription" className="text-black font-medium underline">
+        <Link href="/inscription" className="text-brand-accent font-medium underline">
           Inscris-toi
         </Link>
       </p>
@@ -59,7 +59,7 @@ function EmailLoginForm() {
         required
         maxLength={254}
         placeholder="E-mail"
-        className="border rounded-xl px-4 py-3 text-sm"
+        className="border border-[var(--brand-border)] bg-[var(--brand-bg)] text-brand-text rounded-xl px-4 py-3 text-sm"
       />
       <input
         name="password"
@@ -67,14 +67,14 @@ function EmailLoginForm() {
         required
         maxLength={128}
         placeholder="Mot de passe"
-        className="border rounded-xl px-4 py-3 text-sm"
+        className="border border-[var(--brand-border)] bg-[var(--brand-bg)] text-brand-text rounded-xl px-4 py-3 text-sm"
       />
-      <div className="flex justify-end"><Link href="/mot-de-passe-oublie" className="text-xs text-black/55 underline">Mot de passe oublié ?</Link></div>
+      <div className="flex justify-end"><Link href="/mot-de-passe-oublie" className="text-xs text-[var(--brand-muted)] underline">Mot de passe oublié ?</Link></div>
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}
       <button
         type="submit"
         disabled={pending}
-        className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
+        className="bg-brand-accent text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
       >
         {pending ? "Connexion..." : "Se connecter"}
       </button>
@@ -112,13 +112,13 @@ function PhoneLoginForm() {
           type="tel"
           required
           placeholder="+22790000000"
-          className="border rounded-xl px-4 py-3 text-sm"
+          className="border border-[var(--brand-border)] bg-[var(--brand-bg)] text-brand-text rounded-xl px-4 py-3 text-sm"
         />
         {sendError && <p className="text-red-600 text-sm">{sendError}</p>}
         <button
           type="submit"
           disabled={sending}
-          className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
+          className="bg-brand-accent text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
         >
           {sending ? "Envoi..." : "Recevoir un code par SMS"}
         </button>
@@ -129,7 +129,7 @@ function PhoneLoginForm() {
   return (
     <form action={verifyAction} className="flex flex-col gap-3">
       <input type="hidden" name="phone" value={phone} />
-      <p className="text-sm text-black/60">Code envoyé au {phone}</p>
+      <p className="text-sm text-[var(--brand-muted)]">Code envoyé au {phone}</p>
       <input
         name="code"
         type="text"
@@ -137,13 +137,13 @@ function PhoneLoginForm() {
         required
         maxLength={8}
         placeholder="Code reçu par SMS"
-        className="border rounded-xl px-4 py-3 text-sm"
+        className="border border-[var(--brand-border)] bg-[var(--brand-bg)] text-brand-text rounded-xl px-4 py-3 text-sm"
       />
       {verifyState.error && <p className="text-red-600 text-sm">{verifyState.error}</p>}
       <button
         type="submit"
         disabled={verifyPending}
-        className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
+        className="bg-brand-accent text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
       >
         {verifyPending ? "Vérification..." : "Valider le code"}
       </button>
