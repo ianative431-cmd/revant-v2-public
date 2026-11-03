@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import {
   LineChart,
   Line,
@@ -54,7 +56,7 @@ const PAYOUT_STATUS_LABEL: Record<string, string> = {
   rejected: "Rejeté",
 };
 
-const DONUT_COLORS = ["#8B5CF6", "#3B82F6", "#EC4899", "#F59E0B", "#10B981", "#6366F1"];
+const DONUT_COLORS = ["#687650", "#a8bd83", "#d0b49f", "#485330", "#8c9b6b", "#c6a58f"];
 
 function money(amount: number, currency = "XOF") {
   return `${amount.toLocaleString("fr-FR")} ${currency}`;
@@ -106,7 +108,7 @@ function StatCard({
   pct?: number | null;
 }) {
   return (
-    <div className="bg-[#16161F] rounded-2xl p-4 border border-white/5">
+    <div className="bg-[#203426] rounded-2xl p-4 border border-white/5">
       <p className="text-xs text-white/50 mb-2">{label}</p>
       <p className="text-2xl font-bold text-white">{value}</p>
       <div className="flex items-center gap-1.5 mt-1.5">
@@ -129,7 +131,7 @@ function Panel({
   className?: string;
 }) {
   return (
-    <div className={`bg-[#16161F] rounded-2xl p-4 border border-white/5 ${className}`}>
+    <div className={`bg-[#203426] rounded-2xl p-4 border border-white/5 ${className}`}>
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm font-medium text-white">{title}</p>
         {action}
@@ -284,13 +286,10 @@ export default function FinanceDashboard({
   const needsAttentionCount = summary.pendingPayouts + summary.openDisputes;
 
   return (
-    <div className="-mx-4 -mt-6 md:-mx-8 md:-mt-8 bg-[#0B0B10] min-h-screen px-4 py-6 md:px-8 md:py-8">
-      {/* Barre du haut */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-white">Finance</h1>
-          <p className="text-xs text-white/40 mt-0.5">Chiffres réels, à l&apos;instant — aucune donnée simulée.</p>
-        </div>
+    <div className="-mx-4 -mt-6 md:-mx-8 md:-mt-8 bg-[#171013] min-h-screen px-4 py-6 md:px-8 md:py-8">
+      <div className="relative mb-5 min-h-[132px] overflow-hidden rounded-2xl border border-white/10"><Image src="/images/super-admin-finance-cover.jpg" alt="Photo de couverture issue de la maquette financière Revant" fill priority sizes="100vw" className="object-cover"/><div className="absolute inset-0 bg-gradient-to-r from-[#171013]/95 via-[#171013]/75 to-[#171013]/20"/><div className="relative z-10 flex min-h-[132px] flex-col justify-end p-5"><p className="text-[10px] font-semibold uppercase tracking-[.22em] text-[#c3d0a7]">Revant · Centre financier</p><h1 className="mt-1 text-2xl font-semibold text-white">Finance</h1><p className="mt-1 text-xs text-white/65">Revenus, paiements, retraits et règles financières réelles.</p></div></div>
+      <nav aria-label="Navigation financière" className="mb-5 flex flex-wrap gap-2 border-b border-white/10 pb-3"><Link href="/admin/finance" className="rounded-lg bg-[#687650] px-3 py-2 text-xs font-semibold text-white">Vue générale</Link><Link href="/admin/paiements" className="rounded-lg border border-white/10 px-3 py-2 text-xs text-white/65 hover:bg-white/5">Transactions</Link><Link href="/admin/retraits" className="rounded-lg border border-white/10 px-3 py-2 text-xs text-white/65 hover:bg-white/5">Retraits</Link><a href="#configuration-financiere" className="rounded-lg border border-white/10 px-3 py-2 text-xs text-white/65 hover:bg-white/5">Configuration financière</a></nav>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6"><div><h2 className="text-sm font-semibold text-white">Suivi des flux</h2><p className="text-xs text-white/40 mt-0.5">Chiffres réels, à l&apos;instant — aucune donnée simulée.</p></div>
         <div className="flex items-center gap-2 flex-wrap">
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
@@ -298,7 +297,7 @@ export default function FinanceDashboard({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher un paiement..."
-              className="bg-[#16161F] border border-white/10 rounded-full pl-8 pr-3 py-2 text-xs text-white placeholder:text-white/30 w-48 focus:outline-none focus:border-white/30"
+              className="bg-[#203426] border border-white/10 rounded-full pl-8 pr-3 py-2 text-xs text-white placeholder:text-white/30 w-48 focus:outline-none focus:border-white/30"
             />
           </div>
           <button
@@ -311,13 +310,13 @@ export default function FinanceDashboard({
       </div>
 
       {/* Sélecteur de période */}
-      <div className="flex items-center gap-1 mb-4 bg-[#16161F] border border-white/5 rounded-full p-1 w-fit">
+      <div className="flex items-center gap-1 mb-4 bg-[#203426] border border-white/5 rounded-full p-1 w-fit">
         {(["30d", "3m", "1y"] as TimeRange[]).map((r) => (
           <button
             key={r}
             onClick={() => setRange(r)}
             className={`text-xs font-medium rounded-full px-3 py-1.5 ${
-              range === r ? "bg-white text-[#0B0B10]" : "text-white/50 hover:text-white"
+              range === r ? "bg-white text-[#171013]" : "text-white/50 hover:text-white"
             }`}
           >
             {r === "30d" ? "30 jours" : r === "3m" ? "3 mois" : "1 an"}
@@ -377,7 +376,7 @@ export default function FinanceDashboard({
                   <Tooltip
                     formatter={(v) => money(typeof v === "number" ? v : Number(v))}
                     contentStyle={{
-                      background: "#0B0B10",
+                      background: "#171013",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: 10,
                       fontSize: 12,
@@ -388,10 +387,10 @@ export default function FinanceDashboard({
                   <Line
                     type="monotone"
                     dataKey="value"
-                    stroke="#8B5CF6"
+                    stroke="#a8bd83"
                     strokeWidth={2.5}
                     dot={false}
-                    activeDot={{ r: 4, fill: "#8B5CF6" }}
+                    activeDot={{ r: 4, fill: "#a8bd83" }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -455,7 +454,7 @@ export default function FinanceDashboard({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-[#0B0B10] border border-white/10 rounded-full text-[11px] text-white/70 px-2.5 py-1 focus:outline-none"
+            className="bg-[#171013] border border-white/10 rounded-full text-[11px] text-white/70 px-2.5 py-1 focus:outline-none"
           >
             <option value="all">Tous statuts</option>
             {Object.entries(PAYMENT_STATUS_LABEL).map(([k, v]) => (
@@ -516,8 +515,8 @@ export default function FinanceDashboard({
         </Panel>
       )}
 
-      {/* Commission, règle de retrait, fournisseurs — fonctionnalités existantes conservées */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+      {/* Configuration réelle : commission, règle de retrait et fournisseurs actifs */}
+      <div id="configuration-financiere" className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 scroll-mt-6">
         <Panel title="Commission Revant">
           {canManageSettings ? (
             <CommissionForm initialValue={commissionPercent} />
@@ -575,7 +574,7 @@ export default function FinanceDashboard({
             {payouts.map((p) => (
               <div
                 key={p.id}
-                className="bg-[#0B0B10] border border-white/5 rounded-xl p-3 flex items-center justify-between gap-3"
+                className="bg-[#171013] border border-white/5 rounded-xl p-3 flex items-center justify-between gap-3"
               >
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-white">{money(p.amount, p.currency)}</p>

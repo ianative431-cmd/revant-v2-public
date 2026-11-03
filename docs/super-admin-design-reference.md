@@ -1,11 +1,14 @@
 # Références visuelles Super Admin — dossier Drive Revant
 
-Références reçues dans le dossier fourni par l'utilisateur :
-- `Logo super admin` : logo dédié à l'application privée.
-- `Palette super admin` : palette de référence `#171013`, `#203426`, `#485330`, `#687650`.
-- `Super admin 1` : inspiration de tableau de bord avec hiérarchie claire, indicateurs, graphiques, tâches, commandes et adaptation mobile.
-- `Super admin 3` : inspiration de suivi financier et de transactions ; les valeurs `$0.00` sont des données de démonstration et ne doivent pas être reprises comme chiffres réels de Revant.
-- `Super admin 4` et `Admin espace officiel` : inspirations de cartes d'indicateurs et de tableaux de gestion.
-- `Super admin 2` : visuel de staking ; ses produits et chiffres ne décrivent pas les fonctions de Revant et ne sont pas à reproduire.
+Dossier : `1dLy_p_2uNDLYSj7ZZwvrLUmZ0Ltn0gHZ`.
 
-Le logo fourni est copié dans `public/images/logo-super-admin.png` et sa version carrée d'application dans `public/images/logo-super-admin-512.png`. Les autres captures ne sont pas publiées comme ressources publiques.
+## Trois interfaces reprises
+1. `Super admin 1` — Vue d’ensemble claire : sidebar, indicateurs, courbe, produits, commandes, tâches et activité. Les données sont celles de Revant.
+2. `Super admin 3` — Finance Tracker sombre : couverture photographique, cartes, courbe, transactions et configuration. Photo extraite dans `public/images/super-admin-finance-cover.jpg`. Les chiffres `$0.00` d’exemple ne sont pas repris.
+3. `Super admin 4` — Analytique globale sombre : indicateurs, évolution et carte. Carte extraite dans `public/images/super-admin-world-map.jpg`. Les statistiques géographiques viennent des vrais profils et boutiques.
+
+Logo original : `public/images/logo-super-admin.png`; icône installable : `public/images/logo-super-admin-512.png`. Palette Drive : `#171013`, `#203426`, `#485330`, `#687650`.
+
+`Super admin 2` est une interface de staking/crypto sans rapport avec la marketplace et n’est pas reproduite. `Admin espace officiel` est une référence CRM complémentaire, pas l’un des trois écrans retenus.
+
+Les onglets sont regroupés en Vue générale, Marketplace, Opérations, Finance, Communication, Croissance et sécurité. Les onglets de calendrier, budget ou objectifs sans fonction Revant existante ne sont pas inventés. Aucun réglage décoratif : la configuration financière mène aux formulaires et règles réels ; la sécurité mène à la gestion des appareils.
