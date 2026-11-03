@@ -16,9 +16,9 @@ export default async function MaBoutiquePage() {
   if (!shop) {
     return (
       <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-        <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm text-center">
+        <div className="w-full max-w-sm bg-[var(--brand-surface)] border border-[var(--brand-border)] text-brand-text rounded-[22px] p-8 shadow-sm text-center">
           <h1 className="text-xl font-bold mb-1">Aucune boutique pour l&apos;instant</h1>
-          <p className="text-sm text-brand-text/60 mb-6">
+          <p className="text-sm text-[var(--brand-muted)] mb-6">
             Crée ta boutique pour commencer à vendre sur Revant.
           </p>
           <Link
@@ -37,9 +37,9 @@ export default async function MaBoutiquePage() {
 
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm">
+      <div className="w-full max-w-sm bg-[var(--brand-surface)] border border-[var(--brand-border)] text-brand-text rounded-[22px] p-8 shadow-sm">
         <h1 className="text-xl font-bold mb-1">Ma boutique</h1>
-        <p className="text-sm text-brand-text/60 mb-6">{shop.name}</p>
+        <p className="text-sm text-[var(--brand-muted)] mb-6">{shop.name}</p>
 
         <div className="flex flex-col items-center mb-6">
           {/* eslint-disable-next-line @next/next/no-img-element -- data URL générée côté serveur, pas une source distante à optimiser */}
@@ -49,11 +49,11 @@ export default async function MaBoutiquePage() {
 
         <dl className="text-sm mb-6 space-y-2">
           <div className="flex justify-between gap-3">
-            <dt className="text-brand-text/60">Revant ID</dt>
+            <dt className="text-[var(--brand-muted)]">Revant ID</dt>
             <dd className="font-mono text-xs break-all text-right">{shop.id}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-brand-text/60">Type</dt>
+            <dt className="text-[var(--brand-muted)]">Type</dt>
             <dd>{getShopTypeLabel(shop)}</dd>
           </div>
         </dl>

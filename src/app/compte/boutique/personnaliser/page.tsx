@@ -21,12 +21,12 @@ export default async function PersonnaliserBoutiquePage() {
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
       <div className="w-full max-w-sm">
-        <Link href="/compte/boutique" className="text-sm underline text-brand-text/60">
+        <Link href="/compte/boutique" className="text-sm underline text-[var(--brand-muted)]">
           ← Ma boutique
         </Link>
 
         <h1 className="text-xl font-bold mt-4 mb-1">Personnaliser {shop.name}</h1>
-        <p className="text-sm text-brand-text/60 mb-6">
+        <p className="text-sm text-[var(--brand-muted)] mb-6">
           Choisis une palette de couleurs pour ta boutique publique.
         </p>
 
@@ -46,9 +46,9 @@ export default async function PersonnaliserBoutiquePage() {
           logoUrl={shop.logo_url}
           bannerUrl={shop.banner_url}
         />
-        <div className="bg-white/70 rounded-2xl p-4 mt-4">
-          <p className="text-xs font-semibold text-brand-text/60 mb-1">Autres options</p>
-          <p className="text-xs text-brand-text/50">L&apos;image d&apos;arrière-plan personnalisée et la typographie seront ajoutées dans un prochain lot.</p>
+        <div className="bg-[var(--brand-surface)] border border-[var(--brand-border)] rounded-2xl p-4 mt-4">
+          <p className="text-xs font-semibold text-[var(--brand-muted)] mb-1">Autres options</p>
+          <p className="text-xs text-[var(--brand-muted)]">L&apos;image d&apos;arrière-plan personnalisée et la typographie seront ajoutées dans un prochain lot.</p>
         </div>
       </div>
     </div>
