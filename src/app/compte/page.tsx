@@ -10,7 +10,7 @@ export default async function ComptePage() {
 
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm">
+      <div className="w-full max-w-sm bg-brand-surface border border-brand-border rounded-[22px] p-8 shadow-sm">
         <AvatarUploader
           userId={user.id}
           initialAvatarUrl={(user.user_metadata?.avatar_url as string | undefined) ?? null}

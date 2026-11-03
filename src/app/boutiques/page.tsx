@@ -27,11 +27,11 @@ export default async function BoutiquesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] text-[#111]">
-      <header className="bg-[#090909] text-white">
+    <div className="min-h-screen bg-brand-bg text-brand-text">
+      <header className="border-b border-brand-border bg-brand-surface text-brand-text">
         <div className="mx-auto flex min-h-[68px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-7">
           <Link href="/" className="text-2xl font-black tracking-tight sm:text-3xl">REVANT</Link>
-          <nav aria-label="Navigation publique" className="flex items-center gap-4 text-xs font-medium text-white/85 sm:gap-6">
+          <nav aria-label="Navigation publique" className="flex items-center gap-4 text-xs font-medium text-brand-text/80 sm:gap-6">
             <Link href="/">Accueil</Link>
             <Link href="/#categories">Catégories</Link>
             <Link href="/#produits">Produits</Link>
@@ -40,10 +40,10 @@ export default async function BoutiquesPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
-        <Link href="/" className="text-xs font-semibold text-neutral-600 hover:text-black">← Retour à l’accueil</Link>
+        <Link href="/" className="text-xs font-semibold text-brand-text/65 hover:text-brand-accent">← Retour à l’accueil</Link>
         <div className="mb-6 mt-5">
           <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Les boutiques Revant</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-neutral-600">
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-brand-text/70">
             Parcours les boutiques publiques et consulte leurs articles sans créer de compte.
             La connexion est réservée aux actions qui nécessitent un compte.
           </p>
@@ -74,16 +74,16 @@ export default async function BoutiquesPage() {
             ))}
           </div>
         ) : (
-          <section className="rounded-2xl border border-neutral-200 bg-white px-5 py-10 text-center sm:px-10">
-            <div aria-hidden="true" className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100 text-2xl">⌂</div>
+          <section className="rounded-2xl border border-brand-border bg-brand-surface px-5 py-10 text-center sm:px-10">
+            <div aria-hidden="true" className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-bg text-2xl">⌂</div>
             <h2 className="text-lg font-extrabold">Aucune boutique publique pour le moment</h2>
-            <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-neutral-600">
+            <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-brand-text/70">
               Les vitrines de cette page s’ouvriront dès que des boutiques seront actives.
               Tu peux déjà parcourir les produits publiés, sans te connecter.
             </p>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-              <Link href="/#produits" className="rounded-full bg-black px-5 py-3 text-xs font-bold text-white hover:bg-neutral-800">Explorer les produits</Link>
-              <Link href="/boutiques/creer" className="rounded-full border border-neutral-300 px-5 py-3 text-xs font-bold text-black hover:bg-neutral-50">Ouvrir une boutique</Link>
+              <Link href="/#produits" className="rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white hover:brightness-95">Explorer les produits</Link>
+              <Link href="/boutiques/creer" className="rounded-full border border-brand-border px-5 py-3 text-xs font-bold text-brand-text hover:bg-brand-bg">Ouvrir une boutique</Link>
             </div>
           </section>
         )}

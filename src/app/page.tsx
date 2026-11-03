@@ -56,7 +56,7 @@ export default async function Home({ searchParams }: Props) {
   const term = q?.trim();
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] text-[#111] pb-28">
+    <div className="min-h-screen bg-brand-bg text-brand-text pb-28">
       <SiteHeader />
       <section className="relative mx-3 mt-1 overflow-hidden rounded-2xl bg-[#101010] text-white min-h-[330px] sm:min-h-[390px]">
         <div className="absolute inset-0 bg-cover bg-[center_35%] opacity-75" style={{ backgroundImage: `url("${HERO_PHOTO}")` }} />
@@ -74,14 +74,14 @@ export default async function Home({ searchParams }: Props) {
 
       <RevantMegaShortcuts />
 
-      <section id="a-propos" className="grid grid-cols-2 gap-px border-b border-black/5 bg-[#e8e8e8] px-3 sm:grid-cols-4">
+      <section id="a-propos" className="grid grid-cols-2 gap-px border-b border-brand-border bg-brand-surface px-3 sm:grid-cols-4">
         {[
           ["↗", "LIVRAISON", "Options selon la boutique"],
           ["◇", "ACHAT SIMPLE", "Sans compte obligatoire"],
           ["□", "BOUTIQUES LOCALES", "Des vendeurs à découvrir"],
           ["○", "AIDE EN FRANÇAIS", "Un parcours clair"],
         ].map(([icon, title, detail]) => (
-          <div key={title} className="flex min-h-[76px] items-center gap-3 bg-[#f7f7f7] px-3 py-4 sm:px-5">
+          <div key={title} className="flex min-h-[76px] items-center gap-3 bg-brand-bg px-3 py-4 sm:px-5">
             <span className="text-2xl font-light" aria-hidden="true">{icon}</span>
             <span><strong className="block text-[10px] font-extrabold tracking-wide">{title}</strong><span className="mt-1 block text-[10px] text-neutral-600">{detail}</span></span>
           </div>
@@ -130,10 +130,10 @@ export default async function Home({ searchParams }: Props) {
       <main id="produits" className="px-4 pt-7">
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? `Résultats pour « ${q} »` : shortcutCategoryTitle ?? (activeCategory ? activeCategory.name : "Produits populaires")}</h2><a href="#produits" className="text-xs font-medium">Voir tout →</a></div>
         {loadedProducts.length === 0 ? (
-          <div className="rounded-xl border border-neutral-200 bg-white px-5 py-10 text-center">
+          <div className="rounded-xl border border-brand-border bg-brand-surface px-5 py-10 text-center">
             <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : "Les premières annonces arrivent bientôt."}</p>
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-neutral-500">{term ? "Essaie un autre mot ou explore les catégories." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
-            <Link href="/boutiques/creer" className="mt-4 inline-flex rounded-full bg-black px-5 py-3 text-xs font-bold text-white">Ouvrir une boutique</Link>
+            <Link href="/boutiques/creer" className="mt-4 inline-flex rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white">Ouvrir une boutique</Link>
           </div>
         ) : (
           <InfiniteProductFeed initialProducts={loadedProducts} category={categorie ?? ""} search={term ?? ""} />
