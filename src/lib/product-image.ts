@@ -6,13 +6,13 @@ export const PRODUCT_IMAGE_MAX_DIMENSION = 1600; // px, plus grand côté après
 export const PRODUCT_IMAGE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 /**
- * Chemin de stockage isolé par boutique : {shop_id}/{timestamp}.jpg. Le
- * préfixe {shop_id}/ est ce qui permet aux règles RLS Supabase Storage
- * (migration 0005) de garantir qu'un vendeur ne peut écrire que dans SA
- * PROPRE boutique.
+ * Chemin de stockage isolé par boutique : {shop_id}/{uuid}.jpg.
+ * Le préfixe {shop_id}/ permet aux règles RLS Supabase Storage de garantir
+ * qu'un vendeur ne peut écrire que dans sa propre boutique. L'UUID évite
+ * les collisions lorsque plusieurs photos sont envoyées très rapidement.
  */
 export function buildProductImagePath(shopId: string): string {
-  return `${shopId}/${Date.now()}.jpg`;
+  return `${shopId}/${crypto.randomUUID()}.jpg`;
 }
 
 /** URL publique déterministe, sans appel réseau (bucket public). */
@@ -46,7 +46,7 @@ export function safeProductImageUrl(value: string | null | undefined): string | 
 /**
  * Redimensionne (sans recadrer) une image trop grande et la réencode en
  * JPEG pour limiter le poids envoyé/stocké. Contrairement à l'avatar
- * (carré forcé), une photo d'annonce garde ses proportions d'origine — 
+ * (carré forcé), une photo d'annonce garde ses proportions d'origine —
  * seule la taille maximale est bornée.
  */
 export function compressProductImage(file: File): Promise<Blob> {
