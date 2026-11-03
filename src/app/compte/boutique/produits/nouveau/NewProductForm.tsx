@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
-  PRODUCT_IMAGE_ALLOWED_TYPES,
   PRODUCT_IMAGE_MAX_BYTES,
   PRODUCT_IMAGE_BUCKET,
   buildProductImagePath,

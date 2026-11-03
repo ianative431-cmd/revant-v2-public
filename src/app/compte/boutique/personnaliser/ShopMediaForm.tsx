@@ -27,6 +27,10 @@ function extensionFor(type: "image/jpeg" | "image/png" | "image/webp") {
   return type === "image/jpeg" ? "jpg" : type === "image/png" ? "png" : "webp";
 }
 
+function buildUniqueShopMediaPath(userId: string, shopId: string, kind: MediaKind, type: "image/jpeg" | "image/png" | "image/webp"): string {
+  return userId + "/" + shopId + "/" + kind + "-" + crypto.randomUUID() + "." + extensionFor(type);
+}
+
 function extractOwnedShopMediaPath(value: string | null, userId: string, shopId: string): string | null {
   if (!value) return null;
   try {
@@ -67,7 +71,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
       const supabase = createSupabaseBrowserClient();
       // Un chemin unique évite qu'un cache CDN/navigateur réaffiche l'ancienne
       // bannière ou le précédent logo après remplacement.
-      const path = userId + "/" + shopId + "/" + kind + "-" + Date.now() + "-" + crypto.randomUUID() + "." + extensionFor(actualType);
+      const path = buildUniqueShopMediaPath(userId, shopId, kind, actualType);
       const { error: uploadError } = await supabase.storage
         .from("shop-media")
         .upload(path, file, { upsert: false, contentType: actualType, cacheControl: "31536000" });
