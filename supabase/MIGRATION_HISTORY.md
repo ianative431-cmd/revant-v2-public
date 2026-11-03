@@ -86,3 +86,10 @@ Ces 29 versions figurent dans l'historique Supabase mais aucun fichier SQL corre
 - `20261101095900_p0_guards_no_admin_self_exemption.sql`
 
 La base contient déjà le résultat de ces migrations. Cette liste est un inventaire de récupération, pas une instruction d'exécution.
+
+## Migration Super Admin local-first — 3 novembre 2026
+
+- Migration appliquée au projet Supabase Revant via l'API de migration : version distante **20261103175324**, nom `super_admin_local_first_20261103`.
+- Source conservée dans `supabase/migrations/20261103175324_super_admin_local_first_20261103.sql`. Elle crée uniquement les tables `super_admin_identities` et `super_admin_devices`, leurs index et les privilèges de service ; aucune identité ni aucun appareil n'a été ajouté.
+- Vérification post-migration : RLS activé sur les deux tables ; `anon` et `authenticated` n'ont aucun droit `SELECT` ; `service_role` conserve l'accès requis ; les deux tables sont encore vides.
+- La migration AAL2 reste en attente : aucun facteur TOTP vérifié n'est encore enregistré pour le super-admin. Ne pas appliquer la migration AAL2 avant cet enrôlement.
