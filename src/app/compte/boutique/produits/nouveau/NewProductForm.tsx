@@ -144,11 +144,12 @@ export default function NewProductForm({
     }
 
     setStatus("submitting");
-    const supabase = createSupabaseBrowserClient();
+    let supabase: ReturnType<typeof createSupabaseBrowserClient> | null = null;
     const uploadedPaths: string[] = [];
     let createdProductId: string | null = null;
 
     try {
+      supabase = createSupabaseBrowserClient();
       for (let index = 0; index < files.length; index += 1) {
         const compressed = await compressProductImage(files[index]);
         const basePath = buildProductImagePath(shopId);
@@ -212,10 +213,10 @@ export default function NewProductForm({
       router.push("/compte/boutique/produits");
       router.refresh();
     } catch {
-      if (createdProductId) {
+      if (supabase && createdProductId) {
         await supabase.from("products").delete().eq("id", createdProductId);
       }
-      if (uploadedPaths.length > 0) {
+      if (supabase && uploadedPaths.length > 0) {
         await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
       }
       setStatus("error-generic");
