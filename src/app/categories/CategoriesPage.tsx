@@ -18,8 +18,16 @@ export default async function CategoriesPage() {
     categories = [];
   }
 
+  const categoriesBySlug = new Map(categories.map((item) => [item.slug, item]));
   const items = [
-    ...virtualCategories,
+    ...virtualCategories.map((item) => {
+      const stored = categoriesBySlug.get(item.slug);
+      return {
+        ...item,
+        description: stored?.description ?? item.description,
+        image_url: stored?.image_url ?? null,
+      };
+    }),
     ...categories
       .filter((item) => !["mode", "parfums"].includes(item.slug))
       .map((item) => ({
