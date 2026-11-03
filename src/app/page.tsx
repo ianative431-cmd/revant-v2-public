@@ -89,7 +89,7 @@ export default async function Home({ searchParams }: Props) {
                 role="img"
                 aria-label={`Illustration de la catégorie ${category.name}`}
                 className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
-                style={{ backgroundImage: `url("${getCategoryCoverImage(category.slug)}")` }}
+                style={{ backgroundImage: `url("${getCategoryCoverImage(category.slug, category.image_url)}")` }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
               <span className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white">{category.name}</span>

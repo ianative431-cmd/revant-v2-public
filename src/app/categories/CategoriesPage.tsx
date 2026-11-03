@@ -6,8 +6,8 @@ import { getCategoryCoverImage } from "@/content/products/category-cover-images"
 export const dynamic = "force-dynamic";
 
 const virtualCategories = [
-  { slug: "mode", name: "Mode", description: "Vêtements homme et femme" },
-  { slug: "parfums", name: "Parfums", description: "Eaux de parfum et fragrances" },
+  { slug: "mode", name: "Mode", description: "Vêtements homme et femme", image_url: null },
+  { slug: "parfums", name: "Parfums", description: "Eaux de parfum et fragrances", image_url: null },
 ];
 
 export default async function CategoriesPage() {
@@ -26,6 +26,7 @@ export default async function CategoriesPage() {
         slug: item.slug,
         name: item.name,
         description: item.description,
+        image_url: item.image_url,
       })),
   ];
 
@@ -40,7 +41,7 @@ export default async function CategoriesPage() {
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item) => {
-            const photo = getCategoryCoverImage(item.slug);
+            const photo = getCategoryCoverImage(item.slug, item.image_url);
             return (
               <Link
                 key={item.slug}
