@@ -1,28 +1,14 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveCategories } from "@/server/catalog/categories";
+import { getCategoryCoverImage } from "@/content/products/category-cover-images";
 
 export const dynamic = "force-dynamic";
 
 const virtualCategories = [
-  { slug: "mode", name: "Mode", description: "Vêtements homme et femme" },
-  { slug: "parfums", name: "Parfums", description: "Eaux de parfum et fragrances" },
+  { slug: "mode", name: "Mode", description: "Vêtements homme et femme", image_url: null },
+  { slug: "parfums", name: "Parfums", description: "Eaux de parfum et fragrances", image_url: null },
 ];
-
-// Images de couverture propres à chaque catégorie : aucun produit ni aucune
-// boutique fictive n'est créé. Les images restent des visuels éditoriaux.
-const categoryPhotos: Record<string, string> = {
-  electronique: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=85",
-  mode: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=85",
-  maison: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=900&q=85",
-  beaute: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=900&q=85",
-  parfums: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&q=85",
-  sport: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=900&q=85",
-  auto: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=85",
-  restaurants: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=85",
-  alimentation: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=85",
-  electromenager: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=900&q=85",
-};
 
 export default async function CategoriesPage() {
   let categories: Awaited<ReturnType<typeof getActiveCategories>> = [];
@@ -32,14 +18,23 @@ export default async function CategoriesPage() {
     categories = [];
   }
 
+  const categoriesBySlug = new Map(categories.map((item) => [item.slug, item]));
   const items = [
-    ...virtualCategories,
+    ...virtualCategories.map((item) => {
+      const stored = categoriesBySlug.get(item.slug);
+      return {
+        ...item,
+        description: stored?.description ?? item.description,
+        image_url: stored?.image_url ?? null,
+      };
+    }),
     ...categories
       .filter((item) => !["mode", "parfums"].includes(item.slug))
       .map((item) => ({
         slug: item.slug,
         name: item.name,
         description: item.description,
+        image_url: item.image_url,
       })),
   ];
 
@@ -54,7 +49,7 @@ export default async function CategoriesPage() {
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item) => {
-            const photo = categoryPhotos[item.slug] ?? categoryPhotos.mode;
+            const photo = getCategoryCoverImage(item.slug, item.image_url);
             return (
               <Link
                 key={item.slug}

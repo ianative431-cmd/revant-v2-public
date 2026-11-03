@@ -3,21 +3,13 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveProducts } from "@/server/products/products";
 import { getActiveCategories } from "@/server/catalog/categories";
 import { getActiveShops } from "@/server/shops/shops";
+import { getCategoryCoverImage } from "@/content/products/category-cover-images";
 import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import RevantMegaShortcuts from "@/components/layout/RevantMegaShortcuts";
 import InfiniteProductFeed from "@/components/products/InfiniteProductFeed";
 
 type Props = { searchParams: Promise<{ categorie?: string; q?: string }> };
-
-const CATEGORY_PHOTOS = [
-  "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=700&q=80",
-  "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=700&q=80",
-  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80",
-  "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=700&q=80",
-  "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=700&q=80",
-  "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=700&q=80",
-];
 
 const FARM_PHOTOS = [
   { title: "Produits frais", subtitle: "Du champ à la maison", photo: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80" },
@@ -89,11 +81,16 @@ export default async function Home({ searchParams }: Props) {
       </section>
 
       <section id="categories" className="px-4 pt-7">
-        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">Catégories</h2><a href="#categories" className="text-xs font-medium">Voir tout →</a></div>
+        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">Catégories</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {categories.map((category, index) => (
+          {categories.map((category) => (
             <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-neutral-300">
-              <div className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105" style={{ backgroundImage: `url("${CATEGORY_PHOTOS[index % CATEGORY_PHOTOS.length]}")` }} />
+              <div
+                role="img"
+                aria-label={`Illustration de la catégorie ${category.name}`}
+                className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
+                style={{ backgroundImage: `url("${getCategoryCoverImage(category.slug, category.image_url)}")` }}
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
               <span className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white">{category.name}</span>
             </Link>
