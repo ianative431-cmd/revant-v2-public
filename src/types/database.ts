@@ -12,6 +12,18 @@ export type Database = {
   }
   public: {
     Tables: {
+      super_admin_identities: {
+        Row: { access_key_digest: string; access_key_salt: string; created_at: string; first_name: string; first_name_normalized: string; last_name: string; last_name_normalized: string; updated_at: string; user_id: string }
+        Insert: { access_key_digest: string; access_key_salt: string; created_at?: string; first_name: string; first_name_normalized: string; last_name: string; last_name_normalized: string; updated_at?: string; user_id: string }
+        Update: { access_key_digest?: string; access_key_salt?: string; created_at?: string; first_name?: string; first_name_normalized?: string; last_name?: string; last_name_normalized?: string; updated_at?: string; user_id?: string }
+        Relationships: []
+      }
+      super_admin_devices: {
+        Row: { approved_at: string | null; created_at: string; device_name: string; device_token_digest: string; id: string; last_seen_at: string | null; revoked_at: string | null; status: string; user_id: string }
+        Insert: { approved_at?: string | null; created_at?: string; device_name: string; device_token_digest: string; id?: string; last_seen_at?: string | null; revoked_at?: string | null; status?: string; user_id: string }
+        Update: { approved_at?: string | null; created_at?: string; device_name?: string; device_token_digest?: string; id?: string; last_seen_at?: string | null; revoked_at?: string | null; status?: string; user_id?: string }
+        Relationships: []
+      }
       external_destination_links: {
         Row: {
           created_at: string

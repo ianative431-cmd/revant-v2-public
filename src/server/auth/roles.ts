@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { getCurrentUser } from "@/server/auth/session";
 import type { Enums } from "@/types/database";
+import { hasAal2, hasVerifiedTotp, isTrustedSuperAdminDevice } from "@/server/auth/super-admin";
 
 export type AppRole = Enums<"user_role">;
 
@@ -64,10 +65,13 @@ export async function requireAdmin() {
   const user = await requireUserWithLegalConsent();
   const roles = await getCurrentUserRoles();
 
-  if (!roles.some((role) => ADMIN_ROLES.includes(role))) {
-    redirect("/");
+  if (!roles.some((role) => ADMIN_ROLES.includes(role))) redirect("/");
+  if (roles.includes("super_admin")) {
+    const supabase = await createSupabaseServerClient();
+    if (!(await hasVerifiedTotp(supabase))) redirect("/admin-connexion/securite");
+    if (!(await hasAal2(supabase))) redirect("/admin-connexion/mfa");
+    if (!(await isTrustedSuperAdminDevice(user.id))) redirect("/admin-connexion/appareil-en-attente");
   }
-
   return user;
 }
 
@@ -121,9 +125,10 @@ export async function requireSuperAdmin() {
   const user = await requireUserWithLegalConsent();
   const roles = await getCurrentUserRoles();
 
-  if (!roles.includes("super_admin")) {
-    redirect("/admin");
-  }
-
+  if (!roles.includes("super_admin")) redirect("/admin");
+  const supabase = await createSupabaseServerClient();
+  if (!(await hasVerifiedTotp(supabase))) redirect("/admin-connexion/securite");
+  if (!(await hasAal2(supabase))) redirect("/admin-connexion/mfa");
+  if (!(await isTrustedSuperAdminDevice(user.id))) redirect("/admin-connexion/appareil-en-attente");
   return user;
 }
