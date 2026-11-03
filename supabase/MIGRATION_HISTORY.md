@@ -5,8 +5,8 @@
 ## Règles de sécurité
 
 - **Ne pas lancer `supabase db push` sur la production** tant que les sources manquantes ci-dessous ne sont pas retrouvées et réconciliées.
-- Cette PR ne change pas la base : elle renomme, archive et restaure des fichiers SQL déjà appliqués. Aucun SQL n'est exécuté.
-- Supabase enregistre 64 migrations. Après cette réconciliation, 35 migrations appliquées disposent d'un fichier source local dont le préfixe/version correspond exactement; 29 sources restent introuvables dans `main` et les branches historiques contrôlées.
+- La PR initiale de réconciliation n'a pas changé la base : elle a renommé, archivé et restauré des fichiers SQL déjà appliqués. Les migrations ajoutées ultérieurement dans ce journal ont été appliquées séparément via l'API de migration Supabase.
+- Supabase enregistre maintenant 67 migrations. Après les ajouts documentés dans ce journal, 38 migrations appliquées disposent d'un fichier source local dont le préfixe/version correspond exactement; 29 sources restent introuvables dans `main` et les branches historiques contrôlées.
 - Ne jamais recréer ces 29 fichiers à partir de suppositions ni les rejouer. Les noms distants sont listés plus bas pour faciliter une récupération future.
 - Les anciennes migrations `0001` à `0011` sont archivées car elles ne figurent pas dans l'historique distant actuel et décrivent un ancien modèle incompatible.
 
