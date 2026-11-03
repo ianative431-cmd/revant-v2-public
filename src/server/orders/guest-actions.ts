@@ -1,6 +1,7 @@
 "use server";
 
-import { createHash, createHmac } from "node:crypto";
+import { createHash } from "node:crypto";
+import { createGuestOrderTrackingToken, hashGuestTrackingToken } from "@/server/orders/guest-token.mjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -53,10 +54,8 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
   }
   // Bind the tracking token to the quantity so reusing an idempotency key
   // with a different quantity is rejected by the database RPC.
-  const token = createHmac("sha256", tokenSecret)
-    .update(`revant-guest-order:${idempotencyKey}:${quantity}`)
-    .digest("hex");
-  const tokenHash = createHash("sha256").update(token).digest("hex");
+  const token = createGuestOrderTrackingToken(idempotencyKey, quantity, tokenSecret);
+  const tokenHash = hashGuestTrackingToken(token);
   const sessionSupabase = await createSupabaseServerClient();
   const { data: { user } } = await sessionSupabase.auth.getUser();
   const supabase = createSupabaseAdminClient();
