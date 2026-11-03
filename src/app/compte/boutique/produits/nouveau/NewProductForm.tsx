@@ -167,7 +167,7 @@ export default function NewProductForm({
         uploadedPaths.push(path);
       }
 
-      const { data: product, error: insertError } = await supabase
+      const { data: product, error: insertError } = await client
         .from("products")
         .insert({
           shop_id: shopId,
