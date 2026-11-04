@@ -19,5 +19,8 @@ Palette issue du fichier Drive `Palette super admin` : `#171013`, `#203426`, `#4
 ## Limite hors ligne de cette première tranche
 Cette version fournit l'installation PWA et un écran hors ligne sûr, mais ne synchronise pas encore les données administratives et ne permet pas de valider des opérations hors connexion. Les données privées ne sont volontairement pas mises en cache. La tranche suivante doit ajouter un coffre local chiffré (IndexedDB/WebCrypto), un jeu de données hors ligne explicitement autorisé, une file de brouillons non financiers et une synchronisation idempotente côté serveur. Les paiements, retraits, KYC, rôles et actions irréversibles resteront en ligne et validés par le serveur.
 
-## Migrations — non appliquées
-`supabase/pending_migrations/20261103150000_super_admin_local_first.sql` crée les tables privées `super_admin_identities` et `super_admin_devices`. Elle reste dans `pending_migrations` pour revue et validation. La migration AAL2 existante reste également en attente. Aucun changement Supabase ou Render n'est appliqué par cette branche.
+## État des migrations Supabase — vérifié le 4 novembre 2026
+- `20261103175324_super_admin_local_first_20261103` est appliquée sur le projet Revant. Les tables `super_admin_identities` et `super_admin_devices` existent, avec RLS activé et accès réservé au rôle serveur `service_role` ; aucune donnée d'identité ou d'appareil n'a encore été créée.
+- `20261104222610_require_aal2_for_super_admin` est appliquée et vérifiée. Les fonctions `current_user_has_permission`, `has_any_admin_role` et `admin_operations_snapshot` exigent maintenant `aal2` pour le rôle `super_admin`, y compris à la frontière Postgres/RPC.
+- Les deux fichiers correspondants ont été retirés de `pending_migrations` et l'AAL2 est conservée sous son numéro réel dans `supabase/migrations/` pour garder l'historique du dépôt aligné sur la base.
+- Le coffre local chiffré, les données hors ligne autorisées et la synchronisation idempotente ne sont pas encore implémentés. Les opérations financières, retraits, KYC, rôles et actions irréversibles restent en ligne et validées côté serveur.
