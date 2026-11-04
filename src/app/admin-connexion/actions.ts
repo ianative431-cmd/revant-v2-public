@@ -20,9 +20,10 @@ async function getCurrentSuperAdmin(){const supabase=await createSupabaseServerC
 async function registerOrCheckDevice(userId:string,deviceName:string){
   const db=createSupabaseAdminClient();const store=await cookies();const token=store.get(DEVICE_COOKIE)?.value;
   if(token){const {data:existing}=await db.from("super_admin_devices").select("id,status").eq("user_id",userId).eq("device_token_digest",digestDeviceToken(token)).maybeSingle();if(existing?.status==="approved"){await db.from("super_admin_devices").update({last_seen_at:new Date().toISOString()}).eq("id",existing.id);redirect("/admin");}if(existing?.status==="pending")redirect("/admin-connexion/appareil-en-attente");store.delete(DEVICE_COOKIE);}
-  const {count,error:countError}=await db.from("super_admin_devices").select("id",{count:"exact",head:true}).eq("user_id",userId).eq("status","approved");if(countError)return {error:"Impossible de vérifier les appareils autorisés."};
-  const fresh=createDeviceToken();const status=(count??0)===0?"approved":"pending";
-  const {error}=await db.from("super_admin_devices").insert({user_id:userId,device_name:deviceName,device_token_digest:digestDeviceToken(fresh),status,approved_at:status==="approved"?new Date().toISOString():null,last_seen_at:new Date().toISOString()});
+  // A fresh device must never approve itself, even if every previously trusted device was revoked.
+  // The one-time bootstrap path explicitly registers the first trusted device in configureSuperAdminIdentity.
+  const fresh=createDeviceToken();const status="pending";
+  const {error}=await db.from("super_admin_devices").insert({user_id:userId,device_name:deviceName,device_token_digest:digestDeviceToken(fresh),status,approved_at:null,last_seen_at:new Date().toISOString()});
   if(error)return {error:"Impossible d'enregistrer cet appareil."};store.set(DEVICE_COOKIE,fresh,DEVICE_COOKIE_OPTIONS);if(status==="pending")redirect("/admin-connexion/appareil-en-attente");redirect("/admin");
 }
 
