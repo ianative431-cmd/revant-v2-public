@@ -16,8 +16,18 @@ Palette issue du fichier Drive `Palette super admin` : `#171013`, `#203426`, `#4
 - Le service worker ne met jamais en cache les pages authentifiées, API, commandes, données personnelles ou réponses administratives. Il ne conserve qu'une page hors ligne générique et le logo.
 - Installation après déploiement et migration : ouvrir `/admin/`, puis utiliser « Installer l'application » dans le menu du navigateur sur Android/Chrome ou l'option d'installation de la barre d'adresse sur ordinateur.
 
-## Limite hors ligne de cette première tranche
-Cette version fournit l'installation PWA et un écran hors ligne sûr, mais ne synchronise pas encore les données administratives et ne permet pas de valider des opérations hors connexion. Les données privées ne sont volontairement pas mises en cache. La tranche suivante doit ajouter un coffre local chiffré (IndexedDB/WebCrypto), un jeu de données hors ligne explicitement autorisé, une file de brouillons non financiers et une synchronisation idempotente côté serveur. Les paiements, retraits, KYC, rôles et actions irréversibles resteront en ligne et validés par le serveur.
+## Tranche Android locale — implémentée dans la branche de fonctionnalité
+- L'application Super Admin Capacitor embarque maintenant son propre écran local ; elle n'attend plus le chargement initial de Render pour s'ouvrir.
+- Un coffre local distinct de Supabase permet de créer/déverrouiller/verrouiller un espace de brouillons sur chaque installation.
+- Les brouillons sont chiffrés côté appareil avec Web Crypto (AES-256-GCM, clé dérivée PBKDF2-SHA-256) et conservés dans IndexedDB sous forme chiffrée. Verrouillage automatique après 10 minutes.
+- L'écran affiche l'état réseau et ouvre le vrai portail Super Admin en ligne lorsque la connexion est disponible.
+- Cette tranche ne synchronise pas les brouillons, n'enregistre pas encore les appareils dans Supabase et ne donne aucun pouvoir serveur hors ligne. Le coffre local n'est pas le compte Super Admin.
+
+## Limites et sécurité
+- Ne stocker dans le coffre local que des brouillons non sensibles : jamais de données personnelles, KYC, commandes, paiements, retraits, identifiants, mots de passe ou jetons.
+- Les paiements, retraits, KYC, rôles et actions irréversibles restent en ligne, après authentification et validation serveur.
+- La synchronisation chiffrée/idempotente, l'enrôlement individuel des appareils, la révocation et les conflits restent à construire et tester avant de qualifier l'ensemble de « local-first synchronisé ».
+- Les brouillons ne sont pas sauvegardés ailleurs : la perte des données de l'application ou de la phrase secrète locale peut les rendre irrécupérables.
 
 ## Migrations — non appliquées
 `supabase/pending_migrations/20261103150000_super_admin_local_first.sql` crée les tables privées `super_admin_identities` et `super_admin_devices`. Elle reste dans `pending_migrations` pour revue et validation. La migration AAL2 existante reste également en attente. Aucun changement Supabase ou Render n'est appliqué par cette branche.
