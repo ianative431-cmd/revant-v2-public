@@ -5,7 +5,10 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 type Props = { params: Promise<{ token: string }> };
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Vérification d’un reçu — Revant" };
+export const metadata = {
+  title: "Vérification d’un reçu — Revant",
+  robots: { index: false, follow: false },
+};
 
 export default async function VerifyReceiptPage({ params }: Props) {
   const { token } = await params;
