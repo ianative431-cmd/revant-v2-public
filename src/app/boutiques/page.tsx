@@ -7,8 +7,19 @@ export const metadata = {
   description: "Découvre les boutiques ouvertes sur Revant, sans compte obligatoire pour naviguer.",
 };
 
-const FALLBACK_PHOTO =
-  "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80";
+function safePublicImage(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function safeShopColor(value: string | null): string {
+  return value && /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#A79986";
+}
 
 export default async function BoutiquesPage() {
   let shops: Awaited<ReturnType<typeof getActiveShops>> = [];
@@ -51,7 +62,11 @@ export default async function BoutiquesPage() {
 
         {publicShops.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {publicShops.map((shop) => (
+            {publicShops.map((shop) => {
+              const bannerUrl = safePublicImage(shop.banner_url);
+              const logoUrl = safePublicImage(shop.logo_url);
+              const shopColor = safeShopColor(shop.background_color);
+              return (
               <Link
                 key={shop.id}
                 href={`/shop/${shop.slug}`}
@@ -61,17 +76,29 @@ export default async function BoutiquesPage() {
                 <div
                   className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
                   style={{
-                    backgroundImage: `url("${shop.banner_url || FALLBACK_PHOTO}")`,
+                    backgroundColor: shopColor,
+                    backgroundImage: bannerUrl ? `url("${bannerUrl}")` : undefined,
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                  <strong className="block text-sm">{shop.name}</strong>
+                <div className="absolute bottom-0 left-0 right-0 flex items-end gap-3 p-3 text-white">
+                  <div
+                    role={logoUrl ? "img" : undefined}
+                    aria-label={logoUrl ? `Logo de ${shop.name}` : undefined}
+                    className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/70 bg-white/20 bg-cover bg-center text-lg font-black text-white shadow-md backdrop-blur-sm"
+                    style={{ backgroundColor: logoUrl ? undefined : shopColor, backgroundImage: logoUrl ? `url("${logoUrl}")` : undefined }}
+                  >
+                    {!logoUrl && shop.name.slice(0, 1).toLocaleUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                  <strong className="block truncate text-sm">{shop.name}</strong>
                   <span className="mt-1 block text-[11px] text-white/80">{shop.city ?? "Niger"}</span>
                   <span className="mt-2 inline-block rounded bg-white px-2 py-1 text-[10px] font-bold text-black">OUVRIR →</span>
+                  </div>
                 </div>
               </Link>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <section className="rounded-2xl border border-brand-border bg-brand-surface px-5 py-10 text-center sm:px-10">
