@@ -5,12 +5,14 @@ on:
   pull_request:
     paths:
       - "android-apps/**"
+      - "public/images/logo-super-admin-512.png"
       - ".github/workflows/android-apks.yml"
   push:
     branches:
       - "feat/super-admin-local-first"
     paths:
       - "android-apps/**"
+      - "public/images/logo-super-admin-512.png"
       - ".github/workflows/android-apks.yml"
 
 permissions:
@@ -50,6 +52,25 @@ jobs:
       - name: Generate Android project
         working-directory: ${{ matrix.app.directory }}
         run: npx cap add android
+      - name: Prepare official Super Admin launcher icon
+        if: matrix.app.id == 'super-admin'
+        working-directory: ${{ matrix.app.directory }}
+        env:
+          LOGO_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/public/images/logo-super-admin-512.png
+        run: |
+          mkdir -p assets
+          curl --fail --location --silent --show-error "$LOGO_URL" -o /tmp/revant-super-admin-logo.png
+          npm install --no-save --package-lock=false @capacitor/assets sharp
+          node - <<'NODE'
+          const sharp = require('sharp');
+          sharp('/tmp/revant-super-admin-logo.png')
+            .resize(1024, 1024, { fit: 'contain' })
+            .png()
+            .toFile('assets/logo.png')
+            .then(() => console.log('Official Super Admin logo prepared at 1024x1024'))
+            .catch((error) => { console.error(error); process.exit(1); });
+          NODE
+          npx capacitor-assets generate --android --iconBackgroundColor '#203426' --splashBackgroundColor '#171013'
       - name: Build debug APK
         working-directory: ${{ matrix.app.directory }}/android
         run: ./gradlew assembleDebug --no-daemon
