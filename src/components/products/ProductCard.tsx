@@ -12,16 +12,16 @@ export default function ProductCard({ product }: { product: Product }) {
   const outOfStock = product.stock_quantity <= 0;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article className="revant-card group overflow-hidden rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)] shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/produit/${product.id}`} className="block">
-        <div className="relative aspect-square overflow-hidden bg-[var(--brand-bg)]">
+        <div className="revant-card-media relative aspect-square overflow-hidden bg-[var(--brand-bg)]">
           {imageUrl ? (
             <Image
               src={imageUrl}
               alt={product.name}
               fill
               sizes="(max-width: 640px) 50vw, 20vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.045]"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center px-2 text-center text-xs text-[var(--brand-muted)]">
@@ -34,7 +34,7 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           )}
         </div>
-        <div className="px-3 pt-3">
+        <div className="revant-card-content px-3 pt-3">
           <p className="truncate text-sm font-semibold">{product.name}</p>
           {product.categoryName && (
             <p className="mt-1 text-[11px] text-[var(--brand-muted)]">{product.categoryName}</p>
