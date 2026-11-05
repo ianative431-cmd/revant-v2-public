@@ -215,3 +215,15 @@ nav a:active { transform: scale(.97); }
 @media (prefers-reduced-motion: reduce) {
   .revant-skeleton { background-image: none !important; }
 }
+
+@keyframes revant-cart-success {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.045); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .revant-cart-added { animation: revant-cart-success 360ms var(--revant-motion-ease); border-color: #238636; color: #176b2c; }
+  .revant-nav-item > span:first-child { transition: transform 180ms var(--revant-motion-ease), background-color 180ms ease; }
+  .revant-nav-item:active > span:first-child { transform: scale(.88); }
+  .revant-nav-item.is-active > span:first-child { animation: revant-pop 260ms var(--revant-motion-ease) both; }
+}
