@@ -14,6 +14,18 @@ type Props = {
 
 const MAX_BYTES = 8 * 1024 * 1024;
 
+function extractShopMediaPath(url: string | null): string | null {
+  if (!url) return null;
+  const marker = "/object/public/shop-media/";
+  const index = url.indexOf(marker);
+  if (index === -1) return null;
+  try {
+    return decodeURIComponent(url.slice(index + marker.length).split(/[?#]/, 1)[0]);
+  } catch {
+    return null;
+  }
+}
+
 function detectImageType(bytes: Uint8Array): "image/jpeg" | "image/png" | "image/webp" | null {
   if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
   if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 &&
@@ -51,10 +63,13 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
     setBusy(kind);
     try {
       const supabase = createSupabaseBrowserClient();
-      const path = userId + "/" + shopId + "/" + kind + "." + extensionFor(actualType);
+      // Chaque remplacement crée un objet immuable avec une URL propre.
+      // Cela évite l'upsert, qui peut exiger une permission SELECT sur Storage.
+      const path = userId + "/" + shopId + "/" + kind + "-" + Date.now() + "-" + crypto.randomUUID() + "." + extensionFor(actualType);
       const { error: uploadError } = await supabase.storage
         .from("shop-media")
-        .upload(path, file, { upsert: true, contentType: actualType, cacheControl: "3600" });
+        .upload(path, file, { upsert: false, contentType: actualType, cacheControl: "31536000",
+        });
 
       if (uploadError) {
         setMessage("L'envoi a échoué. Vérifie ta connexion et réessaie.");
@@ -62,16 +77,27 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
       }
 
       const { data } = supabase.storage.from("shop-media").getPublicUrl(path);
+      const previousUrl = kind === "logo" ? logoUrl : bannerUrl;
       const update = kind === "logo" ? { logo_url: data.publicUrl } : { banner_url: data.publicUrl };
-      const { error: updateError } = await supabase
+      const { data: savedShop, error: updateError } = await supabase
         .from("shops")
         .update(update)
         .eq("id", shopId)
-        .eq("owner_id", userId);
+        .eq("owner_id", userId)
+        .select("id")
+        .maybeSingle();
 
-      if (updateError) {
+      if (updateError || !savedShop) {
+        // Ne pas laisser le nouvel objet orphelin si la boutique n'a pas été mise à jour.
+        await supabase.storage.from("shop-media").remove([path]);
         setMessage("Image envoyée, mais impossible de l'associer à la boutique. Réessaie.");
         return;
+      }
+
+      // L'ancien fichier n'est supprimé qu'après confirmation de la mise à jour en base.
+      const oldPath = extractShopMediaPath(previousUrl);
+      if (oldPath && oldPath !== path) {
+        await supabase.storage.from("shop-media").remove([oldPath]);
       }
 
       setMessage(kind === "logo" ? "Logo mis à jour." : "Bannière mise à jour.");
