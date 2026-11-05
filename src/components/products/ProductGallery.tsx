@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { safeProductImageUrl } from "@/lib/product-image";
 
 export default function ProductGallery({
   images,
@@ -13,7 +14,10 @@ export default function ProductGallery({
   outOfStock: boolean;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeImage = images[activeIndex] ?? null;
+  const safeImages = images
+    .map((image) => safeProductImageUrl(image))
+    .filter((image): image is string => image !== null);
+  const activeImage = safeImages[activeIndex] ?? safeImages[0] ?? null;
 
   return (
     <div className="min-w-0">
@@ -37,15 +41,15 @@ export default function ProductGallery({
             Épuisé
           </span>
         )}
-        {images.length > 1 && (
+        {safeImages.length > 1 && (
           <span className="absolute bottom-3 right-3 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
-            {activeIndex + 1} / {images.length}
+            {activeIndex + 1} / {safeImages.length}
           </span>
         )}
       </div>
-      {images.length > 1 && (
+      {safeImages.length > 1 && (
         <div className="mt-3 grid grid-cols-5 gap-2" aria-label="Autres photos du produit">
-          {images.map((image, index) => (
+          {safeImages.map((image, index) => (
             <button
               key={`${image}-${index}`}
               type="button"
