@@ -37,7 +37,7 @@ export default async function AdminDocumentsFinanciersPage() {
         <h1 className="text-xl font-bold">Reçus et factures</h1>
         <p className="mt-1 text-sm text-black/55">Registre central des documents émis par Revant. Consultation uniquement : aucun document ne peut être modifié ou supprimé depuis cet écran.</p>
       </header>
-      <p className="rounded-xl bg-black/5 p-3 text-sm text-black/65">Les documents seront affichés ici après activation du registre et émission des premiers reçus ou factures. Les associés n’ont pas accès à ce module.</p>
+      <p className="rounded-xl bg-black/5 p-3 text-sm text-black/65">Aucun document financier n’a encore été émis. Les reçus et factures apparaîtront ici après leur première émission. Les associés n’ont pas accès à ce module.</p>
       <AdminDataTable rows={rows} columns={[{key:"numéro",label:"Numéro"},{key:"type",label:"Type"},{key:"commande",label:"Commande"},{key:"émission",label:"Émis le"},{key:"vérification",label:"Vérification"}]} />
     </section>
   );

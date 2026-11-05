@@ -50,8 +50,8 @@ export default async function RecuPage({ params }: Props) {
           </dl>
           <div className="flex flex-col items-center border-t border-dashed border-brand-text/15 pt-4">
             {/* eslint-disable-next-line @next/next/no-img-element -- data URL générée côté serveur */}
-            <img src={qrCodeDataUrl} alt="QR code de vérification du reçu de commande" width={120} height={120} />
-            <p className="mt-2 text-center text-[10px] text-brand-text/40">Ce reçu confirme l’existence de la commande et son statut de livraison. Il ne constitue pas une preuve de paiement électronique.</p>
+            <img src={qrCodeDataUrl} alt="QR code d’accès privé au reçu de commande" width={120} height={120} />
+            <p className="mt-2 text-center text-[10px] text-brand-text/40">Ce QR code ouvre l’accès privé à ce reçu dans votre compte Revant. Il ne s’agit pas d’un QR code public de vérification d’authenticité. Ce reçu confirme la commande et son statut de livraison, mais ne constitue pas une preuve de paiement électronique.</p>
           </div>
         </div>
       </div>
