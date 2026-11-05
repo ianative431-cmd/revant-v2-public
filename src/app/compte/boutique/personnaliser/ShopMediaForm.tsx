@@ -65,7 +65,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
       const supabase = createSupabaseBrowserClient();
       // Chaque remplacement crée un objet immuable avec une URL propre.
       // Cela évite l'upsert, qui peut exiger une permission SELECT sur Storage.
-      const path = userId + "/" + shopId + "/" + kind + "-" + Date.now() + "-" + crypto.randomUUID() + "." + extensionFor(actualType);
+      const path = userId + "/" + shopId + "/" + kind + "-" + crypto.randomUUID() + "." + extensionFor(actualType);
       const { error: uploadError } = await supabase.storage
         .from("shop-media")
         .upload(path, file, { upsert: false, contentType: actualType, cacheControl: "31536000",
