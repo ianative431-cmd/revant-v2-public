@@ -1573,6 +1573,53 @@ export type Database = {
         }
         Relationships: []
       }
+      receipt_documents: {
+        Row: {
+          created_at: string
+          document_number: string
+          document_snapshot: Json
+          document_type: string
+          id: string
+          issued_at: string
+          order_id: string
+          revocation_reason: string | null
+          verification_revoked_at: string | null
+          verification_token_hash: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_number: string
+          document_snapshot: Json
+          document_type: string
+          id?: string
+          issued_at?: string
+          order_id: string
+          revocation_reason?: string | null
+          verification_revoked_at?: string | null
+          verification_token_hash?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_number?: string
+          document_snapshot?: Json
+          document_type?: string
+          id?: string
+          issued_at?: string
+          order_id?: string
+          revocation_reason?: string | null
+          verification_revoked_at?: string | null
+          verification_token_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipt_documents_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referrals: {
         Row: {
           created_at: string

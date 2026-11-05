@@ -7,14 +7,20 @@ import type { Database } from "@/types/database";
  *
  * Règles strictes :
  * - Ne jamais importer ce fichier dans un composant "use client" ou dans
- *   tout code exécuté côté navigateur (le `import "server-only"` ci-dessus
- *   fait échouer le build si c'est le cas par erreur).
- * - Réservé aux futures opérations admin qui doivent explicitement
- *   dépasser les droits de l'utilisateur courant (ex. modération,
- *   résolution de litige). Aucune de ces opérations n'est implémentée
- *   à ce stade (voir SECURITY.md et ARCHITECTURE.md).
- * - La clé SUPABASE_SERVICE_ROLE_KEY ne doit jamais être préfixée par
- *   NEXT_PUBLIC_, sous peine d'être exposée au navigateur.
+ *   du code exécuté côté navigateur. `import "server-only"` bloque
+ *   cette erreur au build.
+ * - Chaque usage doit être exceptionnel, côté serveur, après une autorisation
+ *   explicite vérifiée côté serveur. Le rôle service_role contourne RLS :
+ *   il ne remplace jamais requirePermission ni les contrôles de propriété.
+ * - Le registre receipt_documents est utilisé uniquement par :
+ *   (1) l'écran Super Admin protégé par finance.view, avec une sélection
+ *       limitée aux métadonnées non sensibles ;
+ *   (2) le vérificateur public, avec une recherche exacte par empreinte
+ *       SHA-256 et une réponse limitée aux champs publics du document.
+ * - Ne jamais retourner de snapshot complet, de données personnelles ou de
+ *   secret depuis le vérificateur public.
+ * - La clé SUPABASE_SERVICE_ROLE_KEY reste strictement serveur et ne doit
+ *   jamais être préfixée par NEXT_PUBLIC_.
  */
 export function createSupabaseAdminClient() {
   return createClient<Database>(
