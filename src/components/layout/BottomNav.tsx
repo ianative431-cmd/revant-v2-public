@@ -24,7 +24,7 @@ function Item({ href, label, icon, active }: { href: string; label: string; icon
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`group flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 ${active ? "text-[var(--brand-accent)]" : "text-[var(--brand-muted)] hover:text-[var(--brand-text)]"}`}
+      className={`revant-nav-item group flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 ${active ? "is-active text-[var(--brand-accent)]" : "text-[var(--brand-muted)] hover:text-[var(--brand-text)]"}`}
     >
       <span className={`flex h-7 w-10 items-center justify-center rounded-full ${active ? "bg-[var(--brand-accent)]/10" : ""}`}>{icon}</span>
       <span className={`whitespace-nowrap text-[9px] tracking-[.01em] sm:text-[10px] ${active ? "font-extrabold" : "font-medium"}`}>{label}</span>

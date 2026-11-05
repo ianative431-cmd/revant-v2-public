@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* Deux thèmes simples et cohérents : clair blanc/orange, sombre noir/orange. */
 :root,
 :root[data-site-palette="terracotta"] {
   color-scheme: light;
@@ -101,6 +100,70 @@ nav a:active { transform: scale(.97); }
 @media (hover: hover) and (pointer: fine) {
   button:hover, [role="button"]:hover { filter: brightness(1.035); }
 }
+
+/* Revant motion system: lightweight CSS only, no animation dependency. */
+@keyframes revant-enter {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes revant-soft-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes revant-pop {
+  0% { opacity: 0; transform: scale(.94); }
+  70% { opacity: 1; transform: scale(1.015); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes revant-image-in {
+  from { opacity: .65; transform: scale(1.035); }
+  to { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  main > section,
+  main > div,
+  body > div > div > section,
+  body > div > div > main {
+    animation: revant-enter 520ms var(--revant-motion-ease) both;
+  }
+  section .grid > *,
+  main .grid > *,
+  [class*="grid-cols"] > * {
+    animation: revant-enter 460ms var(--revant-motion-ease) both;
+  }
+  section .grid > :nth-child(2),
+  main .grid > :nth-child(2),
+  [class*="grid-cols"] > :nth-child(2) { animation-delay: 45ms; }
+  section .grid > :nth-child(3),
+  main .grid > :nth-child(3),
+  [class*="grid-cols"] > :nth-child(3) { animation-delay: 90ms; }
+  section .grid > :nth-child(4),
+  main .grid > :nth-child(4),
+  [class*="grid-cols"] > :nth-child(4) { animation-delay: 135ms; }
+  section .grid > :nth-child(5),
+  main .grid > :nth-child(5),
+  [class*="grid-cols"] > :nth-child(5) { animation-delay: 180ms; }
+  section .grid > :nth-child(6),
+  main .grid > :nth-child(6),
+  [class*="grid-cols"] > :nth-child(6) { animation-delay: 225ms; }
+  section img,
+  main img,
+  [role="img"] {
+    animation: revant-image-in 650ms ease-out both;
+  }
+  dialog[open],
+  [role="dialog"],
+  [data-state="open"] {
+    animation: revant-pop 220ms var(--revant-motion-ease) both;
+  }
+  nav[aria-label],
+  header {
+    animation: revant-soft-in 360ms ease-out both;
+  }
+  button:active, [role="button"]:active, a:active {
+    transition-duration: 90ms;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;
@@ -108,4 +171,59 @@ nav a:active { transform: scale(.97); }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+
+/* Component-level motion hooks used by marketplace UI. */
+@keyframes revant-toast-in {
+  from { opacity: 0; transform: translate3d(0, 12px, 0) scale(.98); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes revant-skeleton-shimmer {
+  from { background-position: 180% 0; }
+  to { background-position: -180% 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .revant-card {
+    animation: revant-enter 440ms var(--revant-motion-ease) both;
+  }
+  .revant-card-media img {
+    transition: transform 520ms var(--revant-motion-ease);
+  }
+  .revant-card:focus-within .revant-card-media img {
+    transform: scale(1.035);
+  }
+  details[open] > nav {
+    transform-origin: top left;
+    animation: revant-pop 180ms var(--revant-motion-ease) both;
+  }
+  details > summary svg {
+    transition: transform 180ms var(--revant-motion-ease);
+  }
+  details[open] > summary svg {
+    transform: rotate(90deg);
+  }
+  .revant-toast {
+    animation: revant-toast-in 220ms var(--revant-motion-ease) both;
+  }
+  .revant-skeleton {
+    background-image: linear-gradient(100deg, transparent 20%, rgba(127,127,127,.12) 40%, rgba(127,127,127,.12) 60%, transparent 80%);
+    background-size: 220% 100%;
+    animation: revant-skeleton-shimmer 1.35s ease-in-out infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .revant-skeleton { background-image: none !important; }
+}
+
+@keyframes revant-cart-success {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.045); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .revant-cart-added { animation: revant-cart-success 360ms var(--revant-motion-ease); border-color: #238636; color: #176b2c; }
+  .revant-nav-item > span:first-child { transition: transform 180ms var(--revant-motion-ease), background-color 180ms ease; }
+  .revant-nav-item:active > span:first-child { transform: scale(.88); }
+  .revant-nav-item.is-active > span:first-child { animation: revant-pop 260ms var(--revant-motion-ease) both; }
 }
