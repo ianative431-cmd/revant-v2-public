@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { safeProductImageUrl } from "@/lib/product-image";
 
 export default function ProductGallery({
@@ -18,6 +18,14 @@ export default function ProductGallery({
     .map((image) => safeProductImageUrl(image))
     .filter((image): image is string => image !== null);
   const activeImage = safeImages[activeIndex] ?? safeImages[0] ?? null;
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [images]);
+
+  useEffect(() => {
+    if (activeIndex >= safeImages.length) setActiveIndex(0);
+  }, [activeIndex, safeImages.length]);
 
   return (
     <div className="min-w-0">
