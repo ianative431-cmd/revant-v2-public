@@ -17,7 +17,8 @@ export default function ProductGallery({
   const safeImages = images
     .map((image) => safeProductImageUrl(image))
     .filter((image): image is string => image !== null);
-  const activeImage = safeImages[activeIndex] ?? safeImages[0] ?? null;
+  const selectedIndex = safeImages.length > 0 ? activeIndex % safeImages.length : 0;
+  const activeImage = safeImages[selectedIndex] ?? null;
 
   return (
     <div className="min-w-0">
@@ -25,9 +26,9 @@ export default function ProductGallery({
         {activeImage ? (
           <Image
             src={activeImage}
-            alt={`${productName} — photo ${activeIndex + 1}`}
+            alt={`${productName} — photo ${selectedIndex + 1}`}
             fill
-            priority={activeIndex === 0}
+            priority={selectedIndex === 0}
             sizes="(max-width: 640px) 100vw, 50vw"
             className="object-cover"
           />
@@ -43,7 +44,7 @@ export default function ProductGallery({
         )}
         {safeImages.length > 1 && (
           <span className="absolute bottom-3 right-3 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
-            {activeIndex + 1} / {safeImages.length}
+            {selectedIndex + 1} / {safeImages.length}
           </span>
         )}
       </div>
@@ -55,9 +56,9 @@ export default function ProductGallery({
               type="button"
               onClick={() => setActiveIndex(index)}
               aria-label={`Afficher la photo ${index + 1}`}
-              aria-pressed={activeIndex === index}
+              aria-pressed={selectedIndex === index}
               className={`relative aspect-square overflow-hidden rounded-lg border-2 ${
-                activeIndex === index ? "border-[var(--brand-accent)]" : "border-transparent"
+                selectedIndex === index ? "border-[var(--brand-accent)]" : "border-transparent"
               }`}
             >
               <Image src={image} alt="" fill sizes="20vw" className="object-cover" />
