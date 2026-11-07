@@ -48,6 +48,8 @@ export default function NewProductForm({
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const previewUrlsRef = useRef<string[]>([]);
   const [status, setStatus] = useState<Status>("idle");
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -251,22 +253,16 @@ export default function NewProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <label className="grid gap-2 text-sm font-medium">
-        Photos du produit (jusqu&apos;à 5)
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-          onChange={(event) => {
-            handleFilesSelected(Array.from(event.currentTarget.files ?? []));
-            event.currentTarget.value = "";
-          }}
-          className="text-sm"
-        />
-        <span className="text-xs font-normal text-neutral-500">
-          Tu peux prendre une photo avec ton téléphone ou choisir plusieurs images dans la galerie.
-        </span>
-      </label>
+      <section className="grid gap-2 text-sm font-medium" aria-label="Photos du produit">
+        <p>Photos du produit (jusqu&apos;à 5)</p>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" disabled={status === "submitting" || files.length >= MAX_PRODUCT_IMAGES} onClick={() => { if (cameraInputRef.current) { cameraInputRef.current.value = ""; cameraInputRef.current.click(); } }} className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold disabled:opacity-50">Prendre une photo</button>
+          <button type="button" disabled={status === "submitting" || files.length >= MAX_PRODUCT_IMAGES} onClick={() => { if (galleryInputRef.current) { galleryInputRef.current.value = ""; galleryInputRef.current.click(); } }} className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold disabled:opacity-50">Choisir dans la galerie</button>
+        </div>
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={(event) => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (file) handleFilesSelected([file]); }} />
+        <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={(event) => { const selected = Array.from(event.currentTarget.files ?? []); event.currentTarget.value = ""; handleFilesSelected(selected); }} />
+        <span className="text-xs font-normal text-neutral-500">Prends une photo directement ou sélectionne plusieurs images dans la galerie.</span>
+      </section>
 
       {previewUrls.length > 0 && (
         <div className="grid grid-cols-3 gap-2">

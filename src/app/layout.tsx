@@ -16,9 +16,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   icons: {
-    icon: "/images/logo-revant.svg",
-    shortcut: "/images/logo-revant.svg",
-    apple: "/images/logo-revant.svg",
+    icon: "/images/logo-revant-officiel-512.png",
+    shortcut: "/images/logo-revant-officiel-512.png",
+    apple: "/images/logo-revant-officiel-512.png",
   },
 };
 

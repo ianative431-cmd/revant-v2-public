@@ -9,10 +9,13 @@ import {
 import { savePendingProductImage } from "@/lib/pending-product-image";
 
 type Action = "search" | "add";
+type PickerSource = "camera" | "gallery";
 
 export default function PhotoActionMenu() {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const actionRef = useRef<Action>("search");
+  const [pickerAction, setPickerAction] = useState<Action | null>(null);
   const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
   const router = useRouter();
@@ -20,10 +23,15 @@ export default function PhotoActionMenu() {
   function choose(action: Action) {
     actionRef.current = action;
     setNotice("");
-    if (inputRef.current) {
-      inputRef.current.value = "";
-      inputRef.current.click();
-    }
+    setPickerAction(action);
+  }
+
+  function openPicker(source: PickerSource) {
+    setPickerAction(null);
+    const input = source === "camera" ? cameraInputRef.current : galleryInputRef.current;
+    if (!input) return;
+    input.value = "";
+    input.click();
   }
 
   async function onPhotoSelected(file?: File) {
@@ -77,6 +85,12 @@ export default function PhotoActionMenu() {
     reader.readAsDataURL(file);
   }
 
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    void onPhotoSelected(file);
+  }
+
   return (
     <div className="relative flex shrink-0 items-center gap-1">
       <button type="button" aria-label="Rechercher par photo" title="Rechercher par photo" onClick={() => choose("search")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-neutral-500 transition hover:text-[#803e2f] disabled:opacity-50">
@@ -91,7 +105,14 @@ export default function PhotoActionMenu() {
           <path d="M12 9v6M9 12h6" strokeLinecap="round" />
         </svg>
       </button>
-      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => onPhotoSelected(event.target.files?.[0])} />
+      {pickerAction && (
+        <div role="group" aria-label={pickerAction === "search" ? "Choisir une photo pour la recherche" : "Choisir une photo pour le produit"} className="absolute right-0 top-11 z-[60] w-52 overflow-hidden rounded-xl border border-neutral-200 bg-white p-1 text-xs text-neutral-900 shadow-xl">
+          <button type="button" onClick={() => openPicker("camera")} className="block w-full rounded-lg px-3 py-3 text-left hover:bg-neutral-100">Prendre une photo</button>
+          <button type="button" onClick={() => openPicker("gallery")} className="block w-full rounded-lg px-3 py-3 text-left hover:bg-neutral-100">Choisir dans la galerie</button>
+        </div>
+      )}
+      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={handleInputChange} />
+      <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={handleInputChange} />
       {saving && <p role="status" className="absolute right-0 top-11 z-[60] w-56 text-xs text-neutral-500">Préparation de la photo…</p>}
       {notice && <p role="status" className="absolute right-0 top-11 z-[60] w-56 text-xs text-red-700">{notice}</p>}
     </div>
