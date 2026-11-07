@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import PaletteSwitcher from "./PaletteSwitcher";
 import PhotoActionMenu from "./PhotoActionMenu";
@@ -31,7 +32,8 @@ export default async function SiteHeader() {
   const palette = await getSitePalette();
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-[var(--brand-header)] text-[var(--brand-header-text)] shadow-sm">
-      <div className="mx-auto flex min-h-[64px] max-w-[1500px] items-center justify-between gap-2 px-3 sm:px-7">
+      <div className="mx-auto flex min-h-[56px] sm:min-h-[64px] max-w-[1500px] items-center justify-between gap-2 px-3 sm:px-7">
+        <div className="flex shrink-0 items-center gap-1">
         <details className="relative md:hidden">
           <summary aria-label="Ouvrir le menu principal" className="flex min-h-11 min-w-10 list-none cursor-pointer items-center justify-center rounded-xl hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]"><MenuIcon/></summary>
           <nav aria-label="Menu principal" className="absolute left-0 top-12 z-50 w-64 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-header)] p-2 text-sm text-[var(--brand-header-text)] shadow-2xl">
@@ -39,6 +41,10 @@ export default async function SiteHeader() {
             {quickLinks.map((item) => <Link key={item.href + item.label} href={item.href} className="block rounded-xl px-3 py-3 font-medium hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">{item.label}</Link>)}
           </nav>
         </details>
+        <Link href="/" aria-label="Revant — accueil" className="shrink-0 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
+          <Image src="/images/logo-revant-app-512.png" alt="Revant" width={40} height={40} priority className="h-8 w-8 object-contain sm:h-10 sm:w-10" />
+        </Link>
+        </div>
 
         <nav className="hidden items-center gap-7 text-xs font-medium opacity-85 md:flex">
           <Link href="/">Accueil</Link><Link href="/boutiques">Boutiques</Link><Link href="/#categories">Catégories</Link><Link href="/restaurants">Restaurants</Link><Link href="/#a-propos">À propos</Link>
@@ -59,13 +65,13 @@ export default async function SiteHeader() {
           <div className="hidden lg:block"><PaletteSwitcher current={palette}/></div>
         </div>
       </div>
-      <div className="px-3 pb-3 sm:hidden">
-        <form action="/" method="get" role="search" className="flex min-h-12 items-center gap-3 rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 text-[var(--brand-text)] shadow-sm focus-within:ring-2 focus-within:ring-[var(--brand-accent)]">
+      <div className="px-3 pb-2 sm:hidden">
+        <form action="/" method="get" role="search" className="flex min-h-10 items-center gap-2 rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 text-[var(--brand-text)] shadow-sm focus-within:ring-2 focus-within:ring-[var(--brand-accent)]">
           <SearchIcon/>
           <input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:opacity-60"/>
-          <button type="submit" aria-label="Lancer la recherche" className="rounded-full bg-[var(--brand-accent)] px-3 py-2 text-xs font-bold text-white">OK</button>
+          <button type="submit" aria-label="Lancer la recherche" className="rounded-full bg-[var(--brand-accent)] px-2.5 py-1.5 text-xs font-bold text-white">OK</button>
         </form>
-        <div className="mt-2 flex justify-end"><PaletteSwitcher current={palette}/></div>
+        <div className="mt-1 flex justify-end"><PaletteSwitcher current={palette}/></div>
       </div>
     </header>
   );

@@ -16,9 +16,12 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   icons: {
-    icon: "/images/logo-revant-officiel-512.png",
-    shortcut: "/images/logo-revant-officiel-512.png",
-    apple: "/images/logo-revant-officiel-512.png",
+    icon: [
+      { url: "/images/logo-revant-app-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/images/logo-revant-app-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/images/logo-revant-app-192.png",
+    apple: "/images/logo-revant-app-512.png",
   },
 };
 
@@ -27,8 +30,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f97316" },
-    { media: "(prefers-color-scheme: dark)", color: "#090909" },
+    { media: "(prefers-color-scheme: light)", color: "#803e2f" },
+    { media: "(prefers-color-scheme: dark)", color: "#1f1d20" },
   ],
 };
 

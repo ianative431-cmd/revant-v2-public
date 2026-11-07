@@ -6,6 +6,8 @@ on:
     paths:
       - "android-apps/**"
       - "public/images/logo-super-admin-512.png"
+      - "public/images/logo-revant-app-192.png"
+      - "public/images/logo-revant-app-512.png"
       - ".github/workflows/android-apks.yml"
   push:
     branches:
@@ -13,6 +15,8 @@ on:
     paths:
       - "android-apps/**"
       - "public/images/logo-super-admin-512.png"
+      - "public/images/logo-revant-app-192.png"
+      - "public/images/logo-revant-app-512.png"
       - ".github/workflows/android-apks.yml"
 
 permissions:
@@ -52,6 +56,25 @@ jobs:
       - name: Generate Android project
         working-directory: ${{ matrix.app.directory }}
         run: npx cap add android
+      - name: Prepare official Revant launcher icon
+        if: matrix.app.id == 'revant'
+        working-directory: ${{ matrix.app.directory }}
+        env:
+          LOGO_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/public/images/logo-revant-app-512.png
+        run: |
+          mkdir -p assets
+          curl --fail --location --silent --show-error "$LOGO_URL" -o /tmp/revant-official-logo.png
+          npm install --no-save --package-lock=false @capacitor/assets sharp
+          node - <<'NODE'
+          const sharp = require('sharp');
+          sharp('/tmp/revant-official-logo.png')
+            .resize(1024, 1024, { fit: 'contain' })
+            .png()
+            .toFile('assets/logo.png')
+            .then(() => console.log('Official Revant launcher icon prepared at 1024x1024'))
+            .catch((error) => { console.error(error); process.exit(1); });
+          NODE
+          npx capacitor-assets generate --android --iconBackgroundColor '#C76A35' --splashBackgroundColor '#A79986'
       - name: Prepare official Super Admin launcher icon
         if: matrix.app.id == 'super-admin'
         working-directory: ${{ matrix.app.directory }}
