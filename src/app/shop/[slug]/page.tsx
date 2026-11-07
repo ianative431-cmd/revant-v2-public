@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { resolveShopBySlug } from "@/server/shops/shops";
-import { getActiveProductsForShop } from "@/server/products/products";
-import ProductCard from "@/components/products/ProductCard";
-import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
+import ProductCard from "@/components/products/ProductCard";
+import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getActiveProductsForShop } from "@/server/products/products";
+import { resolveShopBySlug } from "@/server/shops/shops";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -29,20 +29,22 @@ function safeImageUrl(value: string | null | undefined): string | null {
 function safeSocialUrl(value: string | null, host: string): string | null {
   const raw = value?.trim();
   if (!raw) return null;
-
   try {
-    const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${host}/${raw.replace(/^@/, "")}`;
+    const candidate = /^https?:\/\//i.test(raw)
+      ? raw
+      : `https://${host}/${raw.replace(/^@/, "")}`;
     const url = new URL(candidate);
-    if (url.protocol !== "https:" || (url.hostname !== host && !url.hostname.endsWith(`.${host}`))) {
-      return null;
-    }
+    if (
+      url.protocol !== "https:" ||
+      (url.hostname !== host && !url.hostname.endsWith(`.${host}`))
+    ) return null;
     return url.toString();
   } catch {
     return null;
   }
 }
 
-function safePhone(value: string | null): string | null {
+function safePhone(value: string | null | undefined): string | null {
   if (!value) return null;
   const digits = value.replace(/[^\d+]/g, "");
   return digits.length >= 7 ? digits : null;
@@ -52,13 +54,17 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const supabase = await createSupabaseServerClient();
   const result = await resolveShopBySlug(supabase, slug);
+  if (result.kind !== "found") return { title: "Boutique — Revant" };
 
-  if (result.kind !== "found") {
-    return { title: "Boutique — Revant" };
-  }
+  const image = safeImageUrl(result.shop.banner_url) ?? safeImageUrl(result.shop.logo_url);
   return {
     title: `${result.shop.name} — Revant`,
     description: result.shop.description ?? `Découvrez les produits de ${result.shop.name} sur Revant.`,
+    openGraph: {
+      title: `${result.shop.name} — Revant`,
+      description: result.shop.description ?? undefined,
+      images: image ? [image] : [],
+    },
   };
 }
 
@@ -68,10 +74,7 @@ export default async function ShopPublicPage({ params }: Props) {
   const result = await resolveShopBySlug(supabase, slug);
 
   if (result.kind === "not_found") notFound();
-
-  if (result.kind === "redirect") {
-    permanentRedirect(`/shop/${result.toSlug}`);
-  }
+  if (result.kind === "redirect") permanentRedirect(`/shop/${result.toSlug}`);
 
   const { shop } = result;
   const isDefaultType = !shop.is_restaurant && !shop.is_pro && !shop.is_premium;
@@ -94,7 +97,6 @@ export default async function ShopPublicPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[#f5f3f0] pb-24 text-[#1f1d20]">
       <SiteHeader />
-
       <main className="mx-auto w-full max-w-[1440px] px-3 pb-10 pt-4 sm:px-6 sm:pt-6">
         <nav aria-label="Fil d’Ariane" className="mb-4 text-xs text-neutral-500">
           <Link href="/" className="hover:text-black">Accueil</Link>
@@ -104,39 +106,36 @@ export default async function ShopPublicPage({ params }: Props) {
           <span className="font-medium text-neutral-800">{shop.name}</span>
         </nav>
 
-        <section className="overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm">
+        <section className="overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-xl shadow-black/10">
           <div
             role={bannerUrl ? "img" : undefined}
             aria-label={bannerUrl ? `Bannière de ${shop.name}` : undefined}
             className="relative h-40 bg-cover bg-center sm:h-56 lg:h-72"
             style={{
               backgroundColor: shopColor,
-              backgroundImage: bannerUrl ? `linear-gradient(90deg, rgba(0,0,0,.28), rgba(0,0,0,.04)), url("${bannerUrl}")` : undefined,
+              backgroundImage: bannerUrl
+                ? `linear-gradient(90deg, rgba(0,0,0,.28), rgba(0,0,0,.04)), url("${bannerUrl}")`
+                : undefined,
             }}
           >
             {!bannerUrl && (
               <div className="absolute inset-0 flex items-center justify-center text-5xl font-black text-white/25 sm:text-7xl">
-                {shop.name.slice(0, 1).toLocaleUpperCase()}
+                {shop.name.slice(0, 1).toLocaleUpperCase("fr")}
               </div>
             )}
-            <div className="absolute left-4 top-4">
-              <Link href="/boutiques" className="inline-flex rounded-full border border-white/30 bg-black/35 px-3 py-2 text-xs font-semibold text-white backdrop-blur hover:bg-black/55">
-                ← Toutes les boutiques
-              </Link>
-            </div>
           </div>
 
-          <div className="relative px-4 pb-5 pt-14 sm:px-7 sm:pb-7">
+          <div className="relative px-4 pb-6 pt-14 sm:px-8 sm:pb-8">
             <div
               role={logoUrl ? "img" : undefined}
               aria-label={logoUrl ? `Logo de ${shop.name}` : undefined}
-              className="absolute -top-12 left-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white bg-cover bg-center text-3xl font-black text-white shadow-md sm:left-7 sm:h-28 sm:w-28"
+              className="absolute -top-12 left-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white bg-cover bg-center text-3xl font-black text-white shadow-lg sm:left-8 sm:h-28 sm:w-28"
               style={{
                 backgroundColor: shopColor,
                 backgroundImage: logoUrl ? `url("${logoUrl}")` : undefined,
               }}
             >
-              {!logoUrl && shop.name.slice(0, 1).toLocaleUpperCase()}
+              {!logoUrl && shop.name.slice(0, 1).toLocaleUpperCase("fr")}
             </div>
 
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -178,31 +177,29 @@ export default async function ShopPublicPage({ params }: Props) {
           </div>
         </section>
 
-        <section id="produits" className="mt-7">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+        <section id="produits" className="mt-7 rounded-[28px] border border-black/5 bg-white p-4 shadow-sm sm:p-7">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[.2em] text-neutral-500">Le catalogue</p>
-              <h2 className="mt-1 text-xl font-black sm:text-2xl">Les produits de la boutique</h2>
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-neutral-500">La sélection de la boutique</p>
+              <h2 className="mt-1 text-xl font-black tracking-tight sm:text-2xl">Nos produits</h2>
+              <p className="mt-1 text-xs text-neutral-500">{products.length} article{products.length > 1 ? "s" : ""} disponible{products.length > 1 ? "s" : ""}</p>
             </div>
-            <span className="rounded-full bg-white px-3 py-2 text-xs font-semibold text-neutral-600 shadow-sm">
-              {products.length} {products.length > 1 ? "produits" : "produit"}
-            </span>
+            <Link href="/boutiques" className="text-xs font-bold text-neutral-700 underline underline-offset-4">Découvrir d’autres boutiques</Link>
           </div>
 
           {products.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-neutral-300 bg-white px-5 py-14 text-center">
-              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-2xl" aria-hidden="true">🛍️</div>
-              <h3 className="text-sm font-bold text-neutral-800">La boutique prépare ses premières annonces</h3>
-              <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-neutral-500">Les produits publiés par cette boutique apparaîtront ici dès qu’ils seront disponibles.</p>
+            <div className="rounded-2xl border border-dashed border-neutral-300 bg-[#f8f7f5] px-5 py-12 text-center">
+              <div aria-hidden="true" className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 text-2xl">🛍️</div>
+              <h3 className="mt-4 text-base font-bold">La boutique prépare ses produits</h3>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-neutral-600">Aucun produit n’est publié pour le moment. Reviens bientôt pour découvrir les nouveautés.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5">
               {products.map((product) => <ProductCard key={product.id} product={product} />)}
             </div>
           )}
         </section>
       </main>
-
       <BottomNav />
     </div>
   );
