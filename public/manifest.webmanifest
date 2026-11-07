@@ -21,16 +21,16 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/images/logo-revant-officiel-192.png",
+      "src": "/images/logo-revant-app-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/logo-revant-officiel-512.png",
+      "src": "/images/logo-revant-app-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }

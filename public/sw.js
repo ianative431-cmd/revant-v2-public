@@ -1,6 +1,6 @@
-const CACHE_NAME = "revant-shell-v4";
+const CACHE_NAME = "revant-shell-v5";
 const OFFLINE_URL = "/offline.html";
-const SHELL_URLS = [OFFLINE_URL, "/images/logo-revant-officiel-512.png"];
+const SHELL_URLS = [OFFLINE_URL, "/images/logo-revant-app-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
