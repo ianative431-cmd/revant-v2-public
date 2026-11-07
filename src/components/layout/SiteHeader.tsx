@@ -41,7 +41,7 @@ export default async function SiteHeader() {
           </nav>
         </details>
         <Link href="/" aria-label="Revant — accueil" className="shrink-0">
-          <Image src="/images/logo-revant.svg" alt="Revant" width={52} height={52} priority className="h-10 w-10 rounded-md object-cover sm:h-12 sm:w-12" />
+          <Image src="/images/logo-revant-officiel-512.png" alt="Revant" width={52} height={52} priority className="h-10 w-10 rounded-md object-contain sm:h-12 sm:w-12" />
         </Link>
         <nav className="hidden items-center gap-7 text-xs font-medium opacity-85 md:flex">
           <Link href="/">Accueil</Link><Link href="/boutiques">Boutiques</Link><Link href="/#categories">Catégories</Link><Link href="/restaurants">Restaurants</Link><Link href="/#a-propos">À propos</Link>

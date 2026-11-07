@@ -225,7 +225,7 @@ export default function AvatarUploader({
         ref={galleryInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
-        className="hidden"
+        className="sr-only"
         onChange={(e) => {
           handleFileSelected(e.target.files?.[0]);
           e.target.value = ""; // permet de resélectionner le même fichier plus tard
@@ -237,7 +237,7 @@ export default function AvatarUploader({
         type="file"
         accept="image/*"
         capture="environment"
-        className="hidden"
+        className="sr-only"
         onChange={(e) => {
           handleFileSelected(e.target.files?.[0]);
           e.target.value = "";

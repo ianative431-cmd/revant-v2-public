@@ -7,15 +7,30 @@
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "any",
   "background_color": "#a79986",
   "theme_color": "#803e2f",
-  "categories": ["shopping", "lifestyle"],
+  "categories": [
+    "shopping",
+    "lifestyle"
+  ],
   "prefer_related_applications": false,
   "icons": [
-    {"src": "/images/logo-revant.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any"},
-    {"src": "/images/logo-revant.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any"},
-    {"src": "/images/logo-revant.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable"}
+    {
+      "src": "/images/logo-revant-officiel-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo-revant-officiel-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }
