@@ -33,6 +33,7 @@ export default async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-[var(--brand-header)] text-[var(--brand-header-text)] shadow-sm">
       <div className="mx-auto flex min-h-[64px] max-w-[1500px] items-center justify-between gap-2 px-3 sm:px-7">
+        <div className="flex shrink-0 items-center gap-1.5">
         <details className="relative md:hidden">
           <summary aria-label="Ouvrir le menu principal" className="flex min-h-11 min-w-10 list-none cursor-pointer items-center justify-center rounded-xl hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]"><MenuIcon/></summary>
           <nav aria-label="Menu principal" className="absolute left-0 top-12 z-50 w-64 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-header)] p-2 text-sm text-[var(--brand-header-text)] shadow-2xl">
@@ -40,9 +41,10 @@ export default async function SiteHeader() {
             {quickLinks.map((item) => <Link key={item.href + item.label} href={item.href} className="block rounded-xl px-3 py-3 font-medium hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">{item.label}</Link>)}
           </nav>
         </details>
-        <Link href="/" aria-label="Revant — accueil" className="shrink-0">
+        <Link href="/" aria-label="Revant — accueil" className="shrink-0 rounded-lg border border-[var(--brand-header-text)]/35 p-0.5 shadow-sm ring-1 ring-[var(--brand-border)]">
           <Image src="/images/logo-revant-officiel-512.png" alt="Revant" width={52} height={52} priority className="h-10 w-10 rounded-md object-contain sm:h-12 sm:w-12" />
         </Link>
+        </div>
         <nav className="hidden items-center gap-7 text-xs font-medium opacity-85 md:flex">
           <Link href="/">Accueil</Link><Link href="/boutiques">Boutiques</Link><Link href="/#categories">Catégories</Link><Link href="/restaurants">Restaurants</Link><Link href="/#a-propos">À propos</Link>
         </nav>
