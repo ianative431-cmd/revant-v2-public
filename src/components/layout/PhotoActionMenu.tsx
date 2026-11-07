@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   PRODUCT_IMAGE_ALLOWED_TYPES,
@@ -85,7 +85,7 @@ export default function PhotoActionMenu() {
     reader.readAsDataURL(file);
   }
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
     event.currentTarget.value = "";
     void onPhotoSelected(file);
