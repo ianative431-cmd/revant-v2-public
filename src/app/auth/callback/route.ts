@@ -5,12 +5,14 @@ const ALLOWED_DESTINATIONS = new Set(["/compte", "/compte/boutique", "/admin", "
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const appOrigin = configuredSiteUrl ? new URL(configuredSiteUrl).origin : requestUrl.origin;
   const code = requestUrl.searchParams.get("code");
   const requestedNext = requestUrl.searchParams.get("next") ?? "/compte";
   const next = ALLOWED_DESTINATIONS.has(requestedNext) ? requestedNext : "/compte";
   const isAdminFlow = next === "/admin";
 
-  const errorUrl = new URL("/auth/erreur", requestUrl.origin);
+  const errorUrl = new URL("/auth/erreur", appOrigin);
   errorUrl.searchParams.set("flow", isAdminFlow ? "admin" : "seller");
 
   if (!code) {
@@ -53,5 +55,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(new URL(next, requestUrl.origin));
+  return NextResponse.redirect(new URL(next, appOrigin));
 }
