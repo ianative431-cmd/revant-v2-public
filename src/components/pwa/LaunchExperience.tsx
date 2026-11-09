@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 type LaunchStage = "logo" | "video" | null;
 
 const VIDEO_SRC = "/media/revant-launch.mp4";
-const LAUNCH_KEY = "revant-launch-experience-shown";
+const PWA_LAUNCH_KEY = "revant-launch-experience-shown";
 
 export default function LaunchExperience() {
   const [stage, setStage] = useState<LaunchStage>(null);
@@ -14,15 +14,22 @@ export default function LaunchExperience() {
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
-    const launchedFromPwa = new URLSearchParams(window.location.search).get("source") === "pwa";
+    const launchSource = new URLSearchParams(window.location.search).get("source");
+    const isNativeColdStart = launchSource === "android-app";
+    const isPwaLaunch = isStandalone || launchSource === "pwa";
 
-    if (!isStandalone && !launchedFromPwa) return;
+    if (!isNativeColdStart && !isPwaLaunch) return;
 
-    try {
-      if (window.sessionStorage.getItem(LAUNCH_KEY) === "1") return;
-      window.sessionStorage.setItem(LAUNCH_KEY, "1");
-    } catch {
-      // Storage may be unavailable in a restricted browser context; continue safely.
+    // A native WebView is created for a cold app launch and remains mounted
+    // when Android merely backgrounds/resumes the app. Do not use browser
+    // session storage for that lifecycle, as it can outlive the Android process.
+    if (!isNativeColdStart) {
+      try {
+        if (window.sessionStorage.getItem(PWA_LAUNCH_KEY) === "1") return;
+        window.sessionStorage.setItem(PWA_LAUNCH_KEY, "1");
+      } catch {
+        // Storage may be unavailable in a restricted browser context; continue safely.
+      }
     }
 
     let logoTimer: number | undefined;
