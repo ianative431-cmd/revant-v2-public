@@ -25,13 +25,18 @@ export default function LaunchExperience() {
       // Storage may be unavailable in a restricted browser context; continue safely.
     }
 
-    setStage("logo");
-    const logoTimer = window.setTimeout(() => setStage("video"), 650);
-    const safetyTimer = window.setTimeout(() => setStage(null), 9_000);
+    let logoTimer: number | undefined;
+    let safetyTimer: number | undefined;
+    const startTimer = window.setTimeout(() => {
+      setStage("logo");
+      logoTimer = window.setTimeout(() => setStage("video"), 650);
+      safetyTimer = window.setTimeout(() => setStage(null), 9_000);
+    }, 0);
 
     return () => {
-      window.clearTimeout(logoTimer);
-      window.clearTimeout(safetyTimer);
+      window.clearTimeout(startTimer);
+      if (logoTimer !== undefined) window.clearTimeout(logoTimer);
+      if (safetyTimer !== undefined) window.clearTimeout(safetyTimer);
     };
   }, []);
 
