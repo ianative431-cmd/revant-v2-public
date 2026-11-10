@@ -65,7 +65,7 @@ export async function requireAdmin() {
   const user = await requireUserWithLegalConsent();
   const roles = await getCurrentUserRoles();
 
-  if (!roles.some((role) => ADMIN_ROLES.includes(role))) redirect("/");
+  if (!roles.some((role) => ADMIN_ROLES.includes(role))) redirect("/admin-connexion?reason=not-admin");
   if (roles.includes("super_admin")) {
     const supabase = await createSupabaseServerClient();
     if (!(await hasVerifiedTotp(supabase))) redirect("/admin-connexion/securite");
