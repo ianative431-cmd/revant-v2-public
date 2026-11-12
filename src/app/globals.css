@@ -3,42 +3,60 @@
 :root,
 :root[data-site-palette="terracotta"] {
   color-scheme: light;
-  --brand-bg: #F8F5EF;
+  --brand-bg: #F7F4EE;
   --brand-surface: #FFFFFF;
-  --brand-accent: #F46A18;
-  --brand-accent-hover: #FF914D;
-  --brand-accent-soft: color-mix(in srgb, #F46A18 12%, #F8F5EF);
-  --brand-text: #20252B;
-  --brand-on-surface: #20252B;
+  --brand-surface-raised: #FFFFFF;
+  --brand-surface-soft: #EEEAE2;
+  --brand-accent: #D94F0B;
+  --brand-accent-hover: #B94308;
+  --brand-accent-soft: #FFF0E6;
+  --brand-accent-contrast: #FFFFFF;
+  --brand-text: #202832;
+  --brand-on-surface: #202832;
   --brand-header: #142B45;
-  --brand-header-text: #F8F5EF;
-  --brand-border: color-mix(in srgb, #20252B 12%, #F8F5EF);
-  --brand-muted: color-mix(in srgb, #20252B 66%, #F8F5EF);
-  --brand-nav: rgba(248, 245, 239, .97);
+  --brand-header-text: #FFF9F2;
+  --brand-border: #D8DDE3;
+  --brand-muted: #586575;
+  --brand-nav: rgba(255, 255, 255, .97);
+  --brand-shadow: 0 8px 28px rgba(20, 43, 69, .10);
 }
 
 :root[data-site-palette="slate-lilac"] {
   color-scheme: dark;
-  --brand-bg: #20252B;
-  --brand-surface: #142B45;
+  --brand-bg: #101923;
+  --brand-surface: #1B2937;
+  --brand-surface-raised: #24384B;
+  --brand-surface-soft: #293D50;
   --brand-accent: #FF914D;
-  --brand-accent-hover: #F46A18;
-  --brand-accent-soft: color-mix(in srgb, #FF914D 14%, #20252B);
-  --brand-text: #F8F5EF;
-  --brand-on-surface: #F8F5EF;
-  --brand-header: #142B45;
-  --brand-header-text: #F8F5EF;
-  --brand-border: color-mix(in srgb, #F8F5EF 16%, #20252B);
-  --brand-muted: color-mix(in srgb, #F8F5EF 68%, #20252B);
-  --brand-nav: rgba(32, 37, 43, .97);
+  --brand-accent-hover: #FFAA70;
+  --brand-accent-soft: #3B2B25;
+  --brand-accent-contrast: #202832;
+  --brand-text: #F4F1EB;
+  --brand-on-surface: #F4F1EB;
+  --brand-header: #0D2033;
+  --brand-header-text: #FFF9F2;
+  --brand-border: #405163;
+  --brand-muted: #C1CBD5;
+  --brand-nav: rgba(19, 32, 46, .97);
+  --brand-shadow: 0 10px 32px rgba(0, 0, 0, .30);
 }
 
 @theme inline {
   --color-brand-bg: var(--brand-bg);
   --color-brand-surface: var(--brand-surface);
+  --color-brand-surface-raised: var(--brand-surface-raised);
+  --color-brand-surface-soft: var(--brand-surface-soft);
   --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+  --color-brand-accent-soft: var(--brand-accent-soft);
+  --color-brand-accent-contrast: var(--brand-accent-contrast);
   --color-brand-text: var(--brand-text);
   --color-brand-on-surface: var(--brand-on-surface);
+  --color-brand-header: var(--brand-header);
+  --color-brand-header-text: var(--brand-header-text);
+  --color-brand-border: var(--brand-border);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-nav: var(--brand-nav);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
@@ -58,6 +76,20 @@ body {
   color: var(--brand-text);
   font-family: Arial, Helvetica, sans-serif;
   overflow-wrap: anywhere;
+}
+
+/* Transition cohérente entre les deux thèmes, sans animer les médias. */
+html[data-site-palette] body,
+html[data-site-palette] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) {
+  transition-property: background-color, color, border-color, box-shadow;
+  transition-duration: 240ms;
+  transition-timing-function: cubic-bezier(.2, .7, .25, 1);
+}
+
+/* Les boutons d'action orange gardent un contraste lisible dans chaque mode. */
+a[class*="bg-brand-accent"], button[class*="bg-brand-accent"],
+a[class*="bg-[#F46A18]"], button[class*="bg-[#F46A18]"] {
+  color: var(--brand-accent-contrast) !important;
 }
 
 img, video, canvas, svg { max-width: 100%; }
