@@ -25,7 +25,7 @@ const quickLinks = [
   { href: "/restaurants", label: "Restaurants" },
   { href: "/compte/commandes", label: "Mes commandes" },
   { href: "/boutiques/creer", label: "Vendre sur Revant" },
-  { href: "/compte", label: "Mon compte" },
+  { href: "/parametres", label: "Paramètres" },
 ];
 
 export default async function SiteHeader() {

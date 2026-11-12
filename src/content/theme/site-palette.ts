@@ -7,18 +7,18 @@ export const SITE_PALETTES: Record<
   { label: string; bg: string; surface: string; accent: string; text: string }
 > = {
   terracotta: {
-    label: "Clair — blanc & orange",
-    bg: "#FFFFFF",
-    surface: "#FFF7ED",
-    accent: "#F97316",
-    text: "#171717",
+    label: "Tangerine électrique — clair",
+    bg: "#F8F5EF",
+    surface: "#FFFFFF",
+    accent: "#F46A18",
+    text: "#20252B",
   },
   "slate-lilac": {
-    label: "Sombre — noir & orange",
-    bg: "#090909",
-    surface: "#171717",
-    accent: "#F97316",
-    text: "#F5F5F5",
+    label: "Tangerine électrique — sombre",
+    bg: "#20252B",
+    surface: "#142B45",
+    accent: "#FF914D",
+    text: "#F8F5EF",
   },
 };
 

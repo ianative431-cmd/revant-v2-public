@@ -31,8 +31,8 @@ export default function PaletteSwitcher({ current }: { current: SitePaletteId })
             title={p.label}
             className={`flex h-8 items-center gap-1.5 rounded-full border px-2 text-[10px] font-semibold ${isActive ? "border-[var(--brand-accent)] bg-[var(--brand-surface)] opacity-100" : "border-[var(--brand-border)] opacity-70"}`}
           >
-            <span className={`h-3 w-3 rounded-full border border-black/10 ${isDark ? "bg-neutral-950" : "bg-white"}`} />
-            <span className={`h-3 w-3 rounded-full ${isDark ? "bg-orange-500" : "bg-orange-500"}`} />
+            <span className={`h-3 w-3 rounded-full border border-black/10 ${isDark ? "bg-[#20252B]" : "bg-[#F8F5EF]"}`} />
+            <span className={`h-3 w-3 rounded-full ${isDark ? "bg-[#FF914D]" : "bg-[#F46A18]"}`} />
           </button>
         );
       })}

@@ -28,7 +28,7 @@ export default async function ComptePage() {
         <Link href="/compte/commandes" className="block text-center text-sm underline mt-2 text-brand-text/70">Mes commandes</Link>
         <Link href="/compte/notifications" className="block text-center text-sm underline mt-2 text-brand-text/70">Notifications</Link>
         <Link href="/compte/livraisons" className="block text-center text-sm underline mt-2 text-brand-text/70">Espace livreur</Link>
-        <Link href="/compte/confidentialite" className="block text-center text-sm underline mt-2 text-brand-text/70">Confidentialité et données</Link>
+        <Link href="/parametres#securite" className="block text-center text-sm underline mt-2 text-brand-text/70">Confidentialité et données</Link>
       </div>
     </div>
   );

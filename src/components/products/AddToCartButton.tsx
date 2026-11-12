@@ -27,5 +27,5 @@ export default function AddToCartButton({ item, compact = false }: { item: CartI
       setAdded(false);
     }
   }
-  return <button type="button" onClick={add} aria-live="polite" className={`revant-cart-action block w-full rounded-full border border-neutral-300 bg-white text-center font-bold text-neutral-900 transition hover:border-[#803e2f] hover:text-[#803e2f] ${added ? "revant-cart-added" : ""} ${compact ? "py-2.5 text-[10px]" : "mt-3 px-6 py-4 text-sm"}`}>{added ? "AJOUTÉ AU PANIER ✓" : "AJOUTER AU PANIER"}</button>;
+  return <button type="button" onClick={add} aria-live="polite" className={`revant-cart-action block w-full rounded-full border border-neutral-300 bg-white text-center font-bold text-neutral-900 transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)] ${added ? "revant-cart-added" : ""} ${compact ? "py-2.5 text-[10px]" : "mt-3 px-6 py-4 text-sm"}`}>{added ? "AJOUTÉ AU PANIER ✓" : "AJOUTER AU PANIER"}</button>;
 }

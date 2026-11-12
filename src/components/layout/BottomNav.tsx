@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Settings } from "lucide-react";
 
 function HomeIcon() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5"><path d="M3 11.5 12 4l9 7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9" strokeLinecap="round" strokeLinejoin="round"/></svg>;
@@ -15,10 +16,6 @@ function MessageIcon() {
 function CartIcon() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" className="h-[18px] w-[18px]" aria-hidden="true"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9.5" cy="20" r="1"/><circle cx="17.5" cy="20" r="1"/></svg>;
 }
-function ProfileIcon() {
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c1.2-3.5 4-5.3 7-5.3s5.8 1.8 7 5.3" strokeLinecap="round"/></svg>;
-}
-
 function Item({ href, label, icon, active }: { href: string; label: string; icon: React.ReactNode; active: boolean }) {
   return (
     <Link
@@ -43,7 +40,7 @@ export default function BottomNav() {
       <Item href="/categories" label="Catégorie" active={pathname === "/categories"} icon={<CategoryIcon/>}/>
       <Item href="/messages" label="Message" active={pathname === "/messages" || pathname.startsWith("/messages/")} icon={<MessageIcon/>}/>
       <Item href="/panier" label="Panier" active={pathname === "/panier"} icon={<CartIcon/>}/>
-      <Item href="/compte" label="Mon Revant" active={pathname === "/compte" || pathname.startsWith("/compte/")} icon={<ProfileIcon/>}/>
+      <Item href="/parametres" label="Paramètres" active={pathname === "/parametres" || pathname.startsWith("/parametres/") || pathname === "/compte" || pathname.startsWith("/compte/")} icon={<Settings size={20} strokeWidth={1.8} aria-hidden="true"/>}/>
     </nav>
   );
 }
