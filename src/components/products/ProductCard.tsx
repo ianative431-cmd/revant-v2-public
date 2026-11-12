@@ -12,7 +12,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const outOfStock = product.stock_quantity <= 0;
 
   return (
-    <article className="revant-card group overflow-hidden rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)] shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+    <article className="revant-card revant-product-card group overflow-hidden rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)] shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/produit/${product.id}`} className="block">
         <div className="revant-card-media relative aspect-square overflow-hidden bg-[var(--brand-bg)]">
           {imageUrl ? (

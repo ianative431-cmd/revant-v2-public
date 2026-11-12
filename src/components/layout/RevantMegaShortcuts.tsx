@@ -32,8 +32,8 @@ export default function RevantMegaShortcuts() {
       <Link href="/boutiques" className="text-xs font-semibold text-[var(--brand-accent)] underline-offset-4 hover:underline">Tout explorer →</Link>
     </div>
     <div className="flex gap-3 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {shortcuts.map((item) => <Link key={item.label} href={item.href} className="group flex w-[76px] shrink-0 flex-col items-center gap-2 rounded-2xl px-1 py-2 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)] sm:w-[92px]">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-accent)] shadow-sm transition group-hover:border-[var(--brand-accent)] group-hover:bg-[var(--brand-accent-soft)] group-active:scale-95 sm:h-16 sm:w-16"><ShortcutIcon kind={item.icon}/></span>
+      {shortcuts.map((item) => <Link key={item.label} href={item.href} className="revant-shortcut group flex w-[76px] shrink-0 flex-col items-center gap-2 rounded-2xl px-1 py-2 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)] sm:w-[92px]">
+        <span className="revant-shortcut-icon flex h-14 w-14 items-center justify-center rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-accent)] shadow-sm transition group-hover:border-[var(--brand-accent)] group-hover:bg-[var(--brand-accent-soft)] group-active:scale-95 sm:h-16 sm:w-16"><ShortcutIcon kind={item.icon}/></span>
         <span className="text-[11px] font-semibold leading-tight text-[var(--brand-text)] sm:text-xs">{item.label}</span>
       </Link>)}
     </div>

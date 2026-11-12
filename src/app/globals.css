@@ -263,3 +263,48 @@ nav a:active { transform: scale(.97); }
   .revant-nav-item:active > span:first-child { transform: scale(.88); }
   .revant-nav-item.is-active > span:first-child { animation: revant-pop 260ms var(--revant-motion-ease) both; }
 }
+
+
+/* Revant visual refresh — deliberate motion on key marketplace surfaces. */
+@keyframes revant-hero-copy-in {
+  0% { opacity: 0; transform: translate3d(0, 18px, 0); filter: blur(5px); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
+}
+@keyframes revant-hero-image-drift {
+  from { transform: scale(1.09); }
+  to { transform: scale(1); }
+}
+@keyframes revant-icon-arrive {
+  0% { opacity: .55; transform: translateY(5px) scale(.82) rotate(-7deg); }
+  75% { opacity: 1; transform: translateY(-2px) scale(1.06) rotate(2deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+@keyframes revant-accent-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-accent) 0%, transparent); }
+  50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--brand-accent) 13%, transparent); }
+}
+@keyframes revant-loading-glow {
+  0%, 100% { opacity: .55; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .revant-hero-copy { animation: revant-hero-copy-in 650ms var(--revant-motion-ease) both; }
+  .revant-hero-slide.is-active { animation: revant-hero-image-drift 6.5s ease-out both; }
+  .revant-shortcut { transition: transform 240ms var(--revant-motion-ease); }
+  .revant-shortcut:hover { transform: translateY(-4px); }
+  .revant-shortcut-icon { transition: transform 260ms var(--revant-motion-ease), box-shadow 260ms ease, background-color 220ms ease; }
+  .revant-shortcut:hover .revant-shortcut-icon { transform: translateY(-2px) scale(1.055); box-shadow: var(--brand-shadow); }
+  .revant-shortcut:active .revant-shortcut-icon { transform: scale(.92); }
+  .revant-product-card { transition: transform 260ms var(--revant-motion-ease), box-shadow 260ms ease, border-color 220ms ease; }
+  .revant-product-card:hover { transform: translateY(-4px); box-shadow: var(--brand-shadow); border-color: color-mix(in srgb, var(--brand-accent) 48%, var(--brand-border)); }
+  .revant-product-card:focus-within { border-color: var(--brand-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-accent) 14%, transparent); }
+  .revant-settings-row { transition: background-color 200ms ease, transform 200ms var(--revant-motion-ease); }
+  .revant-settings-row:hover { transform: translateX(3px); }
+  .revant-settings-row:active { transform: scale(.99); }
+  .revant-nav-item.is-active > span:first-child { animation: revant-icon-arrive 360ms var(--revant-motion-ease) both; }
+  .revant-nav-item.is-active > span:last-child { animation: revant-hero-copy-in 260ms ease-out both; }
+  .revant-cart-added { animation: revant-accent-pulse 650ms ease-out; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .revant-hero-copy, .revant-hero-slide, .revant-shortcut, .revant-product-card, .revant-settings-row { animation: none !important; transform: none !important; }
+}
