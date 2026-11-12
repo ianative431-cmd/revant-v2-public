@@ -37,7 +37,7 @@ export default async function BoutiquesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#f5f3f0] pb-24 text-[#1f1d20]">
+    <div className="min-h-screen bg-brand-bg pb-24 text-brand-text">
       <SiteHeader />
       <main className="mx-auto w-full max-w-[1440px] px-3 py-8 sm:px-6 sm:py-12">
         <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
@@ -61,7 +61,7 @@ export default async function BoutiquesPage() {
               const typeLabel = getShopTypeLabel(shop);
               const color = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
                 ? shop.background_color
-                : "#A79986";
+                : "var(--brand-surface)";
 
               return (
                 <Link
@@ -104,7 +104,7 @@ export default async function BoutiquesPage() {
                     </div>
 
                     <div className="flex min-w-0 items-start justify-between gap-2">
-                      <h2 className="line-clamp-1 text-base font-black tracking-tight text-[#1f1d20]">
+                      <h2 className="line-clamp-1 text-base font-black tracking-tight text-brand-text">
                         {shop.name}
                       </h2>
                       <span className="shrink-0 rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">
@@ -128,13 +128,13 @@ export default async function BoutiquesPage() {
           </div>
         ) : (
           <section className="rounded-[28px] border border-black/5 bg-white px-5 py-12 text-center shadow-sm sm:px-10">
-            <div aria-hidden="true" className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f5f3f0] text-2xl">🛍️</div>
+            <div aria-hidden="true" className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-bg text-2xl">🛍️</div>
             <h2 className="mt-4 text-lg font-extrabold">Aucune boutique publique pour le moment</h2>
             <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-neutral-600">
               Les vitrines apparaîtront ici dès que des boutiques seront actives. Tu peux déjà parcourir les produits publiés.
             </p>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-              <Link href="/#produits" className="rounded-full bg-[#803E2F] px-5 py-3 text-xs font-bold text-white hover:brightness-95">Explorer les produits</Link>
+              <Link href="/#produits" className="rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white hover:brightness-95">Explorer les produits</Link>
               <Link href="/boutiques/creer" className="rounded-full border border-neutral-300 px-5 py-3 text-xs font-bold text-neutral-800 hover:bg-neutral-50">Ouvrir une boutique</Link>
             </div>
           </section>

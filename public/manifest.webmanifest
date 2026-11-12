@@ -12,8 +12,8 @@
     "minimal-ui"
   ],
   "orientation": "any",
-  "background_color": "#a79986",
-  "theme_color": "#803e2f",
+  "background_color": "#F8F5EF",
+  "theme_color": "#F46A18",
   "categories": [
     "shopping",
     "lifestyle"

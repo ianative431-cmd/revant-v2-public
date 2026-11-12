@@ -27,8 +27,8 @@ export default function PhotoSearchPage() {
       <p className="mt-2 text-sm leading-relaxed text-neutral-600">Ta photo est prête. Pour l’instant, le catalogue peut être recherché par mots-clés ; la reconnaissance automatique d’images devra être reliée à un moteur visuel.</p>
       {photo ? <><span className="sr-only">Photo sélectionnée</span><img src={photo} alt="Photo sélectionnée pour la recherche" className="mt-5 max-h-72 w-full rounded-xl bg-neutral-100 object-contain" /></> : <div className="mt-5 flex h-36 items-center justify-center rounded-xl bg-neutral-100 text-sm text-neutral-500">Choisis une photo avec l’icône appareil photo de la recherche.</div>}
       <form onSubmit={submit} className="mt-5 flex gap-2">
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Décris le produit recherché" aria-label="Décrire le produit recherché" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-sm outline-none focus:border-[#803e2f]" />
-        <button type="submit" className="rounded-xl bg-[#803e2f] px-4 py-3 text-sm font-bold text-white">Chercher</button>
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Décris le produit recherché" aria-label="Décrire le produit recherché" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-sm outline-none focus:border-[var(--brand-accent)]" />
+        <button type="submit" className="rounded-xl bg-[var(--brand-accent)] px-4 py-3 text-sm font-bold text-white">Chercher</button>
       </form>
     </div>
   </main>;

@@ -8,6 +8,7 @@ import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import RevantMegaShortcuts from "@/components/layout/RevantMegaShortcuts";
 import InfiniteProductFeed from "@/components/products/InfiniteProductFeed";
+import HeroCarousel from "@/components/home/HeroCarousel";
 
 type Props = { searchParams: Promise<{ categorie?: string; q?: string }> };
 
@@ -19,6 +20,36 @@ const FARM_PHOTOS = [
 ];
 
 const HERO_PHOTO = "https://images.unsplash.com/photo-1514435116008-a80913c597af?auto=format&fit=crop&w=1800&q=85";
+
+const HERO_SLIDES = [
+  {
+    id: "marketplace",
+    eyebrow: "MODE • MAISON • TERROIR",
+    title: "STYLE. QUALITÉ. REVANT.",
+    description: "Des trouvailles du quotidien, des boutiques locales et des produits qui font avancer nos communautés.",
+    ctaLabel: "ACHETER MAINTENANT",
+    ctaHref: "#produits",
+    image: HERO_PHOTO,
+  },
+  {
+    id: "terroir",
+    eyebrow: "PRODUITS FRAIS • CIRCUITS LOCAUX",
+    title: "LE TERROIR À L’HONNEUR",
+    description: "Découvre les produits frais et les saveurs de nos régions, réunis au même endroit.",
+    ctaLabel: "DÉCOUVRIR LE TERROIR",
+    ctaHref: "#boutiques-paysannes",
+    image: FARM_PHOTOS[0].photo,
+  },
+  {
+    id: "boutiques",
+    eyebrow: "BOUTIQUES • DÉCOUVERTES • PROXIMITÉ",
+    title: "TES TROUVAILLES COMMENCENT ICI",
+    description: "Explore les boutiques locales et trouve les produits qui te correspondent.",
+    ctaLabel: "EXPLORER LES BOUTIQUES",
+    ctaHref: "/boutiques",
+    image: FARM_PHOTOS[3].photo,
+  },
+] as const;
 
 export default async function Home({ searchParams }: Props) {
   const { categorie, q } = await searchParams;
@@ -50,19 +81,7 @@ export default async function Home({ searchParams }: Props) {
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text pb-28">
       <SiteHeader />
-      <section className="relative mx-3 mt-1 overflow-hidden rounded-2xl bg-[#101010] text-white min-h-[330px] sm:min-h-[390px]">
-        <div className="absolute inset-0 bg-cover bg-[center_35%] opacity-75" style={{ backgroundImage: `url("${HERO_PHOTO}")` }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/10" />
-        <div className="relative z-10 flex min-h-[330px] sm:min-h-[390px] items-center px-6 py-10 sm:px-12">
-          <div className="max-w-lg">
-            <p className="mb-3 text-[11px] font-semibold tracking-[0.22em] text-white/70">MODE • MAISON • TERROIR</p>
-            <h1 className="mb-4 text-3xl font-black leading-[1.04] tracking-tight sm:text-5xl">STYLE. QUALITÉ.<br />REVANT.</h1>
-            <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/80">Des trouvailles du quotidien, des boutiques locales et des produits qui font avancer nos communautés.</p>
-            <Link href="#produits" className="inline-flex items-center gap-3 rounded-md bg-brand-accent px-5 py-3 text-xs font-bold text-white transition hover:brightness-95">ACHETER MAINTENANT <span aria-hidden="true">→</span></Link>
-          </div>
-        </div>
-        <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2" aria-hidden="true"><span className="h-2 w-2 rounded-full bg-white"/><span className="h-2 w-2 rounded-full border border-white/80"/><span className="h-2 w-2 rounded-full border border-white/80"/></div>
-      </section>
+      <HeroCarousel slides={HERO_SLIDES} />
 
       <RevantMegaShortcuts />
 

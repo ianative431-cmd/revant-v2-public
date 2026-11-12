@@ -62,7 +62,7 @@ export default async function CategoriesPage() {
                   className="aspect-[1.35] bg-cover bg-center transition duration-300 group-hover:scale-[1.02]"
                   style={{
                     backgroundImage: `linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.16)), url("${photo}")`,
-                    backgroundColor: "#A79986",
+                    backgroundColor: "var(--brand-surface)",
                   }}
                 />
                 <div className="p-3">
