@@ -1,8 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import PaletteSwitcher from "./PaletteSwitcher";
 import PhotoActionMenu from "./PhotoActionMenu";
-import { getSitePalette } from "@/server/theme/site-palette";
 
 function SearchIcon() {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4" strokeLinecap="round"/></svg>;
@@ -29,7 +27,6 @@ const quickLinks = [
 ];
 
 export default async function SiteHeader() {
-  const palette = await getSitePalette();
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-[var(--brand-header)] text-[var(--brand-header-text)] shadow-sm">
       <div className="mx-auto flex min-h-[56px] sm:min-h-[64px] max-w-[1500px] items-center justify-between gap-2 px-3 sm:px-7">
@@ -62,7 +59,6 @@ export default async function SiteHeader() {
               {quickLinks.map((item) => <Link key={item.href + item.label} href={item.href} className="block rounded-xl px-3 py-3 font-medium hover:bg-[var(--brand-surface)]">{item.label}</Link>)}
             </nav>
           </details>
-          <div className="hidden lg:block"><PaletteSwitcher current={palette}/></div>
         </div>
       </div>
       <div className="px-3 pb-2 sm:hidden">
@@ -71,7 +67,6 @@ export default async function SiteHeader() {
           <input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:opacity-60"/>
           <button type="submit" aria-label="Lancer la recherche" className="rounded-full bg-[var(--brand-accent)] px-2.5 py-1.5 text-xs font-bold text-white">OK</button>
         </form>
-        <div className="mt-1 flex justify-end"><PaletteSwitcher current={palette}/></div>
       </div>
     </header>
   );
