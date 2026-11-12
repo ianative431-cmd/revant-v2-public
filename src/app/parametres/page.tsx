@@ -41,7 +41,7 @@ const GROUPS: { title: string; items: SettingsItem[] }[] = [
   {
     title: "Activité",
     items: [
-      { href: "/compte/commandes", label: "Historique", description: "Retrouver tes commandes et leur statut", Icon: History, color: "#F46A18" },
+      { href: "/compte/historique", label: "Historique", description: "Achats, ventes et livraisons selon ton rôle", Icon: History, color: "#F46A18" },
       { href: "/compte/recus", label: "Mes reçus", description: "Consulter les reçus des commandes livrées", Icon: ReceiptText, color: "#E6A23C" },
     ],
   },
