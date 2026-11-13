@@ -19,7 +19,6 @@
 - Les reçus listés réutilisent les commandes réellement livrées et les routes de reçu existantes ; ils ne sont pas présentés comme des preuves de paiement.
 - Les palettes de boutiques vendeuses et l’identité Admin/Super Admin restent indépendantes.
 
-
 ## Suite de mise à jour — 13 novembre 2026
 
 ### Intégration et déploiement
@@ -40,3 +39,12 @@
 ### Limites et validation restante
 - La nouvelle branche boutique doit encore passer le workflow complet GitHub avant fusion. Aucun changement Supabase ou de variables Render n'est inclus.
 - Le déploiement public doit être contrôlé par une requête HTTP et par les journaux Render après la mise en ligne.
+
+### Suite de mise à jour — annuaire boutiques (13 novembre 2026)
+- Nouvelle tranche préparée sur une branche isolée issue du commit de production `59c4a1d5f8c90f790b2738da09f5ffed59476f20` : recherche locale des boutiques actives par nom, ville, type et description ; filtres Tout/Boutiques/Restaurants/Premium ; compteurs réels et état vide réinitialisable. Les cartes n'exposent au composant client que les champs publics nécessaires.
+- Garde-fous : aucune migration Supabase, aucune modification des données, de l'authentification, des rôles, des paiements, des QR codes ou des variables Render.
+- Incident de consultation : la lecture de `docs/REVANT_CHAT_VISION_AND_ROADMAP.md` sur `main` a renvoyé 404 ; le document se trouve uniquement dans la branche/PR #100 et n'est pas présent sur `main`. Aucun fichier n'a été créé artificiellement à partir de cette lecture.
+- Contrôle Render : le build du commit `59c4a1d5f8c90f790b2738da09f5ffed59476f20` a terminé avec `Build successful` et Next.js a indiqué `Ready` sur l'instance le 13 novembre 2026 à 00:31 UTC. L'API de déploiement continuait toutefois à retourner `update_in_progress` ; une vérification HTTP externe reste à effectuer avant de qualifier le déploiement de confirmé.
+- Incident d'accès Supabase : l'action de lecture de l'historique des migrations a renvoyé HTTP 403 Forbidden. Aucun changement n'a été tenté en écriture et aucun droit n'a été contourné ; l'historique déjà obtenu précédemment via l'outil MCP en lecture seule reste la référence disponible.
+- Incident d'outil externe : la tentative de vérification HTTP via Firecrawl n'a pas pu s'exécuter car aucune connexion Firecrawl active n'était disponible dans cette session. Aucune dépense ni modification externe n'a été effectuée.
+- Correction documentaire : le journal complet d'origine est conservé dans cette version ; une première écriture sur la branche de travail n'avait inclus que le nouvel extrait. Cette mise à jour restaure l'historique antérieur avant toute fusion.
