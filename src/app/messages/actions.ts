@@ -13,8 +13,14 @@ export async function sendTextMessage(formData: FormData) {
     redirect("/messages?status=invalid");
   }
   const supabase = await createSupabaseServerClient();
-  const { data: conversation } = await supabase.from("conversations").select("id").eq("id", conversationId).maybeSingle();
-  if (!conversation) redirect("/messages?status=unavailable");
+  const { data: conversation } = await supabase
+    .from("conversations")
+    .select("id,buyer_id,seller_id")
+    .eq("id", conversationId)
+    .maybeSingle();
+  if (!conversation || (conversation.buyer_id !== user.id && conversation.seller_id !== user.id)) {
+    redirect("/messages?status=unavailable");
+  }
   const { error } = await supabase.from("messages").insert({
     conversation_id: conversationId,
     sender_id: user.id,
@@ -26,7 +32,6 @@ export async function sendTextMessage(formData: FormData) {
   revalidatePath(`/messages/${conversationId}`);
   redirect(`/messages/${conversationId}`);
 }
-
 
 export async function startConversationAboutProduct(formData: FormData) {
   const user = await requireUserWithLegalConsent();

@@ -14,7 +14,7 @@ export default async function MessageThreadPage({ params, searchParams }: { para
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(conversationId)) notFound();
   const supabase = await createSupabaseServerClient();
   const { data: conversation } = await supabase.from("conversations").select("id,buyer_id,seller_id,shop_id,created_at,updated_at").eq("id", conversationId).maybeSingle().returns<ConversationRow>();
-  if (!conversation) notFound();
+  if (!conversation || (conversation.buyer_id !== user.id && conversation.seller_id !== user.id)) notFound();
   const { data } = await supabase.from("messages").select("id,conversation_id,sender_id,type,body,created_at").eq("conversation_id", conversationId).order("created_at", { ascending: false }).limit(200).returns<MessageRow[]>();
   const messages = [...(data ?? [])].reverse();
   const isBuyer = conversation.buyer_id === user.id;
