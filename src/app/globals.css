@@ -1,37 +1,23 @@
 @import "tailwindcss";
 
 :root,
-:root[data-site-palette="terracotta"] {
+:root[data-site-palette="terracotta"],
+:root[data-site-palette="slate-lilac"] {
   color-scheme: light;
-  --brand-bg: #F8F5EF;
+  --brand-bg: #FFFFFF;
   --brand-surface: #FFFFFF;
-  --brand-accent: #F46A18;
-  --brand-accent-hover: #FF914D;
-  --brand-accent-soft: color-mix(in srgb, #F46A18 12%, #F8F5EF);
-  --brand-text: #20252B;
-  --brand-on-surface: #20252B;
-  --brand-header: #142B45;
-  --brand-header-text: #F8F5EF;
-  --brand-border: color-mix(in srgb, #20252B 12%, #F8F5EF);
-  --brand-muted: color-mix(in srgb, #20252B 66%, #F8F5EF);
-  --brand-nav: rgba(248, 245, 239, .97);
+  --brand-accent: #000000;
+  --brand-accent-hover: #222222;
+  --brand-accent-soft: #F2F2F2;
+  --brand-text: #000000;
+  --brand-on-surface: #000000;
+  --brand-header: #FFFFFF;
+  --brand-header-text: #000000;
+  --brand-border: #E5E5E5;
+  --brand-muted: #555555;
+  --brand-nav: rgba(255, 255, 255, .98);
 }
 
-:root[data-site-palette="slate-lilac"] {
-  color-scheme: dark;
-  --brand-bg: #20252B;
-  --brand-surface: #142B45;
-  --brand-accent: #FF914D;
-  --brand-accent-hover: #F46A18;
-  --brand-accent-soft: color-mix(in srgb, #FF914D 14%, #20252B);
-  --brand-text: #F8F5EF;
-  --brand-on-surface: #F8F5EF;
-  --brand-header: #142B45;
-  --brand-header-text: #F8F5EF;
-  --brand-border: color-mix(in srgb, #F8F5EF 16%, #20252B);
-  --brand-muted: color-mix(in srgb, #F8F5EF 68%, #20252B);
-  --brand-nav: rgba(32, 37, 43, .97);
-}
 
 @theme inline {
   --color-brand-bg: var(--brand-bg);
@@ -233,3 +219,8 @@ nav a:active { transform: scale(.97); }
   .revant-nav-item:active > span:first-child { transform: scale(.88); }
   .revant-nav-item.is-active > span:first-child { animation: revant-pop 260ms var(--revant-motion-ease) both; }
 }
+
+
+/* Temporary high-contrast monochrome icon treatment. */
+:root { --revant-icon-ink: #000000; }
+svg { color: var(--revant-icon-ink); }
