@@ -32,7 +32,7 @@ export default function PaletteSwitcher({ current }: { current: SitePaletteId })
             title={SITE_PALETTES[id].label}
             className={`inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full px-3 text-[11px] font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] ${isActive
               ? "border border-[var(--brand-accent)] bg-[var(--brand-accent-soft)] text-[var(--brand-text)] shadow-sm"
-              : "border border-transparent text-[var(--brand-muted)] hover:bg-[var(--brand-surface-soft)]"}`}
+              : "border border-transparent text-[var(--brand-muted)] hover:bg-[var(--brand-accent-soft)]"}`}
           >
             <Icon size={14} strokeWidth={2.2} aria-hidden="true" />
             <span>{isDark ? "Sombre" : "Clair"}</span>
