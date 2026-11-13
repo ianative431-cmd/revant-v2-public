@@ -2,13 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types/product";
 import AddToCartButton from "@/components/products/AddToCartButton";
+import { safeProductImageUrl } from "@/lib/product-image";
 
 function formatPrice(amount: number, currency: string): string {
   return `${amount.toLocaleString("fr-FR")} ${currency}`;
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-  const imageUrl = product.images[0] ?? null;
+  const imageUrl = safeProductImageUrl(product.images[0]);
   const outOfStock = product.stock_quantity <= 0;
 
   return (

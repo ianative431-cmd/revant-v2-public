@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { safeProductImageUrl } from "@/lib/product-image";
 
 export default function ProductGallery({
   images,
@@ -13,7 +14,11 @@ export default function ProductGallery({
   outOfStock: boolean;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeImage = images[activeIndex] ?? null;
+  const safeImages = images
+    .map((image) => safeProductImageUrl(image))
+    .filter((image): image is string => image !== null);
+  const selectedIndex = safeImages.length > 0 ? activeIndex % safeImages.length : 0;
+  const activeImage = safeImages[selectedIndex] ?? null;
 
   return (
     <div className="min-w-0">
@@ -21,9 +26,9 @@ export default function ProductGallery({
         {activeImage ? (
           <Image
             src={activeImage}
-            alt={`${productName} — photo ${activeIndex + 1}`}
+            alt={`${productName} — photo ${selectedIndex + 1}`}
             fill
-            priority={activeIndex === 0}
+            priority={selectedIndex === 0}
             sizes="(max-width: 640px) 100vw, 50vw"
             className="object-cover"
           />
@@ -37,23 +42,23 @@ export default function ProductGallery({
             Épuisé
           </span>
         )}
-        {images.length > 1 && (
+        {safeImages.length > 1 && (
           <span className="absolute bottom-3 right-3 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
-            {activeIndex + 1} / {images.length}
+            {selectedIndex + 1} / {safeImages.length}
           </span>
         )}
       </div>
-      {images.length > 1 && (
+      {safeImages.length > 1 && (
         <div className="mt-3 grid grid-cols-5 gap-2" aria-label="Autres photos du produit">
-          {images.map((image, index) => (
+          {safeImages.map((image, index) => (
             <button
               key={`${image}-${index}`}
               type="button"
               onClick={() => setActiveIndex(index)}
               aria-label={`Afficher la photo ${index + 1}`}
-              aria-pressed={activeIndex === index}
+              aria-pressed={selectedIndex === index}
               className={`relative aspect-square overflow-hidden rounded-lg border-2 ${
-                activeIndex === index ? "border-[var(--brand-accent)]" : "border-transparent"
+                selectedIndex === index ? "border-[var(--brand-accent)]" : "border-transparent"
               }`}
             >
               <Image src={image} alt="" fill sizes="20vw" className="object-cover" />

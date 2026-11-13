@@ -13,8 +13,19 @@ export const metadata = {
 function safeImageUrl(value: string | null | undefined): string | null {
   if (!value) return null;
   try {
-    const url = new URL(value);
-    return url.protocol === "https:" ? url.toString() : null;
+    const image = new URL(value);
+    const configuredStorage = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!configuredStorage) return null;
+    const storage = new URL(configuredStorage);
+    const allowedPath = "/storage/v1/object/public/shop-media/";
+    if (
+      image.protocol !== "https:" ||
+      image.origin !== storage.origin ||
+      image.username ||
+      image.password ||
+      !image.pathname.startsWith(allowedPath)
+    ) return null;
+    return image.toString();
   } catch {
     return null;
   }

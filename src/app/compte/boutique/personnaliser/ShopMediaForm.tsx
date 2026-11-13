@@ -14,13 +14,23 @@ type Props = {
 
 const MAX_BYTES = 8 * 1024 * 1024;
 
-function extractShopMediaPath(url: string | null): string | null {
-  if (!url) return null;
-  const marker = "/object/public/shop-media/";
-  const index = url.indexOf(marker);
-  if (index === -1) return null;
+function extractOwnedShopMediaPath(value: string | null, userId: string, shopId: string): string | null {
+  if (!value) return null;
   try {
-    return decodeURIComponent(url.slice(index + marker.length).split(/[?#]/, 1)[0]);
+    const image = new URL(value);
+    const configuredStorage = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!configuredStorage) return null;
+    const storage = new URL(configuredStorage);
+    const marker = "/storage/v1/object/public/shop-media/";
+    if (
+      image.protocol !== "https:" ||
+      image.origin !== storage.origin ||
+      image.username ||
+      image.password ||
+      !image.pathname.startsWith(marker)
+    ) return null;
+    const path = decodeURIComponent(image.pathname.slice(marker.length));
+    return path.startsWith(`${userId}/${shopId}/`) ? path : null;
   } catch {
     return null;
   }
@@ -95,7 +105,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
       }
 
       // L'ancien fichier n'est supprimé qu'après confirmation de la mise à jour en base.
-      const oldPath = extractShopMediaPath(previousUrl);
+      const oldPath = extractOwnedShopMediaPath(previousUrl, userId, shopId);
       if (oldPath && oldPath !== path) {
         await supabase.storage.from("shop-media").remove([oldPath]);
       }
