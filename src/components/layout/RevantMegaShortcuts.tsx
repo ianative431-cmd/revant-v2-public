@@ -15,7 +15,7 @@ function ShortcutIcon({ kind }: { kind: string }) {
   const common = {
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.65,
+    strokeWidth: 1.9,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
   };
@@ -53,13 +53,13 @@ export default function RevantMegaShortcuts() {
               key={item.label}
               href={item.href}
               aria-label={`Explorer : ${item.label}`}
-              className="group flex min-h-[112px] w-[88px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] px-2 py-3 text-center shadow-[0_5px_18px_rgba(20,43,69,0.06)] transition duration-200 hover:-translate-y-1 hover:border-[var(--brand-accent)] hover:shadow-[0_12px_28px_rgba(20,43,69,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] active:scale-[0.98] sm:w-[104px] sm:min-h-[124px]"
+              className="group flex min-h-[88px] w-[76px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-[#E5E5E5] bg-white px-2 py-2 text-center transition duration-200 hover:bg-[#F7F7F7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.98] sm:w-[88px] sm:min-h-[96px]"
             >
-              <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--brand-accent)]/10 text-[var(--brand-accent)] transition duration-200 group-hover:rotate-[-3deg] group-hover:bg-[var(--brand-accent)] group-hover:text-white sm:h-[54px] sm:w-[54px]">
+              <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#D8D8D8] bg-white text-black shadow-[0_1px_4px_rgba(0,0,0,0.08)] transition duration-200 group-hover:bg-[#F2F2F2] sm:h-11 sm:w-11">
                 <ShortcutIcon kind={item.icon} />
                 <span className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/55 to-transparent opacity-70" />
               </span>
-              <span className="text-[11px] font-bold leading-tight text-[var(--brand-text)] sm:text-xs">{item.label}</span>
+              <span className="text-[10px] font-semibold leading-tight text-black sm:text-[11px]">{item.label}</span>
             </Link>
           ))}
         </div>
