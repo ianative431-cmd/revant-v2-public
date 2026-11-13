@@ -5,6 +5,8 @@ import { getCurrentUser } from "@/server/auth/session";
 import { getProductById } from "@/server/products/products";
 import AddToCartButton from "@/components/products/AddToCartButton";
 import ProductGallery from "@/components/products/ProductGallery";
+import SiteHeader from "@/components/layout/SiteHeader";
+import BottomNav from "@/components/layout/BottomNav";
 import { startConversationAboutProduct } from "@/app/messages/actions";
 
 type Props = { params: Promise<{ id: string }> };
@@ -22,8 +24,9 @@ export default async function ProductPage({ params }: Props) {
   const imageUrl = product.images[0] ?? null;
 
   return (
-    <div className="min-h-screen bg-brand-bg px-4 py-6 text-brand-text">
-      <div className="mx-auto max-w-5xl">
+    <div className="min-h-screen bg-brand-bg pb-28 text-brand-text">
+      <SiteHeader />
+      <main className="mx-auto max-w-5xl px-4 py-6">
         <Link href="/" className="text-sm text-[var(--brand-muted)] hover:text-black">← Retour aux produits</Link>
         <div className="mt-5 grid gap-8 rounded-2xl bg-[var(--brand-surface)] border border-[var(--brand-border)] p-4 shadow-sm sm:grid-cols-2 sm:p-7">
           <ProductGallery images={product.images} productName={product.name} outOfStock={outOfStock} />
@@ -40,7 +43,8 @@ export default async function ProductPage({ params }: Props) {
             <p className="mt-3 text-xs text-[var(--brand-muted)]">Aucun compte n’est nécessaire pour passer commande.</p>
           </div>
         </div>
-      </div>
+      </main>
+      <BottomNav />
     </div>
   );
 }

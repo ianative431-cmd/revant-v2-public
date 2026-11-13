@@ -18,3 +18,25 @@
 - Aucune migration Supabase, aucun changement de secrets, d’authentification, de paiements, de permissions Super Admin ou de règles RLS.
 - Les reçus listés réutilisent les commandes réellement livrées et les routes de reçu existantes ; ils ne sont pas présentés comme des preuves de paiement.
 - Les palettes de boutiques vendeuses et l’identité Admin/Super Admin restent indépendantes.
+
+
+## Suite de mise à jour — 13 novembre 2026
+
+### Intégration et déploiement
+- La PR #101 (raccourcis Revant Mega et cartes produits) a passé le workflow GitHub `Validate Revant` : installation, audit dépendances, ESLint, tests Node et build Next.js réussis. Fusion squash dans `main` : `4f4380159cc98c3e891f4be9f47ff495ba743841`.
+- Le service Render public `revant-v2-ui-premium` a été déployé manuellement depuis `main` (auto-déploiement désactivé). Le déploiement `dep-dbr5ctk9v7es73epmv90` est passé à l'état `live` le 13 novembre 2026 à 00:16 UTC. Le service Admin n'a pas été modifié.
+
+### Réintégration de la vitrine et des images
+- Les PR historiques #72 et #91 reposaient sur une ancienne base. Leur contenu est réintégré dans une branche neuve issue de `main`, sans reprendre la suppression du carrousel trois slides, les couleurs anciennes en dur, ni le remplacement des commandes distinctes caméra/galerie par un seul champ.
+- Les URL d'images de boutiques et produits sont limitées au bucket public approprié (`shop-media` ou `product-images`) du projet Supabase configuré, en HTTPS et à origine exacte.
+- La validation des images produit contrôle la signature réelle JPEG/PNG/WebP. Les chemins de stockage produit utilisent un UUID pour éviter les collisions. La suppression d'une ancienne image de boutique est limitée au dossier de la boutique du propriétaire connecté.
+- L'interface caméra et galerie reste séparée. Les pages Catégories, Produit et Restaurants reprennent la navigation partagée et restent sur les variables de thème Tangerine actuelles.
+
+### État Supabase vérifié en lecture seule
+- `storage.buckets` : `product-images` public, limite 10 485 760 octets (10 MiB), JPEG/PNG/WebP ; `shop-media` public, limite 8 388 608 octets (8 MiB), JPEG/PNG/WebP.
+- La migration historique `20261103231500_configure_product_images_bucket` n'est pas présente dans les 74 migrations appliquées. Le stockage réel a déjà les limites attendues ; aucune migration n'a été rejouée ni appliquée.
+- Les appels de gestion Supabase ont échoué en lecture (HTTP 403 sur l'historique Management API, HTTP 401 sur la configuration Storage). Repli : inspection réussie via la connexion MCP en lecture seule (historique et requête SELECT sur `storage.buckets`). Aucun contournement des droits, aucune écriture DB.
+
+### Limites et validation restante
+- La nouvelle branche boutique doit encore passer le workflow complet GitHub avant fusion. Aucun changement Supabase ou de variables Render n'est inclus.
+- Le déploiement public doit être contrôlé par une requête HTTP et par les journaux Render après la mise en ligne.

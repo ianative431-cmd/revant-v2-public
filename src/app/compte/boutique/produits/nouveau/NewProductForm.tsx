@@ -4,11 +4,11 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
-  PRODUCT_IMAGE_ALLOWED_TYPES,
   PRODUCT_IMAGE_MAX_BYTES,
   PRODUCT_IMAGE_BUCKET,
   buildProductImagePath,
   compressProductImage,
+  hasValidProductImageSignature,
 } from "@/lib/product-image";
 import type { Category } from "@/server/catalog/categories";
 import { consumePendingProductImage } from "@/lib/pending-product-image";
@@ -81,8 +81,12 @@ export default function NewProductForm({
           selected = new File([blob], "revant-product-photo.jpg", { type: blob.type || "image/jpeg" });
         }
         if (!active || !selected) return;
-        if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type) || selected.size > PRODUCT_IMAGE_MAX_BYTES) {
-          setStatus(selected.size > PRODUCT_IMAGE_MAX_BYTES ? "error-size" : "error-type");
+        if (selected.size > PRODUCT_IMAGE_MAX_BYTES) {
+          setStatus("error-size");
+          return;
+        }
+        if (!(await hasValidProductImageSignature(selected))) {
+          setStatus("error-type");
           return;
         }
         const previewUrl = URL.createObjectURL(selected);
@@ -101,7 +105,7 @@ export default function NewProductForm({
     return () => previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
   }, []);
 
-  function handleFilesSelected(selectedFiles: File[]) {
+  async function handleFilesSelected(selectedFiles: File[]) {
     if (selectedFiles.length === 0) return;
     const remaining = MAX_PRODUCT_IMAGES - files.length;
     if (remaining <= 0 || selectedFiles.length > remaining) {
@@ -111,12 +115,12 @@ export default function NewProductForm({
 
     const accepted: File[] = [];
     for (const selected of selectedFiles.slice(0, Math.max(0, remaining))) {
-      if (!PRODUCT_IMAGE_ALLOWED_TYPES.includes(selected.type)) {
-        setStatus("error-type");
-        return;
-      }
       if (selected.size > PRODUCT_IMAGE_MAX_BYTES) {
         setStatus("error-size");
+        return;
+      }
+      if (!(await hasValidProductImageSignature(selected))) {
+        setStatus("error-type");
         return;
       }
       accepted.push(selected);
@@ -259,8 +263,8 @@ export default function NewProductForm({
           <button type="button" disabled={status === "submitting" || files.length >= MAX_PRODUCT_IMAGES} onClick={() => { if (cameraInputRef.current) { cameraInputRef.current.value = ""; cameraInputRef.current.click(); } }} className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold disabled:opacity-50">Prendre une photo</button>
           <button type="button" disabled={status === "submitting" || files.length >= MAX_PRODUCT_IMAGES} onClick={() => { if (galleryInputRef.current) { galleryInputRef.current.value = ""; galleryInputRef.current.click(); } }} className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold disabled:opacity-50">Choisir dans la galerie</button>
         </div>
-        <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={(event) => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (file) handleFilesSelected([file]); }} />
-        <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={(event) => { const selected = Array.from(event.currentTarget.files ?? []); event.currentTarget.value = ""; handleFilesSelected(selected); }} />
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={(event) => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (file) void handleFilesSelected([file]); }} />
+        <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={(event) => { const selected = Array.from(event.currentTarget.files ?? []); event.currentTarget.value = ""; void handleFilesSelected(selected); }} />
         <span className="text-xs font-normal text-neutral-500">Prends une photo directement ou sélectionne plusieurs images dans la galerie.</span>
       </section>
 
