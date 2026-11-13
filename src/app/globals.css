@@ -39,6 +39,9 @@
   --color-brand-accent: var(--brand-accent);
   --color-brand-text: var(--brand-text);
   --color-brand-on-surface: var(--brand-on-surface);
+  --color-brand-border: var(--brand-border);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-nav: var(--brand-nav);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
@@ -176,7 +179,6 @@ nav a:active { transform: scale(.97); }
     transition-duration: 0.01ms !important;
   }
 }
-
 
 /* Component-level motion hooks used by marketplace UI. */
 @keyframes revant-toast-in {
