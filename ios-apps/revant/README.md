@@ -7,6 +7,7 @@ This is the dedicated native iOS application target. It is intentionally separat
 - SwiftUI application shell with native navigation for Accueil, Catégories, Messages, Panier and Mon compte.
 - On iOS 26 and later, the native navigation controls use the system Liquid Glass material. Older supported iOS versions use a system-material fallback.
 - WKWebView loads the existing Revant customer marketplace at `https://revant-v2-ui-premium.onrender.com`, with the website header and bottom navigation hidden so the native navigation is not duplicated.
+- The 1024×1024 App Store icon is generated from the existing opaque RGB Revant app logo at `public/images/logo-revant-app-512.png`; the original brand asset is not modified.
 - Native camera/photo-library purpose strings are declared for the marketplace's product-photo upload and search flows.
 - A restricted JavaScript bridge exposes push-permission requests and delivery Live Activity start/end actions to the customer web app.
 - ActivityKit and a WidgetKit extension render delivery progress on the Lock Screen and Dynamic Island on supported iPhones.
@@ -48,6 +49,7 @@ On macOS with Xcode 26 or later:
 
 ```sh
 brew install xcodegen
+bash scripts/prepare-app-icon.sh
 xcodegen generate --spec project.yml
 xcodebuild -project Revant.xcodeproj -scheme Revant -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 ```

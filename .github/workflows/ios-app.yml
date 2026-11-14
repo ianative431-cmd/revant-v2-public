@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - "ios-apps/revant/**"
+      - "public/images/logo-revant-app-512.png"
       - "src/components/native/**"
       - "src/app/api/native/**"
       - "src/app/compte/notifications/**"
@@ -37,6 +38,10 @@ jobs:
 
       - name: Install XcodeGen
         run: brew install xcodegen
+
+      - name: Prepare App Store icon
+        working-directory: ios-apps/revant
+        run: bash scripts/prepare-app-icon.sh
 
       - name: Generate Xcode project
         working-directory: ios-apps/revant

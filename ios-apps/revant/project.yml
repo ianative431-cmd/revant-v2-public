@@ -24,6 +24,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: ne.revant.marketplace
         PRODUCT_NAME: Revant
         CODE_SIGN_ENTITLEMENTS: Revant/Revant.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleDisplayName: Revant
         INFOPLIST_KEY_NSSupportsLiveActivities: YES
         INFOPLIST_KEY_NSCameraUsageDescription: "Revant utilise la caméra pour photographier les produits que tu souhaites publier ou rechercher."
