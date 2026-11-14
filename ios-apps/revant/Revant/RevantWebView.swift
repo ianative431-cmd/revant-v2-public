@@ -46,7 +46,8 @@ struct RevantWebView: UIViewRepresentable {
       const nativeStyle = document.createElement("style");
       nativeStyle.textContent =
         'html[data-revant-native="ios"] header.sticky.top-0{display:none!important;}' +
-        'html[data-revant-native="ios"] nav[aria-label="Navigation principale"]{display:none!important;}';
+        'html[data-revant-native="ios"] nav[aria-label="Navigation principale"]{display:none!important;}' +
+        'html[data-revant-native="ios"] [data-revant-native-only="true"]{display:inline-flex!important;}';
       document.documentElement.appendChild(nativeStyle);
 
       const nativeHandler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.revantNative;

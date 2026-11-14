@@ -36,11 +36,9 @@ export default function NotificationPreferences() {
   const [preferences, setPreferences] = useState<Preferences>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [nativeAvailable, setNativeAvailable] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    setNativeAvailable(Boolean(window.RevantNative));
     let active = true;
     fetch("/api/native/notification-preferences", { credentials: "same-origin" })
       .then(async (response) => {
@@ -87,15 +85,14 @@ export default function NotificationPreferences() {
             Choisis les catégories pour lesquelles tu souhaites recevoir des alertes.
           </p>
         </div>
-        {nativeAvailable && (
-          <button
-            type="button"
-            onClick={() => window.RevantNative?.requestPushPermission?.()}
-            className="rounded-full bg-brand-accent px-3 py-2 text-xs font-semibold text-white"
-          >
-            Activer sur cet iPhone
-          </button>
-        )}
+        <button
+          type="button"
+          data-revant-native-only="true"
+          onClick={() => window.RevantNative?.requestPushPermission?.()}
+          className="hidden rounded-full bg-brand-accent px-3 py-2 text-xs font-semibold text-white"
+        >
+          Activer sur cet iPhone
+        </button>
       </div>
 
       <div className="mt-4 divide-y divide-brand-border">
