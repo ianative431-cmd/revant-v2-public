@@ -102,7 +102,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
         });
 
       if (uploadError) {
-        setMessage("L'envoi a échoue, Vérifie ta connexion et réessaie.");
+        setMessage("L'envoi a échoué. Vérifie ta connexion et réessaie.");
         return;
       }
 
@@ -118,13 +118,13 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
         .maybeSingle();
 
       if (updateError || !savedShop) {
-        // Ne pas laisser le nouvel objet orphelin si la boutique n'a pas �té mise à jour.
+        // Ne pas laisser le nouvel objet orphelin si la boutique n'a pas été mise à jour.
         await supabase.storage.from("shop-media").remove([path]);
         setMessage("Image envoyée, mais impossible de l'associer à la boutique. Réessaie.");
         return;
       }
 
-      // L'ancien fichier n'est supprimé qu'après confirmation de la mise  à jour en base.
+      // L'ancien fichier n'est supprimé qu'après confirmation de la mise à jour en base.
       const oldPath = extractOwnedShopMediaPath(previousUrl, userId, shopId);
       if (oldPath && oldPath !== path) {
         await supabase.storage.from("shop-media").remove([oldPath]);
@@ -149,7 +149,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
   return (
     <section className="bg-white rounded-2xl p-4 mt-6">
       <h2 className="text-sm font-semibold mb-3">Identité visuelle de la boutique</h2>
-      <div class=name="grid gap-4">
+      <div className="grid gap-4">
         <div className="flex items-center gap-3">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- public Supabase Storage image
@@ -170,7 +170,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
           <p className="text-sm font-medium">Bannière</p>
           {bannerUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- public Supabase Storage image
-            <img src={bannerUrl} alt="Banni�re actuelle" className="w-full h-28 rounded-xl object-cover" />
+            <img src={bannerUrl} alt="Bannière actuelle" className="w-full h-28 rounded-xl object-cover" />
           ) : (
             <div className="w-full h-28 rounded-xl bg-black/5 flex items-center justify-center text-xs text-black/40">Aucune bannière</div>
           )}
