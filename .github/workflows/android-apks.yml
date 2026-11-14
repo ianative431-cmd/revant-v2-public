@@ -102,16 +102,16 @@ jobs:
         run: |
           APK_PATH="${{ matrix.app.directory }}/android/app/build/outputs/apk/debug/app-debug.apk"
           APK_SIZE_BYTES="$(stat -c '%s' "$APK_PATH")"
-          MAX_SIZE_BYTES=$((60 * 1024 * 1024))
-          APK_SIZE_MIB="$(awk -v bytes="$APK_SIZE_BYTES" 'BEGIN { printf "%.2f", bytes / 1048576 }')"
-          echo "APK size: ${APK_SIZE_MIB} MiB (${APK_SIZE_BYTES} bytes)"
+          MAX_SIZE_BYTES=60000000
+          APK_SIZE_MB="$(awk -v bytes="$APK_SIZE_BYTES" 'BEGIN { printf "%.2f", bytes / 1000000 }')"
+          echo "APK size: ${APK_SIZE_MB} MB (${APK_SIZE_BYTES} bytes)"
           {
             echo "### ${{ matrix.app.label }} APK"
-            echo "- Size: ${APK_SIZE_MIB} MiB"
-            echo "- Maximum allowed: 60 MiB"
+            echo "- Size: ${APK_SIZE_MB} MB"
+            echo "- Maximum allowed: 60 MB"
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$APK_SIZE_BYTES" -gt "$MAX_SIZE_BYTES" ]; then
-            echo "::error::${{ matrix.app.label }} APK exceeds the 60 MiB size limit."
+            echo "::error::${{ matrix.app.label }} APK exceeds the 60 MB size limit."
             exit 1
           fi
       - name: Upload APK
