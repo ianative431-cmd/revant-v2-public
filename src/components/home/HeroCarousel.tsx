@@ -44,7 +44,7 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
 
   return (
     <section
-      className="relative mx-3 mt-1 min-h-[330px] overflow-hidden rounded-2xl bg-[#142B45] text-white sm:min-h-[390px]"
+      className="relative mx-3 mt-1 min-h-[270px] overflow-hidden rounded-2xl bg-[#142B45] text-white sm:min-h-[360px]"
       role="region"
       aria-roledescription="carrousel"
       aria-label="À la une"
@@ -65,7 +65,7 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
         ))}
       </div>
       <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/15" aria-hidden="true" />
-      <div className="relative z-10 flex min-h-[330px] items-center px-6 py-10 sm:min-h-[390px] sm:px-12">
+      <div className="relative z-10 flex min-h-[270px] items-center px-5 py-6 sm:min-h-[360px] sm:px-12 sm:py-10">
         <div
           key={activeSlide.id}
           role="group"
@@ -74,16 +74,16 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
           aria-live="off"
           className="revant-hero-copy max-w-lg"
         >
-          <p className="mb-3 text-[11px] font-semibold tracking-[0.22em] text-white/75">{activeSlide.eyebrow}</p>
-          <h1 className="mb-4 text-3xl font-black leading-[1.04] tracking-tight sm:text-5xl">{activeSlide.title}</h1>
-          <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/85">{activeSlide.description}</p>
-          <Link href={activeSlide.ctaHref} className="inline-flex items-center gap-3 rounded-md bg-[#F46A18] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#FF914D]">
+          <p className="mb-2 text-[9px] font-semibold tracking-[0.2em] text-white/75 sm:mb-3 sm:text-[11px]">{activeSlide.eyebrow}</p>
+          <h1 className="mb-3 text-2xl font-black leading-[1.04] tracking-tight sm:mb-4 sm:text-5xl">{activeSlide.title}</h1>
+          <p className="mb-4 max-w-sm text-xs leading-relaxed text-white/85 sm:mb-6 sm:text-sm">{activeSlide.description}</p>
+          <Link href={activeSlide.ctaHref} className="inline-flex items-center gap-3 rounded-md bg-[#F46A18] px-4 py-2.5 text-[11px] font-bold text-white transition hover:bg-[#FF914D] sm:px-5 sm:py-3 sm:text-xs">
             {activeSlide.ctaLabel} <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>
       {slides.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 z-20 flex -translate-x-1/2 items-center" role="group" aria-label="Choisir une bannière">
+        <div className="absolute bottom-1 left-1/2 z-20 flex -translate-x-1/2 items-center sm:bottom-2" role="group" aria-label="Choisir une bannière">
           {slides.map((slide, index) => {
             const isActive = index === activeIndex;
             return (
@@ -93,7 +93,7 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
                 aria-label={`Afficher la bannière ${index + 1} : ${slide.title}`}
                 aria-pressed={isActive}
                 onClick={() => setActiveIndex(index)}
-                className="flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="flex h-9 w-9 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:h-11 sm:w-11"
               >
                 <span className={`h-2.5 rounded-full transition-all duration-300 ${isActive ? "w-6 bg-[#F46A18]" : "w-2.5 border border-white/90 bg-white/35"}`} />
               </button>

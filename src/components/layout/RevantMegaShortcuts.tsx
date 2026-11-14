@@ -36,28 +36,27 @@ function ShortcutIcon({ kind }: { kind: string }) {
 
 export default function RevantMegaShortcuts() {
   return (
-    <section aria-label="Explorer Revant Mega" className="px-3 pb-3 pt-6 sm:px-5 sm:pt-8">
-      <div className="mb-4 flex items-end justify-between gap-3 px-1">
+    <section aria-label="Explorer Revant Mega" className="px-3 pb-3 pt-5 sm:px-5 sm:pt-8">
+      <div className="mb-3 flex items-end justify-between gap-3 px-1 sm:mb-4">
         <div>
           <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--brand-accent)]">À découvrir</p>
           <h2 className="text-base font-extrabold tracking-tight sm:text-lg">Explorer Revant Mega</h2>
         </div>
-        <Link href="/boutiques" className="shrink-0 rounded-full px-3 py-2 text-xs font-bold text-[var(--brand-accent)] transition hover:bg-[var(--brand-accent)]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">
+        <Link href="/boutiques" className="shrink-0 px-2 py-2 text-xs font-bold text-[var(--brand-accent)] transition hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">
           Tout explorer <span aria-hidden="true">→</span>
         </Link>
       </div>
       <nav aria-label="Raccourcis des univers Revant" className="relative">
-        <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {shortcuts.map((item) => (
             <Link
               key={item.label}
               href={item.href}
               aria-label={`Explorer : ${item.label}`}
-              className="group flex min-h-[88px] w-[76px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-[#E5E5E5] bg-white px-2 py-2 text-center transition duration-200 hover:bg-[#F7F7F7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.98] sm:w-[88px] sm:min-h-[96px]"
+              className="group flex min-h-[76px] w-[68px] shrink-0 snap-start flex-col items-center justify-center gap-2 bg-transparent px-1 py-1 text-center transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.98] sm:w-[80px] sm:min-h-[88px]"
             >
-              <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#D8D8D8] bg-white text-black shadow-[0_1px_4px_rgba(0,0,0,0.08)] transition duration-200 group-hover:bg-[#F2F2F2] sm:h-11 sm:w-11">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F5F5F5] text-black transition duration-200 group-hover:bg-[#EAEAEA] group-active:scale-95 sm:h-13 sm:w-13">
                 <ShortcutIcon kind={item.icon} />
-                <span className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/55 to-transparent opacity-70" />
               </span>
               <span className="text-[10px] font-semibold leading-tight text-black sm:text-[11px]">{item.label}</span>
             </Link>
