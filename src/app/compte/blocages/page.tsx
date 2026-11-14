@@ -4,8 +4,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { unblockUser } from "@/server/messages/block-actions";
 
-export default async function BlockedAccountsPage() {
+export default async function BlockedAccountsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const user = await requireUserWithLegalConsent();
+  const { status } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const db = supabase as unknown as SupabaseClient;
   const { data, error } = await db
@@ -20,6 +21,7 @@ export default async function BlockedAccountsPage() {
         <Link href="/compte" className="text-sm underline text-brand-muted">← Mon compte</Link>
         <h1 className="mt-4 text-xl font-bold">Comptes bloqués</h1>
         <p className="mt-1 text-sm text-brand-muted">Les comptes bloqués ne peuvent plus t’envoyer de nouveaux messages et leurs conversations sont masquées.</p>
+        {status === "blocked" && <p role="status" className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800">Compte bloqué. Tu peux le débloquer ici à tout moment.</p>}
         {error ? (
           <p className="mt-5 rounded-xl bg-white p-4 text-sm text-red-700">Impossible de charger les comptes bloqués.</p>
         ) : !data?.length ? (

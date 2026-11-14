@@ -31,7 +31,6 @@ export default async function MessageThreadPage({ params, searchParams }: { para
     .returns<MessageRow[]>();
   const messages = [...(data ?? [])].reverse();
   const isBuyer = conversation.buyer_id === user.id;
-  const otherUserId = isBuyer ? conversation.seller_id : conversation.buyer_id;
   let title = isBuyer ? "Conversation avec le vendeur" : "Conversation avec l’acheteur";
   if (conversation.shop_id) {
     const { data: shop } = await supabase.from("shops").select("name").eq("id", conversation.shop_id).maybeSingle();
@@ -70,7 +69,7 @@ export default async function MessageThreadPage({ params, searchParams }: { para
             </div>
           ))}
         </section>
-        {status === "error" && <p role="status" className="bg-red-50 px-4 py-2 text-xs text-red-700">Le message n’a pas pu être envoyé.</p>}
+        {status === "error" && <p role="status" className="bg-red-50 px-4 py-2 text-xs text-red-700">Le message n’a pas pu être envoyé. Réessaie.</p>}
         <form action={sendTextMessage} className="flex items-end gap-2 rounded-b-2xl bg-white p-3 shadow-sm">
           <input type="hidden" name="conversationId" value={conversationId} />
           <label className="flex-1">

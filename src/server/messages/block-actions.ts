@@ -28,16 +28,16 @@ export async function blockUserFromConversation(formData: FormData): Promise<nev
   const blockedId = conversation.buyer_id === user.id ? conversation.seller_id : conversation.buyer_id;
   if (!blockedId || blockedId === user.id) redirect("/messages?status=invalid");
 
-  const { error } = await db.from("user_blocks").upsert({
+  const { error } = await db.from("user_blocks").insert({
     blocker_id: user.id,
     blocked_id: blockedId,
-  }, { onConflict: "blocker_id,blocked_id" });
+  });
 
-  if (error) redirect(`/messages/${conversationId}?status=error`);
+  if (error && error.code !== "23505") redirect(`/messages/${conversationId}?status=error`);
   revalidatePath("/messages");
   revalidatePath(`/messages/${conversationId}`);
   revalidatePath("/compte/blocages");
-  redirect("/messages?status=blocked");
+  redirect("/compte/blocages?status=blocked");
 }
 
 export async function unblockUser(formData: FormData): Promise<void> {
