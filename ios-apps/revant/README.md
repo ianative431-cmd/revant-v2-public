@@ -12,6 +12,9 @@ This is the dedicated native iOS application target. It is intentionally separat
 - ActivityKit and a WidgetKit extension render delivery progress on the Lock Screen and Dynamic Island on supported iPhones.
 - ActivityKit push tokens are registered against the authenticated buyer's own order. Successful delivery-driver claim, progress and delivery-confirmation transitions send signed APNs Live Activity updates.
 - APNs alert notifications for order confirmation/cancellation and delivery assignment/progress/completion respect the user's saved category preferences.
+- Product, shop and seller reporting is available to customers and a protected Admin queue allows staff with the required permission to review and resolve reports.
+- Users can block and unblock conversation participants. RLS hides blocked conversations and rejects new messages even when a client bypasses the website UI.
+- Customer sign-out removes the current iPhone's APNs token and ends/removes its registered delivery Live Activities.
 - Per-category notification preferences and APNs device-token registration are stored server-side.
 
 ## Required protected server configuration
@@ -31,13 +34,13 @@ This is a native foundation, not a claim of App Store approval. The marketplace 
 
 The following remain in the App Store compliance checklist:
 1. Complete account deletion inside the app, with safe handling of financial/legal retention.
-2. Customer reporting and blocking controls for user-generated content and abusive accounts.
-3. Confirm the applicable Sign in with Apple exception or implement Sign in with Apple if required.
-4. Decide Apple In-App Purchase treatment for digital seller subscriptions and paid boosts; physical-goods checkout remains a separate category.
-5. Verify privacy manifests and privacy disclosures for every shipped SDK and service.
-6. Configure App Store Connect metadata, screenshots, privacy labels, age rating, reviewer account and review notes.
+2. Confirm the applicable Sign in with Apple exception or implement Sign in with Apple if required.
+3. Decide Apple In-App Purchase treatment for digital seller subscriptions and paid boosts; physical-goods checkout remains a separate category.
+4. Verify privacy manifests and privacy disclosures for every shipped SDK and service.
+5. Configure App Store Connect metadata, screenshots, privacy labels, age rating, reviewer account and review notes.
+6. Complete physical-device testing of APNs alerts, Live Activities, camera/photo selection, sign-in, block/report flows and account lifecycle.
 
-General APNs alerts for message, payment, security and promotion events still need their corresponding trusted event handlers to be connected. The preferences for those categories are stored but are not yet active for every event type.
+General APNs alerts for message, payment, refund, security and promotion events still need their corresponding trusted event handlers to be connected. The preferences for those categories are stored but are not yet active for every event type.
 
 ## Build locally
 

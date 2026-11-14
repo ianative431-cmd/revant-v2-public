@@ -14,6 +14,7 @@ Last source and live-schema audit: 2026-11-14. A passing simulator build is not 
 - [x] Server-side APNs device-token registration, current-device token cleanup on customer sign-out, and preference-aware APNs alerts for order and delivery events.
 - [x] Customer-facing report controls for products, shops and seller accounts, using the existing RLS-protected `public.reports` table.
 - [x] Role-protected Admin signalement review queue; linked from the dashboard only for staff with `products.manage`.
+- [x] User blocking and unblocking from conversations, with database RLS preventing new conversations, message sending and message visibility while a block is active.
 - [x] GitHub Actions simulator build using Xcode 26+.
 
 ## Verified App Review blockers / unresolved work
@@ -21,11 +22,11 @@ Last source and live-schema audit: 2026-11-14. A passing simulator build is not 
 ### Account deletion — blocker
 The current source tree does not expose an in-app account deletion flow or a corresponding customer-facing deletion action. The live schema has many restrictive foreign keys from historical, financial and operational records to profiles, plus Storage objects. Implement deletion from inside the app only after auditing every table, ledger, order, KYC record, audit record and owned Storage object. Preserve records that must legally remain while deleting or anonymizing personal data where appropriate. Do not simply cascade-delete financial history or Auth users.
 
-### User-generated content safety — partial
-The active Supabase project already contains `public.reports` with RLS policies allowing authenticated users to submit reports for user, shop, product, review, message and order targets, and to read their own reports. This branch adds customer report controls for products, shops and seller accounts, plus an Admin review queue for authorized staff. A user-blocking mechanism that prevents unwanted messages and content exposure has not yet been found or implemented.
+### User-generated content safety — substantially improved, still requires testing
+The active Supabase project already contains `public.reports` with RLS policies allowing authenticated users to submit reports for user, shop, product, review, message and order targets, and to read their own reports. This branch adds customer report controls for products, shops and seller accounts, plus an Admin review queue. It also adds user blocking/unblocking and enforces blocks at the database boundary for conversations and messages. Test both block directions, direct API attempts, unblocking, and Admin report resolution against the migrated database before release.
 
 ### Minimum functionality — high review risk
-The iOS target currently hosts the existing remote Revant customer website in WKWebView. Native navigation, APNs alerts and delivery Live Activities add native value, but Apple Guideline 4.2 may still reject a thin website wrapper. Continue moving important customer journeys and device capabilities into meaningful native experiences and test the complete app, not only the shell.
+The iOS target currently hosts the existing remote Revant customer website in WKWebView. Native navigation, APNs alerts, content reporting/blocking and delivery Live Activities add native value, but Apple Guideline 4.2 may still reject a thin website wrapper. Continue moving important customer journeys and device capabilities into meaningful native experiences and test the complete app, not only the shell.
 
 ### General push notifications — partial
 Preference-aware APNs alerts are wired for seller order confirmation/cancellation and delivery assignment/progress/completion. General alert pushes for messages, payment, refunds, security and promotions still need their trusted event handlers connected. Do not describe every category as live until those integrations and physical-device tests pass.
@@ -57,4 +58,4 @@ Physical goods sold through the marketplace can use the normal payment processor
 
 ## Supabase deployment status
 
-The migrations in this branch for APNs device tokens, notification preferences and Live Activity tokens are repository files only. They have not been applied to the live Supabase project from this workflow. Apply them only after review and verify the resulting schema/RLS with Supabase before deploying the corresponding server code.
+The migrations in this branch for APNs device tokens, notification preferences, Live Activity tokens and user blocks are repository files only. They have not been applied to the live Supabase project from this workflow. The existing `public.reports` table and its RLS policies were inspected read-only. Apply the new migrations only after review and verify the resulting schema/RLS with Supabase before deploying the corresponding server code.
