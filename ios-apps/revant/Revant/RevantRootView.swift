@@ -75,17 +75,34 @@ struct RevantRootView: View {
             .padding(.top, 8)
             .padding(.bottom, 10)
 
-            RevantWebView(path: selectedTab.path)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .safeAreaBar(edge: .bottom, spacing: 0) {
-                    RevantTabBar(selection: $selectedTab)
-                        .padding(.horizontal, 14)
-                        .padding(.top, 8)
-                        .padding(.bottom, 6)
-                }
+            marketplaceNavigation
         }
         .background(Color(uiColor: .systemBackground))
         .tint(Color(red: 0.96, green: 0.42, blue: 0.09))
+    }
+
+    @ViewBuilder
+    private var marketplaceNavigation: some View {
+        if #available(iOS 26.0, *) {
+            RevantWebView(path: selectedTab.path)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .safeAreaBar(edge: .bottom, spacing: 0) {
+                    tabBar
+                }
+        } else {
+            VStack(spacing: 0) {
+                RevantWebView(path: selectedTab.path)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                tabBar
+            }
+        }
+    }
+
+    private var tabBar: some View {
+        RevantTabBar(selection: $selectedTab)
+            .padding(.horizontal, 14)
+            .padding(.top, 8)
+            .padding(.bottom, 6)
     }
 }
 
