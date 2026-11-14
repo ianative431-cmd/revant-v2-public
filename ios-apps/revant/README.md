@@ -5,12 +5,14 @@ This is the dedicated native iOS application target. It is intentionally separat
 ## Current implementation
 
 - SwiftUI application shell with native navigation for Accueil, Catégories, Messages, Panier and Mon compte.
-- On iOS 26 and later, the native navigation controls use the system Liquid Glass material. Older supported iOS versions use a system material fallback.
+- On iOS 26 and later, the native navigation controls use the system Liquid Glass material. Older supported iOS versions use a system-material fallback.
 - WKWebView loads the existing Revant customer marketplace at `https://revant-v2-ui-premium.onrender.com`, with the website header and bottom navigation hidden so the native navigation is not duplicated.
+- Native camera/photo-library purpose strings are declared for the marketplace's product-photo upload and search flows.
 - A restricted JavaScript bridge exposes push-permission requests and delivery Live Activity start/end actions to the customer web app.
 - ActivityKit and a WidgetKit extension render delivery progress on the Lock Screen and Dynamic Island on supported iPhones.
-- ActivityKit push tokens are registered against the authenticated buyer's own order. Successful delivery-driver state transitions send signed APNs Live Activity updates; delivery confirmation ends the activity.
-- Per-category notification preferences and APNs device-token registration are prepared. Device tokens are stored server-side.
+- ActivityKit push tokens are registered against the authenticated buyer's own order. Successful delivery-driver claim, progress and delivery-confirmation transitions send signed APNs Live Activity updates.
+- APNs alert notifications for order confirmation/cancellation and delivery assignment/progress/completion respect the user's saved category preferences.
+- Per-category notification preferences and APNs device-token registration are stored server-side.
 
 ## Required protected server configuration
 
@@ -34,6 +36,8 @@ The following remain in the App Store compliance checklist:
 4. Decide Apple In-App Purchase treatment for digital seller subscriptions and paid boosts; physical-goods checkout remains a separate category.
 5. Verify privacy manifests and privacy disclosures for every shipped SDK and service.
 6. Configure App Store Connect metadata, screenshots, privacy labels, age rating, reviewer account and review notes.
+
+General APNs alerts for message, payment, security and promotion events still need their corresponding trusted event handlers to be connected. The preferences for those categories are stored but are not yet active for every event type.
 
 ## Build locally
 
