@@ -1,4 +1,4 @@
-const CACHE_NAME = "revant-shell-v6";
+const CACHE_NAME = "revant-shell-v7";
 const OFFLINE_URL = "/offline.html";
 const LAUNCH_VIDEO_URL = "/media/revant-launch.mp4";
 const SHELL_URLS = [OFFLINE_URL, "/images/logo-revant-app-512.png", LAUNCH_VIDEO_URL];
@@ -88,9 +88,16 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/inscription")
   ) return;
 
+  // Keep the live site fresh; show the small, self-contained shell on network failure.
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request).catch(async () => (await caches.match(OFFLINE_URL)) || Response.error())
+      fetch(request).catch(async () => {
+        const offlinePage = await caches.match(OFFLINE_URL);
+        return offlinePage || new Response(
+          "<!doctype html><html lang=\"fr\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Revant hors connexion</title><body style=\"font:16px system-ui;padding:32px;color:#111\"><h1>Revant</h1><p>Connexion indisponible. Réessaie lorsque le réseau sera revenu.</p></body></html>",
+          { headers: { "Content-Type": "text/html; charset=utf-8" } }
+        );
+      })
     );
   }
 });

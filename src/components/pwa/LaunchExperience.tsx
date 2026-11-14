@@ -51,7 +51,7 @@ export default function LaunchExperience() {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#a79986]"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--brand-accent)]"
       role="status"
       aria-label="Bienvenue sur Revant"
     >

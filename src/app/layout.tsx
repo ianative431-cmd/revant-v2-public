@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./interaction-performance.css";
 import Footer from "@/components/layout/Footer";
+import GlobalDismissibleDetails from "@/components/layout/GlobalDismissibleDetails";
 import CookieConsentBanner from "@/components/cookie-consent/CookieConsentBanner";
 import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
+import NativePushRegistration from "@/components/native/NativePushRegistration";
 import LaunchExperience from "@/components/pwa/LaunchExperience";
 import { getSitePalette } from "@/server/theme/site-palette";
 
@@ -31,8 +34,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#803e2f" },
-    { media: "(prefers-color-scheme: dark)", color: "#1f1d20" },
+    { media: "(prefers-color-scheme: light)", color: "#F46A18" },
+    { media: "(prefers-color-scheme: dark)", color: "#20252B" },
   ],
 };
 
@@ -41,7 +44,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="fr" className="h-full antialiased" data-site-palette={palette}>
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-text">
+        <GlobalDismissibleDetails />
         <ServiceWorkerRegister />
+        <NativePushRegistration />
         <LaunchExperience />
         <div className="flex-1 flex flex-col">{children}</div>
         <Footer />
