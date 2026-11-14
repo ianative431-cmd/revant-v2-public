@@ -21,6 +21,9 @@ export async function submitShopForReview(
   _prevState: ShopReviewActionState,
   _formData: FormData
 ): Promise<ShopReviewActionState> {
+  void _prevState;
+  void _formData;
+
   const user = await requireUserWithLegalConsent();
   const userClient = await createSupabaseServerClient();
   const shop = await getShopByOwnerId(userClient, user.id);

@@ -30,7 +30,7 @@ export default function ShopReviewPanel({ status, hasContact }: Props) {
     return (
       <section className="mb-5 rounded-2xl border border-amber-700/20 bg-white p-4">
         <p className="text-sm font-semibold text-amber-700">Validation en attente</p>
-        <p className="mt-1 text-xs text-black/55">La demande a été envoyée. L'équipe Revant doit approuver la boutique avant sa publication.</p>
+        <p className="mt-1 text-xs text-black/55">La demande a été envoyée. L&apos;équipe Revant doit approuver la boutique avant sa publication.</p>
       </section>
     );
   }
@@ -39,7 +39,7 @@ export default function ShopReviewPanel({ status, hasContact }: Props) {
     return (
       <section className="mb-5 rounded-2xl border border-red-600/20 bg-white p-4">
         <p className="text-sm font-semibold text-red-600">Boutique suspendue</p>
-        <p className="mt-1 text-xs text-black/55">La vitrine n'est pas visible publiquement. Contacte l'administration Revant pour connaître la raison.</p>
+        <p className="mt-1 text-xs text-black/55">La vitrine n&apos;est pas visible publiquement. Contacte l&apos;administration Revant pour connaître la raison.</p>
       </section>
     );
   }
@@ -48,7 +48,7 @@ export default function ShopReviewPanel({ status, hasContact }: Props) {
     return (
       <section className="mb-5 rounded-2xl border border-black/10 bg-white p-4">
         <p className="text-sm font-semibold">Boutique fermée</p>
-        <p className="mt-1 text-xs text-black/55">Cette boutique n'est pas publiée.</p>
+        <p className="mt-1 text-xs text-black/55">Cette boutique n&apos;est pas publiée.</p>
       </section>
     );
   }
@@ -59,12 +59,12 @@ export default function ShopReviewPanel({ status, hasContact }: Props) {
     <section className="mb-5 rounded-2xl border border-black/10 bg-white p-4">
       <h2 className="text-sm font-semibold">Publication de la boutique</h2>
       <p className="mt-1 text-xs text-black/55">
-        Ta boutique est encore en brouillon. Elle ne sera visible par les clients qu'après validation.
+        Ta boutique est encore en brouillon. Elle ne sera visible par les clients qu&apos;après validation.
       </p>
 
       {!hasContact ? (
         <p className="mt-3 text-xs text-amber-700">
-          Ajoute d'abord un téléphone ou WhatsApp dans{" "}
+          Ajoute d&apos;abord un téléphone ou WhatsApp dans{" "}
           <Link href="/compte/boutique/personnaliser#contacts" className="font-semibold underline">
             Coordonnées et réseaux sociaux
           </Link>.
