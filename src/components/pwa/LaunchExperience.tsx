@@ -23,9 +23,15 @@ export default function LaunchExperience() {
     // Android's WebView is the actual app surface. Keep its splash brief so
     // it never blocks the first interaction while the marketplace hydrates.
     if (isNativeColdStart) {
-      setStage("logo");
-      const nativeSplashTimer = window.setTimeout(() => setStage(null), 520);
-      return () => window.clearTimeout(nativeSplashTimer);
+      let nativeSplashTimer: number | undefined;
+      const nativeSplashStartTimer = window.setTimeout(() => {
+        setStage("logo");
+        nativeSplashTimer = window.setTimeout(() => setStage(null), 520);
+      }, 0);
+      return () => {
+        window.clearTimeout(nativeSplashStartTimer);
+        if (nativeSplashTimer !== undefined) window.clearTimeout(nativeSplashTimer);
+      };
     }
 
     // Show the PWA intro once per browser tab/session, not on every navigation.
