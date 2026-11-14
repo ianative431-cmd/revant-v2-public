@@ -77,11 +77,12 @@ struct RevantRootView: View {
 
             RevantWebView(path: selectedTab.path)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            RevantTabBar(selection: $selectedTab)
-                .padding(.horizontal, 14)
-                .padding(.top, 8)
-                .padding(.bottom, 6)
+                .safeAreaBar(edge: .bottom, spacing: 0) {
+                    RevantTabBar(selection: $selectedTab)
+                        .padding(.horizontal, 14)
+                        .padding(.top, 8)
+                        .padding(.bottom, 6)
+                }
         }
         .background(Color(uiColor: .systemBackground))
         .tint(Color(red: 0.96, green: 0.42, blue: 0.09))
