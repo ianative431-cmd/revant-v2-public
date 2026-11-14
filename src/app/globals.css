@@ -3,40 +3,55 @@
 :root,
 :root[data-site-palette="terracotta"] {
   color-scheme: light;
-  --brand-bg: #F8F5EF;
+  --brand-bg: #F7F4EE;
   --brand-surface: #FFFFFF;
-  --brand-accent: #F46A18;
-  --brand-accent-hover: #D9570C;
+  --brand-surface-raised: #FFFFFF;
+  --brand-surface-soft: #EEEAE2;
+  --brand-accent: #D94F0B;
+  --brand-accent-hover: #B94308;
   --brand-accent-soft: #FFF0E6;
-  --brand-text: #20252B;
-  --brand-on-surface: #20252B;
-  --brand-header: #FFFFFF;
-  --brand-header-text: #20252B;
-  --brand-border: #E7DED4;
-  --brand-muted: #625D56;
+  --brand-accent-contrast: #FFFFFF;
+  --brand-text: #202832;
+  --brand-on-surface: #202832;
+  --brand-header: #142B45;
+  --brand-header-text: #FFF9F2;
+  --brand-border: #D8DDE3;
+  --brand-muted: #586575;
   --brand-nav: rgba(255, 255, 255, .97);
+  --brand-shadow: 0 8px 28px rgba(20, 43, 69, .10);
 }
 
 :root[data-site-palette="slate-lilac"] {
   color-scheme: dark;
-  --brand-bg: #20252B;
-  --brand-surface: #142B45;
+  --brand-bg: #101923;
+  --brand-surface: #1B2937;
+  --brand-surface-raised: #24384B;
+  --brand-surface-soft: #293D50;
   --brand-accent: #FF914D;
   --brand-accent-hover: #FFAA70;
-  --brand-accent-soft: #29394A;
-  --brand-text: #F8F5EF;
-  --brand-on-surface: #F8F5EF;
-  --brand-header: #142B45;
-  --brand-header-text: #F8F5EF;
-  --brand-border: #34485C;
-  --brand-muted: #B8C0C8;
-  --brand-nav: rgba(20, 43, 69, .98);
+  --brand-accent-soft: #3B2B25;
+  --brand-accent-contrast: #202832;
+  --brand-text: #F4F1EB;
+  --brand-on-surface: #F4F1EB;
+  --brand-header: #0D2033;
+  --brand-header-text: #FFF9F2;
+  --brand-border: #405163;
+  --brand-muted: #C1CBD5;
+  --brand-nav: rgba(19, 32, 46, .97);
+  --brand-shadow: 0 10px 32px rgba(0, 0, 0, .30);
 }
 
 @theme inline {
   --color-brand-bg: var(--brand-bg);
   --color-brand-surface: var(--brand-surface);
+  --color-brand-surface-raised: var(--brand-surface-raised);
+  --color-brand-surface-soft: var(--brand-surface-soft);
   --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+  --color-brand-accent-soft: var(--brand-accent-soft);
+  --color-brand-accent-contrast: var(--brand-accent-contrast);
+  --color-brand-header: var(--brand-header);
+  --color-brand-header-text: var(--brand-header-text);
   --color-brand-text: var(--brand-text);
   --color-brand-on-surface: var(--brand-on-surface);
   --color-brand-border: var(--brand-border);
@@ -236,3 +251,51 @@ nav a:active { transform: scale(.97); }
 
 
 /* Les icônes SVG héritent la couleur de leur composant via currentColor. */
+
+
+/* Revant visual refresh — smooth theme changes and restrained marketplace motion. */
+html[data-site-palette] body,
+html[data-site-palette] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) {
+  transition-property: background-color, color, border-color, box-shadow;
+  transition-duration: 240ms;
+  transition-timing-function: cubic-bezier(.2, .7, .25, 1);
+}
+a[class*="bg-brand-accent"], button[class*="bg-brand-accent"],
+a[class*="bg-[#F46A18]"], button[class*="bg-[#F46A18]"] {
+  color: var(--brand-accent-contrast) !important;
+}
+@keyframes revant-hero-copy-in {
+  0% { opacity: 0; transform: translate3d(0, 18px, 0); filter: blur(5px); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
+}
+@keyframes revant-hero-image-drift {
+  from { transform: scale(1.09); }
+  to { transform: scale(1); }
+}
+@keyframes revant-icon-arrive {
+  0% { opacity: .55; transform: translateY(5px) scale(.82) rotate(-7deg); }
+  75% { opacity: 1; transform: translateY(-2px) scale(1.06) rotate(2deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .revant-hero-copy { animation: revant-hero-copy-in 650ms var(--revant-motion-ease) both; }
+  .revant-hero-slide.is-active { animation: revant-hero-image-drift 6.5s ease-out both; }
+  .revant-shortcut { transition: transform 240ms var(--revant-motion-ease); }
+  .revant-shortcut:hover { transform: translateY(-4px); }
+  .revant-shortcut-icon { transition: transform 260ms var(--revant-motion-ease), box-shadow 260ms ease, background-color 220ms ease; }
+  .revant-shortcut:hover .revant-shortcut-icon { transform: translateY(-2px) scale(1.055); box-shadow: var(--brand-shadow); }
+  .revant-shortcut:active .revant-shortcut-icon { transform: scale(.92); }
+  .revant-product-card { transition: transform 260ms var(--revant-motion-ease), box-shadow 260ms ease, border-color 220ms ease; }
+  .revant-product-card:hover { transform: translateY(-4px); box-shadow: var(--brand-shadow); border-color: color-mix(in srgb, var(--brand-accent) 48%, var(--brand-border)); }
+  .revant-product-card:focus-within { border-color: var(--brand-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-accent) 14%, transparent); }
+  .revant-settings-row { transition: background-color 200ms ease, transform 200ms var(--revant-motion-ease); }
+  .revant-settings-row:hover { transform: translateX(3px); }
+  .revant-settings-row:active { transform: scale(.99); }
+  .revant-nav-item.is-active > span:first-child { animation: revant-icon-arrive 360ms var(--revant-motion-ease) both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .revant-hero-copy, .revant-hero-slide, .revant-shortcut, .revant-product-card, .revant-settings-row {
+    animation: none !important;
+    transform: none !important;
+  }
+}

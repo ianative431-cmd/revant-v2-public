@@ -64,7 +64,7 @@ const GROUPS: { title: string; items: SettingsItem[] }[] = [
 function SettingsRow({ item }: { item: SettingsItem }) {
   const Icon = item.Icon;
   return (
-    <Link href={item.href} className="flex min-h-[76px] items-center gap-3 px-4 py-3 transition hover:bg-brand-accent/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent sm:px-5">
+    <Link href={item.href} className="revant-settings-row flex min-h-[76px] items-center gap-3 px-4 py-3 transition hover:bg-brand-accent/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent sm:px-5">
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ color: item.color, backgroundColor: `${item.color}16` }}>
         <Icon size={21} strokeWidth={1.8} aria-hidden="true" />
       </span>
