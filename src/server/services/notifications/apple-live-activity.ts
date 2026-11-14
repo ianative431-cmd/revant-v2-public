@@ -86,7 +86,8 @@ export async function sendApplePushAlertToUser(
       .select(category)
       .eq("user_id", userId)
       .maybeSingle();
-    const enabled = preferences?.[category] ?? DEFAULT_PREFERENCES[category];
+    const preferenceRecord = preferences as Record<string, boolean> | null;
+    const enabled = preferenceRecord?.[category] ?? DEFAULT_PREFERENCES[category];
     if (!enabled) return;
 
     const { data: devices, error } = await admin
