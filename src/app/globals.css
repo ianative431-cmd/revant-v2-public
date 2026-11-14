@@ -1,23 +1,37 @@
 @import "tailwindcss";
 
 :root,
-:root[data-site-palette="terracotta"],
-:root[data-site-palette="slate-lilac"] {
+:root[data-site-palette="terracotta"] {
   color-scheme: light;
-  --brand-bg: #FFFFFF;
+  --brand-bg: #F8F5EF;
   --brand-surface: #FFFFFF;
-  --brand-accent: #000000;
-  --brand-accent-hover: #222222;
-  --brand-accent-soft: #F2F2F2;
-  --brand-text: #000000;
-  --brand-on-surface: #000000;
+  --brand-accent: #F46A18;
+  --brand-accent-hover: #D9570C;
+  --brand-accent-soft: #FFF0E6;
+  --brand-text: #20252B;
+  --brand-on-surface: #20252B;
   --brand-header: #FFFFFF;
-  --brand-header-text: #000000;
-  --brand-border: #E5E5E5;
-  --brand-muted: #555555;
-  --brand-nav: rgba(255, 255, 255, .98);
+  --brand-header-text: #20252B;
+  --brand-border: #E7DED4;
+  --brand-muted: #625D56;
+  --brand-nav: rgba(255, 255, 255, .97);
 }
 
+:root[data-site-palette="slate-lilac"] {
+  color-scheme: dark;
+  --brand-bg: #20252B;
+  --brand-surface: #142B45;
+  --brand-accent: #FF914D;
+  --brand-accent-hover: #FFAA70;
+  --brand-accent-soft: #29394A;
+  --brand-text: #F8F5EF;
+  --brand-on-surface: #F8F5EF;
+  --brand-header: #142B45;
+  --brand-header-text: #F8F5EF;
+  --brand-border: #34485C;
+  --brand-muted: #B8C0C8;
+  --brand-nav: rgba(20, 43, 69, .98);
+}
 
 @theme inline {
   --color-brand-bg: var(--brand-bg);
@@ -221,6 +235,4 @@ nav a:active { transform: scale(.97); }
 }
 
 
-/* Temporary high-contrast monochrome icon treatment. */
-:root { --revant-icon-ink: #000000; }
-svg { color: var(--revant-icon-ink); }
+/* Les icônes SVG héritent la couleur de leur composant via currentColor. */

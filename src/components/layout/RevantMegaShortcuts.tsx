@@ -53,12 +53,12 @@ export default function RevantMegaShortcuts() {
               key={item.label}
               href={item.href}
               aria-label={`Explorer : ${item.label}`}
-              className="group flex min-h-[76px] w-[68px] shrink-0 snap-start flex-col items-center justify-center gap-2 bg-transparent px-1 py-1 text-center transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black active:scale-[0.98] sm:w-[80px] sm:min-h-[88px]"
+              className="group flex min-h-[76px] w-[68px] shrink-0 snap-start flex-col items-center justify-center gap-2 bg-transparent px-1 py-1 text-center transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] active:scale-[0.98] sm:w-[80px] sm:min-h-[88px]"
             >
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F5F5F5] text-black transition duration-200 group-hover:bg-[#EAEAEA] group-active:scale-95 sm:h-13 sm:w-13">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand-accent-soft)] text-[var(--brand-accent)] transition duration-200 group-hover:bg-[var(--brand-accent)] group-hover:text-white group-active:scale-95 sm:h-13 sm:w-13">
                 <ShortcutIcon kind={item.icon} />
               </span>
-              <span className="text-[10px] font-semibold leading-tight text-black sm:text-[11px]">{item.label}</span>
+              <span className="text-[10px] font-semibold leading-tight text-[var(--brand-text)] sm:text-[11px]">{item.label}</span>
             </Link>
           ))}
         </div>
