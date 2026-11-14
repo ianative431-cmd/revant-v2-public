@@ -17,6 +17,7 @@ import {
 import BottomNav from "@/components/layout/BottomNav";
 import PaletteSwitcher from "@/components/layout/PaletteSwitcher";
 import SiteHeader from "@/components/layout/SiteHeader";
+import SettingsSearch from "@/components/layout/SettingsSearch";
 import { SITE_PALETTES } from "@/content/theme/site-palette";
 import { getSitePalette } from "@/server/theme/site-palette";
 
@@ -84,15 +85,26 @@ function SettingsInfoCard({ children, id }: { children: ReactNode; id: string })
 export default async function ParametresPage() {
   const palette = await getSitePalette();
 
+  const searchEntries = GROUPS.flatMap((group) =>
+    group.items.map(({ href, label, description }) => ({
+      href,
+      label,
+      description,
+      group: group.title,
+    })),
+  );
+
   return (
     <div className="min-h-screen bg-brand-bg pb-28 text-brand-text">
-      <SiteHeader />
+      <SiteHeader hideSearch />
       <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:py-10">
         <header className="mb-7">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-accent">REVANT</p>
           <h1 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">Paramètres</h1>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-brand-muted">Retrouve ton compte, ton activité et les préférences de ton application.</p>
         </header>
+
+        <SettingsSearch entries={searchEntries} />
 
         <div className="space-y-6">
           {GROUPS.map((group) => (
