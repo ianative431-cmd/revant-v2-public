@@ -3,26 +3,87 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#803e2f">
-  <title>Revant — hors connexion</title>
+  <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light">
+  <title>Revant — mode hors connexion</title>
   <style>
-    :root{color-scheme:light;--bg:#a79986;--accent:#803e2f;--text:#1f1d20}
+    :root{color-scheme:light;--bg:#fff;--surface:#f5f5f5;--ink:#111;--muted:#666;--line:#e7e7e7}
     *{box-sizing:border-box}
-    body{margin:0;min-height:100svh;padding:24px;display:grid;place-items:center;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
-    main{width:min(100%,480px);padding:clamp(24px,6vw,40px);border-radius:24px;background:#f7f3ee;box-shadow:0 16px 48px #1f1d2020;text-align:center}
-    img{width:76px;height:76px;object-fit:contain;margin:0 auto 16px}
-    h1{font-size:clamp(1.5rem,5vw,2rem);line-height:1.2;margin:0 0 12px}
-    p{margin:0 0 22px}
-    button{min-height:48px;padding:12px 22px;border:0;border-radius:999px;background:var(--accent);color:white;font:inherit;font-weight:700;cursor:pointer}
-    button:focus-visible{outline:3px solid var(--text);outline-offset:3px}
+    body{margin:0;min-height:100svh;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+    main{width:min(100% - 32px,760px);margin:0 auto;padding:28px 0 44px}
+    header{display:flex;align-items:center;gap:12px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+    header img{width:48px;height:48px;object-fit:contain}
+    .brand{font-size:19px;font-weight:850;letter-spacing:-.04em}
+    .state{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:750;white-space:nowrap}
+    .intro{padding:34px 0 22px}
+    .eyebrow{font-size:10px;font-weight:850;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    h1{font-size:clamp(27px,6vw,42px);line-height:1.08;letter-spacing:-.045em;margin:10px 0 12px}
+    p{color:var(--muted);margin:0;max-width:560px}
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:25px 0 12px}
+    h2{font-size:16px;margin:0;font-weight:850}
+    .hint{font-size:11px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .tile{display:flex;align-items:center;gap:11px;min-height:66px;padding:11px;border:1px solid var(--line);border-radius:15px;background:#fff}
+    .icon{width:38px;height:38px;flex:0 0 38px;border-radius:50%;display:grid;place-items:center;background:#111;color:#fff;font-size:15px;font-weight:800}
+    .tile strong{display:block;font-size:12px}
+    .tile small{display:block;margin-top:2px;color:var(--muted);font-size:10px}
+    .notice{margin-top:22px;padding:18px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
+    .notice strong{display:block;font-size:13px;margin-bottom:5px}
+    .notice p{font-size:12px}
+    button{width:100%;min-height:48px;margin-top:18px;padding:12px 20px;border:0;border-radius:999px;background:#111;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+    button:focus-visible{outline:3px solid #777;outline-offset:3px}
+    footer{padding-top:24px;text-align:center;color:#777;font-size:10px}
+    @media(min-width:560px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.tile{align-items:flex-start;flex-direction:column}.icon{width:34px;height:34px;flex-basis:34px}}
   </style>
 </head>
 <body>
   <main>
-    <img src="/images/logo-revant-app-512.png" alt="Revant">
-    <h1>Vous êtes hors connexion</h1>
-    <p>Revant a besoin d’Internet pour charger les boutiques et synchroniser les données. Vérifiez votre connexion puis réessayez.</p>
-    <button type="button" onclick="location.reload()">Réessayer</button>
+    <header>
+      <img src="/images/logo-revant-app-512.png" alt="Logo Revant">
+      <div class="brand">REVANT</div>
+      <div class="state" id="connection-state">HORS CONNEXION</div>
+    </header>
+
+    <section class="intro">
+      <div class="eyebrow">Ton marketplace reste accessible</div>
+      <h1>Bonjour, bienvenue sur Revant.</h1>
+      <p>La connexion Internet est momentanément indisponible. L’accueil et les principales rubriques restent visibles pendant ce temps.</p>
+    </section>
+
+    <div class="section-head">
+      <h2>Explorer les catégories</h2>
+      <span class="hint">Aperçu hors ligne</span>
+    </div>
+    <section class="grid" aria-label="Catégories Revant">
+      <div class="tile"><span class="icon">M</span><span><strong>Mode</strong><small>Vêtements et styles</small></span></div>
+      <div class="tile"><span class="icon">P</span><span><strong>Parfums</strong><small>Parfums et beauté</small></span></div>
+      <div class="tile"><span class="icon">A</span><span><strong>Accessoires</strong><small>Les petits détails</small></span></div>
+      <div class="tile"><span class="icon">H</span><span><strong>Maison</strong><small>Pour ton intérieur</small></span></div>
+      <div class="tile"><span class="icon">É</span><span><strong>Électronique</strong><small>Appareils et accessoires</small></span></div>
+      <div class="tile"><span class="icon">B</span><span><strong>Boutiques</strong><small>Les vendeurs locaux</small></span></div>
+      <div class="tile"><span class="icon">T</span><span><strong>Terroir</strong><small>Produits de nos régions</small></span></div>
+      <div class="tile"><span class="icon">R</span><span><strong>Restaurants</strong><small>À découvrir bientôt</small></span></div>
+    </section>
+
+    <section class="notice">
+      <strong>Les collections ne sont pas encore disponibles.</strong>
+      <p>Les produits et les boutiques se rechargeront automatiquement lorsque la connexion sera rétablie. Aucun contenu vide ou écran blanc ne sera affiché ici.</p>
+      <button type="button" id="retry">Réessayer la connexion</button>
+    </section>
+    <footer>Revant · Marketplace locale</footer>
   </main>
+  <script>
+    const state = document.getElementById("connection-state");
+    const retry = document.getElementById("retry");
+    function updateConnection() {
+      const online = navigator.onLine;
+      state.textContent = online ? "CONNEXION RETROUVÉE" : "HORS CONNEXION";
+      retry.textContent = online ? "Recharger Revant" : "Réessayer la connexion";
+    }
+    window.addEventListener("online", updateConnection);
+    window.addEventListener("offline", updateConnection);
+    retry.addEventListener("click", () => location.reload());
+    updateConnection();
+  </script>
 </body>
 </html>
