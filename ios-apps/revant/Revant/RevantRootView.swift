@@ -12,10 +12,10 @@ private enum RevantTab: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .home: return "Accueil"
-        case .categories: return "Catégories"
-        case .messages: return "Messages"
+        case .categories: return "Catégorie"
+        case .messages: return "Message"
         case .cart: return "Panier"
-        case .account: return "Mon compte"
+        case .account: return "Mon Revante"
         }
     }
 
@@ -62,6 +62,7 @@ struct RevantRootView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Activer les notifications")
+                .accessibilityHint("Les alertes de commande et de livraison peuvent être personnalisées dans les réglages de notifications.")
                 .background {
                     if #available(iOS 26.0, *) {
                         Circle().fill(.clear).glassEffect(.regular)
@@ -100,10 +101,11 @@ private struct RevantTabBar: View {
                         Image(systemName: tab.symbol)
                             .font(.system(size: 18, weight: selection == tab ? .semibold : .regular))
                         Text(tab.title)
-                            .font(.system(size: 10, weight: selection == tab ? .semibold : .medium))
+                            .font(.caption2.weight(selection == tab ? .semibold : .medium))
                             .lineLimit(1)
+                            .minimumScaleFactor(0.75)
                     }
-                    .foregroundStyle(selection == tab ? Color.orange : Color.secondary)
+                    .foregroundStyle(selection == tab ? Color.accentColor : Color.secondary)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
                     .contentShape(Rectangle())
