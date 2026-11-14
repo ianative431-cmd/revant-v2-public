@@ -121,7 +121,17 @@ export default async function AccountDeletionPage({
             {request.request_status === "requested" && <p className="mt-4 text-sm leading-6 text-brand-muted">La demande est enregistrée. Elle doit encore être examinée. Aucun accès ni historique n’a été supprimé.</p>}
             {request.request_status === "blocked" && <p className="mt-4 text-sm leading-6 text-brand-muted">La demande reste ouverte. Les données financières et les historiques protégés ne seront pas effacés pour contourner ces étapes.</p>}
             {active && <form action={cancelAccountDeletion} className="mt-5"><button type="submit" className="rounded-full border border-brand-border px-4 py-2 text-sm font-semibold">Annuler ma demande</button></form>}
-            {!active && <p className="mt-4 text-sm text-brand-muted">Si tu souhaites renouveler une demande, contacte le support Revant pour vérifier la situation.</p>}
+            {request.request_status === "approved" && <p className="mt-4 text-sm leading-6 text-brand-muted">Ta demande est en cours d’examen par l’équipe habilitée. Aucune suppression automatique n’est déclenchée.</p>}
+            {!active && (request.request_status === "cancelled" || request.request_status === "rejected") && (
+              <div className="mt-5 border-t border-brand-border pt-4">
+                <p className="text-sm text-brand-muted">Tu peux envoyer une nouvelle demande si ta situation a changé.</p>
+                <form action={requestAccountDeletion} className="mt-4 space-y-3">
+                  <label htmlFor="confirmation" className="block text-sm font-medium">Pour confirmer, écris : SUPPRIMER MON COMPTE</label>
+                  <input id="confirmation" name="confirmation" type="text" required autoComplete="off" pattern="SUPPRIMER MON COMPTE" className="w-full rounded-xl border border-brand-border bg-brand-bg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--brand-accent)]" placeholder="SUPPRIMER MON COMPTE" />
+                  <button type="submit" className="w-full rounded-full bg-[var(--brand-accent)] px-5 py-3 text-sm font-bold text-white">Envoyer une nouvelle demande</button>
+                </form>
+              </div>
+            )}
           </section>
         ) : (
           <section className="mt-6 rounded-2xl border border-brand-border bg-white p-5">
