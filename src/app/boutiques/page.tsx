@@ -34,14 +34,19 @@ function safeImageUrl(value: string | null | undefined): string | null {
 
 export default async function BoutiquesPage() {
   let shops: Awaited<ReturnType<typeof getActiveShops>> = [];
+  let certifiedShopIds = new Set<string>();
 
-  // Page publique : aucune session n'est nécessaire pour consulter les boutiques.
-  // Si Supabase est momentanément indisponible, la page affiche un état vide utile.
+  // Public badges are based only on approved certifications stored in the database.
   try {
     const supabase = await createSupabaseServerClient();
     shops = await getActiveShops(supabase, { limit: 100 });
+    if (shops.length > 0) {
+      const { data: certifications, error: certificationError } = await supabase.from("certifications").select("shop_id").eq("type", "shop").eq("status", "approved").in("shop_id", shops.map((shop) => shop.id));
+      if (!certificationError) certifiedShopIds = new Set((certifications ?? []).map((item) => item.shop_id));
+    }
   } catch {
     shops = [];
+    certifiedShopIds = new Set();
   }
 
   const publicShops: PublicShopCard[] = shops
@@ -55,6 +60,7 @@ export default async function BoutiquesPage() {
       typeLabel: getShopTypeLabel(shop),
       isRestaurant: shop.is_restaurant,
       isPremium: shop.is_premium,
+      isCertified: certifiedShopIds.has(shop.id),
       bannerUrl: safeImageUrl(shop.banner_url) ?? safeImageUrl(shop.background_image_url),
       logoUrl: safeImageUrl(shop.logo_url),
       color: shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)

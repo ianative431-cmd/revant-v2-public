@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requirePermission } from "@/server/auth/roles";
 import { getAdminKycQueue } from "@/server/admin/kyc";
 import KycDocumentButton from "./KycDocumentButton";
-import { updateKycStatusAction } from "@/server/admin/kyc-actions";
+import { syncApprovedShopCertificationAction, updateKycStatusAction } from "@/server/admin/kyc-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +28,7 @@ const ERROR_LABEL: Record<string, string> = {
   document: "Impossible d'approuver : le document privé n'est pas associé ou introuvable.",
   reviewed: "Ce dossier a déjà été traité. Recharge la liste.",
   save: "La mise à jour a échoué. Réessaie ou consulte les journaux.",
+  certification: "Le dossier est approuvé, mais le badge bleu n’a pas pu être enregistré. Tu peux relancer l’attribution ci-dessous.",
 };
 
 function formatDate(value: string | null) {
@@ -38,10 +39,10 @@ function formatDate(value: string | null) {
 export default async function AdminKycPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; error?: string; notice?: string }>;
+  searchParams: Promise<{ status?: string; error?: string; notice?: string; kycId?: string }>;
 }) {
   await requirePermission("kyc.manage");
-  const [{ status: requestedStatus, error, notice }, records] = await Promise.all([searchParams, getAdminKycQueue()]);
+  const [{ status: requestedStatus, error, notice, kycId }, records] = await Promise.all([searchParams, getAdminKycQueue()]);
   const filter: Filter = FILTERS.includes(requestedStatus as Filter) ? (requestedStatus as Filter) : "pending";
   const counts = {
     pending: records.filter((item) => item.status === "pending").length,
@@ -73,6 +74,9 @@ export default async function AdminKycPage({
       )}
       {notice === "rejected" && (
         <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Le dossier a été refusé et le motif a été enregistré.</p>
+      )}
+      {notice === "certified" && (
+        <p role="status" className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">Le badge bleu « Boutique certifiée » a été enregistré pour les boutiques du vendeur.</p>
       )}
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -167,6 +171,12 @@ export default async function AdminKycPage({
                   </div>
                 )}
               </div>
+              {item.status === "approved" && error === "certification" && kycId === item.id && (
+                <form action={syncApprovedShopCertificationAction} className="mt-3">
+                  <input type="hidden" name="kycId" value={item.id} />
+                  <button type="submit" className="rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-xs font-bold text-blue-800 hover:bg-blue-100">Réessayer l’attribution du badge bleu</button>
+                </form>
+              )}
               {item.status === "rejected" && item.rejectionReason && (
                 <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-800">Motif enregistré : {item.rejectionReason}</p>
               )}

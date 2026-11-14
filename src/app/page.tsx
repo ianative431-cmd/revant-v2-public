@@ -78,6 +78,7 @@ export default async function Home({ searchParams }: Props) {
   let categories: Awaited<ReturnType<typeof getActiveCategories>> = [];
   let loadedProducts: Awaited<ReturnType<typeof getActiveProducts>> = [];
   let shops: Awaited<ReturnType<typeof getActiveShops>> = [];
+  let certifiedShopIds = new Set<string>();
   try {
     const supabase = await createSupabaseServerClient();
     categories = await getActiveCategories(supabase);
@@ -87,12 +88,17 @@ export default async function Home({ searchParams }: Props) {
       getActiveProducts(supabase, { categoryId, productType, limit: 24, searchTerm: q?.trim() || undefined }),
       getActiveShops(supabase, { limit: 8 }),
     ]);
+    if (shops.length > 0) {
+      const { data: certifications, error: certificationError } = await supabase.from("certifications").select("shop_id").eq("type", "shop").eq("status", "approved").in("shop_id", shops.map((shop) => shop.id));
+      if (!certificationError) certifiedShopIds = new Set((certifications ?? []).map((item) => item.shop_id));
+    }
   } catch {
     // On conserve la navigation publique et les états vides si le backend
     // n'est pas configuré, sans renvoyer le visiteur vers la connexion.
     categories = [];
     loadedProducts = [];
     shops = [];
+    certifiedShopIds = new Set();
   }
   const activeCategory = categories.find((c) => c.slug === categorie);
   const shortcutCategoryTitle = categorie === "mode" ? "Mode" : categorie === "parfums" ? "Parfums" : null;
@@ -146,6 +152,12 @@ export default async function Home({ searchParams }: Props) {
               <Link key={shop.id} href={`/shop/${shop.slug}`} className="relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200">
                 <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${safeShopBanner(shop.banner_url) ?? safeShopBanner(shop.background_image_url) ?? safeShopBanner(shop.logo_url) ?? FARM_PHOTOS[0].photo}")` }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                {(certifiedShopIds.has(shop.id) || shop.is_premium) && (
+                  <div className="absolute right-2 top-2 flex flex-col items-end gap-1.5">
+                    {certifiedShopIds.has(shop.id) && <span className="rounded-full bg-blue-600 px-2.5 py-1 text-[9px] font-extrabold text-white">✓ CERTIFIÉE</span>}
+                    {shop.is_premium && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[9px] font-extrabold text-amber-900">PREMIUM</span>}
+                  </div>
+                )}
                 <div className="absolute bottom-3 left-3 text-white"><strong className="block text-sm">{shop.name}</strong><span className="text-[11px]">{shop.city ?? "Niger"}</span></div>
               </Link>
             ))}
