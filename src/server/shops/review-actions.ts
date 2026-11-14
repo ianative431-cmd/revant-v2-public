@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { getShopByOwnerId } from "@/server/shops/shops";
 
@@ -21,7 +22,7 @@ export async function submitShopForReview(
   _formData: FormData
 ): Promise<ShopReviewActionState> {
   const user = await requireUserWithLegalConsent();
-  const userClient = await import("@/lib/supabase/server").then((m) => m.createSupabaseServerClient());
+  const userClient = await createSupabaseServerClient();
   const shop = await getShopByOwnerId(userClient, user.id);
 
   if (!shop) {
