@@ -65,6 +65,7 @@ export default async function MaBoutiquePage() {
         <Link href="/compte/boutique/produits" className="block text-center w-full bg-brand-accent text-white rounded-full py-3 text-sm font-medium mb-3">Mes annonces</Link>
         <Link href="/compte/boutique/commandes" className="block text-center w-full border border-brand-accent rounded-full py-3 text-sm font-medium mb-3">Commandes</Link>
         <Link href="/compte/boutique/reseaux" className="block text-center w-full border border-brand-accent rounded-full py-3 text-sm font-medium mb-3">Calendrier des réseaux sociaux</Link>
+        <Link href="/compte/boutique/verification" className="block text-center w-full border border-blue-200 bg-blue-50 text-blue-800 rounded-full py-3 text-sm font-semibold mb-3">Certification de ma boutique</Link>
         <div className="mt-6 border-t pt-4">
           <Link href="/compte/boutique/personnaliser" className="block text-center w-full border border-brand-accent rounded-full py-3 text-sm font-medium">
             Personnaliser la boutique
