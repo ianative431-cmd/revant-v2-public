@@ -6,8 +6,8 @@
 
 - **Ne pas lancer `supabase db push` sur la production** tant que les sources historiques manquantes ci-dessous ne sont pas retrouvées et réconciliées.
 - La réconciliation des sources ne modifie pas la base : elle aligne uniquement les noms des fichiers locaux avec les versions déjà enregistrées à distance.
-- L'historique distant contient maintenant **74 migrations**. Après alignement des quatre sources de reçus décrites ci-dessous, **45 versions distantes ont une source locale dont la version correspond exactement**; **29 sources historiques restent introuvables**.
-- Trois migrations Apple locales ne figurent pas encore dans l'historique distant : elles ne sont pas appliquées. Ne pas les appliquer avant revue et validation de leurs prérequis Apple.
+- L'historique distant contient **74 migrations**. Le dépôt contient **49 fichiers actifs** dans `supabase/migrations` : **45 versions** correspondent exactement à l'historique distant, **29 sources historiques distantes restent introuvables**, et **4 fichiers locaux ne sont pas appliqués**.
+- Les 4 fichiers locaux non appliqués sont la migration de configuration du bucket photos produits et les 3 migrations Apple listées plus bas. Ne pas les exécuter avant revue et réconciliation de l'historique.
 - Ne jamais recréer les 29 fichiers historiques à partir de suppositions ni les rejouer. Les noms distants sont listés plus bas pour faciliter une récupération future.
 - Les anciennes migrations `0001` à `0011` sont archivées car elles ne figurent pas dans l'historique distant actuel et décrivent un ancien modèle incompatible.
 
@@ -74,6 +74,13 @@ Le fichier `supabase/migrations/20261102234204_20261102133000_shop_media_storage
 - Vérification distante : les deux signatures coexistent; `anon` et `authenticated` n'ont pas EXECUTE sur la nouvelle surcharge; `service_role` l'a. Le `search_path` est vide.
 - La migration est additive et ne déclenche aucun paiement. Aucun test avec commande réelle n'a été effectué : la base n'a pas de boutique ni de produit réel.
 - Ne pas lancer `supabase db push` : les 29 sources historiques manquantes restent à réconcilier.
+
+## Migration photos produits locale non appliquée
+
+- Fichier : `supabase/migrations/20261113130000_product_images_storage_bucket.sql`.
+- Ajoutée par la PR #113 pour rendre reproductible la configuration du bucket `product-images` (public, 8 MiB maximum, JPEG/PNG/WebP).
+- Elle ne figure pas dans l'historique distant de 74 versions vérifié le 14 novembre 2026 : **elle n'a pas été appliquée à la production**.
+- Ne pas la lancer isolément tant que les 29 sources historiques distantes restent introuvables. Le code applicatif limite déjà les photos à 8 MiB.
 
 ## Migrations Apple locales non appliquées
 
