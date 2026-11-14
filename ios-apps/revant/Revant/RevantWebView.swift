@@ -23,6 +23,7 @@ struct RevantWebView: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         context.coordinator.webView = webView
         context.coordinator.lastRequestedPath = path
         webView.load(URLRequest(url: Self.url(for: path)))
@@ -41,6 +42,13 @@ struct RevantWebView: UIViewRepresentable {
 
     private static let bridgeScript = """
     (function () {
+      document.documentElement.setAttribute("data-revant-native", "ios");
+      const nativeStyle = document.createElement("style");
+      nativeStyle.textContent =
+        'html[data-revant-native="ios"] header.sticky.top-0{display:none!important;}' +
+        'html[data-revant-native="ios"] nav[aria-label="Navigation principale"]{display:none!important;}';
+      document.documentElement.appendChild(nativeStyle);
+
       const nativeHandler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.revantNative;
       if (!nativeHandler) return;
       window.RevantNative = {
