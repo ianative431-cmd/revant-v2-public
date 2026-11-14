@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { getPalettesForShopType } from "@/content/shops/color-palettes";
 import PaletteCard from "./PaletteCard";
+import ShopContactForm from "./ShopContactForm";
 import ShopMediaForm from "./ShopMediaForm";
 
 export default async function PersonnaliserBoutiquePage() {
@@ -27,10 +28,19 @@ export default async function PersonnaliserBoutiquePage() {
 
         <h1 className="text-xl font-bold mt-4 mb-1">Personnaliser {shop.name}</h1>
         <p className="text-sm text-[var(--brand-muted)] mb-6">
-          Choisis une palette de couleurs pour ta boutique publique.
+          Gère les informations visibles sur la vitrine publique de ta boutique.
         </p>
 
-        <div className="flex flex-col gap-4 mb-8">
+        <ShopContactForm
+          countryCode={shop.country_code}
+          phone={shop.phone}
+          whatsapp={shop.whatsapp}
+          instagram={shop.instagram}
+          tiktok={shop.tiktok}
+          snapchat={shop.snapchat}
+        />
+
+        <div className="mt-8 flex flex-col gap-4 mb-8">
           {palettes.map((palette) => (
             <PaletteCard
               key={palette.id}
