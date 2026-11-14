@@ -1,0 +1,53 @@
+name: Revant
+options:
+  bundleIdPrefix: ne.revant
+  deploymentTarget:
+    iOS: "16.2"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.2"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    GENERATE_INFOPLIST_FILE: YES
+targets:
+  Revant:
+    type: application
+    platform: iOS
+    sources:
+      - path: Revant
+      - path: Shared/RevantLiveActivityAttributes.swift
+    dependencies:
+      - target: RevantLiveActivityExtension
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ne.revant.marketplace
+        PRODUCT_NAME: Revant
+        CODE_SIGN_ENTITLEMENTS: Revant/Revant.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_CFBundleDisplayName: Revant
+        INFOPLIST_KEY_NSSupportsLiveActivities: YES
+        INFOPLIST_KEY_NSCameraUsageDescription: "Revant utilise la caméra pour photographier les produits que tu souhaites publier ou rechercher."
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Revant accède à tes photos pour ajouter des images à tes produits et à ta boutique."
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        SWIFT_VERSION: "5.0"
+      configs:
+        Debug:
+          APS_ENVIRONMENT: development
+        Release:
+          APS_ENVIRONMENT: production
+  RevantLiveActivityExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: LiveActivity
+      - path: Shared/RevantLiveActivityAttributes.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ne.revant.marketplace.LiveActivity
+        PRODUCT_NAME: RevantLiveActivity
+        INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+        SWIFT_VERSION: "5.0"

@@ -97,6 +97,23 @@ jobs:
       - name: Build debug APK
         working-directory: ${{ matrix.app.directory }}/android
         run: ./gradlew assembleDebug --no-daemon
+      - name: Enforce 60 MB APK size limit
+        shell: bash
+        run: |
+          APK_PATH="${{ matrix.app.directory }}/android/app/build/outputs/apk/debug/app-debug.apk"
+          APK_SIZE_BYTES="$(stat -c '%s' "$APK_PATH")"
+          MAX_SIZE_BYTES=60000000
+          APK_SIZE_MB="$(awk -v bytes="$APK_SIZE_BYTES" 'BEGIN { printf "%.2f", bytes / 1000000 }')"
+          echo "APK size: ${APK_SIZE_MB} MB (${APK_SIZE_BYTES} bytes)"
+          {
+            echo "### ${{ matrix.app.label }} APK"
+            echo "- Size: ${APK_SIZE_MB} MB"
+            echo "- Maximum allowed: 60 MB"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$APK_SIZE_BYTES" -gt "$MAX_SIZE_BYTES" ]; then
+            echo "::error::${{ matrix.app.label }} APK exceeds the 60 MB size limit."
+            exit 1
+          fi
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

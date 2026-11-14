@@ -1,0 +1,59 @@
+name: Build Revant iOS
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "ios-apps/revant/**"
+      - "public/images/logo-revant-app-512.png"
+      - "src/components/native/**"
+      - "src/app/api/native/**"
+      - "src/app/compte/notifications/**"
+      - "src/app/compte/commandes/**"
+      - "src/app/layout.tsx"
+      - "supabase/migrations/**"
+      - ".github/workflows/ios-app.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-ios-simulator:
+    name: Build iOS Simulator app
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Xcode 26+
+        shell: bash
+        run: |
+          xcodebuild -version
+          VERSION="$(xcodebuild -version | awk '/Xcode/ { print $2 }')"
+          MAJOR="${VERSION%%.*}"
+          if [ "$MAJOR" -lt 26 ]; then
+            echo "Xcode 26 or later is required; found $VERSION"
+            exit 1
+          fi
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Prepare App Store icon
+        working-directory: ios-apps/revant
+        run: bash scripts/prepare-app-icon.sh
+
+      - name: Generate Xcode project
+        working-directory: ios-apps/revant
+        run: xcodegen generate --spec project.yml
+
+      - name: Build for iOS Simulator
+        working-directory: ios-apps/revant
+        run: |
+          xcodebuild \
+            -project Revant.xcodeproj \
+            -scheme Revant \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build

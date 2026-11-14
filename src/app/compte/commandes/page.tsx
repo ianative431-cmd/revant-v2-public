@@ -3,6 +3,7 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOrdersForBuyer } from "@/server/orders/orders";
 import BuyerOrderActions from "./BuyerOrderActions";
+import NativeDeliveryActivityButton from "./NativeDeliveryActivityButton";
 import type { OrderStatus } from "@/types/order";
 
 const DELIVERY_STATUS_LABEL: Record<string, string> = {
@@ -27,6 +28,9 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   disputed: "En litige",
 };
 
+const ACTIVE_DELIVERY_STATES = new Set<string>(["assigned", "picked_up", "in_transit"]);
+const CLOSED_ORDER_STATES = new Set<string>(["delivered", "cancelled", "refunded"]);
+
 export default async function MesCommandesPage() {
   await requireUserWithLegalConsent();
   const supabase = await createSupabaseServerClient();
@@ -41,29 +45,38 @@ export default async function MesCommandesPage() {
           <p className="py-10 text-center text-sm text-brand-text/60">Aucune commande pour l’instant.</p>
         ) : (
           <div className="flex flex-col gap-3">
-            {orders.map((order) => (
-              <article key={order.id} className="rounded-2xl bg-white p-4">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold">Commande {order.order_number}</p>
-                    <p className="mt-1 text-xs text-brand-text/50">{new Date(order.created_at).toLocaleDateString("fr-FR")}</p>
-                  </div>
-                  <span className="rounded-full bg-brand-text/5 px-2.5 py-1 text-[11px] text-brand-text/70">{STATUS_LABEL[order.status]}</span>
-                </div>
-                <div className="mt-3 space-y-2 border-t border-brand-text/10 pt-3">
-                  {order.items.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between gap-3 text-sm">
-                      <span className="min-w-0 truncate">{item.product_name} × {item.quantity}</span>
-                      <span className="shrink-0 font-semibold">{Number(item.line_total).toLocaleString("fr-FR")} {item.currency.trim()}</span>
+            {orders.map((order) => {
+              const deliveryStatus = order.delivery?.status ?? null;
+              const activeDelivery = deliveryStatus !== null && ACTIVE_DELIVERY_STATES.has(deliveryStatus);
+              const progress = deliveryStatus === "assigned" ? 0.25 : deliveryStatus === "picked_up" ? 0.55 : deliveryStatus === "in_transit" ? 0.85 : 0;
+              const itemTitle = order.items[0]?.product_name ?? "Commande Revant";
+
+              return (
+                <article key={order.id} className="rounded-2xl bg-white p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold">Commande {order.order_number}</p>
+                      <p className="mt-1 text-xs text-brand-text/50">{new Date(order.created_at).toLocaleDateString("fr-FR")}</p>
                     </div>
-                  ))}
-                </div>
-                <p className="mt-3 text-sm font-bold">Total : {Number(order.total_amount).toLocaleString("fr-FR")} {order.currency.trim()}</p>
-                {order.delivery && <p className="mt-2 text-xs text-brand-text/55">Livraison : {DELIVERY_STATUS_LABEL[order.delivery.status] ?? order.delivery.status}</p>}
-                {order.status === "pending" && <div className="mt-3"><BuyerOrderActions orderId={order.id} /></div>}
-                {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
-              </article>
-            ))}
+                    <span className="rounded-full bg-brand-text/5 px-2.5 py-1 text-[11px] text-brand-text/70">{STATUS_LABEL[order.status]}</span>
+                  </div>
+                  <div className="mt-3 space-y-2 border-t border-brand-text/10 pt-3">
+                    {order.items.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between gap-3 text-sm">
+                        <span className="min-w-0 truncate">{item.product_name} × {item.quantity}</span>
+                        <span className="shrink-0 font-semibold">{Number(item.line_total).toLocaleString("fr-FR")} {item.currency.trim()}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-sm font-bold">Total : {Number(order.total_amount).toLocaleString("fr-FR")} {order.currency.trim()}</p>
+                  {order.delivery && <p className="mt-2 text-xs text-brand-text/55">Livraison : {DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? deliveryStatus}</p>}
+                  {activeDelivery && <NativeDeliveryActivityButton action="start" orderReference={order.order_number} itemTitle={itemTitle} status={DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? "Livraison en cours"} detail={DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? "Livraison en cours"} progress={progress} />}
+                  {CLOSED_ORDER_STATES.has(order.status) && <NativeDeliveryActivityButton action="end" orderReference={order.order_number} />}
+                  {order.status === "pending" && <div className="mt-3"><BuyerOrderActions orderId={order.id} /></div>}
+                  {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
+                </article>
+              );
+            })}
           </div>
         )}
       </div>

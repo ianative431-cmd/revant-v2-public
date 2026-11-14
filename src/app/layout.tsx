@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import GlobalDismissibleDetails from "@/components/layout/GlobalDismissibleDetails";
 import CookieConsentBanner from "@/components/cookie-consent/CookieConsentBanner";
 import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
+import NativePushRegistration from "@/components/native/NativePushRegistration";
 import { getSitePalette } from "@/server/theme/site-palette";
 
 export const metadata: Metadata = {
@@ -44,6 +45,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-text">
         <GlobalDismissibleDetails />
         <ServiceWorkerRegister />
+        <NativePushRegistration />
         <div className="flex-1 flex flex-col">{children}</div>
         <Footer />
         <CookieConsentBanner />
