@@ -2,6 +2,7 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { signOutAction } from "../(auth)/actions";
 import Link from "next/link";
 import AvatarUploader from "@/components/profile/AvatarUploader";
+import SignOutForm from "@/components/native/SignOutForm";
 
 export default async function ComptePage() {
   const user = await requireUserWithLegalConsent();
@@ -21,9 +22,7 @@ export default async function ComptePage() {
           {user.phone && <div className="flex justify-between"><dt className="text-brand-text/60">Téléphone</dt><dd>+{user.phone}</dd></div>}
           <div className="flex justify-between"><dt className="text-brand-text/60">Compte créé le</dt><dd>{new Date(user.created_at).toLocaleDateString("fr-FR")}</dd></div>
         </dl>
-        <form action={signOutAction}>
-          <button type="submit" className="w-full border border-brand-accent rounded-full py-3 text-sm font-medium">Se déconnecter</button>
-        </form>
+        <SignOutForm action={signOutAction} />
         <Link href="/compte/boutique" className="block text-center text-sm underline mt-4 text-brand-text/70">Ma boutique</Link>
         <Link href="/compte/commandes" className="block text-center text-sm underline mt-2 text-brand-text/70">Mes commandes</Link>
         <Link href="/compte/notifications" className="block text-center text-sm underline mt-2 text-brand-text/70">Notifications</Link>
