@@ -1,16 +1,30 @@
 # Historique des migrations Supabase — Revant
 
-État vérifié le 3 novembre 2026 (UTC) sur le projet `xugcmpnrigqfszyfufoc`.
+État vérifié le 14 novembre 2026 (UTC) sur le projet `xugcmpnrigqfszyfufoc`.
 
 ## Règles de sécurité
 
-- **Ne pas lancer `supabase db push` sur la production** tant que les sources manquantes ci-dessous ne sont pas retrouvées et réconciliées.
-- La PR initiale de réconciliation n'a pas changé la base : elle a renommé, archivé et restauré des fichiers SQL déjà appliqués. Les migrations ajoutées ultérieurement dans ce journal ont été appliquées séparément via l'API de migration Supabase.
-- Supabase enregistre maintenant 68 migrations. Après les ajouts documentés dans ce journal, 39 migrations appliquées disposent d'un fichier source local dont le préfixe/version correspond exactement; 29 sources restent introuvables dans `main` et les branches historiques contrôlées.
-- Ne jamais recréer ces 29 fichiers à partir de suppositions ni les rejouer. Les noms distants sont listés plus bas pour faciliter une récupération future.
+- **Ne pas lancer `supabase db push` sur la production** tant que les sources historiques manquantes ci-dessous ne sont pas retrouvées et réconciliées.
+- La réconciliation des sources ne modifie pas la base : elle aligne uniquement les noms des fichiers locaux avec les versions déjà enregistrées à distance.
+- L'historique distant contient maintenant **74 migrations**. Après alignement des quatre sources de reçus décrites ci-dessous, **45 versions distantes ont une source locale dont la version correspond exactement**; **29 sources historiques restent introuvables**.
+- Trois migrations Apple locales ne figurent pas encore dans l'historique distant : elles ne sont pas appliquées. Ne pas les appliquer avant revue et validation de leurs prérequis Apple.
+- Ne jamais recréer les 29 fichiers historiques à partir de suppositions ni les rejouer. Les noms distants sont listés plus bas pour faciliter une récupération future.
 - Les anciennes migrations `0001` à `0011` sont archivées car elles ne figurent pas dans l'historique distant actuel et décrivent un ancien modèle incompatible.
 
 ## Fichiers renommés pour correspondre aux versions distantes
+
+Les quatre migrations de reçus ci-dessous ont été retrouvées dans les PR fusionnées #87 et #90. Les noms distants ont été lus dans l'historique Supabase. Le contenu SQL local est conservé à l'identique; seuls les préfixes de version des fichiers sont alignés.
+
+| Ancien fichier | Nouveau fichier |
+|---|---|
+| `20261105170000_secure_receipt_document_registry.sql` | `20261105172810_secure_receipt_document_registry.sql` |
+| `20261105171000_receipt_verification_token_hash.sql` | `20261105172812_receipt_verification_token_hash.sql` |
+| `20261105172812_lock_down_receipt_trigger_functions.sql` | `20261105172832_lock_down_receipt_trigger_functions.sql` |
+| `20261105210000_server_only_receipt_storage.sql` | `20261105210038_server_only_receipt_storage.sql` |
+
+**Limite de vérification :** l'API d'historique Supabase expose les versions et noms des migrations, pas le contenu SQL exécuté ni son empreinte. La correspondance est établie par les noms et les PR fusionnées; elle ne constitue pas une preuve cryptographique que le SQL distant est identique octet par octet. Aucun SQL n'a été exécuté pendant cette réconciliation.
+
+## Fichiers renommés pour correspondre aux versions distantes — historiques
 
 | Ancien fichier | Nouveau fichier |
 |---|---|
@@ -61,9 +75,19 @@ Le fichier `supabase/migrations/20261102234204_20261102133000_shop_media_storage
 - La migration est additive et ne déclenche aucun paiement. Aucun test avec commande réelle n'a été effectué : la base n'a pas de boutique ni de produit réel.
 - Ne pas lancer `supabase db push` : les 29 sources historiques manquantes restent à réconcilier.
 
+## Migrations Apple locales non appliquées
+
+Les fichiers suivants existent dans `supabase/migrations`, mais ne figurent pas dans l'historique distant de 74 versions vérifié le 14 novembre 2026 :
+
+- `20261114123000_add_apple_notification_foundation.sql`
+- `20261114124500_add_live_activity_tokens.sql`
+- `20261114133000_add_user_blocks.sql`
+
+Elles sont donc locales et non appliquées à la base de production. Elles restent soumises à revue, à validation de la configuration APNs/ActivityKit et à une application contrôlée après réconciliation de l'historique.
+
 ## Sources SQL distantes non retrouvées
 
-Ces 29 versions figurent dans l'historique Supabase mais aucun fichier SQL correspondant n'a été trouvé dans `main` ou les branches historiques contrôlées :
+Ces 29 versions figurent dans l'historique Supabase mais aucun fichier SQL correspondant n'a été retrouvé dans les sources locales contrôlées :
 
 - `20260928110300_revant_core_foundation.sql`
 - `20260928110736_revant_orders_finance_foundation.sql`
