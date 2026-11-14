@@ -58,7 +58,7 @@ export default async function PersonnaliserBoutiquePage() {
         />
         <div className="bg-[var(--brand-surface)] border border-[var(--brand-border)] rounded-2xl p-4 mt-4">
           <p className="text-xs font-semibold text-[var(--brand-muted)] mb-1">Autres options</p>
-          <p className="text-xs text-[var(--brand-muted)]">L'image d'arrière-plan personnalisée et la typographie seront ajoutées dans un prochain lot.</p>
+          <p className="text-xs text-[var(--brand-muted)]">L&apos;image d&apos;arrière-plan personnalisée et la typographie seront ajoutées dans un prochain lot.</p>
         </div>
       </div>
     </div>
