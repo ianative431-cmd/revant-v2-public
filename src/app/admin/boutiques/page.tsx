@@ -43,9 +43,13 @@ export default async function AdminBoutiquesPage() {
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <Link href={"/shop/" + shop.slug} className="text-xs text-black/50 underline">
-                  Voir
-                </Link>
+                {shop.status === "active" ? (
+                  <Link href={"/shop/" + shop.slug} className="text-xs text-black/50 underline">
+                    Voir
+                  </Link>
+                ) : (
+                  <span className="text-[10px] text-black/35">Non publiée</span>
+                )}
                 {canManageShops && <ShopStatusToggle shopId={shop.id} status={shop.status} />}
               </div>
             </div>
