@@ -29,6 +29,7 @@ export default async function ComptePage() {
         <Link href="/compte/livraisons" className="block text-center text-sm underline mt-2 text-brand-text/70">Espace livreur</Link>
         <Link href="/compte/blocages" className="block text-center text-sm underline mt-2 text-brand-text/70">Comptes bloqués</Link>
         <Link href="/parametres#securite" className="block text-center text-sm underline mt-2 text-brand-text/70">Confidentialité et données</Link>
+        <Link href="/compte/suppression" className="block text-center text-sm underline mt-2 text-brand-text/70">Suppression du compte</Link>
       </div>
     </div>
   );
