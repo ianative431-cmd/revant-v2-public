@@ -7,6 +7,8 @@ Last source and live-schema audit: 2026-11-14. A passing simulator build is not 
 - [x] Dedicated SwiftUI iOS application target, separate from the Android Capacitor app and Super Admin.
 - [x] iOS 26+ Liquid Glass on native navigation controls, with system-material fallback.
 - [x] Native navigation for the five customer destinations; the website's duplicate header and bottom navigation are hidden only inside the iOS WKWebView.
+- [x] 1024×1024 App Store icon generated from the existing opaque RGB Revant app logo.
+- [x] Apple privacy manifest declares the app's UserDefaults access with the official app-only reason code CA92.1.
 - [x] ActivityKit/WidgetKit delivery Live Activity for Lock Screen and Dynamic Island.
 - [x] ActivityKit push token registration scoped to the authenticated buyer's own order.
 - [x] Signed APNs Live Activity updates wired to successful delivery-driver claim, progress and delivery-confirmation actions.
@@ -45,13 +47,13 @@ The customer app currently has first-party email/phone account methods and Googl
 Physical goods sold through the marketplace can use the normal payment processor. Digital services consumed in the app—such as seller subscriptions, premium digital features or paid boosts—need a separate Apple In-App Purchase assessment before they are enabled in the iOS app. Do not route digital entitlements through Moneroo without confirming the applicable Apple rules.
 
 ### Privacy and SDKs
+- The native app now declares its UserDefaults required-reason API use in `PrivacyInfo.xcprivacy` with reason `CA92.1`.
 - Inventory every native SDK, web SDK, analytics provider and data flow actually shipped in the final binary.
-- Add/verify privacy manifests and required-reason API declarations for any SDKs that Apple lists as requiring them.
+- Complete the privacy manifest's collected-data disclosures if the final app/embedded SDKs collect data covered by Apple's manifest rules.
 - Complete App Store privacy labels, public privacy policy, data retention/deletion disclosures and permission-purpose strings.
 - Recheck this inventory whenever dependencies or analytics SDKs change.
 
 ### Store submission materials
-- Confirm a 1024×1024 App Store icon based on the approved Revant logo.
 - Prepare current iPhone screenshots, description, keywords, age rating and support/privacy URLs.
 - Provide a reviewer account and precise review notes for customer, seller and delivery flows.
 - Test on supported iPhone sizes, iOS 26, VoiceOver, Dynamic Type, dark mode, poor connectivity and permission-denied states.
