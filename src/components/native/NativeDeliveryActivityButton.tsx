@@ -2,22 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-declare global {
-  interface Window {
-    RevantNative?: {
-      startDeliveryActivity?: (payload: {
-        orderReference: string;
-        itemTitle: string;
-        status: string;
-        detail: string;
-        etaLabel: string;
-        progress: number;
-      }) => void;
-      endDeliveryActivity?: (payload: { orderReference: string }) => void;
-    };
-  }
-}
-
 type Props =
   | {
       action: "start";

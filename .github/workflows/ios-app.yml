@@ -1,82 +1,54 @@
-import ActivityKit
-import SwiftUI
-import WidgetKit
+name: Build Revant iOS
 
-struct RevantDeliveryLiveActivity: Widget {
-    var body: some WidgetConfiguration {
-        ActivityConfiguration(for: RevantDeliveryAttributes.self) { context in
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Label("Livraison Revant", systemImage: "shippingbox.fill")
-                        .font(.caption.weight(.semibold))
-                    Spacer()
-                    Text(context.attributes.orderReference)
-                        .font(.caption2.monospaced())
-                        .foregroundStyle(.secondary)
-                }
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "ios-apps/revant/**"
+      - "src/components/native/**"
+      - "src/app/api/native/**"
+      - "src/app/compte/notifications/**"
+      - "src/app/compte/commandes/**"
+      - "src/app/layout.tsx"
+      - "supabase/migrations/**"
+      - ".github/workflows/ios-app.yml"
 
-                Text(context.attributes.itemTitle)
-                    .font(.headline)
-                    .lineLimit(1)
+permissions:
+  contents: read
 
-                HStack {
-                    Text(context.state.status)
-                        .font(.subheadline.weight(.medium))
-                    Spacer()
-                    Text(context.state.etaLabel)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+jobs:
+  build-ios-simulator:
+    name: Build iOS Simulator app
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-                ProgressView(value: context.state.progress)
-                Text(context.state.detail)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-            }
-            .padding()
-            .activityBackgroundTint(Color(red: 0.96, green: 0.94, blue: 0.90))
-            .activitySystemActionForegroundColor(.black)
-        } dynamicIsland: { context in
-            DynamicIsland {
-                DynamicIslandExpandedRegion(.leading) {
-                    Label("Revant", systemImage: "shippingbox.fill")
-                        .font(.caption.weight(.bold))
-                }
-                DynamicIslandExpandedRegion(.trailing) {
-                    Text("\(Int(context.state.progress * 100))%")
-                        .font(.caption.monospacedDigit())
-                }
-                DynamicIslandExpandedRegion(.bottom) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(context.attributes.itemTitle)
-                            .font(.subheadline.weight(.semibold))
-                            .lineLimit(1)
-                        Text(context.state.status)
-                            .font(.caption)
-                        ProgressView(value: context.state.progress)
-                        Text(context.state.detail)
-                            .font(.caption2)
-                            .lineLimit(2)
-                    }
-                }
-            } compactLeading: {
-                Image(systemName: "shippingbox.fill")
-            } compactTrailing: {
-                Text("\(Int(context.state.progress * 100))%")
-                    .font(.caption2.monospacedDigit())
-            } minimal: {
-                Image(systemName: "shippingbox.fill")
-            }
-            .keylineTint(.orange)
-            .widgetURL(URL(string: "https://revant-v2-ui-premium.onrender.com/compte/commandes"))
-        }
-    }
-}
+      - name: Verify Xcode 26+
+        shell: bash
+        run: |
+          xcodebuild -version
+          VERSION="$(xcodebuild -version | awk '/Xcode/ { print $2 }')"
+          MAJOR="${VERSION%%.*}"
+          if [ "$MAJOR" -lt 26 ]; then
+            echo "Xcode 26 or later is required; found $VERSION"
+            exit 1
+          fi
 
-@main
-struct RevantLiveActivityBundle: WidgetBundle {
-    var body: some Widget {
-        RevantDeliveryLiveActivity()
-    }
-}
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: ios-apps/revant
+        run: xcodegen generate --spec project.yml
+
+      - name: Build for iOS Simulator
+        working-directory: ios-apps/revant
+        run: |
+          xcodebuild \
+            -project Revant.xcodeproj \
+            -scheme Revant \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build

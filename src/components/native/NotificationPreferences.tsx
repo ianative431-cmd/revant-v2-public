@@ -12,14 +12,6 @@ type Preferences = {
   system: boolean;
 };
 
-declare global {
-  interface Window {
-    RevantNative?: {
-      requestPushPermission?: () => void;
-    };
-  }
-}
-
 const DEFAULTS: Preferences = {
   orders: true,
   payments: true,

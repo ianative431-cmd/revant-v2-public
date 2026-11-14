@@ -2,15 +2,6 @@
 
 import { useEffect } from "react";
 
-declare global {
-  interface Window {
-    __revantAPNSToken?: string;
-    RevantNative?: {
-      requestPushPermission?: () => void;
-    };
-  }
-}
-
 const TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
 
 export default function NativePushRegistration() {
@@ -29,9 +20,7 @@ export default function NativePushRegistration() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token }),
         });
-        if (!response.ok) {
-          lastSubmittedToken = null;
-        }
+        if (!response.ok) lastSubmittedToken = null;
       } catch {
         lastSubmittedToken = null;
       }
