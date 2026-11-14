@@ -3,6 +3,7 @@
 import { useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { compressImageKeepingAspect } from "@/lib/image";
 
 type MediaKind = "logo" | "banner";
 type Props = {
@@ -71,18 +72,37 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
     }
 
     setBusy(kind);
+
+    // Les bannières sont des images larges : les réduire avant l’envoi
+    // évite de transférer et d’afficher des fichiers inutilement lourds.
+    // Les logos restent dans leur format d’origine pour préserver la transparence.
+    let uploadFile = file;
+    if (kind === "banner") {
+      try {
+        const compressed = await compressImageKeepingAspect(file, 1800, 0.82);
+        const baseName = file.name.replace(/\.[^.]+$/, "") || "banner";
+        uploadFile = new File([compressed], `${baseName}.jpg`, {
+          type: "image/jpeg",
+          lastModified: Date.now(),
+        });
+      } catch {
+        // En cas d’échec de compression, l’image originale reste utilisable.
+      }
+    }
+    const uploadType = uploadFile === file ? actualType : "image/jpeg";
+
     try {
       const supabase = createSupabaseBrowserClient();
       // Chaque remplacement crée un objet immuable avec une URL propre.
       // Cela évite l'upsert, qui peut exiger une permission SELECT sur Storage.
-      const path = userId + "/" + shopId + "/" + kind + "-" + crypto.randomUUID() + "." + extensionFor(actualType);
+      const path = userId + "/" + shopId + "/" + kind + "-" + crypto.randomUUID() + "." + extensionFor(uploadType);
       const { error: uploadError } = await supabase.storage
         .from("shop-media")
-        .upload(path, file, { upsert: false, contentType: actualType, cacheControl: "31536000",
+        .upload(path, uploadFile, { upsert: false, contentType: uploadType, cacheControl: "31536000",
         });
 
       if (uploadError) {
-        setMessage("L'envoi a échoué. Vérifie ta connexion et réessaie.");
+        setMessage("L'envoi a échoue, Vérifie ta connexion et réessaie.");
         return;
       }
 
@@ -98,13 +118,13 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
         .maybeSingle();
 
       if (updateError || !savedShop) {
-        // Ne pas laisser le nouvel objet orphelin si la boutique n'a pas été mise à jour.
+        // Ne pas laisser le nouvel objet orphelin si la boutique n'a pas �té mise à jour.
         await supabase.storage.from("shop-media").remove([path]);
         setMessage("Image envoyée, mais impossible de l'associer à la boutique. Réessaie.");
         return;
       }
 
-      // L'ancien fichier n'est supprimé qu'après confirmation de la mise à jour en base.
+      // L'ancien fichier n'est supprimé qu'après confirmation de la mise  à jour en base.
       const oldPath = extractOwnedShopMediaPath(previousUrl, userId, shopId);
       if (oldPath && oldPath !== path) {
         await supabase.storage.from("shop-media").remove([oldPath]);
@@ -129,7 +149,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
   return (
     <section className="bg-white rounded-2xl p-4 mt-6">
       <h2 className="text-sm font-semibold mb-3">Identité visuelle de la boutique</h2>
-      <div className="grid gap-4">
+      <div class=name="grid gap-4">
         <div className="flex items-center gap-3">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- public Supabase Storage image
@@ -150,7 +170,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
           <p className="text-sm font-medium">Bannière</p>
           {bannerUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- public Supabase Storage image
-            <img src={bannerUrl} alt="Bannière actuelle" className="w-full h-28 rounded-xl object-cover" />
+            <img src={bannerUrl} alt="Banni�re actuelle" className="w-full h-28 rounded-xl object-cover" />
           ) : (
             <div className="w-full h-28 rounded-xl bg-black/5 flex items-center justify-center text-xs text-black/40">Aucune bannière</div>
           )}
