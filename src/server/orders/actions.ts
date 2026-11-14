@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
+import { sendAppleOrderAlertForBuyer } from "@/server/services/notifications/apple-live-activity";
 
 export type OrderActionState = { error: string | null; success?: boolean };
 
@@ -38,6 +39,12 @@ async function runOrderTransition(
   const rpc = supabase as unknown as OrderTransitionRpc;
   const { error } = await rpc.rpc(rpcName, { p_order_id: orderId });
   if (error) return { error: messageForOrderError(error.message, fallback) };
+
+  if (rpcName === "seller_confirm_order") {
+    await sendAppleOrderAlertForBuyer(orderId, "Commande confirmée", "Le vendeur a confirmé ta commande.");
+  } else if (rpcName === "seller_cancel_order") {
+    await sendAppleOrderAlertForBuyer(orderId, "Commande annulée", "Le vendeur a annulé ta commande.");
+  }
 
   revalidatePath("/compte/boutique/commandes");
   revalidatePath("/compte/commandes");

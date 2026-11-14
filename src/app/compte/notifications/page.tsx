@@ -3,6 +3,7 @@ import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { decryptDeliveryCode } from "@/server/delivery/code-crypto.mjs";
 import { MarkAllNotificationsReadButton, MarkNotificationReadButton } from "./NotificationActions";
+import NotificationPreferences from "@/components/native/NotificationPreferences";
 
 const TYPE_LABEL: Record<string, string> = {
   order: "Commande",
@@ -41,7 +42,9 @@ export default async function NotificationsPage() {
 
   return <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
     <div className="w-full max-w-2xl space-y-5">
-      <header><Link href="/compte" className="text-sm underline text-brand-text/60">← Mon compte</Link><div className="mt-4 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-xl font-bold">Notifications</h1><p className="mt-1 text-sm text-brand-text/55">Tes commandes, paiements, livraisons et informations Revant.</p></div><span className="rounded-full bg-white px-3 py-1 text-xs text-brand-text/65">{unreadCount} non lue(s)</span></div></header>
+      <Link href="/compte" className="text-sm underline text-brand-text/60">← Mon compte</Link>
+      <NotificationPreferences />
+      <header><div className="mt-4 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-xl font-bold">Notifications</h1><p className="mt-1 text-sm text-brand-text/55">Tes commandes, paiements, livraisons et informations Revant.</p></div><span className="rounded-full bg-white px-3 py-1 text-xs text-brand-text/65">{unreadCount} non lue(s)</span></div></header>
       {unreadCount > 0 && <div className="flex justify-end"><MarkAllNotificationsReadButton /></div>}
       {error ? <p className="rounded-xl bg-white p-4 text-sm text-red-700">Impossible de charger les notifications pour le moment.</p> : notifications.length === 0 ? <p className="rounded-2xl bg-white p-6 text-center text-sm text-brand-text/55">Tu n’as aucune notification pour le moment.</p> : <div className="space-y-3">{displayNotifications.map((item) => <article key={item.id} className={`rounded-2xl bg-white p-4 ${item.read_at ? "opacity-75" : "border-l-4 border-[var(--brand-accent)]"}`}>
         <div className="flex flex-wrap items-start justify-between gap-2"><div><p className="text-[10px] font-semibold uppercase tracking-wide text-brand-text/40">{TYPE_LABEL[item.type] ?? item.type}</p><h2 className="mt-1 text-sm font-semibold">{item.title}</h2></div>{!item.read_at && <span className="rounded-full bg-[var(--brand-accent)]/10 px-2 py-1 text-[10px] font-semibold text-[var(--brand-accent)]">Nouveau</span>}</div>
