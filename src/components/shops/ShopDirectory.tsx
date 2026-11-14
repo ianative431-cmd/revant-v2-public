@@ -13,6 +13,7 @@ export type PublicShopCard = {
   typeLabel: string;
   isRestaurant: boolean;
   isPremium: boolean;
+  isCertified: boolean;
   bannerUrl: string | null;
   logoUrl: string | null;
   color: string;
@@ -140,10 +141,20 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
                     {shop.name.slice(0, 1).toLocaleUpperCase("fr")}
                   </div>
                 )}
-                {shop.isPremium && (
-                  <span className="absolute right-3 top-3 rounded-full bg-amber-100 px-3 py-1 text-[10px] font-extrabold text-amber-900">
-                    PREMIUM
-                  </span>
+                {(shop.isCertified || shop.isPremium) && (
+                  <div className="absolute right-3 top-3 flex flex-col items-end gap-2">
+                    {shop.isCertified && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold text-white shadow-sm">
+                        <span aria-hidden="true">✓</span>
+                        BOUTIQUE CERTIFIÉE
+                      </span>
+                    )}
+                    {shop.isPremium && (
+                      <span className="rounded-full bg-amber-100 px-3 py-1 text-[10px] font-extrabold text-amber-900 shadow-sm">
+                        PREMIUM
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
 

@@ -55,6 +55,16 @@ export default async function VerificationBoutiquePage({
     .eq("user_id", user.id)
     .maybeSingle();
   const status = kyc?.status ?? "not_started";
+  const { data: certification } = await supabase
+    .from("certifications")
+    .select("id")
+    .eq("shop_id", shop.id)
+    .eq("type", "shop")
+    .eq("status", "approved")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const isCertified = Boolean(certification?.id);
   const canSubmit = status === "not_started" || status === "rejected" || status === "expired" || (status === "pending" && !kyc?.document_path);
 
   return (
@@ -62,7 +72,7 @@ export default async function VerificationBoutiquePage({
       <div className="mx-auto max-w-xl rounded-[22px] bg-white p-6 shadow-sm sm:p-8">
         <Link href="/compte/boutique" className="text-sm text-brand-text/60 underline">← Ma boutique</Link>
         <h1 className="mt-4 text-2xl font-bold">Vérification de ma boutique</h1>
-        <p className="mt-2 text-sm text-brand-text/65">Envoie un justificatif pour confirmer ton identité. Tes documents restent privés et ne sont visibles que par les personnes autorisées à traiter le dossier.</p>
+        <p className="mt-2 text-sm text-brand-text/65">Dépose un justificatif d’identité. Après examen et approbation par l’équipe Revant, ta boutique recevra le badge bleu « Boutique certifiée ». Le badge doré Premium est indépendant. Tes documents restent privés et ne sont visibles que par les personnes autorisées à traiter le dossier.</p>
 
         <section className="mt-6 rounded-xl border border-brand-border p-4">
           <p className="text-xs text-brand-text/60">État du dossier</p>
@@ -71,6 +81,11 @@ export default async function VerificationBoutiquePage({
           {kyc?.rejection_reason && <p className="mt-3 text-sm text-red-700">Motif : {kyc.rejection_reason}</p>}
         </section>
 
+        {isCertified && (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-xs font-bold text-white">
+            <span aria-hidden="true">✓</span> Boutique certifiée
+          </div>
+        )}
         {params.submitted === "1" && <p className="mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-800">Ton dossier a été transmis. Tu recevras une réponse après examen.</p>}
         {params.error && ERRORS[params.error] && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{ERRORS[params.error]}</p>}
 
@@ -100,7 +115,13 @@ export default async function VerificationBoutiquePage({
             <button type="submit" className="w-full rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white">Envoyer pour vérification</button>
           </form>
         ) : (
-          <p className="mt-6 text-sm text-brand-text/65">{status === "pending" ? "Ton dossier est en cours d'examen. Tu n'as rien à faire pour le moment." : "Ta boutique est vérifiée."}</p>
+          <p className="mt-6 text-sm text-brand-text/65">
+            {status === "pending"
+              ? "Ton dossier est en cours d'examen. Tu n'as rien à faire pour le moment."
+              : isCertified
+                ? "Ton identité a été vérifiée et le badge bleu est actif sur ta boutique."
+                : "Ton identité est approuvée. La certification de la boutique doit encore être enregistrée par l’administration."}
+          </p>
         )}
       </div>
     </main>

@@ -8,6 +8,60 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+async function ensureShopCertificationForKyc(
+  kycId: string,
+  reviewerId: string | null
+): Promise<{ slug?: string; error?: string }> {
+  const admin = createSupabaseAdminClient();
+  const { data: kyc, error: kycError } = await admin
+    .from("kyc_profiles")
+    .select("user_id,status")
+    .eq("id", kycId)
+    .maybeSingle();
+
+  if (kycError || !kyc || kyc.status !== "approved") {
+    return { error: "Dossier KYC approuvé introuvable." };
+  }
+
+  const { data: shop, error: shopError } = await admin
+    .from("shops")
+    .select("id,slug")
+    .eq("owner_id", kyc.user_id)
+    .maybeSingle();
+
+  if (shopError || !shop) return { error: "Boutique du vendeur introuvable." };
+
+  const { data: existing, error: existingError } = await admin
+    .from("certifications")
+    .select("id")
+    .eq("shop_id", shop.id)
+    .eq("type", "shop")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (existingError) return { error: "Impossible de lire la certification existante." };
+
+  const certification = {
+    status: "approved" as const,
+    badge_label: "Boutique certifiée",
+    badge_color: "#2563EB",
+    reviewed_by: reviewerId,
+    reviewed_at: new Date().toISOString(),
+  };
+
+  const { error: saveError } = existing
+    ? await admin.from("certifications").update(certification).eq("id", existing.id)
+    : await admin.from("certifications").insert({
+        shop_id: shop.id,
+        type: "shop",
+        ...certification,
+      });
+
+  if (saveError) return { error: "Impossible d'enregistrer le badge bleu." };
+  return { slug: shop.slug };
+}
+
 export async function getKycDocumentUrl(kycId: string): Promise<{ url?: string; error?: string }> {
   await requirePermission("kyc.manage");
   if (!UUID_RE.test(kycId)) return { error: "Dossier invalide." };
@@ -76,6 +130,32 @@ export async function updateKycStatusAction(formData: FormData): Promise<void> {
     redirect("/admin/kyc?error=save");
   }
 
+  if (action === "approve") {
+    const { data: { user: reviewer } } = await supabase.auth.getUser();
+    const certification = await ensureShopCertificationForKyc(id, reviewer?.id ?? null);
+    if (certification.error) {
+      redirect("/admin/kyc?status=approved&error=certification&kycId=" + encodeURIComponent(id));
+    }
+    if (certification.slug) revalidatePath("/shop/" + certification.slug);
+  }
+
   revalidatePath("/admin/kyc");
   redirect("/admin/kyc?status=" + (action === "approve" ? "approved" : "rejected") + "&notice=" + (action === "approve" ? "approved" : "rejected"));
+}
+
+export async function syncApprovedShopCertificationAction(formData: FormData): Promise<void> {
+  await requirePermission("kyc.manage");
+  const id = String(formData.get("kycId") ?? "");
+  if (!UUID_RE.test(id)) redirect("/admin/kyc?status=approved&error=invalid");
+
+  const supabase = await createSupabaseServerClient();
+  const { data: { user: reviewer } } = await supabase.auth.getUser();
+  const certification = await ensureShopCertificationForKyc(id, reviewer?.id ?? null);
+  if (certification.error) {
+    redirect("/admin/kyc?status=approved&error=certification&kycId=" + encodeURIComponent(id));
+  }
+
+  revalidatePath("/admin/kyc");
+  if (certification.slug) revalidatePath("/shop/" + certification.slug);
+  redirect("/admin/kyc?status=approved&notice=certified");
 }
