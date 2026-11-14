@@ -1,24 +1,26 @@
 /*
- * Revant interaction tuning.
- * Keep feedback immediate on touch devices and shorten decorative entrance
- * animations so they never make controls feel unresponsive.
+ * Revant mobile interaction tuning.
+ * Keep touch feedback short and remove decorative stagger delays that make
+ * server-rendered screens feel as if controls are waiting to become active.
  */
 :root {
   --revant-motion-fast: 90ms;
-  --revant-motion-normal: 120ms;
+  --revant-motion-normal: 110ms;
 }
 
 a,
 button,
 [role="button"],
 summary {
-  transition-duration: 110ms !important;
+  transition-duration: 100ms !important;
   transition-timing-function: cubic-bezier(0.2, 0.7, 0.25, 1);
+  touch-action: manipulation;
 }
 
 button:active,
 [role="button"]:active,
-summary:active {
+summary:active,
+a:active {
   transition-duration: 60ms !important;
 }
 
@@ -28,46 +30,55 @@ summary:active {
   body > div > div > section,
   body > div > div > main {
     animation-duration: 180ms !important;
+    animation-delay: 0ms !important;
   }
 
   section .grid > *,
   main .grid > *,
   [class*="grid-cols"] > * {
-    animation-duration: 180ms !important;
+    animation-duration: 150ms !important;
     animation-delay: 0ms !important;
   }
 
   section img,
   main img,
   [role="img"] {
-    animation-duration: 220ms !important;
-  }
-
-  header {
-    animation-duration: 160ms !important;
-  }
-
-  .revant-card {
     animation-duration: 180ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  header,
+  .revant-card,
+  details[open] > nav,
+  .revant-cart-added,
+  .revant-nav-item > span:first-child {
+    animation-duration: 150ms !important;
+    animation-delay: 0ms !important;
   }
 
   .revant-card-media img {
-    transition-duration: 160ms !important;
+    transition-duration: 140ms !important;
   }
+}
 
-  details[open] > nav {
-    animation-duration: 120ms !important;
-  }
-
-  .revant-cart-added {
-    animation-duration: 180ms !important;
-  }
-
-  .revant-nav-item > span:first-child {
+/* The mobile WebView has less rendering headroom than a desktop browser. */
+@media (max-width: 640px) {
+  html[data-site-palette] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) {
     transition-duration: 100ms !important;
   }
 
-  .revant-nav-item.is-active > span:first-child {
-    animation-duration: 160ms !important;
+  .revant-hero-copy {
+    animation-duration: 180ms !important;
+    filter: none !important;
+  }
+
+  section .grid > *,
+  main .grid > *,
+  [class*="grid-cols"] > * {
+    animation-delay: 0ms !important;
+  }
+
+  .revant-settings-row:hover {
+    transform: none;
   }
 }
