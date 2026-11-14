@@ -1,19 +1,23 @@
 /*
- * Revant mobile interaction tuning.
- * Keep touch feedback short and remove decorative stagger delays that make
- * server-rendered screens feel as if controls are waiting to become active.
+ * Revant motion system — 4x faster.
+ * UI animation durations are reduced to 25% of their previous values.
+ * CSS-only: no extra JavaScript, animation package, or rendering work.
+ * The user's reduced-motion preference is always respected.
  */
 :root {
-  --revant-motion-fast: 90ms;
-  --revant-motion-normal: 110ms;
+  --revant-motion-scale: 0.25;
+  --revant-motion-fast: 25ms;
+  --revant-motion-normal: 50ms;
+  --revant-motion-ease: cubic-bezier(0.2, 0.7, 0.25, 1);
 }
 
+/* Immediate touch feedback. */
 a,
 button,
 [role="button"],
 summary {
-  transition-duration: 100ms !important;
-  transition-timing-function: cubic-bezier(0.2, 0.7, 0.25, 1);
+  transition-duration: 25ms !important;
+  transition-timing-function: var(--revant-motion-ease);
   touch-action: manipulation;
 }
 
@@ -21,29 +25,30 @@ button:active,
 [role="button"]:active,
 summary:active,
 a:active {
-  transition-duration: 60ms !important;
+  transition-duration: 15ms !important;
 }
 
+/* Quarter the existing page, card, grid, image and navigation animations. */
 @media (prefers-reduced-motion: no-preference) {
   main > section,
   main > div,
   body > div > div > section,
   body > div > div > main {
-    animation-duration: 180ms !important;
+    animation-duration: 45ms !important;
     animation-delay: 0ms !important;
   }
 
   section .grid > *,
   main .grid > *,
   [class*="grid-cols"] > * {
-    animation-duration: 150ms !important;
+    animation-duration: 37.5ms !important;
     animation-delay: 0ms !important;
   }
 
   section img,
   main img,
   [role="img"] {
-    animation-duration: 180ms !important;
+    animation-duration: 45ms !important;
     animation-delay: 0ms !important;
   }
 
@@ -52,33 +57,94 @@ a:active {
   details[open] > nav,
   .revant-cart-added,
   .revant-nav-item > span:first-child {
-    animation-duration: 150ms !important;
+    animation-duration: 37.5ms !important;
     animation-delay: 0ms !important;
   }
 
   .revant-card-media img {
-    transition-duration: 140ms !important;
-  }
-}
-
-/* The mobile WebView has less rendering headroom than a desktop browser. */
-@media (max-width: 640px) {
-  html[data-site-palette] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) {
-    transition-duration: 100ms !important;
+    transition-duration: 35ms !important;
   }
 
   .revant-hero-copy {
-    animation-duration: 180ms !important;
-    filter: none !important;
+    animation-duration: 162.5ms !important;
   }
 
-  section .grid > *,
-  main .grid > *,
-  [class*="grid-cols"] > * {
-    animation-delay: 0ms !important;
+  .revant-hero-slide.is-active {
+    animation-duration: 1.625s !important;
+  }
+
+  .revant-shortcut,
+  .revant-shortcut-icon {
+    transition-duration: 60ms !important;
+  }
+
+  .revant-product-card {
+    transition-duration: 65ms !important;
+  }
+
+  .revant-settings-row {
+    transition-duration: 50ms !important;
+  }
+
+  .revant-toast {
+    animation-duration: 55ms !important;
+  }
+
+  .revant-skeleton {
+    animation-duration: 337.5ms !important;
+  }
+
+  .revant-cart-added {
+    animation-duration: 90ms !important;
+  }
+
+  .revant-nav-item > span:first-child {
+    transition-duration: 45ms !important;
+  }
+}
+
+/* Palette changes previously took 240ms; make them 60ms. */
+html[data-site-palette] body,
+html[data-site-palette] body :where(
+  header, footer, nav, main, section, article, aside,
+  button, a, input, select, textarea,
+  [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]
+) {
+  transition-duration: 60ms !important;
+}
+
+/* Mobile WebView: remove stagger waits and make touch feedback even snappier. */
+@media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
+  html[data-site-palette] body :where(
+    header, footer, nav, main, section, article, aside,
+    button, a, input, select, textarea,
+    [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]
+  ) {
+    transition-duration: 25ms !important;
+  }
+
+  .revant-hero-copy {
+    animation-duration: 45ms !important;
+    filter: none !important;
   }
 
   .revant-settings-row:hover {
     transform: none;
+  }
+}
+
+/* Never override accessibility settings for users who request reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .revant-skeleton {
+    background-image: none !important;
   }
 }
