@@ -45,7 +45,7 @@ export default async function SiteHeader() {
           <Link href="/">Accueil</Link><Link href="/boutiques">Boutiques</Link><Link href="/#categories">Catégories</Link><Link href="/restaurants">Restaurants</Link><Link href="/#a-propos">À propos</Link>
         </nav>
         <div className="flex items-center gap-1 sm:gap-3">
-          <form action="/" method="get" role="search" className="hidden items-center gap-2 rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)]/65 px-3 py-2 backdrop-blur-md sm:flex">
+          <form action="/" method="get" role="search" className="hidden items-center gap-2 rounded-full border border-black/10 bg-white/65 px-3 py-2 shadow-sm backdrop-blur-md sm:flex">
             <Search {...iconProps} /><input name="q" aria-label="Rechercher des produits" placeholder="Rechercher" className="w-24 bg-transparent text-xs text-[var(--brand-text)] outline-none placeholder:opacity-60 sm:w-32"/>
             <PhotoActionMenu allowAdd={allowAdd} />
           </form>
@@ -60,7 +60,7 @@ export default async function SiteHeader() {
         </div>
       </div>
       <div className="px-3 pb-1 sm:hidden">
-        <form action="/" method="get" role="search" className="flex h-10 min-h-10 items-center gap-2 rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)]/65 px-3 text-[var(--brand-text)] shadow-sm backdrop-blur-md focus-within:ring-2 focus-within:ring-[var(--brand-accent)]">
+        <form action="/" method="get" role="search" className="flex h-10 min-h-10 items-center gap-2 rounded-full border border-black/10 bg-white/65 px-3 text-[var(--brand-text)] shadow-sm backdrop-blur-md focus-within:ring-2 focus-within:ring-[var(--brand-accent)]">
           <Search {...iconProps} />
           <input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="h-full min-h-0 min-w-0 flex-1 bg-transparent py-0 text-sm outline-none placeholder:opacity-60"/>
           <PhotoActionMenu allowAdd={allowAdd} />
