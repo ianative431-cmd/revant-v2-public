@@ -83,7 +83,6 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
         const baseName = file.name.replace(/\.[^.]+$/, "") || "banner";
         uploadFile = new File([compressed], `${baseName}.jpg`, {
           type: "image/jpeg",
-          lastModified: Date.now(),
         });
       } catch {
         // En cas d’échec de compression, l’image originale reste utilisable.
