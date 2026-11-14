@@ -59,7 +59,7 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 bg-cover bg-[center_35%] transition-opacity duration-700 ease-in-out ${index === activeIndex ? "opacity-80" : "opacity-0"} ${reducedMotion ? "duration-0" : ""}`}
+            className={`revant-hero-slide absolute inset-0 bg-cover bg-[center_35%] transition-[opacity,transform] duration-700 ease-in-out ${index === activeIndex ? "is-active opacity-80" : "opacity-0"} ${reducedMotion ? "duration-0" : ""}`}
             style={{ backgroundImage: `url("${slide.image}")` }}
           />
         ))}

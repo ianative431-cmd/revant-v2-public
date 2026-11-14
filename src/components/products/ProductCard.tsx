@@ -13,7 +13,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const outOfStock = product.stock_quantity <= 0;
 
   return (
-    <article className="revant-card group relative overflow-hidden rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)] shadow-[0_5px_20px_rgba(20,43,69,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(20,43,69,0.13)] focus-within:border-[var(--brand-accent)]">
+    <article className="revant-card revant-product-card group relative overflow-hidden rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)] shadow-[0_5px_20px_rgba(20,43,69,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(20,43,69,0.13)] focus-within:border-[var(--brand-accent)]">
       <Link
         href={`/produit/${product.id}`}
         aria-label={`Voir le produit : ${product.name}`}
