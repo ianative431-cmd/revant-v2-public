@@ -6,6 +6,7 @@ import GlobalDismissibleDetails from "@/components/layout/GlobalDismissibleDetai
 import CookieConsentBanner from "@/components/cookie-consent/CookieConsentBanner";
 import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
 import NativePushRegistration from "@/components/native/NativePushRegistration";
+import LaunchExperience from "@/components/pwa/LaunchExperience";
 import { getSitePalette } from "@/server/theme/site-palette";
 
 export const metadata: Metadata = {
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <GlobalDismissibleDetails />
         <ServiceWorkerRegister />
         <NativePushRegistration />
+        <LaunchExperience />
         <div className="flex-1 flex flex-col">{children}</div>
         <Footer />
         <CookieConsentBanner />
