@@ -3,6 +3,7 @@
 import { useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { compressImageKeepingAspect } from "@/lib/image";
 
 type MediaKind = "logo" | "banner";
 type Props = {
@@ -71,14 +72,32 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
     }
 
     setBusy(kind);
+
+    // Les bannières sont des images larges : les réduire avant l’envoi
+    // évite de transférer et d’afficher des fichiers inutilement lourds.
+    // Les logos restent dans leur format d’origine pour préserver la transparence.
+    let uploadFile = file;
+    if (kind === "banner") {
+      try {
+        const compressed = await compressImageKeepingAspect(file, 1800, 0.82);
+        const baseName = file.name.replace(/\.[^.]+$/, "") || "banner";
+        uploadFile = new File([compressed], `${baseName}.jpg`, {
+          type: "image/jpeg",
+        });
+      } catch {
+        // En cas d’échec de compression, l’image originale reste utilisable.
+      }
+    }
+    const uploadType = uploadFile === file ? actualType : "image/jpeg";
+
     try {
       const supabase = createSupabaseBrowserClient();
       // Chaque remplacement crée un objet immuable avec une URL propre.
       // Cela évite l'upsert, qui peut exiger une permission SELECT sur Storage.
-      const path = userId + "/" + shopId + "/" + kind + "-" + crypto.randomUUID() + "." + extensionFor(actualType);
+      const path = userId + "/" + shopId + "/" + kind + "-" + crypto.randomUUID() + "." + extensionFor(uploadType);
       const { error: uploadError } = await supabase.storage
         .from("shop-media")
-        .upload(path, file, { upsert: false, contentType: actualType, cacheControl: "31536000",
+        .upload(path, uploadFile, { upsert: false, contentType: uploadType, cacheControl: "31536000",
         });
 
       if (uploadError) {
