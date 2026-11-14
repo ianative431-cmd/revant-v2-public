@@ -1,6 +1,6 @@
 # Revant — Apple App Store readiness
 
-Last source audit: 2026-11-14. This checklist is based on the current repository and the dedicated iOS branch. A passing simulator build is not App Store approval.
+Last source and live-schema audit: 2026-11-14. A passing simulator build is not App Store approval.
 
 ## Implemented in this branch
 
@@ -10,27 +10,29 @@ Last source audit: 2026-11-14. This checklist is based on the current repository
 - [x] ActivityKit/WidgetKit delivery Live Activity for Lock Screen and Dynamic Island.
 - [x] ActivityKit push token registration scoped to the authenticated buyer's own order.
 - [x] Signed APNs Live Activity updates wired to successful delivery-driver claim, progress and delivery-confirmation actions.
-- [x] Per-category notification preferences UI and Supabase schema.
-- [x] Server-side APNs device token registration; tokens are not exposed to browser clients.
+- [x] Per-category notification preferences and Supabase schema.
+- [x] Server-side APNs device-token registration, current-device token cleanup on customer sign-out, and preference-aware APNs alerts for order and delivery events.
+- [x] Customer-facing report controls for products, shops and seller accounts, using the existing RLS-protected `public.reports` table.
+- [x] Role-protected Admin signalement review queue; linked from the dashboard only for staff with `products.manage`.
 - [x] GitHub Actions simulator build using Xcode 26+.
 
 ## Verified App Review blockers / unresolved work
 
 ### Account deletion — blocker
-The current source tree does not expose an in-app account deletion flow or a corresponding customer-facing deletion action. Implement deletion from inside the app. Before deleting an Auth user, audit every table, storage object, financial ledger, order, KYC record and legal retention obligation. Preserve records that must legally remain while deleting or anonymizing personal data where appropriate. Do not simply cascade-delete financial history.
+The current source tree does not expose an in-app account deletion flow or a corresponding customer-facing deletion action. The live schema has many restrictive foreign keys from historical, financial and operational records to profiles, plus Storage objects. Implement deletion from inside the app only after auditing every table, ledger, order, KYC record, audit record and owned Storage object. Preserve records that must legally remain while deleting or anonymizing personal data where appropriate. Do not simply cascade-delete financial history or Auth users.
 
-### User-generated content safety — blocker
-The marketplace contains user-created listings, shop content and messaging. The repository has administrative moderation actions, but the source audit did not find customer-facing report-content or block-user controls. Add reporting for relevant content/accounts, a block mechanism that actually prevents further unwanted contact/content exposure, and a documented moderation response path.
+### User-generated content safety — partial
+The active Supabase project already contains `public.reports` with RLS policies allowing authenticated users to submit reports for user, shop, product, review, message and order targets, and to read their own reports. This branch adds customer report controls for products, shops and seller accounts, plus an Admin review queue for authorized staff. A user-blocking mechanism that prevents unwanted messages and content exposure has not yet been found or implemented.
 
 ### Minimum functionality — high review risk
-The iOS target currently hosts the existing remote Revant customer website in WKWebView. Native navigation, push registration and delivery Live Activities add native value, but Apple Guideline 4.2 may still reject a thin website wrapper. Continue moving important customer journeys and device capabilities into meaningful native experiences and test the complete app, not only the shell.
+The iOS target currently hosts the existing remote Revant customer website in WKWebView. Native navigation, APNs alerts and delivery Live Activities add native value, but Apple Guideline 4.2 may still reject a thin website wrapper. Continue moving important customer journeys and device capabilities into meaningful native experiences and test the complete app, not only the shell.
 
 ### General push notifications — partial
-This branch implements APNs device-token registration and category preferences. The Live Activity APNs path is wired to delivery state transitions. General alert pushes for messages, payments, refunds, security and promotions are not yet connected to their trusted event-creation pipeline. Do not describe all push categories as live until that integration and end-to-end device tests pass.
+Preference-aware APNs alerts are wired for seller order confirmation/cancellation and delivery assignment/progress/completion. General alert pushes for messages, payment, refunds, security and promotions still need their trusted event handlers connected. Do not describe every category as live until those integrations and physical-device tests pass.
 
 ### Apple account and signing — external prerequisite
 - Register/confirm the App ID `ne.revant.marketplace` in the Apple Developer account.
-- Enable Push Notifications and use the matching provisioning profiles.
+- Enable Push Notifications and use matching development/distribution provisioning profiles.
 - Create an APNs authentication key and configure the server-only variables documented in README.md.
 - Build and test on a physical iPhone; a simulator build cannot validate APNs or Dynamic Island behavior.
 - Create a signed archive and upload through App Store Connect after all checks pass.

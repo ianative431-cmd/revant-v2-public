@@ -9,7 +9,7 @@ export type ReportActionState = {
   success?: boolean;
 };
 
-const ALLOWED_TARGETS = new Set(["user", "shop", "product", "review", "message", "order"]);
+const ALLOWED_TARGETS = new Set(["user", "shop", "product"]);
 const ALLOWED_REASONS = new Set(["spam", "fraud", "counterfeit", "inappropriate", "harassment", "misleading", "other"]);
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -47,6 +47,9 @@ export async function submitContentReport(
     const { data: shop } = await db.from("shops").select("owner_id").eq("id", targetId).maybeSingle();
     if (!shop) return { error: "Cette boutique n’existe plus." };
     if (shop.owner_id === user.id) return { error: "Tu ne peux pas signaler ta propre boutique." };
+  } else if (targetType === "user") {
+    const { data: sellerShop } = await db.from("shops").select("id").eq("owner_id", targetId).limit(1).maybeSingle();
+    if (!sellerShop) return { error: "Ce compte vendeur n’est pas disponible." };
   }
 
   const { data: existing } = await db
@@ -68,8 +71,6 @@ export async function submitContentReport(
     description: description || null,
   });
 
-  if (error) {
-    return { error: "Le signalement n’a pas pu être envoyé. Réessaie plus tard." };
-  }
+  if (error) return { error: "Le signalement n’a pas pu être envoyé. Réessaie plus tard." };
   return { error: null, success: true };
 }
