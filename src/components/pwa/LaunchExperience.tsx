@@ -20,24 +20,35 @@ export default function LaunchExperience() {
 
     if (!isNativeColdStart && !isPwaLaunch) return;
 
-    // A native WebView is created for a cold app launch and remains mounted
-    // when Android merely backgrounds/resumes the app. Do not use browser
-    // session storage for that lifecycle, as it can outlive the Android process.
-    if (!isNativeColdStart) {
-      try {
-        if (window.sessionStorage.getItem(PWA_LAUNCH_KEY) === "1") return;
-        window.sessionStorage.setItem(PWA_LAUNCH_KEY, "1");
-      } catch {
-        // Storage may be unavailable in a restricted browser context; continue safely.
-      }
+    // Android's WebView is the actual app surface. Keep its splash brief so
+    // it never blocks the first interaction while the marketplace hydrates.
+    if (isNativeColdStart) {
+      let nativeSplashTimer: number | undefined;
+      const nativeSplashStartTimer = window.setTimeout(() => {
+        setStage("logo");
+        nativeSplashTimer = window.setTimeout(() => setStage(null), 520);
+      }, 0);
+      return () => {
+        window.clearTimeout(nativeSplashStartTimer);
+        if (nativeSplashTimer !== undefined) window.clearTimeout(nativeSplashTimer);
+      };
+    }
+
+    // Show the PWA intro once per browser tab/session, not on every navigation.
+    try {
+      if (window.sessionStorage.getItem(PWA_LAUNCH_KEY) === "1") return;
+      window.sessionStorage.setItem(PWA_LAUNCH_KEY, "1");
+    } catch {
+      // Storage may be unavailable in a restricted browser context; continue safely.
     }
 
     let logoTimer: number | undefined;
     let safetyTimer: number | undefined;
     const startTimer = window.setTimeout(() => {
       setStage("logo");
-      logoTimer = window.setTimeout(() => setStage("video"), 650);
-      safetyTimer = window.setTimeout(() => setStage(null), 9_000);
+      logoTimer = window.setTimeout(() => setStage("video"), 450);
+      // A failed or stalled video must never leave the PWA covered indefinitely.
+      safetyTimer = window.setTimeout(() => setStage(null), 4_500);
     }, 0);
 
     return () => {
@@ -59,7 +70,7 @@ export default function LaunchExperience() {
         <img
           src="/images/logo-revant-app-512.png"
           alt="Revant"
-          className="h-28 w-28 animate-[revant-logo-in_500ms_ease-out_both] object-contain"
+          className="h-28 w-28 animate-[revant-logo-in_400ms_ease-out_both] object-contain"
         />
       ) : (
         <video
