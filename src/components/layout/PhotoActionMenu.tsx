@@ -1,17 +1,19 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   PRODUCT_IMAGE_ALLOWED_TYPES,
   PRODUCT_IMAGE_MAX_BYTES,
 } from "@/lib/product-image";
 import { savePendingProductImage } from "@/lib/pending-product-image";
+import { useDismissOnOutside } from "@/hooks/useDismissOnOutside";
 
 type Action = "search" | "add";
 type PickerSource = "camera" | "gallery";
 
 export default function PhotoActionMenu() {
+  const rootRef = useRef<HTMLDivElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const actionRef = useRef<Action>("search");
@@ -19,6 +21,25 @@ export default function PhotoActionMenu() {
   const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
   const router = useRouter();
+
+  const closeFloatingPanel = useCallback(() => {
+    setPickerAction(null);
+    setNotice("");
+  }, []);
+
+  const restoreTriggerFocus = useCallback(() => {
+    closeFloatingPanel();
+    rootRef.current
+      ?.querySelector<HTMLButtonElement>('button[aria-label="Rechercher par photo"]')
+      ?.focus();
+  }, [closeFloatingPanel]);
+
+  useDismissOnOutside(
+    rootRef,
+    closeFloatingPanel,
+    Boolean(pickerAction || notice),
+    restoreTriggerFocus,
+  );
 
   function choose(action: Action) {
     actionRef.current = action;
@@ -92,7 +113,7 @@ export default function PhotoActionMenu() {
   }
 
   return (
-    <div className="relative flex shrink-0 items-center gap-1">
+    <div ref={rootRef} className="relative flex shrink-0 items-center gap-1">
       <button type="button" aria-label="Rechercher par photo" title="Rechercher par photo" onClick={() => choose("search")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-neutral-500 transition hover:text-[var(--brand-accent)] disabled:opacity-50">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-5 w-5" aria-hidden="true">
           <circle cx="10.5" cy="10.5" r="6.5" />
