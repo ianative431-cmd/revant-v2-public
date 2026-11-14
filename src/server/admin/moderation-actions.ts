@@ -4,16 +4,14 @@ import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/server/auth/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { PRODUCT_IMAGE_BUCKET } from "@/lib/product-image";
+import { canTransitionShopStatus } from "@/lib/shop-status.mjs";
 
 export type AdminModerationState = { error: string | null };
 
 /**
- * Suspend/réactive une boutique. Le trigger shops_protect_admin_columns
- * (migration 0002) refuse ce changement à quiconque n'est pas
- * "service_role" — même un compte admin authentifié classique. Le
- * client service role est donc la seule voie possible ici, mais
- * requirePermission() reste la garde qui décide QUI a le droit d'appeler
- * cette fonction.
+ * Change le statut d'une boutique après vérification de la transition
+ * autorisée. La vérification de permission reste obligatoire et la
+ * mise à jour compare aussi le statut courant pour éviter une course.
  */
 export async function setShopStatus(
   _prevState: AdminModerationState,
@@ -24,18 +22,44 @@ export async function setShopStatus(
   const shopId = String(formData.get("shopId") ?? "");
   const nextStatus = String(formData.get("nextStatus") ?? "");
 
+  if (!/^[0-9a-f-]{36}$/i.test(shopId)) {
+    return { error: "Boutique invalide." };
+  }
   if (nextStatus !== "active" && nextStatus !== "suspended") {
-    return { error: "Statut invalide." };
+    return { error: "Statut demandé invalide." };
   }
 
   const admin = createSupabaseAdminClient();
-  const { error } = await admin.from("shops").update({ status: nextStatus }).eq("id", shopId);
+  const { data: currentShop, error: readError } = await admin
+    .from("shops")
+    .select("status, slug")
+    .eq("id", shopId)
+    .maybeSingle();
 
-  if (error) {
-    return { error: "Impossible de mettre à jour la boutique." };
+  if (readError || !currentShop) {
+    return { error: "Boutique introuvable." };
+  }
+  if (!canTransitionShopStatus(currentShop.status, nextStatus)) {
+    return { error: "Cette transition de statut n'est pas autorisée." };
+  }
+
+  const { data: updatedShop, error } = await admin
+    .from("shops")
+    .update({ status: nextStatus })
+    .eq("id", shopId)
+    .eq("status", currentShop.status)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !updatedShop) {
+    return { error: "Le statut a changé ou la mise à jour a échoué. Recharge la page puis réessaie." };
   }
 
   revalidatePath("/admin/boutiques");
+  revalidatePath("/shop/" + currentShop.slug);
+  revalidatePath("/");
+  revalidatePath("/boutiques");
+  revalidatePath("/restaurants");
   return { error: null };
 }
 
@@ -65,7 +89,7 @@ export async function deleteProductAsAdmin(
   }
 
   const paths = imageUrls
-    .map((url) => url.split(`/${PRODUCT_IMAGE_BUCKET}/`)[1])
+    .map((url) => url.split("/" + PRODUCT_IMAGE_BUCKET + "/")[1])
     .filter((path): path is string => Boolean(path));
 
   if (paths.length > 0) {
