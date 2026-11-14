@@ -28,6 +28,9 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   disputed: "En litige",
 };
 
+const ACTIVE_DELIVERY_STATES = new Set<string>(["assigned", "picked_up", "in_transit"]);
+const CLOSED_ORDER_STATES = new Set<string>(["delivered", "cancelled", "refunded"]);
+
 export default async function MesCommandesPage() {
   await requireUserWithLegalConsent();
   const supabase = await createSupabaseServerClient();
@@ -44,7 +47,7 @@ export default async function MesCommandesPage() {
           <div className="flex flex-col gap-3">
             {orders.map((order) => {
               const deliveryStatus = order.delivery?.status ?? null;
-              const activeDelivery = deliveryStatus !== null && ["assigned", "picked_up", "in_transit"].includes(deliveryStatus);
+              const activeDelivery = deliveryStatus !== null && ACTIVE_DELIVERY_STATES.has(deliveryStatus);
               const progress = deliveryStatus === "assigned" ? 0.25 : deliveryStatus === "picked_up" ? 0.55 : deliveryStatus === "in_transit" ? 0.85 : 0;
               const itemTitle = order.items[0]?.product_name ?? "Commande Revant";
 
@@ -68,7 +71,7 @@ export default async function MesCommandesPage() {
                   <p className="mt-3 text-sm font-bold">Total : {Number(order.total_amount).toLocaleString("fr-FR")} {order.currency.trim()}</p>
                   {order.delivery && <p className="mt-2 text-xs text-brand-text/55">Livraison : {DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? deliveryStatus}</p>}
                   {activeDelivery && <NativeDeliveryActivityButton action="start" orderReference={order.order_number} itemTitle={itemTitle} status={DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? "Livraison en cours"} detail={DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? "Livraison en cours"} progress={progress} />}
-                  {["delivered", "cancelled", "refunded"].includes(order.status) && <NativeDeliveryActivityButton action="end" orderReference={order.order_number} />}
+                  {CLOSED_ORDER_STATES.has(order.status) && <NativeDeliveryActivityButton action="end" orderReference={order.order_number} />}
                   {order.status === "pending" && <div className="mt-3"><BuyerOrderActions orderId={order.id} /></div>}
                   {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
                 </article>

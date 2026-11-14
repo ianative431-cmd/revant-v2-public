@@ -18,6 +18,7 @@ targets:
       - path: Shared/RevantLiveActivityAttributes.swift
     dependencies:
       - target: RevantLiveActivityExtension
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: ne.revant.marketplace
@@ -37,7 +38,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: ne.revant.marketplace.LiveActivity
         PRODUCT_NAME: RevantLiveActivity
-        INFOPLIST_KEY_NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier: com.apple.widgetkit-extension
         APPLICATION_EXTENSION_API_ONLY: YES
         SKIP_INSTALL: YES
         SWIFT_VERSION: "5.0"
