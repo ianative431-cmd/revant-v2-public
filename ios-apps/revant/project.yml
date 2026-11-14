@@ -23,11 +23,19 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: ne.revant.marketplace
         PRODUCT_NAME: Revant
+        CODE_SIGN_ENTITLEMENTS: Revant/Revant.entitlements
         INFOPLIST_KEY_CFBundleDisplayName: Revant
         INFOPLIST_KEY_NSSupportsLiveActivities: YES
+        INFOPLIST_KEY_NSCameraUsageDescription: "Revant utilise la caméra pour photographier les produits que tu souhaites publier ou rechercher."
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Revant accède à tes photos pour ajouter des images à tes produits et à ta boutique."
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         SWIFT_VERSION: "5.0"
+      configs:
+        Debug:
+          APS_ENVIRONMENT: development
+        Release:
+          APS_ENVIRONMENT: production
   RevantLiveActivityExtension:
     type: app-extension
     platform: iOS
