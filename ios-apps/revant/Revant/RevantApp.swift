@@ -42,4 +42,5 @@ final class RevantAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificati
 
 extension Notification.Name {
     static let revantAPNSTokenDidChange = Notification.Name("revant.apns.token.didChange")
+    static let revantLiveActivityTokenDidChange = Notification.Name("revant.liveActivity.token.didChange")
 }

@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { encryptDeliveryCode } from "@/server/delivery/code-crypto.mjs";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
+import { sendAppleLiveActivityUpdateForDelivery } from "@/server/services/notifications/apple-live-activity";
 
 export type DeliveryActionState = { error: string | null; success?: boolean };
 
@@ -84,6 +85,13 @@ export async function claimDelivery(
   if (!UUID_PATTERN.test(deliveryId)) return { error: "Référence de livraison invalide." };
   const result = await callDeliveryRpc("driver_claim_delivery", { p_delivery_id: deliveryId }, "Impossible de prendre cette livraison.");
   if (result.error) return { error: result.error };
+  await sendAppleLiveActivityUpdateForDelivery(deliveryId, {
+    event: "update",
+    status: "Livreur assigné",
+    detail: "Un livreur a pris en charge la livraison.",
+    etaLabel: "Suivi en direct",
+    progress: 0.25,
+  });
   revalidatePath("/compte/livraisons");
   revalidatePath("/compte/boutique/commandes");
   revalidatePath("/compte/notifications");
@@ -100,6 +108,14 @@ export async function updateDeliveryStatus(
   if (status !== "picked_up" && status !== "in_transit" && status !== "failed") return { error: "Étape de livraison invalide." };
   const result = await callDeliveryRpc("driver_update_delivery_status", { p_delivery_id: deliveryId, p_status: status }, "Impossible de mettre à jour la livraison.");
   if (result.error) return { error: result.error };
+
+  const liveState = status === "picked_up"
+    ? { status: "Commande récupérée", detail: "Le livreur a récupéré la commande.", etaLabel: "Suivi en direct", progress: 0.55 }
+    : status === "in_transit"
+      ? { status: "En route", detail: "La commande est en route vers toi.", etaLabel: "Suivi en direct", progress: 0.85 }
+      : { status: "Incident de livraison", detail: "Un incident a été signalé. Revant suit la situation.", etaLabel: "Mise à jour nécessaire", progress: 0.85 };
+
+  await sendAppleLiveActivityUpdateForDelivery(deliveryId, { event: "update", ...liveState });
   revalidatePath("/compte/livraisons");
   revalidatePath("/compte/commandes");
   revalidatePath("/compte/boutique/commandes");
@@ -118,6 +134,14 @@ export async function confirmDeliveryCode(
   const result = await callDeliveryRpc("driver_confirm_delivery_code", { p_delivery_id: deliveryId, p_code: code }, "Impossible de confirmer la remise.");
   if (result.error) return { error: result.error };
   if (result.data !== true) return { error: "Code incorrect. Demande à l’acheteur de vérifier son code de remise." };
+
+  await sendAppleLiveActivityUpdateForDelivery(deliveryId, {
+    event: "end",
+    status: "Livrée",
+    detail: "La commande a été remise.",
+    etaLabel: "Terminée",
+    progress: 1,
+  });
   revalidatePath("/compte/livraisons");
   revalidatePath("/compte/commandes");
   revalidatePath("/compte/boutique/commandes");

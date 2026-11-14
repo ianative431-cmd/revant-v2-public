@@ -6,22 +6,34 @@ This is the dedicated native iOS application target. It is intentionally separat
 
 - SwiftUI application shell with native navigation for Accueil, Catégories, Messages, Panier and Mon compte.
 - On iOS 26 and later, the native navigation controls use the system Liquid Glass material. Older supported iOS versions use a system material fallback.
-- WKWebView loads the existing Revant customer marketplace at `https://revant-v2-ui-premium.onrender.com`.
-- A restricted JavaScript bridge exposes push-permission requests and order Live Activity start/end actions to the customer web app.
+- WKWebView loads the existing Revant customer marketplace at `https://revant-v2-ui-premium.onrender.com`, with the website header and bottom navigation hidden so the native navigation is not duplicated.
+- A restricted JavaScript bridge exposes push-permission requests and delivery Live Activity start/end actions to the customer web app.
 - ActivityKit and a WidgetKit extension render delivery progress on the Lock Screen and Dynamic Island on supported iPhones.
-- APNs permission and device-token registration are prepared. The web application stores the authenticated user's device token through a server-side endpoint.
+- ActivityKit push tokens are registered against the authenticated buyer's own order. Successful delivery-driver state transitions send signed APNs Live Activity updates; delivery confirmation ends the activity.
+- Per-category notification preferences and APNs device-token registration are prepared. Device tokens are stored server-side.
+
+## Required protected server configuration
+
+Configure these variables in the server environment only; never commit them:
+- `APNS_TEAM_ID`
+- `APNS_KEY_ID`
+- `APNS_PRIVATE_KEY` (the complete Apple .p8 private key)
+- `APNS_BUNDLE_ID=ne.revant.marketplace`
+- `APNS_ENVIRONMENT=sandbox` for development builds, then `production` for App Store builds.
+
+The Apple Developer App ID must enable Push Notifications and the distribution provisioning profile must include the capability. Live Activities also require `NSSupportsLiveActivities` in the app Info.plist. Physical-device tests are required; simulator builds do not prove APNs delivery or Dynamic Island behavior.
 
 ## Important limits before App Store release
 
-This is a buildable native foundation, not a claim of App Store approval. The current marketplace content is still served by the website. Apple may reject an app that is only a repackaged website; native customer flows and meaningful app-specific functionality must be tested and expanded.
+This is a native foundation, not a claim of App Store approval. The marketplace content is still served by the website. Apple may reject an app that is only a repackaged website; native customer flows and meaningful app-specific functionality must continue to be expanded and reviewed against App Review Guideline 4.2.
 
-Remote push delivery and remote Live Activity updates still require:
-1. An Apple Developer account and the `ne.revant.marketplace` App ID with Push Notifications enabled.
-2. A distribution provisioning profile and APNs authentication key.
-3. Secure APNs sender configuration on the server and integration with the actual order/message/payment notification events.
-4. End-to-end tests on a physical iPhone. Simulator builds do not prove APNs delivery or Dynamic Island behavior.
-
-The app currently starts or updates a delivery Live Activity when the customer explicitly taps the tracking action in the order list. Background updates from the server are a separate APNs/ActivityKit integration step.
+The following remain in the App Store compliance checklist:
+1. Complete account deletion inside the app, with safe handling of financial/legal retention.
+2. Customer reporting and blocking controls for user-generated content and abusive accounts.
+3. Confirm the applicable Sign in with Apple exception or implement Sign in with Apple if required.
+4. Decide Apple In-App Purchase treatment for digital seller subscriptions and paid boosts; physical-goods checkout remains a separate category.
+5. Verify privacy manifests and privacy disclosures for every shipped SDK and service.
+6. Configure App Store Connect metadata, screenshots, privacy labels, age rating, reviewer account and review notes.
 
 ## Build locally
 

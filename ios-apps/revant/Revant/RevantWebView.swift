@@ -67,6 +67,9 @@ struct RevantWebView: UIViewRepresentable {
         window.__revantAPNSToken = token;
         window.dispatchEvent(new CustomEvent("revant:push-token", { detail: { token: token } }));
       };
+      window.__revantSetLiveActivityToken = function (payload) {
+        window.dispatchEvent(new CustomEvent("revant:live-activity-token", { detail: payload || {} }));
+      };
     })();
     """
 
@@ -80,6 +83,12 @@ struct RevantWebView: UIViewRepresentable {
                 self,
                 selector: #selector(pushTokenDidChange(_:)),
                 name: .revantAPNSTokenDidChange,
+                object: nil
+            )
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(liveActivityTokenDidChange(_:)),
+                name: .revantLiveActivityTokenDidChange,
                 object: nil
             )
         }
@@ -128,6 +137,7 @@ struct RevantWebView: UIViewRepresentable {
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             deliverStoredPushToken()
+            deliverStoredLiveActivityTokens()
         }
 
         @objc private func pushTokenDidChange(_ notification: Notification) {
@@ -136,9 +146,33 @@ struct RevantWebView: UIViewRepresentable {
             }
         }
 
+        @objc private func liveActivityTokenDidChange(_ notification: Notification) {
+            guard let payload = notification.object as? [String: String] else { return }
+            DispatchQueue.main.async { [weak self] in
+                self?.deliverLiveActivityToken(payload)
+            }
+        }
+
         private func deliverStoredPushToken() {
             guard let token = UserDefaults.standard.string(forKey: "revant.apns.deviceToken") else { return }
             webView?.evaluateJavaScript("window.__revantSetPushToken && window.__revantSetPushToken('\(token)')")
+        }
+
+        private func deliverStoredLiveActivityTokens() {
+            let defaults = UserDefaults.standard.dictionaryRepresentation()
+            for (key, value) in defaults where key.hasPrefix("revant.liveActivityToken.") {
+                if let payload = value as? [String: String] {
+                    deliverLiveActivityToken(payload)
+                }
+            }
+        }
+
+        private func deliverLiveActivityToken(_ payload: [String: String]) {
+            guard
+                let data = try? JSONSerialization.data(withJSONObject: payload),
+                let json = String(data: data, encoding: .utf8)
+            else { return }
+            webView?.evaluateJavaScript("window.__revantSetLiveActivityToken && window.__revantSetLiveActivityToken(\(json))")
         }
     }
 }
