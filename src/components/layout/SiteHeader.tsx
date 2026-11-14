@@ -29,7 +29,7 @@ const quickLinks = [
 export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-[var(--brand-header)] text-[var(--brand-header-text)] shadow-sm">
-      <div className="mx-auto flex min-h-[56px] sm:min-h-[64px] max-w-[1500px] items-center justify-between gap-2 px-3 sm:px-7">
+      <div className="mx-auto flex h-[52px] min-h-[52px] sm:h-auto sm:min-h-[64px] max-w-[1500px] items-center justify-between gap-2 px-3 sm:px-7">
         <div className="flex shrink-0 items-center gap-1">
           <details className="relative md:hidden">
             <summary aria-label="Ouvrir le menu principal" className="flex min-h-11 min-w-10 list-none cursor-pointer items-center justify-center rounded-xl hover:bg-[var(--brand-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]"><MenuIcon/></summary>
@@ -61,11 +61,11 @@ export default function SiteHeader() {
           </details>
         </div>
       </div>
-      <div className="px-3 pb-2 sm:hidden">
-        <form action="/" method="get" role="search" className="flex min-h-10 items-center gap-2 rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 text-[var(--brand-text)] shadow-sm focus-within:ring-2 focus-within:ring-[var(--brand-accent)]">
+      <div className="px-3 pb-1 sm:hidden">
+        <form action="/" method="get" role="search" className="flex h-10 min-h-10 items-center gap-2 rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 text-[var(--brand-text)] shadow-sm focus-within:ring-2 focus-within:ring-[var(--brand-accent)]">
           <SearchIcon/>
-          <input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:opacity-60"/>
-          <button type="submit" aria-label="Lancer la recherche" className="rounded-full bg-[var(--brand-accent)] px-2.5 py-1.5 text-xs font-bold text-white">OK</button>
+          <input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="h-full min-h-0 min-w-0 flex-1 bg-transparent py-0 text-sm outline-none placeholder:opacity-60"/>
+          <button type="submit" aria-label="Lancer la recherche" className="h-8 shrink-0 rounded-full bg-[var(--brand-accent)] px-3 text-xs font-bold text-white">OK</button>
         </form>
       </div>
     </header>
