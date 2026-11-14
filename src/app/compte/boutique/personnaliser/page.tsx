@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
 import { getPalettesForShopType } from "@/content/shops/color-palettes";
 import PaletteCard from "./PaletteCard";
+import ShopContactForm from "./ShopContactForm";
 import ShopMediaForm from "./ShopMediaForm";
 
 export default async function PersonnaliserBoutiquePage() {
@@ -27,10 +28,19 @@ export default async function PersonnaliserBoutiquePage() {
 
         <h1 className="text-xl font-bold mt-4 mb-1">Personnaliser {shop.name}</h1>
         <p className="text-sm text-[var(--brand-muted)] mb-6">
-          Choisis une palette de couleurs pour ta boutique publique.
+          Gère les informations visibles sur la vitrine publique de ta boutique.
         </p>
 
-        <div className="flex flex-col gap-4 mb-8">
+        <ShopContactForm
+          countryCode={shop.country_code}
+          phone={shop.phone}
+          whatsapp={shop.whatsapp}
+          instagram={shop.instagram}
+          tiktok={shop.tiktok}
+          snapchat={shop.snapchat}
+        />
+
+        <div className="mt-8 flex flex-col gap-4 mb-8">
           {palettes.map((palette) => (
             <PaletteCard
               key={palette.id}
@@ -48,7 +58,7 @@ export default async function PersonnaliserBoutiquePage() {
         />
         <div className="bg-[var(--brand-surface)] border border-[var(--brand-border)] rounded-2xl p-4 mt-4">
           <p className="text-xs font-semibold text-[var(--brand-muted)] mb-1">Autres options</p>
-          <p className="text-xs text-[var(--brand-muted)]">L&apos;image d&apos;arrière-plan personnalisée et la typographie seront ajoutées dans un prochain lot.</p>
+          <p className="text-xs text-[var(--brand-muted)]">L'image d'arrière-plan personnalisée et la typographie seront ajoutées dans un prochain lot.</p>
         </div>
       </div>
     </div>
