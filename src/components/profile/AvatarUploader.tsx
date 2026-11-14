@@ -190,20 +190,20 @@ export default function AvatarUploader({
 
         {menuOpen && status !== "cropping" && (
           <div className="absolute z-10 top-full mt-2 left-1/2 -translate-x-1/2 bg-white border border-brand-text/10 rounded-xl shadow-md text-sm overflow-hidden w-48">
-            <button
-              type="button"
-              className="w-full text-left px-4 py-3 hover:bg-brand-text/[0.03]"
-              onClick={() => galleryInputRef.current?.click()}
+            <label
+              htmlFor="revant-avatar-gallery"
+              onClick={() => setMenuOpen(false)}
+              className="block w-full text-left px-4 py-3 hover:bg-brand-text/[0.03] cursor-pointer"
             >
               Choisir dans la galerie
-            </button>
-            <button
-              type="button"
-              className="w-full text-left px-4 py-3 hover:bg-brand-text/[0.03] border-t border-brand-text/[0.06]"
-              onClick={() => cameraInputRef.current?.click()}
+            </label>
+            <label
+              htmlFor="revant-avatar-camera"
+              onClick={() => setMenuOpen(false)}
+              className="block w-full text-left px-4 py-3 hover:bg-brand-text/[0.03] border-t border-brand-text/[0.06] cursor-pointer"
             >
               Prendre une photo
-            </button>
+            </label>
             {avatarUrl && (
               <button
                 type="button"
@@ -222,6 +222,7 @@ export default function AvatarUploader({
 
       {/* Galerie : pas d'attribut capture, ouvre le sélecteur de fichiers normal */}
       <input
+        id="revant-avatar-gallery"
         ref={galleryInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
@@ -233,6 +234,7 @@ export default function AvatarUploader({
       />
       {/* Appareil photo : capture=environment ouvre directement la caméra */}
       <input
+        id="revant-avatar-camera"
         ref={cameraInputRef}
         type="file"
         accept="image/*"
