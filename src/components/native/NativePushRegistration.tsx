@@ -14,7 +14,7 @@ export default function NativePushRegistration() {
   useEffect(() => {
     let disposed = false;
     let lastSubmittedToken: string | null = null;
-    const submittedActivityTokens = new Set<string>();
+    const submittedActivityTokens = new Map<string, string>();
 
     async function registerToken(token: string) {
       if (disposed || !TOKEN_PATTERN.test(token) || token === lastSubmittedToken) return;
@@ -45,10 +45,10 @@ export default function NativePushRegistration() {
         typeof orderReference !== "string" ||
         orderReference.length < 1 ||
         orderReference.length > 80 ||
-        submittedActivityTokens.has(activityId)
+        submittedActivityTokens.get(activityId) === token
       ) return;
 
-      submittedActivityTokens.add(activityId);
+      submittedActivityTokens.set(activityId, token);
       try {
         const response = await fetch("/api/native/live-activity-token", {
           method: "POST",
@@ -75,6 +75,9 @@ export default function NativePushRegistration() {
     window.addEventListener("revant:live-activity-token", onLiveActivityToken);
     if (typeof window.__revantAPNSToken === "string") {
       void registerToken(window.__revantAPNSToken);
+    }
+    for (const payload of window.__revantLiveActivityTokens ?? []) {
+      void registerLiveActivityToken(payload);
     }
 
     return () => {

@@ -11,8 +11,6 @@ type LiveActivityState = {
   progress: number;
 };
 
-type DeliveryRow = { order_id: string };
-type OrderRow = { buyer_id: string | null; order_number: string };
 type ActivityTokenRow = { token: string; activity_id: string };
 
 function base64url(value: string) {
@@ -54,15 +52,15 @@ export async function sendAppleLiveActivityUpdateForDelivery(
       .from("deliveries")
       .select("order_id")
       .eq("id", deliveryId)
-      .maybeSingle<DeliveryRow>();
-    if (deliveryError || !delivery) return;
+      .maybeSingle();
+    if (deliveryError || !delivery?.order_id) return;
 
     const { data: order, error: orderError } = await admin
       .from("orders")
       .select("buyer_id,order_number")
       .eq("id", delivery.order_id)
-      .maybeSingle<OrderRow>();
-    if (orderError || !order?.buyer_id) return;
+      .maybeSingle();
+    if (orderError || !order?.buyer_id || !order.order_number) return;
 
     const { data: activityTokens, error: tokenError } = await admin
       .from("user_live_activity_tokens")
@@ -103,8 +101,10 @@ export async function sendAppleLiveActivityUpdateForDelivery(
         signal: AbortSignal.timeout(4000),
       });
 
-      if (response.status === 410 || response.status === 400) {
+      if (response.status === 410) {
         await admin.from("user_live_activity_tokens").delete().eq("token", row.token);
+      } else if (response.ok && state.event === "end") {
+        await admin.from("user_live_activity_tokens").delete().eq("activity_id", row.activity_id);
       }
     }));
   } catch (error) {

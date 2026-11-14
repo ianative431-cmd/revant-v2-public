@@ -14,8 +14,15 @@ declare global {
     endDeliveryActivity?: (payload: { orderReference: string }) => void;
   }
 
+  interface RevantLiveActivityTokenPayload {
+    token?: string;
+    activityId?: string;
+    orderReference?: string;
+  }
+
   interface Window {
     RevantNative?: RevantNativeBridge;
     __revantAPNSToken?: string;
+    __revantLiveActivityTokens?: RevantLiveActivityTokenPayload[];
   }
 }

@@ -67,7 +67,9 @@ struct RevantWebView: UIViewRepresentable {
         window.__revantAPNSToken = token;
         window.dispatchEvent(new CustomEvent("revant:push-token", { detail: { token: token } }));
       };
+      window.__revantLiveActivityTokens = window.__revantLiveActivityTokens || [];
       window.__revantSetLiveActivityToken = function (payload) {
+        if (payload) window.__revantLiveActivityTokens.push(payload);
         window.dispatchEvent(new CustomEvent("revant:live-activity-token", { detail: payload || {} }));
       };
     })();
