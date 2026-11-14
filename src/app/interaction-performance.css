@@ -1,0 +1,73 @@
+/*
+ * Revant interaction tuning.
+ * Keep feedback immediate on touch devices and shorten decorative entrance
+ * animations so they never make controls feel unresponsive.
+ */
+:root {
+  --revant-motion-fast: 90ms;
+  --revant-motion-normal: 120ms;
+}
+
+a,
+button,
+[role="button"],
+summary {
+  transition-duration: 110ms !important;
+  transition-timing-function: cubic-bezier(0.2, 0.7, 0.25, 1);
+}
+
+button:active,
+[role="button"]:active,
+summary:active {
+  transition-duration: 60ms !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  main > section,
+  main > div,
+  body > div > div > section,
+  body > div > div > main {
+    animation-duration: 180ms !important;
+  }
+
+  section .grid > *,
+  main .grid > *,
+  [class*="grid-cols"] > * {
+    animation-duration: 180ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  section img,
+  main img,
+  [role="img"] {
+    animation-duration: 220ms !important;
+  }
+
+  header {
+    animation-duration: 160ms !important;
+  }
+
+  .revant-card {
+    animation-duration: 180ms !important;
+  }
+
+  .revant-card-media img {
+    transition-duration: 160ms !important;
+  }
+
+  details[open] > nav {
+    animation-duration: 120ms !important;
+  }
+
+  .revant-cart-added {
+    animation-duration: 180ms !important;
+  }
+
+  .revant-nav-item > span:first-child {
+    transition-duration: 100ms !important;
+  }
+
+  .revant-nav-item.is-active > span:first-child {
+    animation-duration: 160ms !important;
+  }
+}

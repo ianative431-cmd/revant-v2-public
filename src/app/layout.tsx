@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./interaction-performance.css";
 import Footer from "@/components/layout/Footer";
+import GlobalDismissibleDetails from "@/components/layout/GlobalDismissibleDetails";
 import CookieConsentBanner from "@/components/cookie-consent/CookieConsentBanner";
 import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
 import { getSitePalette } from "@/server/theme/site-palette";
@@ -40,6 +42,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="fr" className="h-full antialiased" data-site-palette={palette}>
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-text">
+        <GlobalDismissibleDetails />
         <ServiceWorkerRegister />
         <div className="flex-1 flex flex-col">{children}</div>
         <Footer />
