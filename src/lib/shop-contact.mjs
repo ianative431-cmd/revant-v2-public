@@ -33,7 +33,16 @@ export function normalizeShopPhone(value, defaultCallingCode = "227") {
     }
     let nationalDigits = compact.replace(/\D/g, "");
     if (nationalDigits.startsWith("0")) nationalDigits = nationalDigits.slice(1);
-    compact = "+" + defaultCallingCode + nationalDigits;
+
+    // Certains anciens enregistrements contiennent déjà l'indicatif du pays
+    // sans le signe "+", parfois précédé du zéro national.
+    const hasCountryCode =
+      nationalDigits.startsWith(defaultCallingCode) &&
+      nationalDigits.length >= defaultCallingCode.length + 7 &&
+      nationalDigits.length <= defaultCallingCode.length + 12;
+    compact = hasCountryCode
+      ? "+" + nationalDigits
+      : "+" + defaultCallingCode + nationalDigits;
   }
 
   const digits = compact.slice(1);
