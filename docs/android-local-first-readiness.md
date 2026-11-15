@@ -121,3 +121,21 @@ Cette section corrige le périmètre de l'ancien état de référence du 4 novem
 5. Ne pas appliquer de migration, modifier les secrets, changer les rôles ou activer des opérations financières hors ligne dans cette tranche d'audit.
 
 Aucune modification de code Android, de configuration Render, de secret, de migration Supabase, de rôle ou de paiement n'a été réalisée pendant cette vérification documentaire.
+
+
+## Précision — registre d'appareils Super Admin déjà présent côté serveur (15 novembre 2026)
+
+La vérification du code confirme que l'approbation individuelle des appareils existe déjà dans le portail Super Admin web ; il ne faut pas créer un second registre parallèle.
+
+- La table `public.super_admin_devices` contient un enregistrement par appareil, avec nom, empreinte du jeton, statut `pending/approved/revoked`, dates de création, d'approbation, de révocation et dernière activité.
+- Après connexion personnelle et vérification TOTP/AAL2, un nouvel appareil reçoit un jeton aléatoire. Seule son empreinte est enregistrée en base ; le jeton brut est placé dans un cookie `HttpOnly`, `Secure` en production, `SameSite=Strict`, avec une durée d'un an.
+- Le premier appareil est approuvé pendant la configuration initiale, après authentification renforcée.
+- Les appareils suivants sont créés en attente. Ils ne peuvent pas s'approuver eux-mêmes : un appareil déjà approuvé et une session AAL2 doivent confirmer l'approbation.
+- La révocation est également limitée à un appareil de confiance et à une session AAL2 ; les approbations et révocations créent une entrée d'audit dans `admin_actions`.
+- Le portail utilise ce registre dans `/admin/securite/appareils`. Le coffre local Capacitor Super Admin ne l'utilise pas encore : il n'a pas de jeton de confiance, ne connaît pas le statut serveur de son installation et ne synchronise rien.
+
+### Conséquence pour la prochaine tranche
+
+Réutiliser le registre et les contrôles existants (`super_admin_devices`, TOTP/AAL2, cookie/empreinte, audit) comme source d'autorité. Concevoir le pont Capacitor vers un stockage natif sécurisé du secret d'appareil, sans mettre le jeton brut dans le bundle, IndexedDB, les logs ou les brouillons. Après déverrouillage local, l'application doit toujours obtenir une session serveur fraîche et faire vérifier l'appareil approuvé et AAL2 avant toute opération administrative. La révocation doit bloquer les futures synchronisations et opérations en ligne.
+
+Cette précision est une lecture du code du dépôt. Aucun compte, appareil, jeton, cookie, rôle, table ou migration n'a été modifié ni consulté en base pendant cet audit.
