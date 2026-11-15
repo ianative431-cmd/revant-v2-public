@@ -15,6 +15,12 @@ test("normalise un numéro international au format 00", () => {
   assert.equal(normalizeShopPhone("+33 6 12 34 56 78", "227"), "+33612345678");
 });
 
+test("reconnaît un indicatif déjà enregistré sans signe plus", () => {
+  assert.equal(normalizeShopPhone("22796123456", "227"), "+22796123456");
+  assert.equal(normalizeShopPhone("227 96 12 34 56", "227"), "+22796123456");
+  assert.equal(normalizeShopPhone("0227 96123456", "227"), "+22796123456");
+});
+
 test("refuse les numéros invalides et les numéros locaux sans pays connu", () => {
   assert.equal(normalizeShopPhone("", "227"), null);
   assert.equal(normalizeShopPhone("appel-moi", "227"), undefined);
