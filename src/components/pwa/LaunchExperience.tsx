@@ -62,15 +62,15 @@ export default function LaunchExperience() {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--brand-accent)]"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--brand-bg)]"
       role="status"
       aria-label="Bienvenue sur Revant"
     >
       {stage === "logo" ? (
         <img
-          src="/images/logo-revant-app-512.png"
+          src="/images/revant-box-mark.svg"
           alt="Revant"
-          className="h-28 w-28 animate-[revant-logo-in_400ms_ease-out_both] object-contain"
+          className="revant-brand-mark h-28 w-28 animate-[revant-logo-in_400ms_ease-out_both] object-contain"
         />
       ) : (
         <video

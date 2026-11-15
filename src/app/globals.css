@@ -299,3 +299,12 @@ a[class*="bg-[#F46A18]"], button[class*="bg-[#F46A18]"] {
     transform: none !important;
   }
 }
+
+/* Revant application mark: transparent box only, black in light mode and white in dark mode. */
+.revant-brand-mark {
+  display: block;
+  background: transparent;
+}
+:root[data-site-palette="slate-lilac"] .revant-brand-mark {
+  filter: brightness(0) invert(1);
+}
