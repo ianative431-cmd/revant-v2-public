@@ -6,15 +6,18 @@ import ProductCard from "@/components/products/ProductCard";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveProductsForShop } from "@/server/products/products";
-import { normalizeShopPhone } from "@/lib/shop-contact.mjs";
+import {
+  normalizeShopPhone,
+  normalizeShopSocialUrl,
+} from "@/lib/shop-contact.mjs";
 import { resolveShopBySlug } from "@/server/shops/shops";
 
 type Props = { params: Promise<{ slug: string }> };
 
 const SOCIAL_NETWORKS = [
-  { key: "instagram", label: "Instagram", host: "instagram.com" },
-  { key: "tiktok", label: "TikTok", host: "tiktok.com" },
-  { key: "snapchat", label: "Snapchat", host: "snapchat.com" },
+  { key: "instagram", label: "Instagram" },
+  { key: "tiktok", label: "TikTok" },
+  { key: "snapchat", label: "Snapchat" },
 ] as const;
 
 function safeImageUrl(value: string | null | undefined): string | null {
@@ -33,24 +36,6 @@ function safeImageUrl(value: string | null | undefined): string | null {
       !image.pathname.startsWith(allowedPath)
     ) return null;
     return image.toString();
-  } catch {
-    return null;
-  }
-}
-
-function safeSocialUrl(value: string | null, host: string): string | null {
-  const raw = value?.trim();
-  if (!raw) return null;
-  try {
-    const candidate = /^https?:\/\//i.test(raw)
-      ? raw
-      : `https://${host}/${raw.replace(/^@/, "")}`;
-    const url = new URL(candidate);
-    if (
-      url.protocol !== "https:" ||
-      (url.hostname !== host && !url.hostname.endsWith(`.${host}`))
-    ) return null;
-    return url.toString();
   } catch {
     return null;
   }
@@ -103,7 +88,7 @@ export default async function ShopPublicPage({ params }: Props) {
     : "#F46A18";
   const socials = SOCIAL_NETWORKS.flatMap((network) => {
     const value = shop[network.key];
-    const href = safeSocialUrl(value, network.host);
+    const href = normalizeShopSocialUrl(value, network.key) ?? null;
     return href ? [{ label: network.label, href }] : [];
   });
   const location = [shop.city, shop.country_code].filter(Boolean).join(", ");
