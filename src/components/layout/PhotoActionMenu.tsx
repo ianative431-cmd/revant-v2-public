@@ -115,14 +115,14 @@ export default function PhotoActionMenu({ allowAdd = false }: { allowAdd?: boole
 
   return (
     <div ref={rootRef} className="relative flex shrink-0 items-center gap-1">
-      <button type="button" aria-label="Rechercher par photo" title="Rechercher par photo" onClick={() => choose("search")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-neutral-500 transition hover:text-[var(--brand-accent)] disabled:opacity-50">
+      <button type="button" aria-label="Rechercher par photo" title="Rechercher par photo" onClick={() => choose("search")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-white/80 transition hover:text-[var(--brand-accent)] disabled:opacity-50">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-5 w-5" aria-hidden="true">
           <circle cx="10.5" cy="10.5" r="6.5" />
           <path d="m15.5 15.5 5 5M8 10.5h5M10.5 8v5" strokeLinecap="round" />
         </svg>
       </button>
       {allowAdd && (
-        <button type="button" aria-label="Ajouter un produit" title="Ajouter un produit" onClick={() => choose("add")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-neutral-500 transition hover:text-[var(--brand-accent)] disabled:opacity-50">
+        <button type="button" aria-label="Ajouter un produit" title="Ajouter un produit" onClick={() => choose("add")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-white/80 transition hover:text-[var(--brand-accent)] disabled:opacity-50">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-5 w-5" aria-hidden="true">
             <path d="M4 7h3l1.5-2h7L17 7h3v12H4V7Z" strokeLinejoin="round" />
             <path d="M12 9v6M9 12h6" strokeLinecap="round" />
@@ -135,8 +135,8 @@ export default function PhotoActionMenu({ allowAdd = false }: { allowAdd?: boole
           <button type="button" onClick={() => openPicker("gallery")} className="block w-full rounded-lg px-3 py-3 text-left hover:bg-neutral-100">Choisir dans la galerie</button>
         </div>
       )}
-      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={handleInputChange} />
-      <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={handleInputChange} />
+      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="sr-only" aria-hidden="true" tabIndex={-1} onChange={handleInputChange} />
+      <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" aria-hidden="true" tabIndex={-1} onChange={handleInputChange} />
       {saving && <p role="status" className="absolute right-0 top-11 z-[60] w-56 text-xs text-neutral-500">Préparation de la photo…</p>}
       {notice && <p role="status" className="absolute right-0 top-11 z-[60] w-56 text-xs text-red-700">{notice}</p>}
     </div>
