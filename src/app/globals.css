@@ -308,3 +308,55 @@ a[class*="bg-[#F46A18]"], button[class*="bg-[#F46A18]"] {
 :root[data-site-palette="slate-lilac"] .revant-brand-mark {
   filter: brightness(0) invert(1);
 }
+
+
+/* Dark palette compatibility: legacy light utility classes must follow the selected site palette on every route. */
+html[data-site-palette="slate-lilac"] :where(
+  .bg-white, .bg-gray-50, .bg-gray-100, .bg-neutral-50, .bg-neutral-100,
+  .bg-slate-50, .bg-slate-100, .bg-zinc-50, .bg-zinc-100, .bg-stone-50, .bg-stone-100,
+  [class~="bg-[#fff]"], [class~="bg-[#ffffff]"]
+) {
+  background-color: var(--brand-surface) !important;
+}
+html[data-site-palette="slate-lilac"] :where(
+  .bg-gray-200, .bg-neutral-200, .bg-neutral-300, .bg-slate-200, .bg-zinc-200, .bg-stone-200
+) {
+  background-color: var(--brand-surface-soft) !important;
+}
+html[data-site-palette="slate-lilac"] :where(
+  .text-black, .text-gray-900, .text-gray-800, .text-gray-700,
+  .text-neutral-900, .text-neutral-800, .text-slate-900, .text-slate-800,
+  .text-zinc-900, .text-zinc-800, .text-stone-900, .text-stone-800,
+  [class~="text-[#000]"], [class~="text-[#000000]"]
+) {
+  color: var(--brand-text) !important;
+}
+html[data-site-palette="slate-lilac"] :where(
+  .text-gray-600, .text-gray-500, .text-gray-400, .text-neutral-700, .text-neutral-600, .text-neutral-500,
+  .text-slate-700, .text-slate-600, .text-slate-500, .text-zinc-700, .text-zinc-600, .text-zinc-500,
+  .text-stone-700, .text-stone-600, .text-stone-500
+) {
+  color: var(--brand-muted) !important;
+}
+html[data-site-palette="slate-lilac"] :where(
+  .border-black, .border-gray-100, .border-gray-200, .border-neutral-100, .border-neutral-200,
+  .border-slate-100, .border-slate-200, .border-zinc-100, .border-zinc-200,
+  [class~="border-black/5"], [class~="border-black/10"], [class~="border-black/[0.06]"],
+  [class~="divide-black/[0.06]"]
+) {
+  border-color: var(--brand-border) !important;
+}
+html[data-site-palette="slate-lilac"] :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  color-scheme: dark;
+  background-color: var(--brand-surface);
+  color: var(--brand-text);
+  border-color: var(--brand-border);
+}
+html[data-site-palette="slate-lilac"] :where(input, textarea)::placeholder {
+  color: var(--brand-muted);
+  opacity: 1;
+}
+html[data-site-palette="slate-lilac"] select option {
+  color: var(--brand-text);
+  background-color: var(--brand-surface);
+}
