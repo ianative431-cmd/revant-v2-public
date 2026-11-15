@@ -69,7 +69,7 @@ export default async function ShopPublicPage({ params }: Props) {
 
   const { shop } = result;
   const isDefaultType = !shop.is_restaurant && !shop.is_pro && !shop.is_premium;
-  const typeLabel = isDefaultType ? null : getShopTypeLabel(shop);
+  const typeLabel = isDefaultType || shop.is_premium ? null : getShopTypeLabel(shop);
   const [products, certificationResult] = await Promise.all([
     getActiveProductsForShop(supabase, shop.id),
     supabase.from("certifications").select("id").eq("shop_id", shop.id).eq("type", "shop").eq("status", "approved").limit(1).maybeSingle(),
@@ -155,9 +155,6 @@ export default async function ShopPublicPage({ params }: Props) {
                     <span className="rounded-full bg-[var(--brand-bg)] px-3 py-1 text-[10px] font-bold text-[var(--brand-muted)]">{typeLabel}</span>
                   )}
                   {isCertified && <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-3 py-1 text-[11px] font-bold text-white">✓ Boutique certifiée</span>}
-                  {shop.is_premium && (
-                    <span className="rounded-full bg-amber-100 px-3 py-1 text-[10px] font-extrabold text-amber-900">Premium</span>
-                  )}
                 </div>
                 {location && (
                   <p className="mb-3 flex items-center gap-1.5 text-xs font-medium text-[var(--brand-muted)]">
