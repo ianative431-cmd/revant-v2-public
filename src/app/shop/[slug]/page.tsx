@@ -6,6 +6,7 @@ import ProductCard from "@/components/products/ProductCard";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveProductsForShop } from "@/server/products/products";
+import { normalizeShopPhone } from "@/lib/shop-contact.mjs";
 import { resolveShopBySlug } from "@/server/shops/shops";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -55,12 +56,6 @@ function safeSocialUrl(value: string | null, host: string): string | null {
   }
 }
 
-function safePhone(value: string | null | undefined): string | null {
-  if (!value) return null;
-  const digits = value.replace(/[^\d+]/g, "");
-  return digits.length >= 7 ? digits : null;
-}
-
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const supabase = await createSupabaseServerClient();
@@ -97,8 +92,11 @@ export default async function ShopPublicPage({ params }: Props) {
   const isCertified = Boolean(certificationResult.data?.id);
   const bannerUrl = safeImageUrl(shop.banner_url) ?? safeImageUrl(shop.background_image_url);
   const logoUrl = safeImageUrl(shop.logo_url);
-  const phone = safePhone(shop.phone);
-  const whatsapp = safePhone(shop.whatsapp ?? shop.phone);
+  const defaultCallingCode = shop.country_code === "NE" ? "227" : null;
+  const phone = normalizeShopPhone(shop.phone, defaultCallingCode) ?? null;
+  const whatsapp = shop.whatsapp?.trim()
+    ? normalizeShopPhone(shop.whatsapp, defaultCallingCode) ?? null
+    : phone;
   const whatsappDigits = whatsapp?.replace(/\D/g, "");
   const shopColor = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
     ? shop.background_color
@@ -253,7 +251,7 @@ export default async function ShopPublicPage({ params }: Props) {
             <div className="mt-4 grid gap-2">
               {phone && (
                 <a href={`tel:${phone}`} className="flex min-h-12 items-center justify-between rounded-2xl border border-[var(--brand-border)] px-4 text-xs font-semibold transition hover:border-[var(--brand-accent)]">
-                  <span>Téléphone</span><span className="text-[var(--brand-muted)]">{shop.phone}</span>
+                  <span>Téléphone</span><span className="text-[var(--brand-muted)]">{phone}</span>
                 </a>
               )}
               {whatsappDigits && (
