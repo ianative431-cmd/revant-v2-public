@@ -15,8 +15,8 @@ export const SITE_PALETTES: Record<
   },
   "slate-lilac": {
     label: "Tangerine électrique — sombre",
-    bg: "#202832",
-    surface: "#1B2937",
+    bg: "#080808",
+    surface: "#111111",
     accent: "#FF914D",
     text: "#F4F1EB",
   },
