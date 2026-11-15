@@ -66,3 +66,58 @@ This document records the state checked against the repository, not an assumptio
 ## Acceptance criteria for calling the apps local-first
 
 A network-disabled device can open the locally packaged app and unlock only its own encrypted, allowlisted offline workspace; no private data is exposed before unlock; no privileged action succeeds offline; on reconnection, only approved drafts synchronize exactly once after fresh server-side authorization; conflicts and revocations are handled safely; all of this is covered by automated tests.
+
+
+## Vérification complémentaire du dépôt — 15 novembre 2026
+
+Cette section corrige le périmètre de l'ancien état de référence du 4 novembre. Elle décrit les fichiers présents dans `main` après le commit `52a65f2`; elle ne prétend pas qu'un test sur appareil réel ou une nouvelle inspection de la base Supabase a été exécuté.
+
+### 1. Application Revant — constat actuel
+
+- `android-apps/revant/capacitor.config.ts` conserve `server.url` vers `https://revant-v2-ui-premium.onrender.com/?source=android-app`.
+- `android-apps/revant/www/index.html` reste un écran d'attente « Ouverture de Revant… » et ne contient pas le catalogue ni l'interface marketplace.
+- L'application Android Revant dépend donc encore du réseau pour charger son interface principale. Elle n'est pas autonome hors ligne.
+- Identifiant natif conservé : `ne.revant.marketplace`.
+
+### 2. Super Admin — constat actuel
+
+- `android-apps/super-admin/capacitor.config.ts` n'a pas de `server.url` : le WebView démarre sur le fichier local `www/index.html`.
+- Ce fichier embarque un écran local autonome avec coffre IndexedDB chiffré par Web Crypto : AES-GCM 256 bits, clé dérivée par PBKDF2-SHA-256 avec 600 000 itérations, sel aléatoire de 16 octets et IV aléatoire de 12 octets.
+- Le coffre accepte uniquement des brouillons locaux non sensibles (100 maximum, 4 000 caractères par contenu). Il se verrouille après 10 minutes d'inactivité et lorsque l'application passe en arrière-plan.
+- Le raccourci vers l'administration réelle reste conditionné à `navigator.onLine`, puis redirige vers `/admin-connexion`. L'indicateur réseau ne prouve pas à lui seul que le serveur est joignable.
+- L'écran local n'accorde aucun rôle, ne contourne pas Supabase Auth/MFA et ne synchronise aucun brouillon. Il ne constitue pas encore l'application Super Admin complète.
+- Identifiant natif conservé : `ne.revant.superadmin`.
+
+### 3. PWA Super Admin web
+
+- `public/admin/sw.js` est limité à la navigation de l'espace `/admin` : il met en cache la page hors ligne générique et le logo Super Admin.
+- Les requêtes API ne sont pas mises en cache ; les navigations authentifiées sont réseau d'abord et retombent sur la page hors ligne générique. Ne pas élargir ce cache aux pages privées, aux réponses API ou aux données administratives.
+
+### 4. Construction Android et dépendances
+
+- Les deux projets Capacitor utilisent actuellement Capacitor Core/Android 7.4.3 et génèrent le projet Android pendant le workflow avec `npx cap add android`.
+- Le workflow `.github/workflows/android-apks.yml` construit `assembleDebug` pour les deux applications. Il ne produit pas d'APK release signé ni d'AAB signé.
+- Le contrôle de taille de 60 MB existe dans ce workflow ; il s'agit d'un garde-fou CI existant, pas d'une preuve que 60 MB est le budget final optimal.
+- Le paquet web principal est une application Next.js 16.4.4 / React 19.3.1 avec `next build` puis `next start`. Le dépôt n'est pas configuré comme un export statique complet. Un simple `output: export` ne peut donc pas être ajouté sans traiter les pages serveur, les Server Actions, les sessions et les fonctions Supabase.
+
+### 5. État des fonctionnalités local-first
+
+| Capacité | Revant Android | Super Admin Android |
+|---|---|---|
+| Démarrage de l'interface sans réseau | Non, interface chargée depuis Render | Oui, écran local limité |
+| Coffre local chiffré | Non | Oui, brouillons non sensibles uniquement |
+| Catalogue public hors ligne | Non | Sans objet |
+| Données privées administratives hors ligne | Non | Non |
+| Appareils approuvés et révocables dans l'app locale | Non implémenté | Non connecté au coffre local |
+| Synchronisation idempotente des brouillons | Non | Non |
+| Opérations financières/administratives privilégiées hors ligne | Interdit | Interdit |
+
+### 6. Suite technique recommandée
+
+1. Cartographier les routes et dépendances Next.js qui nécessitent un serveur, puis isoler un shell mobile local pour les écrans qui peuvent réellement fonctionner sans SSR.
+2. Pour Revant, commencer par les ressources publiques autorisées (shell, catégories, catalogue public et assets validés) ; afficher clairement les états hors ligne et ne jamais présenter une commande locale comme confirmée par le serveur.
+3. Pour Super Admin, conserver le coffre actuel comme brouillon local non sensible. Concevoir séparément l'enrôlement et la révocation d'appareils, l'outbox chiffrée et la synchronisation authentifiée ; chaque opération en ligne doit refaire les contrôles rôle, AAL2, appareil approuvé, schéma, propriété et idempotence côté serveur.
+4. Tester la révocation, l'expiration de session, l'absence d'AAL2, les doublons, les conflits, la perte réseau et le redémarrage avant toute synchronisation de données.
+5. Ne pas appliquer de migration, modifier les secrets, changer les rôles ou activer des opérations financières hors ligne dans cette tranche d'audit.
+
+Aucune modification de code Android, de configuration Render, de secret, de migration Supabase, de rôle ou de paiement n'a été réalisée pendant cette vérification documentaire.
