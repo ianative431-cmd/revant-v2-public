@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signInWithEmail, sendPhoneOtp, verifyPhoneOtp } from "../actions";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
+import WhatsAppComingSoon from "@/components/auth/WhatsAppComingSoon";
 
 export default function ConnexionPage() {
   const [mode, setMode] = useState<"email" | "phone">("email");
@@ -13,6 +14,7 @@ export default function ConnexionPage() {
       <h1 className="text-xl font-bold mb-1">Connexion</h1>
       <p className="text-sm text-[var(--brand-muted)] mb-4">Accède à ton compte Revant.</p>
       <GoogleSignInButton nextPath="/compte" />
+      <WhatsAppComingSoon />
       <p className="my-4 text-center text-xs text-[var(--brand-muted)]">ou continue avec</p>
 
       <div className="flex gap-2 mb-6">
