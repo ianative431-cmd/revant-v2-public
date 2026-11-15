@@ -2,6 +2,10 @@ const CACHE_NAME = "revant-shell-v7";
 const OFFLINE_URL = "/offline.html";
 const LAUNCH_VIDEO_URL = "/media/revant-launch.mp4";
 const SHELL_URLS = [OFFLINE_URL, "/images/logo-revant-app-512.png", LAUNCH_VIDEO_URL];
+const CATALOGUE_CACHE_NAME = "revant-public-catalogue-v1";
+const CATALOGUE_KEY = "/__revant_public_catalogue__";
+const MAX_CATALOGUE_ITEMS = 12;
+const MAX_IMAGE_BYTES = 1572864;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -35,7 +39,7 @@ async function cachedLaunchVideoResponse(request) {
   const total = bytes.byteLength;
   const match = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
   if (!match || (!match[1] && !match[2])) {
-    return new Response(null, { status: 416, headers: { "Content-Range": `bytes */${total}` } });
+    return new Response(null, { status: 416, headers: { "Content-Range": "bytes */" + total } });
   }
 
   let start;
@@ -43,7 +47,7 @@ async function cachedLaunchVideoResponse(request) {
   if (!match[1]) {
     const suffixLength = Number(match[2]);
     if (!Number.isSafeInteger(suffixLength) || suffixLength <= 0) {
-      return new Response(null, { status: 416, headers: { "Content-Range": `bytes */${total}` } });
+      return new Response(null, { status: 416, headers: { "Content-Range": "bytes */" + total } });
     }
     start = Math.max(total - suffixLength, 0);
     end = total - 1;
@@ -53,7 +57,7 @@ async function cachedLaunchVideoResponse(request) {
   }
 
   if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 0 || start >= total || end < start) {
-    return new Response(null, { status: 416, headers: { "Content-Range": `bytes */${total}` } });
+    return new Response(null, { status: 416, headers: { "Content-Range": "bytes */" + total } });
   }
   end = Math.min(end, total - 1);
 
@@ -62,11 +66,111 @@ async function cachedLaunchVideoResponse(request) {
     headers: {
       "Accept-Ranges": "bytes",
       "Content-Length": String(end - start + 1),
-      "Content-Range": `bytes ${start}-${end}/${total}`,
+      "Content-Range": "bytes " + start + "-" + end + "/" + total,
       "Content-Type": cached.headers.get("Content-Type") || "video/mp4",
     },
   });
 }
+
+async function savePublicCatalogue(data) {
+  if (!data || !Array.isArray(data.products) || !Number.isFinite(data.savedAt)) return;
+  const allowedOrigin = typeof data.storageOrigin === "string" ? data.storageOrigin : "";
+  let storageOrigin = "";
+  try {
+    const parsedOrigin = new URL(allowedOrigin);
+    if (parsedOrigin.protocol === "https:") storageOrigin = parsedOrigin.origin;
+  } catch {
+    storageOrigin = "";
+  }
+
+  const products = data.products.slice(0, MAX_CATALOGUE_ITEMS).flatMap((item) => {
+    if (
+      !item ||
+      typeof item.id !== "string" ||
+      typeof item.name !== "string" ||
+      !Number.isFinite(item.price) ||
+      item.price < 0 ||
+      typeof item.currency !== "string" ||
+      typeof item.stock !== "number" ||
+      !Number.isFinite(item.stock)
+    ) return [];
+
+    let image = "";
+    if (typeof item.image === "string" && storageOrigin) {
+      try {
+        const candidate = new URL(item.image);
+        if (
+          candidate.protocol === "https:" &&
+          candidate.origin === storageOrigin &&
+          candidate.pathname.startsWith("/storage/v1/object/public/product-images/") &&
+          !candidate.username &&
+          !candidate.password
+        ) image = candidate.toString();
+      } catch {
+        image = "";
+      }
+    }
+
+    return [{
+      id: item.id.slice(0, 80),
+      name: item.name.slice(0, 120),
+      price: item.price,
+      currency: item.currency.slice(0, 8),
+      stock: Math.max(0, Math.floor(item.stock)),
+      category: typeof item.category === "string" ? item.category.slice(0, 60) : "",
+      image,
+    }];
+  });
+
+  if (!products.length) return;
+  const assetCache = await caches.open(CATALOGUE_CACHE_NAME);
+  const keepImages = new Set();
+
+  for (const product of products) {
+    if (!product.image) continue;
+    keepImages.add(product.image);
+    try {
+      if (await assetCache.match(product.image)) continue;
+      const response = await fetch(product.image, { mode: "cors", credentials: "omit", cache: "no-store" });
+      const length = Number(response.headers.get("content-length") || 0);
+      const contentType = response.headers.get("content-type") || "";
+      if (
+        !response.ok ||
+        response.type === "opaque" ||
+        !contentType.toLowerCase().startsWith("image/") ||
+        (length > 0 && length > MAX_IMAGE_BYTES)
+      ) continue;
+      const blob = await response.clone().blob();
+      if (blob.size > MAX_IMAGE_BYTES) continue;
+      await assetCache.put(product.image, response);
+    } catch {
+      // A failed image must not prevent saving the public catalogue metadata.
+    }
+  }
+
+  const oldAssets = await assetCache.keys();
+  await Promise.all(oldAssets
+    .filter((request) => request.url !== new URL(CATALOGUE_KEY, self.location.origin).href && !keepImages.has(request.url))
+    .map((request) => assetCache.delete(request)));
+
+  const payload = {
+    savedAt: data.savedAt,
+    products: products.map(({ id, name, price, currency, stock, category, image }) => ({
+      id, name, price, currency, stock, category, image,
+    })),
+  };
+  await assetCache.put(
+    CATALOGUE_KEY,
+    new Response(JSON.stringify(payload), {
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+    }),
+  );
+}
+
+self.addEventListener("message", (event) => {
+  if (!event.data || event.data.type !== "REVANT_CACHE_PUBLIC_CATALOGUE") return;
+  event.waitUntil(savePublicCatalogue(event.data).catch(() => undefined));
+});
 
 self.addEventListener("fetch", (event) => {
   const request = event.request;
