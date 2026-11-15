@@ -90,7 +90,7 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
       {
         heading: "Partage des données",
         body: [
-          "Les données peuvent être partagées avec des prestataires strictement nécessaires au fonctionnement du service : hébergement (Supabase, Vercel), envoi de SMS de vérification (Twilio), traitement des paiements (prestataire à confirmer), et assistance basée sur l'IA pour le support.",
+          "Les données peuvent être partagées avec des prestataires strictement nécessaires au fonctionnement du service : hébergement (Render, Supabase), envoi de SMS de vérification (Twilio), traitement des paiements (prestataire à confirmer), et assistance basée sur l'IA pour le support.",
           "Revant ne vend jamais les données personnelles des utilisateurs à des tiers à des fins publicitaires.",
         ],
       },
@@ -184,7 +184,7 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
       {
         heading: "Hébergement",
         body: [
-          "Le site et l'application sont hébergés via Vercel (frontend) et Supabase (base de données, authentification, stockage).",
+          "Le site et l'application sont hébergés via Render (frontend) et Supabase (base de données, authentification, stockage).",
         ],
       },
       {

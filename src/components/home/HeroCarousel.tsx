@@ -77,7 +77,7 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
           <p className="mb-2 text-[9px] font-semibold tracking-[0.2em] text-white/75 sm:mb-3 sm:text-[11px]">{activeSlide.eyebrow}</p>
           <h1 className="mb-3 text-2xl font-black leading-[1.04] tracking-tight sm:mb-4 sm:text-5xl">{activeSlide.title}</h1>
           <p className="mb-4 max-w-sm text-xs leading-relaxed text-white/85 sm:mb-6 sm:text-sm">{activeSlide.description}</p>
-          <Link href={activeSlide.ctaHref} className="inline-flex items-center gap-3 rounded-md bg-[#F46A18] px-4 py-2.5 text-[11px] font-bold text-white transition hover:bg-[#FF914D] sm:px-5 sm:py-3 sm:text-xs">
+          <Link href={activeSlide.ctaHref} className="inline-flex items-center gap-3 rounded-md bg-[var(--brand-accent)] px-4 py-2.5 text-[11px] font-bold text-white transition hover:bg-[var(--brand-accent-hover)] sm:px-5 sm:py-3 sm:text-xs">
             {activeSlide.ctaLabel} <span aria-hidden="true">→</span>
           </Link>
         </div>
@@ -95,7 +95,7 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
                 onClick={() => setActiveIndex(index)}
                 className="flex h-9 w-9 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:h-11 sm:w-11"
               >
-                <span className={`h-2.5 rounded-full transition-all duration-300 ${isActive ? "w-6 bg-[#F46A18]" : "w-2.5 border border-white/90 bg-white/35"}`} />
+                <span className={`h-2.5 rounded-full transition-all duration-300 ${isActive ? "w-6 bg-[var(--brand-accent)]" : "w-2.5 border border-white/90 bg-white/35"}`} />
               </button>
             );
           })}

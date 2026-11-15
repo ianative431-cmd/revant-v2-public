@@ -63,10 +63,10 @@ export default async function CategoriesPage() {
                 Explorer Revant
               </span>
               <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">
-                Trouvez votre univers.
+                Trouve ton univers.
               </h1>
               <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--brand-muted)] sm:text-base">
-                Mode, parfums et bien plus : choisissez une catégorie pour découvrir les produits proposés par les boutiques Revant.
+                Mode, parfums et bien plus : choisis une catégorie pour découvrir les produits proposés par les boutiques Revant.
               </p>
               <div className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-[var(--brand-muted)]">
                 <span className="h-2 w-2 rounded-full bg-brand-accent" />
@@ -130,7 +130,7 @@ export default async function CategoriesPage() {
                           {item.description}
                         </p>
                       ) : (
-                        <p className="text-xs text-[var(--brand-muted)]">Découvrez notre sélection</p>
+                        <p className="text-xs text-[var(--brand-muted)]">Découvre notre sélection</p>
                       )}
                       <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-extrabold text-brand-accent sm:text-xs">
                         Voir les produits

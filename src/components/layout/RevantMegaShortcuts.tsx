@@ -4,8 +4,8 @@ import { Shirt, FlaskConical, ShoppingBag, House, Smartphone, Store, Leaf, Utens
 const shortcuts = [
   { label: "Mode", href: "/?categorie=mode#produits", icon: Shirt },
   { label: "Parfums", href: "/?categorie=parfums#produits", icon: FlaskConical },
-  { label: "Accessoires", href: "/?categorie=sacs-accessoires#produits", icon: ShoppingBag },
-  { label: "Maison", href: "/maison", icon: House },
+  { label: "Beauté", href: "/?categorie=beaute#produits", icon: ShoppingBag },
+  { label: "Immobilier", href: "/maison", icon: House },
   { label: "Électronique", href: "/?categorie=electronique#produits", icon: Smartphone },
   { label: "Boutiques", href: "/boutiques", icon: Store },
   { label: "Terroir", href: "/#boutiques-paysannes", icon: Leaf },

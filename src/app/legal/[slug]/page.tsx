@@ -1,7 +1,22 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLegalDocument, LEGAL_DOCUMENTS } from "@/content/legal/documents";
 import { LEGAL_DISCLAIMER } from "@/content/legal/types";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const doc = getLegalDocument(slug);
+  if (!doc) return { title: "Document introuvable — Revant" };
+  return {
+    title: `${doc.title} — Revant`,
+    description: doc.summary,
+  };
+}
 
 export function generateStaticParams() {
   return LEGAL_DOCUMENTS.map((doc) => ({ slug: doc.slug }));
