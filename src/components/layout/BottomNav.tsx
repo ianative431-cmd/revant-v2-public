@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutGrid, MessageCircle, ShoppingCart, Settings } from "lucide-react";
+import { Home, LayoutGrid, MessageCircle, ShoppingCart, UserRound } from "lucide-react";
 
 type NavIcon = React.ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>;
 
@@ -32,7 +32,7 @@ export default function BottomNav() {
       <Item href="/categories" label="Catégorie" active={pathname === "/categories"} icon={LayoutGrid}/>
       <Item href="/messages" label="Message" active={pathname === "/messages" || pathname.startsWith("/messages/")} icon={MessageCircle}/>
       <Item href="/panier" label="Panier" active={pathname === "/panier"} icon={ShoppingCart}/>
-      <Item href="/parametres" label="Paramètres" active={pathname === "/parametres" || pathname.startsWith("/parametres/") || pathname === "/compte" || pathname.startsWith("/compte/")} icon={Settings}/>
+      <Item href="/parametres" label="Mon Revante" active={pathname === "/parametres" || pathname.startsWith("/parametres/") || pathname === "/compte" || pathname.startsWith("/compte/")} icon={UserRound}/>
     </nav>
   );
 }
