@@ -33,7 +33,7 @@ const GROUPS: { title: string; items: SettingsItem[] }[] = [
   {
     title: "Compte et sécurité",
     items: [
-      { href: "/compte", label: "Mon compte", description: "Tes informations personnelles et ton profil", Icon: UserRound, color: "#F46A18" },
+      { href: "/compte", label: "Mon compte", description: "Tes informations personnelles et ton profil", Icon: UserRound, color: "var(--brand-accent)" },
       { href: "#securite", label: "Sécurité et confidentialité", description: "Accès au compte et protection des données", Icon: ShieldCheck, color: "#57707A" },
       { href: "/compte/notifications", label: "Notifications", description: "Commandes, paiements et informations Revant", Icon: Bell, color: "#E6A23C" },
       { href: "#langue-region", label: "Langue et région", description: "Français · Niger · XOF", Icon: Globe, color: "#57707A" },
@@ -42,7 +42,7 @@ const GROUPS: { title: string; items: SettingsItem[] }[] = [
   {
     title: "Activité",
     items: [
-      { href: "/compte/historique", label: "Historique", description: "Achats, ventes et livraisons selon ton rôle", Icon: History, color: "#F46A18" },
+      { href: "/compte/historique", label: "Historique", description: "Achats, ventes et livraisons selon ton rôle", Icon: History, color: "var(--brand-accent)" },
       { href: "/compte/recus", label: "Mes reçus", description: "Consulter les reçus des commandes livrées", Icon: ReceiptText, color: "#E6A23C" },
     ],
   },
@@ -56,7 +56,7 @@ const GROUPS: { title: string; items: SettingsItem[] }[] = [
   {
     title: "Assistance et informations",
     items: [
-      { href: "#aide", label: "Aide et assistance", description: "Messagerie et ressources utiles", Icon: Headset, color: "#F46A18" },
+      { href: "#aide", label: "Aide et assistance", description: "Messagerie et ressources utiles", Icon: Headset, color: "var(--brand-accent)" },
       { href: "/legal", label: "Informations légales", description: "Conditions, confidentialité et documents Revant", Icon: Scale, color: "#989DAA" },
     ],
   },
@@ -66,7 +66,7 @@ function SettingsRow({ item }: { item: SettingsItem }) {
   const Icon = item.Icon;
   return (
     <Link href={item.href} className="revant-settings-row flex min-h-[76px] items-center gap-3 px-4 py-3 transition hover:bg-brand-accent/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent sm:px-5">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ color: item.color, backgroundColor: `${item.color}16` }}>
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ color: item.color, backgroundColor: `color-mix(in srgb, ${item.color} 9%, transparent)` }}>
         <Icon size={21} strokeWidth={1.8} aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">

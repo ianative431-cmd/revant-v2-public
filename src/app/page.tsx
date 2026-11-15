@@ -84,8 +84,11 @@ export default async function Home({ searchParams }: Props) {
     categories = await getActiveCategories(supabase);
     const productType = categorie === "mode" ? "clothing" : categorie === "parfums" ? "perfume" : undefined;
     const categoryId = productType ? undefined : categories.find((c) => c.slug === categorie)?.id;
+    const productsPromise = categorie && !productType && !categoryId
+      ? Promise.resolve([])
+      : getActiveProducts(supabase, { categoryId, productType, limit: 24, searchTerm: q?.trim() || undefined });
     [loadedProducts, shops] = await Promise.all([
-      getActiveProducts(supabase, { categoryId, productType, limit: 24, searchTerm: q?.trim() || undefined }),
+      productsPromise,
       getActiveShops(supabase, { limit: 8 }),
     ]);
     if (shops.length > 0) {
@@ -102,6 +105,7 @@ export default async function Home({ searchParams }: Props) {
   }
   const activeCategory = categories.find((c) => c.slug === categorie);
   const shortcutCategoryTitle = categorie === "mode" ? "Mode" : categorie === "parfums" ? "Parfums" : null;
+  const unknownCategory = Boolean(categorie && !shortcutCategoryTitle && !activeCategory);
   const term = q?.trim();
 
   return (
@@ -163,25 +167,26 @@ export default async function Home({ searchParams }: Props) {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {FARM_PHOTOS.map((farm) => (
-              <Link key={farm.title} href="/boutiques" aria-label={`Ouvrir le répertoire des boutiques — ${farm.title}`} className="group relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200 outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
-                <div className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105" style={{ backgroundImage: `url("${farm.photo}")` }} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                <div className="absolute bottom-3 left-3 right-3 text-white"><strong className="block text-sm">{farm.title}</strong><span className="text-[11px] text-white/80">{farm.subtitle}</span><span className="mt-2 inline-block rounded bg-white px-2 py-1 text-[10px] font-bold text-black">DÉCOUVRIR →</span></div>
-              </Link>
-            ))}
+          <div className="rounded-2xl border border-dashed border-brand-border bg-brand-surface px-5 py-8 text-center">
+            <div aria-hidden="true" className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-bg text-2xl">🌾</div>
+            <h3 className="mt-3 text-sm font-extrabold">Les boutiques paysannes arrivent bientôt</h3>
+            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">
+              Les vitrines et les produits des vendeurs apparaîtront ici dès que leurs boutiques seront actives.
+            </p>
+            <Link href="/boutiques/creer" className="mt-4 inline-flex rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white">
+              Ouvrir ma boutique
+            </Link>
           </div>
         )}
       </section>
 
       <main id="produits" className="px-4 pt-7">
-        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? `Résultats pour « ${q} »` : shortcutCategoryTitle ?? (activeCategory ? activeCategory.name : "Produits populaires")}</h2><a href="#produits" className="text-xs font-medium">Voir tout →</a></div>
+        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? `Résultats pour « ${q} »` : unknownCategory ? "Catégorie indisponible" : shortcutCategoryTitle ?? (activeCategory ? activeCategory.name : "Produits populaires")}</h2><a href="#produits" className="text-xs font-medium">Voir tout →</a></div>
         {loadedProducts.length === 0 ? (
           <div className="rounded-xl border border-brand-border bg-brand-surface px-5 py-10 text-center">
-            <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : "Les premières annonces arrivent bientôt."}</p>
-            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">{term ? "Essaie un autre mot ou explore les catégories." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
-            <Link href="/boutiques/creer" className="mt-4 inline-flex rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white">Ouvrir une boutique</Link>
+            <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : unknownCategory ? "Cette catégorie n’est pas disponible pour le moment." : "Les premières annonces arrivent bientôt."}</p>
+            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">{term ? "Essaie un autre mot ou explore les catégories." : unknownCategory ? "Choisis une catégorie actuellement proposée par Revant." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
+            <Link href={unknownCategory ? "/categories" : "/boutiques/creer"} className="mt-4 inline-flex rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white">{unknownCategory ? "Explorer les catégories" : "Ouvrir une boutique"}</Link>
           </div>
         ) : (
           <InfiniteProductFeed initialProducts={loadedProducts} category={categorie ?? ""} search={term ?? ""} />
