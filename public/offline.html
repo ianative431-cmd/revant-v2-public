@@ -125,7 +125,8 @@
             const imageRequest = await cache.match(product.image);
             if (imageRequest) {
               const image = document.createElement("img");
-              image.src = product.image;
+              const imageBlob = await imageRequest.blob();
+              image.src = URL.createObjectURL(imageBlob);
               image.alt = typeof product.name === "string" ? product.name : "Produit";
               image.loading = "lazy";
               card.appendChild(image);
