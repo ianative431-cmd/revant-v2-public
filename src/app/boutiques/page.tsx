@@ -42,8 +42,12 @@ export default async function BoutiquesPage() {
     const supabase = await createSupabaseServerClient();
     shops = await getActiveShops(supabase, { limit: 100 });
     if (shops.length > 0) {
-      const { data: certifications, error: certificationError } = await supabase.from("certifications").select("shop_id").eq("type", "shop").eq("status", "approved").in("shop_id", shops.map((shop) => shop.id));
-      if (!certificationError) certifiedShopIds = new Set((certifications ?? []).map((item) => item.shop_id));
+      try {
+        const { data: certifications, error: certificationError } = await supabase.from("certifications").select("shop_id").eq("type", "shop").eq("status", "approved").in("shop_id", shops.map((shop) => shop.id));
+        if (!certificationError) certifiedShopIds = new Set((certifications ?? []).map((item) => item.shop_id));
+      } catch {
+        certifiedShopIds = new Set();
+      }
     }
   } catch {
     shops = [];
