@@ -40,7 +40,8 @@ function shouldShowBackButton(pathname: string): boolean {
 
 function getFallbackPath(pathname: string): string {
   if (AUTH_ROUTES.has(pathname)) return "/";
-  if (pathname === "/categories" || pathname.startsWith("/categories/")) return "/categories";
+  if (pathname === "/categories") return "/";
+  if (pathname.startsWith("/categories/")) return "/categories";
   if (pathname.startsWith("/produit/")) return "/categories";
   if (pathname.startsWith("/shop/")) return "/boutiques";
   if (pathname.startsWith("/messages/")) return "/messages";
