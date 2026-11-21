@@ -22,11 +22,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/images/revant-box-mark-192.png?v=20261115", sizes: "192x192", type: "image/png" },
-      { url: "/images/revant-box-mark-512.png?v=20261115", sizes: "512x512", type: "image/png" },
+      { url: "/images/logo-revant-officiel-192.png?v=20261121-carton-complet", sizes: "192x192", type: "image/png" },
+      { url: "/images/logo-revant-officiel-512.png?v=20261121-carton-complet", sizes: "512x512", type: "image/png" },
     ],
-    shortcut: "/images/revant-box-mark-192.png?v=20261115",
-    apple: "/images/revant-box-mark-512.png?v=20261115",
+    shortcut: "/images/logo-revant-officiel-192.png?v=20261121-carton-complet",
+    apple: "/images/logo-revant-officiel-512.png?v=20261121-carton-complet",
   },
 };
 
