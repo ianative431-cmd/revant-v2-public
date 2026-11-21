@@ -52,8 +52,8 @@ export default function CookieConsentBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 flex justify-center px-4 pb-4">
-      <div className="w-full max-w-lg bg-white rounded-[22px] shadow-lg p-5 border border-brand-text/10">
+    <div className="fixed inset-x-0 bottom-0 z-[90] flex justify-center px-3 pb-[calc(env(safe-area-inset-bottom,0px)+12px)]">
+      <div className="max-h-[calc(100dvh-24px)] w-full max-w-lg overflow-y-auto rounded-[22px] border border-brand-border bg-brand-surface p-4 text-brand-text shadow-2xl sm:p-5">
         {mode === "banner" ? (
           <>
             <p className="text-sm mb-4">
@@ -64,10 +64,10 @@ export default function CookieConsentBanner() {
               </Link>
               .
             </p>
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => save({ categories: defaultCategories(true), consentType: "accept_all" })}
-                className="flex-1 bg-brand-accent text-white rounded-full py-2.5 text-sm font-medium"
+                className="col-span-2 min-h-11 rounded-full bg-brand-accent px-3 py-2.5 text-sm font-semibold text-white"
               >
                 Tout accepter
               </button>
@@ -75,13 +75,13 @@ export default function CookieConsentBanner() {
                 onClick={() =>
                   save({ categories: defaultCategories(false), consentType: "reject_non_essential" })
                 }
-                className="flex-1 border border-brand-accent rounded-full py-2.5 text-sm font-medium"
+                className="min-h-11 rounded-full border border-brand-accent px-3 py-2.5 text-sm font-semibold text-brand-text"
               >
                 Refuser les non essentiels
               </button>
               <button
                 onClick={() => setMode("customize")}
-                className="flex-1 bg-brand-text/5 rounded-full py-2.5 text-sm font-medium"
+                className="min-h-11 rounded-full bg-brand-bg px-3 py-2.5 text-sm font-semibold text-brand-text"
               >
                 Personnaliser
               </button>
@@ -115,16 +115,16 @@ export default function CookieConsentBanner() {
                 );
               })}
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setMode("banner")}
-                className="flex-1 bg-brand-text/5 rounded-full py-2.5 text-sm font-medium"
+                className="min-h-11 rounded-full bg-brand-bg px-3 py-2.5 text-sm font-semibold text-brand-text"
               >
                 Retour
               </button>
               <button
                 onClick={() => save({ categories, consentType: "custom" })}
-                className="flex-1 bg-brand-accent text-white rounded-full py-2.5 text-sm font-medium"
+                className="min-h-11 rounded-full bg-brand-accent px-3 py-2.5 text-sm font-semibold text-white"
               >
                 Enregistrer mes choix
               </button>
