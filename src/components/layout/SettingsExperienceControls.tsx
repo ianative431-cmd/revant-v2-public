@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { Check, Moon, Zap } from "lucide-react";
 import PaletteSwitcher from "@/components/layout/PaletteSwitcher";
 import type { SitePaletteId } from "@/content/theme/site-palette";
@@ -11,7 +11,34 @@ type TextScale = "normal" | "large";
 type Settings = { motion: MotionMode; glass: GlassLevel; text: TextScale };
 
 const STORAGE_KEY = "revant-display-preferences-v1";
+const CHANGE_EVENT = "revant-display-preferences";
 const DEFAULTS: Settings = { motion: "ultra", glass: "subtle", text: "normal" };
+
+function readSettings(raw: string): Settings {
+  try {
+    const parsed = JSON.parse(raw) as Partial<Settings>;
+    return {
+      motion: parsed.motion === "reduced" ? "reduced" : "ultra",
+      glass: parsed.glass === "balanced" || parsed.glass === "strong" ? parsed.glass : "subtle",
+      text: parsed.text === "large" ? "large" : "normal",
+    };
+  } catch {
+    return DEFAULTS;
+  }
+}
+
+function subscribe(callback: () => void) {
+  window.addEventListener("storage", callback);
+  window.addEventListener(CHANGE_EVENT, callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener(CHANGE_EVENT, callback);
+  };
+}
+
+function getSnapshot() {
+  try { return localStorage.getItem(STORAGE_KEY) ?? ""; } catch { return ""; }
+}
 
 function applySettings(settings: Settings) {
   const root = document.documentElement;
@@ -21,36 +48,21 @@ function applySettings(settings: Settings) {
 }
 
 export default function SettingsExperienceControls({ mode, currentPalette }: { mode: "appearance" | "interactions"; currentPalette: SitePaletteId }) {
-  const [settings, setSettings] = useState<Settings>(DEFAULTS);
-  const [ready, setReady] = useState(false);
+  const raw = useSyncExternalStore(subscribe, getSnapshot, () => "");
+  const settings = useMemo(() => readSettings(raw), [raw]);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<Settings>;
-        const next: Settings = {
-          motion: parsed.motion === "reduced" ? "reduced" : "ultra",
-          glass: parsed.glass === "balanced" || parsed.glass === "strong" ? parsed.glass : "subtle",
-          text: parsed.text === "large" ? "large" : "normal",
-        };
-        setSettings(next);
-        applySettings(next);
-      } else applySettings(DEFAULTS);
-    } catch { applySettings(DEFAULTS); }
-    setReady(true);
-  }, []);
+    applySettings(settings);
+  }, [settings]);
 
   function update<K extends keyof Settings>(key: K, value: Settings[K]) {
-    setSettings((current) => {
-      const next = { ...current, [key]: value };
-      applySettings(next);
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* Storage may be unavailable in private mode. */ }
-      return next;
-    });
+    const next = { ...settings, [key]: value };
+    applySettings(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      window.dispatchEvent(new Event(CHANGE_EVENT));
+    } catch { /* Storage may be unavailable in private mode. */ }
   }
-
-  if (!ready) return <div className="border-t border-brand-border px-4 py-4 text-xs text-brand-muted" aria-live="polite">Chargement des préférences…</div>;
 
   if (mode === "appearance") {
     return (
