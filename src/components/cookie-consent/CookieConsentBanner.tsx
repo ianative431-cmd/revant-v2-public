@@ -52,8 +52,8 @@ export default function CookieConsentBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[90] flex justify-center px-3 pb-[calc(env(safe-area-inset-bottom,0px)+12px)]">
-      <div className="max-h-[calc(100dvh-24px)] w-full max-w-lg overflow-y-auto rounded-[22px] border border-brand-border bg-brand-surface p-4 text-brand-text shadow-2xl sm:p-5">
+    <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+84px)] z-[90] flex justify-center px-3">
+      <div className="max-h-[calc(100dvh-env(safe-area-inset-bottom,0px)-112px)] w-full max-w-lg overflow-y-auto rounded-[22px] border border-brand-border bg-brand-surface p-4 text-brand-text shadow-2xl sm:p-5">
         {mode === "banner" ? (
           <>
             <p className="text-sm mb-4">

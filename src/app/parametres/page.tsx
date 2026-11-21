@@ -62,9 +62,6 @@ export default async function ParametresPage() {
                 </div>
                 <SettingsExperienceControls mode="appearance" currentPalette={palette} />
               </div>
-              <div className="border-t border-brand-border pt-4">
-                <SettingsExperienceControls mode="interactions" currentPalette={palette} />
-              </div>
             </div>
           </SettingsSection>
 
