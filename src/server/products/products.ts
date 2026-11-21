@@ -83,13 +83,14 @@ export async function getProductsForShop(
   supabase: SupabaseClient,
   shopId: string
 ): Promise<Product[]> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("shop_id", shopId)
     .order("created_at", { ascending: false })
     .returns<ProductRow[]>();
 
+  if (error) throw error;
   return (data ?? []).map(mapRow);
 }
 

@@ -16,7 +16,8 @@ export async function getShopByOwnerId(
     .eq("owner_id", ownerId)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error) throw error;
+  if (!data) return null;
   return data as Shop;
 }
 
