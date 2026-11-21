@@ -97,13 +97,14 @@ export async function getProductById(
   supabase: SupabaseClient,
   id: string
 ): Promise<Product | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("id", id)
     .maybeSingle()
     .returns<ProductRow>();
 
+  if (error) throw error;
   return data ? mapRow(data) : null;
 }
 
