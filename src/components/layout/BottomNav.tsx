@@ -32,7 +32,7 @@ export default function BottomNav() {
       <Item href="/categories" label="Catégorie" active={pathname === "/categories"} icon={LayoutGrid}/>
       <Item href="/messages" label="Message" active={pathname === "/messages" || pathname.startsWith("/messages/")} icon={MessageCircle}/>
       <Item href="/panier" label="Panier" active={pathname === "/panier"} icon={ShoppingCart}/>
-      <Item href="/compte" label="Mon Revante" active={pathname === "/compte" || pathname.startsWith("/compte/") || pathname === "/parametres" || pathname.startsWith("/parametres/")} icon={UserRound}/>
+      <Item href="/compte" label="Mon Revante" active={pathname === "/compte" || pathname.startsWith("/compte/") || pathname === "/parametres" || pathname.startsWith("/parametres/") || pathname === "/wallet" || pathname.startsWith("/wallet/")} icon={UserRound}/>
     </nav>
   );
 }
