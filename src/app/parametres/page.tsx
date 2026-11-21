@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { LucideIcon, ReactNode } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import {
   Bell, ChevronRight, CircleHelp, Globe2, LockKeyhole, ShieldCheck, UserRound,
 } from "lucide-react";
