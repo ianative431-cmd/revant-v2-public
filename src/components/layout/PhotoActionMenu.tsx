@@ -115,14 +115,14 @@ export default function PhotoActionMenu({ allowAdd = false }: { allowAdd?: boole
 
   return (
     <div ref={rootRef} className="relative flex shrink-0 items-center gap-1">
-      <button type="button" aria-label="Rechercher par photo" title="Rechercher par photo" onClick={() => choose("search")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-white/80 transition hover:text-[var(--brand-accent)] disabled:opacity-50">
+      <button type="button" aria-label="Rechercher par photo" title="Rechercher par photo" onClick={() => choose("search")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-brand-muted transition hover:text-[var(--brand-accent)] disabled:opacity-50">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-5 w-5" aria-hidden="true">
           <circle cx="10.5" cy="10.5" r="6.5" />
           <path d="m15.5 15.5 5 5M8 10.5h5M10.5 8v5" strokeLinecap="round" />
         </svg>
       </button>
       {allowAdd && (
-        <button type="button" aria-label="Ajouter un produit" title="Ajouter un produit" onClick={() => choose("add")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-white/80 transition hover:text-[var(--brand-accent)] disabled:opacity-50">
+        <button type="button" aria-label="Ajouter un produit" title="Ajouter un produit" onClick={() => choose("add")} disabled={saving} className="flex h-10 w-8 items-center justify-center text-brand-muted transition hover:text-[var(--brand-accent)] disabled:opacity-50">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-5 w-5" aria-hidden="true">
             <path d="M4 7h3l1.5-2h7L17 7h3v12H4V7Z" strokeLinejoin="round" />
             <path d="M12 9v6M9 12h6" strokeLinecap="round" />
@@ -130,9 +130,9 @@ export default function PhotoActionMenu({ allowAdd = false }: { allowAdd?: boole
         </button>
       )}
       {pickerAction && (
-        <div role="group" aria-label={pickerAction === "search" ? "Choisir une photo pour la recherche" : "Choisir une photo pour le produit"} className="absolute right-0 top-11 z-[60] w-52 overflow-hidden rounded-xl border border-neutral-200 bg-white p-1 text-xs text-neutral-900 shadow-xl">
-          <button type="button" onClick={() => openPicker("camera")} className="block w-full rounded-lg px-3 py-3 text-left hover:bg-neutral-100">Prendre une photo</button>
-          <button type="button" onClick={() => openPicker("gallery")} className="block w-full rounded-lg px-3 py-3 text-left hover:bg-neutral-100">Choisir dans la galerie</button>
+        <div role="group" aria-label={pickerAction === "search" ? "Choisir une photo pour la recherche" : "Choisir une photo pour le produit"} className="absolute right-0 top-11 z-[60] w-52 overflow-hidden rounded-xl border border-brand-border bg-brand-surface p-1 text-xs text-brand-text shadow-xl">
+          <button type="button" onClick={() => openPicker("camera")} className="block w-full rounded-lg px-3 py-3 text-left hover:bg-brand-bg">Prendre une photo</button>
+          <button type="button" onClick={() => openPicker("gallery")} className="block w-full rounded-lg px-3 py-3 text-left hover:bg-brand-bg">Choisir dans la galerie</button>
         </div>
       )}
       <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="sr-only" aria-hidden="true" tabIndex={-1} onChange={handleInputChange} />

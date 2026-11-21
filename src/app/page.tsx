@@ -142,12 +142,12 @@ export default async function Home({ searchParams }: Props) {
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">Catégories</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {displayedCategories.map((category) => (
-            <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-neutral-300">
+            <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-brand-surface-soft">
               <div
                 role="img"
                 aria-label={`Illustration de la catégorie ${category.name}`}
                 className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
-                style={{ backgroundImage: `url("${getCategoryCoverImage(category.slug, category.image_url)}")` }}
+                style={{ backgroundImage: `url("${getCategoryCoverImage(category.slug, category.image_url)}"), linear-gradient(135deg, var(--brand-accent), var(--brand-surface-soft))` }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
               <span className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white">{category.name}</span>
