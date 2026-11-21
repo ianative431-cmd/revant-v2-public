@@ -174,9 +174,9 @@ export default async function Home({ searchParams }: Props) {
         </div>
       </section>
 
-      <section id="boutiques-paysannes" className="px-4 pt-7">
-        <div className="mb-1 flex items-center justify-between"><h2 className="text-lg font-extrabold">Boutiques paysannes</h2><Link href="/boutiques/creer" className="text-xs font-medium">Vendre ici →</Link></div>
-        <p className="mb-3 text-xs text-brand-muted">Des produits frais, locaux et de qualité.</p>
+      <section id="boutiques-locales" className="px-4 pt-7">
+        <div className="mb-1"><h2 className="text-lg font-extrabold">Boutiques locales</h2></div>
+        <p className="mb-3 text-xs text-brand-muted">Découvre les vendeurs et leurs univers.</p>
         {shopsUnavailable ? (
           <div role="status" className="rounded-2xl border border-brand-border bg-brand-surface px-5 py-8 text-center">
             <h3 className="text-sm font-extrabold">Boutiques temporairement indisponibles</h3>
@@ -202,7 +202,7 @@ export default async function Home({ searchParams }: Props) {
         ) : (
           <div className="rounded-2xl border border-dashed border-brand-border bg-brand-surface px-5 py-8 text-center">
             <div aria-hidden="true" className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-bg text-2xl">🌾</div>
-            <h3 className="mt-3 text-sm font-extrabold">Les boutiques paysannes arrivent bientôt</h3>
+            <h3 className="mt-3 text-sm font-extrabold">Les boutiques locales arrivent bientôt</h3>
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">
               Les vitrines et les produits des vendeurs apparaîtront ici dès que leurs boutiques seront actives.
             </p>
@@ -225,23 +225,25 @@ export default async function Home({ searchParams }: Props) {
           <div className="rounded-xl border border-brand-border bg-brand-surface px-5 py-10 text-center">
             <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : unknownCategory ? "Cette catégorie n’est pas disponible pour le moment." : "Les premières annonces arrivent bientôt."}</p>
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">{term ? "Essaie un autre mot ou explore les catégories." : unknownCategory ? "Choisis une catégorie actuellement proposée par Revant." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
-            <Link href={unknownCategory ? "/categories" : "/boutiques/creer"} className="mt-4 inline-flex rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white">{unknownCategory ? "Explorer les catégories" : "Ouvrir une boutique"}</Link>
+            {unknownCategory && <Link href="/categories" className="mt-4 inline-flex rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white">Explorer les catégories</Link>}
           </div>
         ) : (
           <InfiniteProductFeed initialProducts={loadedProducts} category={categorie ?? ""} search={term ?? ""} />
         )}
       </main>
 
-      <section className="grid gap-3 px-4 pt-7 md:grid-cols-3">
+      <section className={`grid gap-3 px-4 pt-7 ${shops.length > 0 && !shopsUnavailable ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
         <Link href="#produits" className="relative flex min-h-32 items-end overflow-hidden rounded-xl bg-black p-5 text-white">
           <div className="absolute inset-0 bg-cover bg-center opacity-65" style={{ backgroundImage: `url("${HERO_PHOTO}")` }} /><div className="relative"><strong className="text-sm font-extrabold">NOUVEAUTÉS</strong><p className="mt-1 text-xs text-white/80">Explore les dernières annonces.</p><span className="mt-3 inline-block rounded bg-white px-3 py-2 text-[10px] font-bold text-black">VOIR LES PRODUITS →</span></div>
         </Link>
-        <Link href="#boutiques-paysannes" className="relative flex min-h-32 items-end overflow-hidden rounded-xl bg-black p-5 text-white">
+        <Link href="#boutiques-locales" className="relative flex min-h-32 items-end overflow-hidden rounded-xl bg-black p-5 text-white">
           <div className="absolute inset-0 bg-cover bg-center opacity-65" style={{ backgroundImage: `url("${FARM_PHOTOS[1].photo}")` }} /><div className="relative"><strong className="text-sm font-extrabold">ACHETER LOCAL</strong><p className="mt-1 text-xs text-white/80">Découvre les produits de nos régions.</p><span className="mt-3 inline-block rounded bg-white px-3 py-2 text-[10px] font-bold text-black">DÉCOUVRIR →</span></div>
         </Link>
-        <Link href="/boutiques/creer" className="relative flex min-h-32 items-end overflow-hidden rounded-xl bg-black p-5 text-white">
+        {shops.length > 0 && !shopsUnavailable && (
+          <Link href="/boutiques/creer" className="relative flex min-h-32 items-end overflow-hidden rounded-xl bg-black p-5 text-white">
           <div className="absolute inset-0 bg-cover bg-center opacity-65" style={{ backgroundImage: `url("${FARM_PHOTOS[0].photo}")` }} /><div className="relative"><strong className="text-sm font-extrabold">VENDS SUR REVANT</strong><p className="mt-1 text-xs text-white/80">Présente tes produits à de nouveaux clients.</p><span className="mt-3 inline-block rounded bg-white px-3 py-2 text-[10px] font-bold text-black">CRÉER MA BOUTIQUE →</span></div>
         </Link>
+        )}
       </section>
       <BottomNav />
     </div>
