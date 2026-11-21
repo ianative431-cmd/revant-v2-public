@@ -33,7 +33,7 @@ export default function BottomNav() {
       <Item href="/messages" label="Message" active={pathname === "/messages" || pathname.startsWith("/messages/")} icon={MessageCircle}/>
       <Item href="/wallet" label="Wallet" active={pathname === "/wallet" || pathname.startsWith("/wallet/")} icon={Wallet}/>
       <Item href="/panier" label="Panier" active={pathname === "/panier"} icon={ShoppingCart}/>
-      <Item href="/parametres" label="Mon Revante" active={pathname === "/parametres" || pathname.startsWith("/parametres/") || pathname === "/compte" || pathname.startsWith("/compte/")} icon={UserRound}/>
+      <Item href="/compte" label="Mon Revante" active={pathname === "/compte" || pathname.startsWith("/compte/") || pathname === "/parametres" || pathname.startsWith("/parametres/")} icon={UserRound}/>
     </nav>
   );
 }
