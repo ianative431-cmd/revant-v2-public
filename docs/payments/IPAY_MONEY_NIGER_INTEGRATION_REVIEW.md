@@ -4,9 +4,11 @@ Date de vérification : 21 novembre 2026
 Dépôt : `ianative431-cmd/revant-v2-public`  
 Statut : étude technique et commerciale, aucune activation de paiement.
 
-## Décision recommandée
+## Statut et décision de présélection
 
-**Passerelle principale à intégrer en premier : iMoney Encaissement (iFUTUR SA).**
+**iMoney Encaissement (iFUTUR SA) est un prestataire candidat à évaluer, et non un partenaire officiel de Revant.**
+
+Au 21 novembre 2026, aucun contrat signé, compte marchand Revant validé, mandat d'encaissement, accord de reversement ou partenariat officiel avec iFUTUR/iMoney n'a été établi dans les éléments vérifiés. Aucune intégration ne doit être présentée comme autorisée ou active. La couverture technique décrite ci-dessous justifie uniquement de poursuivre la vérification commerciale, juridique et technique.
 
 Le service est local au Niger et sa documentation officielle décrit les moyens suivants pour le marché nigérien :
 - Mobile Money : Airtel Niger, Moov Niger, Zamani Niger.
@@ -25,8 +27,12 @@ Sources officielles :
 
 ## Intégration API confirmée
 
+### Divergence de base URL à résoudre avant tout test
+
+Le code actuel de Revant (`src/server/integrations/ipay-money.mjs`) utilise `https://i-pay.money/api/v1`. Une ancienne documentation sandbox iPayMoney publiée sur GitBook indique également cet hôte. Cependant, la page officielle développeurs iFUTUR consultée le 21 novembre 2026 présente désormais un exemple avec `https://api.imoney.ne/v1/payments`. Ces références peuvent correspondre à des versions ou produits différents ; ne pas remplacer l'URL dans le code sur simple supposition. iFUTUR doit confirmer par écrit les bases URL Sandbox et Live, les versions maintenues, les chemins d'encaissement, de payout et de remboursement, ainsi que la migration éventuelle depuis `i-pay.money`.
+
 ### Authentification et environnements
-- Base URL : `https://i-pay.money/api/v1`.
+- Base URL utilisée par l'adaptateur existant : `https://i-pay.money/api/v1` (à confirmer ; la page développeurs officielle récente affiche aussi `https://api.imoney.ne/v1/payments`).
 - API REST JSON.
 - En-têtes communs : `Authorization: Bearer <secret>`, `Content-Type: application/json`, `Ipay-Target-Environment: sandbox|live`.
 - `POST /payments` exige `Ipay-Payment-Type: mobile`.
@@ -75,7 +81,7 @@ Les tests doivent couvrir succès, échec, montant invalide, référence dupliqu
 
 | Prestataire | Couverture Niger/XOF documentée | Conclusion |
 | --- | --- | --- |
-| iMoney Encaissement / iFUTUR | Airtel, Moov, Zamani, Amana, Nita, Visa/Mastercard/GIM UEMOA ; API et hosted checkout | Meilleure couverture locale confirmée ; choix principal à qualifier avec un compte marchand |
+| iMoney Encaissement / iFUTUR | Airtel, Moov, Zamani, Amana, Nita, Visa/Mastercard/GIM UEMOA ; API et hosted checkout | Couverture locale publiée intéressante ; candidat à qualifier, sans contrat ni sélection définitive |
 | Moneroo | Airtel Niger XOF listé pour encaissement ; la carte XOF listée ne couvre pas NE ; la liste des reversements ne liste pas de méthode Niger | Alternative possible pour Airtel Niger, mais couverture carte et reversements Niger insuffisamment adaptée |
 | Flutterwave | XOF et cartes présents, mais les réseaux Mobile Money francophones listés officiellement couvrent BF, CM, CI et SN, pas NE | Ne pas retenir comme voie principale pour Mobile Money au Niger sans confirmation écrite d'éligibilité du compte et des réseaux |
 
@@ -88,13 +94,13 @@ Sources comparatives :
 
 ## Reversements et frais : limites à ne pas confondre
 
-La documentation iMoney décrit les reversements dans le tableau de bord marchand, pas une API publique de création de reversement dans le contrat API v1 consulté.
+Les conditions marchandes décrivent les reversements classiques dans le tableau de bord. En complément, les pages officielles iFUTUR publiées pour les développeurs annoncent désormais des versements programmatiques et des remboursements par API, et la solution iMoney Cash Transfert annonce des paiements de masse via API. Toutefois, les pages publiques consultées ne suffisent pas à confirmer les endpoints exacts, les bénéficiaires autorisés, les règles de validation, ni la compatibilité avec des reversements marketplace vers des vendeurs tiers.
 - Les transactions réussies doivent avoir plus de trois jours pour être éligibles à une demande de reversement.
 - Modes indiqués : My NITA (1 %), Amana (1 %), virement bancaire (0 % dans la configuration décrite), compte PayOUT (0 % dans la configuration décrite).
 - Les frais effectifs dépendent du contrat marchand et des moyens activés.
 - Les conditions marchandes iMoney mentionnent un reversement au marchand sous cinq jours ouvrés maximum après clôture de la période de facturation, sous réserve des conditions contractuelles.
 
-**Conséquence pour Revant :** iMoney peut être la passerelle d'encaissement, mais ne remplace pas le ledger interne Revant ni le système de règlement automatique des vendeurs. La commission, le solde pending, le solde available, les remboursements, les litiges et les paiements aux vendeurs doivent rester pilotés par un ledger Revant auditable et par un contrat de reversement explicitement convenu.
+**Conséquence pour Revant :** si un contrat est conclu ultérieurement, iMoney pourrait être évalué pour l'encaissement et, sous réserve de validation des APIs, pour les versements. À ce jour, aucun partenariat n'est confirmé. L'existence d'une API de versement ne prouve pas qu'elle permet le split de paiement ou les reversements automatiques de sommes dues à des vendeurs tiers. Le prestataire ne remplace pas le ledger interne Revant. La commission, le solde pending, le solde available, les remboursements, les litiges et les paiements aux vendeurs doivent rester pilotés par un ledger Revant auditable et par un contrat de reversement explicitement convenu.
 
 ## État réel de Revant au moment du contrôle
 
