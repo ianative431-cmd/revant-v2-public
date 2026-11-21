@@ -85,7 +85,7 @@ export default async function ShopPublicPage({ params }: Props) {
   const whatsappDigits = whatsapp?.replace(/\D/g, "");
   const shopColor = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
     ? shop.background_color
-    : "#F46A18";
+    : "var(--brand-accent)";
   const socials = SOCIAL_NETWORKS.flatMap((network) => {
     const value = shop[network.key];
     const href = normalizeShopSocialUrl(value, network.key) ?? null;
@@ -154,7 +154,7 @@ export default async function ShopPublicPage({ params }: Props) {
                   {typeLabel && (
                     <span className="rounded-full bg-[var(--brand-bg)] px-3 py-1 text-[10px] font-bold text-[var(--brand-muted)]">{typeLabel}</span>
                   )}
-                  {isCertified && <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-3 py-1 text-[11px] font-bold text-white">✓ Boutique certifiée</span>}
+                  {isCertified && <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-600 px-3 py-1 text-[11px] font-bold text-white">✓ Boutique vérifiée</span>}
                 </div>
                 {location && (
                   <p className="mb-3 flex items-center gap-1.5 text-xs font-medium text-[var(--brand-muted)]">
@@ -166,18 +166,6 @@ export default async function ShopPublicPage({ params }: Props) {
                 )}
               </div>
 
-              <div className="flex shrink-0 flex-wrap gap-2">
-                {whatsappDigits && (
-                  <a href={`https://wa.me/${whatsappDigits}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#128C7E] px-5 text-xs font-extrabold text-white shadow-sm transition hover:bg-[#0d7569] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#128C7E]">
-                    WhatsApp <span aria-hidden="true">↗</span>
-                  </a>
-                )}
-                {phone && (
-                  <a href={`tel:${phone}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[var(--brand-border)] px-5 text-xs font-bold text-[var(--brand-text)] transition hover:bg-[var(--brand-bg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">
-                    Appeler
-                  </a>
-                )}
-              </div>
             </div>
           </div>
         </section>
@@ -185,7 +173,7 @@ export default async function ShopPublicPage({ params }: Props) {
         <nav aria-label="Navigation de la boutique" className="mt-4 flex items-center gap-1 overflow-x-auto rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] p-1.5 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <a href="#accueil" className="shrink-0 rounded-full bg-[var(--brand-accent)] px-4 py-2.5 text-[11px] font-extrabold text-white">Accueil boutique</a>
           <a href="#produits" className="shrink-0 rounded-full px-4 py-2.5 text-[11px] font-bold text-[var(--brand-muted)] transition hover:bg-[var(--brand-bg)] hover:text-[var(--brand-text)]">Produits ({products.length})</a>
-          <a href="#apropos" className="shrink-0 rounded-full px-4 py-2.5 text-[11px] font-bold text-[var(--brand-muted)] transition hover:bg-[var(--brand-bg)] hover:text-[var(--brand-text)]">À propos & contact</a>
+          <a href="#contact" className="shrink-0 rounded-full px-4 py-2.5 text-[11px] font-bold text-[var(--brand-muted)] transition hover:bg-[var(--brand-bg)] hover:text-[var(--brand-text)]">Contact & réseaux</a>
         </nav>
 
         <section id="produits" aria-labelledby="products-title" className="mt-5 scroll-mt-24 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:mt-7 sm:rounded-[30px] sm:p-7">
@@ -213,24 +201,11 @@ export default async function ShopPublicPage({ params }: Props) {
           )}
         </section>
 
-        <section id="apropos" aria-labelledby="about-title" className="mt-5 grid scroll-mt-24 gap-4 lg:mt-6 lg:grid-cols-[1.1fr_.9fr]">
-          <div className="rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:rounded-[30px] sm:p-7">
-            <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Découvrez le vendeur</p>
-            <h2 id="about-title" className="mt-1 text-xl font-black tracking-tight">À propos de la boutique</h2>
-            <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[var(--brand-muted)]">
-              {shop.description || "Retrouvez ici les informations et les produits publiés par cette boutique sur Revant."}
-            </p>
-            {location && (
-              <p className="mt-5 flex items-center gap-2 border-t border-[var(--brand-border)] pt-4 text-xs font-semibold text-[var(--brand-text)]">
-                <span aria-hidden="true">⌖</span>{location}
-              </p>
-            )}
-          </div>
-
+        <section id="contact" aria-labelledby="contact-title" className="mt-5 scroll-mt-24">
           <div className="rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:rounded-[30px] sm:p-7">
             <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Échangez avec le vendeur</p>
-            <h2 className="mt-1 text-xl font-black tracking-tight">Contact & réseaux</h2>
-            <div className="mt-4 grid gap-2">
+            <h2 id="contact-title" className="mt-1 text-xl font-black tracking-tight">Contact & réseaux</h2>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {phone && (
                 <a href={`tel:${phone}`} className="flex min-h-12 items-center justify-between rounded-2xl border border-[var(--brand-border)] px-4 text-xs font-semibold transition hover:border-[var(--brand-accent)]">
                   <span>Téléphone</span><span className="text-[var(--brand-muted)]">{phone}</span>

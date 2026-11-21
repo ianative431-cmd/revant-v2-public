@@ -50,7 +50,7 @@ export default async function ParametresPage() {
           </SettingsSection>
 
           <SettingsSection title="Sécurité">
-            <SettingsLink href="/mot-de-passe-oublie" label="Mot de passe" description="Modifier ou récupérer l’accès au compte" Icon={ShieldCheck} />
+            <SettingsLink href="/mot-de-passe-oublie" label="Mot de passe" description="Recevoir un lien de réinitialisation par e-mail" Icon={ShieldCheck} />
           </SettingsSection>
 
           <SettingsSection title="Préférences">

@@ -167,7 +167,7 @@ export default async function Home({ searchParams }: Props) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 {(certifiedShopIds.has(shop.id) || shop.is_premium) && (
                   <div className="absolute right-2 top-2 flex flex-col items-end gap-1.5">
-                    {certifiedShopIds.has(shop.id) && <span className="rounded-full bg-blue-600 px-2.5 py-1 text-[9px] font-extrabold text-white">✓ CERTIFIÉE</span>}
+                    {certifiedShopIds.has(shop.id) && <span className="rounded-full bg-violet-600 px-2.5 py-1 text-[9px] font-extrabold text-white">✓ BOUTIQUE VÉRIFIÉE</span>}
                     {shop.is_premium && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[9px] font-extrabold text-amber-900">PREMIUM</span>}
                   </div>
                 )}
