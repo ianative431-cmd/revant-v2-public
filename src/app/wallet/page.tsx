@@ -85,7 +85,7 @@ export default async function WalletPage({ searchParams }: Props) {
   const view = isSeller && params.vue === "acheteur" ? "acheteur" : isSeller ? "vendeur" : "acheteur";
   return (
     <div className="min-h-screen bg-brand-bg pb-32 text-brand-text">
-      <SiteHeader hideSearch/>
+      <SiteHeader/>
       <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:py-10">
         <header className="mb-6"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-brand-accent">REVANT</p><h1 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">Wallet</h1><p className="mt-2 max-w-xl text-sm leading-relaxed text-brand-muted">{view === "vendeur" ? "Suis les revenus de ta boutique et les mouvements de ton solde." : "Gère tes cartes et tes moyens de paiement en un seul endroit."}</p></header>
         {isSeller && <div className="mb-5 flex flex-wrap gap-2" aria-label="Type de wallet"><WalletTab href="/wallet?vue=acheteur" active={view === "acheteur"}>Acheteur</WalletTab><WalletTab href="/wallet?vue=vendeur" active={view === "vendeur"}>Vendeur</WalletTab></div>}

@@ -1,12 +1,12 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
-import { Search, UserRound, ShoppingBag, Menu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Menu, Search } from "lucide-react";
 import PhotoActionMenu from "./PhotoActionMenu";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const iconProps = { size: 20, strokeWidth: 1.65, "aria-hidden": true as const };
-
-const quickLinks = [
+type QuickLink = { href: string; label: string };
+const quickLinks: QuickLink[] = [
   { href: "/boutiques", label: "Toutes les boutiques" },
   { href: "/#categories", label: "Catégories Revant Mega" },
   { href: "/restaurants", label: "Restaurants" },
@@ -15,74 +15,50 @@ const quickLinks = [
   { href: "/parametres", label: "Paramètres" },
 ];
 
-export default async function SiteHeader({ hideSearch = false }: { hideSearch?: boolean }) {
-  let allowAdd = false;
-  try {
-    const supabase = await createSupabaseServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    allowAdd = Boolean(user);
-  } catch {
-    allowAdd = false;
-  }
+export default function SiteHeader({ hideSearch = false }: { hideSearch?: boolean }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [allowAdd, setAllowAdd] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/auth/session", { credentials: "same-origin", cache: "no-store" })
+      .then((response) => response.ok ? response.json() : null)
+      .then((session) => { if (active) setAllowAdd(Boolean(session?.user)); })
+      .catch(() => { if (active) setAllowAdd(false); });
+    return () => { active = false; };
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--brand-header)] text-[var(--brand-header-text)] shadow-sm">
-      <div className="mx-auto flex h-12 min-h-12 max-w-[1500px] items-center justify-between gap-2 px-3 sm:h-14 sm:min-h-14 sm:px-7">
-        <div className="flex shrink-0 items-center gap-2">
-          <details className="relative md:hidden">
-            <summary aria-label="Ouvrir le menu principal" className="flex min-h-10 min-w-10 list-none cursor-pointer items-center justify-center rounded-xl hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
-              <Menu {...iconProps} size={23} />
-            </summary>
-            <nav aria-label="Menu principal" className="absolute left-0 top-12 z-50 w-64 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-header)] p-2 text-sm text-[var(--brand-header-text)] shadow-2xl">
-              <p className="px-3 pb-2 pt-3 text-[10px] font-bold uppercase tracking-[.18em] opacity-60">Explorer Revant</p>
-              {quickLinks.map((item) => (
-                <Link key={item.href + item.label} href={item.href} className="block rounded-xl px-3 py-3 font-medium hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </details>
-          <Link href="/" aria-label="Revant — accueil" className="inline-flex shrink-0 items-center gap-2 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl"><Image src="/images/logo-revant-officiel-512.png?v=20261121-carton-complet" alt="" width={56} height={56} priority unoptimized className="h-14 w-14 !max-w-none object-contain" /></span>
-            <span className="text-sm font-semibold tracking-tight sm:text-base">Revant</span>
-          </Link>
-        </div>
-
-        <nav aria-label="Navigation principale" className="hidden items-center gap-5 text-xs font-semibold md:flex lg:gap-7">
-          <Link href="/" className="hover:text-white/75">Accueil</Link>
-          <Link href="/boutiques" className="hover:text-white/75">Boutiques</Link>
-          <Link href="/#categories" className="hover:text-white/75">Catégories</Link>
-          <Link href="/restaurants" className="hover:text-white/75">Restaurants</Link>
-          <Link href="/#a-propos" className="hover:text-white/75">À propos</Link>
-        </nav>
-
-        <div className="flex items-center gap-1 sm:gap-2">
-          {!hideSearch && (
-            <form action="/" method="get" role="search" className="hidden items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-md sm:flex">
-              <Search {...iconProps} />
-              <input name="q" aria-label="Rechercher des produits" placeholder="Rechercher" className="w-24 bg-transparent text-xs text-white outline-none placeholder:text-white/60 sm:w-32" />
-              <PhotoActionMenu allowAdd={allowAdd} />
-            </form>
-          )}
-          <Link href="/compte" aria-label="Mon compte" className="flex min-h-10 min-w-10 items-center justify-center rounded-full hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
-            <UserRound {...iconProps} />
-          </Link>
-          <Link href="/panier" aria-label="Mon panier" className="flex min-h-10 min-w-10 items-center justify-center rounded-full hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
-            <ShoppingBag {...iconProps} />
-          </Link>
-        </div>
+    <div className="pointer-events-none fixed inset-x-0 top-3 z-[70] flex items-start justify-center px-3" aria-label="Commandes flottantes Revant">
+      <div className="pointer-events-auto absolute left-3 top-0">
+        <button
+          type="button"
+          aria-label={menuOpen ? "Fermer le menu principal" : "Ouvrir le menu principal"}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-brand-border bg-brand-surface/95 text-brand-text shadow-lg backdrop-blur-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent"
+        >
+          <Menu size={22} strokeWidth={1.8} aria-hidden />
+        </button>
+        {menuOpen && (
+          <nav aria-label="Menu principal" className="absolute left-0 top-14 w-64 rounded-2xl border border-brand-border bg-brand-surface p-2 text-sm text-brand-text shadow-2xl backdrop-blur-xl">
+            <p className="px-3 pb-2 pt-3 text-[10px] font-bold uppercase tracking-[.18em] text-brand-muted">Explorer Revant</p>
+            {quickLinks.map((item) => (
+              <Link key={item.href + item.label} href={item.href} onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-3 font-medium hover:bg-brand-bg focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent">
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        )}
       </div>
 
       {!hideSearch && (
-        <div className="px-3 pb-1 sm:hidden">
-          <form action="/" method="get" role="search" className="flex h-10 min-h-10 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-white shadow-sm backdrop-blur-md focus-within:ring-2 focus-within:ring-[var(--brand-accent)]">
-            <Search {...iconProps} />
-            <input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="h-full min-h-0 min-w-0 flex-1 bg-transparent py-0 text-sm text-white outline-none placeholder:text-white/60" />
-            <PhotoActionMenu allowAdd={allowAdd} />
-            <button type="submit" aria-label="Lancer la recherche" className="h-8 shrink-0 rounded-full bg-[var(--brand-accent)] px-3 text-xs font-bold text-white">OK</button>
-          </form>
-        </div>
+        <form action="/" method="get" role="search" className="pointer-events-auto flex h-11 w-[calc(100%-76px)] max-w-[560px] items-center gap-2 rounded-full border border-brand-border bg-brand-surface/95 px-3 text-brand-text shadow-lg backdrop-blur-xl focus-within:border-brand-accent focus-within:ring-2 focus-within:ring-brand-accent/20">
+          <Search size={19} strokeWidth={1.8} className="shrink-0 text-brand-muted" aria-hidden />
+          <input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher…" className="h-full min-w-0 flex-1 bg-transparent text-sm text-brand-text outline-none placeholder:text-brand-muted" />
+          <PhotoActionMenu allowAdd={allowAdd} />
+        </form>
       )}
-    </header>
+    </div>
   );
 }

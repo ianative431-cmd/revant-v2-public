@@ -45,3 +45,9 @@
 ## 01:01 UTC — récupération des logs GitHub Actions
 - Le téléchargement des logs du job `131610798706` avant la fin du job a renvoyé HTTP 404 `BlobNotFound`.
 - Le suivi du job par l'API des étapes a ensuite confirmé la réussite complète de l'installation, de l'audit de production à sévérité modérée, d'ESLint, des tests Node et du build. Aucun échec du code n'a été constaté.
+
+
+## 13:45 UTC — création de branche via connexion GitHub directe refusée
+- Tentative de création de la branche `fix/floating-header-remove-banner-20261121` via l'outil GitHub direct : HTTP 403 `Resource not accessible by integration`.
+- Aucun fichier, branche ou commit n'a été modifié par cette tentative échouée.
+- Reprise via la connexion GitHub d'écriture Revant déjà autorisée ; la branche a ensuite été créée à partir du commit `76ada9d877ab6173bf5f3fc45ac3b9b30393e590`.
