@@ -1,0 +1,50 @@
+name: Build Revant Android debug APK
+
+on:
+  push:
+    branches:
+      - fix/capacitor-google-oauth-pkce
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Capacitor wrapper dependencies
+        working-directory: android-apps/revant
+        run: npm ci
+      - name: Generate Android project and sync plugins
+        working-directory: android-apps/revant
+        run: |
+          npx cap add android
+          npx cap sync android
+          grep -q "ne.revant.marketplace" android/app/src/main/res/values/strings.xml
+          grep -q "@string/custom_url_scheme" android/app/src/main/AndroidManifest.xml
+      - name: Build debug APK
+        working-directory: android-apps/revant/android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: revant-android-debug
+          path: android-apps/revant/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14

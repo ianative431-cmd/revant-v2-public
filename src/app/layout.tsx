@@ -6,6 +6,7 @@ import GlobalDismissibleDetails from "@/components/layout/GlobalDismissibleDetai
 import CookieConsentBanner from "@/components/cookie-consent/CookieConsentBanner";
 import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
 import NativePushRegistration from "@/components/native/NativePushRegistration";
+import NativeOAuthCallbackHandler from "@/components/auth/NativeOAuthCallbackHandler";
 import LaunchExperience from "@/components/pwa/LaunchExperience";
 import { getSitePalette } from "@/server/theme/site-palette";
 
@@ -47,6 +48,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <GlobalDismissibleDetails />
         <ServiceWorkerRegister />
         <NativePushRegistration />
+        <NativeOAuthCallbackHandler />
         <LaunchExperience />
         <div className="flex-1 flex flex-col">{children}</div>
         <Footer />
