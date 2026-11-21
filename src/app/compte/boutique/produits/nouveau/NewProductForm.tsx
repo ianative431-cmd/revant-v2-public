@@ -12,6 +12,7 @@ import {
 } from "@/lib/product-image";
 import type { Category } from "@/server/catalog/categories";
 import { consumePendingProductImage } from "@/lib/pending-product-image";
+import ProductPhotoStudio from "@/components/products/ProductPhotoStudio";
 
 const MAX_PRODUCT_IMAGES = 5;
 
@@ -48,6 +49,7 @@ export default function NewProductForm({
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const previewUrlsRef = useRef<string[]>([]);
   const [status, setStatus] = useState<Status>("idle");
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
@@ -133,6 +135,17 @@ export default function NewProductForm({
       setPreviewUrls((current) => [...current, ...newPreviewUrls].slice(0, MAX_PRODUCT_IMAGES));
       setStatus("idle");
     }
+  }
+
+  function applyEditedPhoto(index: number, edited: File) {
+    const oldUrl = previewUrls[index];
+    if (oldUrl) URL.revokeObjectURL(oldUrl);
+    const nextUrl = URL.createObjectURL(edited);
+    previewUrlsRef.current = previewUrlsRef.current.map((url, i) => i === index ? nextUrl : url);
+    setFiles((current) => current.map((file, i) => i === index ? edited : file));
+    setPreviewUrls((current) => current.map((url, i) => i === index ? nextUrl : url));
+    setEditingIndex(null);
+    setStatus("idle");
   }
 
   function removeImage(index: number) {
@@ -274,22 +287,15 @@ export default function NewProductForm({
             <div key={url} className="relative aspect-square overflow-hidden rounded-xl bg-neutral-100">
               {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local (blob URL) */}
               <img src={url} alt={"Aperçu photo " + (index + 1)} className="h-full w-full object-cover" />
-              <button
-                type="button"
-                onClick={() => removeImage(index)}
-                aria-label={"Retirer la photo " + (index + 1)}
-                className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-sm text-white"
-              >
-                ×
-              </button>
-              {index === 0 && (
-                <span className="absolute bottom-1 left-1 rounded bg-black/70 px-2 py-1 text-[10px] text-white">
-                  Principale
-                </span>
-              )}
+              <button type="button" onClick={() => removeImage(index)} aria-label={"Retirer la photo " + (index + 1)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-sm text-white">×</button>
+              <button type="button" onClick={() => setEditingIndex(index)} className="absolute bottom-1 right-1 rounded-full bg-white/95 px-2 py-1 text-[10px] font-semibold text-black">Améliorer</button>
+              {index === 0 && <span className="absolute bottom-1 left-1 rounded bg-black/70 px-2 py-1 text-[10px] text-white">Principale</span>}
             </div>
           ))}
         </div>
+      )}
+      {editingIndex !== null && files[editingIndex] && (
+        <ProductPhotoStudio file={files[editingIndex]} onApply={(edited) => applyEditedPhoto(editingIndex, edited)} onCancel={() => setEditingIndex(null)} />
       )}
 
       <input
