@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import BottomNav from "@/components/layout/BottomNav";
 import SiteHeader from "@/components/layout/SiteHeader";
+import SettingsExperienceControls from "@/components/layout/SettingsExperienceControls";
 import { getSitePalette } from "@/server/theme/site-palette";
 
 function SettingsSection({ title, children }: { title: string; children: ReactNode }) {
