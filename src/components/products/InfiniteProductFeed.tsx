@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import type { Product } from "@/types/product";
+import { safeProductImageUrl } from "@/lib/product-image";
 
 type FeedResponse = { products: Product[]; hasMore: boolean };
 
@@ -22,6 +23,47 @@ export default function InfiniteProductFeed({
   const sentinel = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
 
+  useEffect(() => {
+    if (category || search || initialProducts.length === 0 || !("serviceWorker" in navigator)) return;
+    let cancelled = false;
+    const seedCatalogue = async () => {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        if (cancelled) return;
+        const worker = registration.active ?? navigator.serviceWorker.controller;
+        if (!worker) return;
+        let storageOrigin = "";
+        try {
+          const configuredStorage = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          if (configuredStorage) storageOrigin = new URL(configuredStorage).origin;
+        } catch {
+          storageOrigin = "";
+        }
+        const publicProducts = initialProducts.slice(0, 12).map((product) => ({
+          id: product.id,
+          name: product.name,
+          price: product.base_price,
+          currency: product.currency,
+          stock: product.stock_quantity,
+          category: product.categoryName ?? "",
+          image: safeProductImageUrl(product.images[0]) ?? "",
+        }));
+        worker.postMessage({
+          type: "REVANT_CACHE_PUBLIC_CATALOGUE",
+          savedAt: Date.now(),
+          storageOrigin,
+          products: publicProducts,
+        });
+      } catch {
+        // Offline caching is an enhancement; it must never interrupt the live feed.
+      }
+    };
+    void seedCatalogue();
+    return () => {
+      cancelled = true;
+    };
+  }, [category, initialProducts, search]);
+
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore) return;
     loadingRef.current = true;
@@ -34,7 +76,7 @@ export default function InfiniteProductFeed({
       });
       if (category) params.set("categorie", category);
       if (search) params.set("q", search);
-      const response = await fetch(`/api/products/feed?${params.toString()}`, {
+      const response = await fetch("/api/products/feed?" + params.toString(), {
         method: "GET",
         headers: { Accept: "application/json" },
         cache: "no-store",
