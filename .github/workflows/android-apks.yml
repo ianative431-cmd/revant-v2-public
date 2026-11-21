@@ -50,9 +50,12 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Install Capacitor dependencies
+      - name: Install locked Capacitor dependencies
         working-directory: ${{ matrix.app.directory }}
-        run: npm install
+        run: npm ci
+      - name: Audit Android build dependencies
+        working-directory: ${{ matrix.app.directory }}
+        run: npm audit --audit-level=high
       - name: Generate Android project
         working-directory: ${{ matrix.app.directory }}
         run: npx cap add android
