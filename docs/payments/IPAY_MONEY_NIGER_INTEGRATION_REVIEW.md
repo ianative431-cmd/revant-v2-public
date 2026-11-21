@@ -90,13 +90,13 @@ Sources comparatives :
 
 ## Reversements et frais : limites à ne pas confondre
 
-La documentation iMoney décrit les reversements dans le tableau de bord marchand, pas une API publique de création de reversement dans le contrat API v1 consulté.
+Les conditions marchandes décrivent les reversements classiques dans le tableau de bord. En complément, les pages officielles iFUTUR publiées pour les développeurs annoncent désormais des versements programmatiques et des remboursements par API, et la solution iMoney Cash Transfert annonce des paiements de masse via API. Toutefois, les pages publiques consultées ne suffisent pas à confirmer les endpoints exacts, les bénéficiaires autorisés, les règles de validation, ni la compatibilité avec des reversements marketplace vers des vendeurs tiers.
 - Les transactions réussies doivent avoir plus de trois jours pour être éligibles à une demande de reversement.
 - Modes indiqués : My NITA (1 %), Amana (1 %), virement bancaire (0 % dans la configuration décrite), compte PayOUT (0 % dans la configuration décrite).
 - Les frais effectifs dépendent du contrat marchand et des moyens activés.
 - Les conditions marchandes iMoney mentionnent un reversement au marchand sous cinq jours ouvrés maximum après clôture de la période de facturation, sous réserve des conditions contractuelles.
 
-**Conséquence pour Revant :** si un contrat est conclu ultérieurement, iMoney pourrait servir de passerelle d'encaissement. À ce jour, aucun partenariat n'est confirmé. Le prestataire ne remplace pas le ledger interne Revant ni le système de règlement des vendeurs. La commission, le solde pending, le solde available, les remboursements, les litiges et les paiements aux vendeurs doivent rester pilotés par un ledger Revant auditable et par un contrat de reversement explicitement convenu.
+**Conséquence pour Revant :** si un contrat est conclu ultérieurement, iMoney pourrait être évalué pour l'encaissement et, sous réserve de validation des APIs, pour les versements. À ce jour, aucun partenariat n'est confirmé. L'existence d'une API de versement ne prouve pas qu'elle permet le split de paiement ou les reversements automatiques de sommes dues à des vendeurs tiers. Le prestataire ne remplace pas le ledger interne Revant. La commission, le solde pending, le solde available, les remboursements, les litiges et les paiements aux vendeurs doivent rester pilotés par un ledger Revant auditable et par un contrat de reversement explicitement convenu.
 
 ## État réel de Revant au moment du contrôle
 
