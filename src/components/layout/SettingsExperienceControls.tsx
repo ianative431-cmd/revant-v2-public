@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Moon, Sun } from "lucide-react";
+import { Check, Moon, Sun, Zap } from "lucide-react";
 import PaletteSwitcher from "@/components/layout/PaletteSwitcher";
 import type { SitePaletteId } from "@/content/theme/site-palette";
 
@@ -20,13 +20,7 @@ function applySettings(settings: Settings) {
   root.dataset.revantText = settings.text;
 }
 
-export default function SettingsExperienceControls({
-  mode,
-  currentPalette,
-}: {
-  mode: "appearance" | "interactions";
-  currentPalette: SitePaletteId;
-}) {
+export default function SettingsExperienceControls({ mode, currentPalette }: { mode: "appearance" | "interactions"; currentPalette: SitePaletteId }) {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [ready, setReady] = useState(false);
 
@@ -42,12 +36,8 @@ export default function SettingsExperienceControls({
         };
         setSettings(next);
         applySettings(next);
-      } else {
-        applySettings(DEFAULTS);
-      }
-    } catch {
-      applySettings(DEFAULTS);
-    }
+      } else applySettings(DEFAULTS);
+    } catch { applySettings(DEFAULTS); }
     setReady(true);
   }, []);
 
@@ -60,9 +50,7 @@ export default function SettingsExperienceControls({
     });
   }
 
-  if (!ready) {
-    return <div className="border-t border-brand-border px-4 py-4 text-xs text-brand-muted" aria-live="polite">Chargement des préférences…</div>;
-  }
+  if (!ready) return <div className="border-t border-brand-border px-4 py-4 text-xs text-brand-muted" aria-live="polite">Chargement des préférences…</div>;
 
   if (mode === "appearance") {
     return (
