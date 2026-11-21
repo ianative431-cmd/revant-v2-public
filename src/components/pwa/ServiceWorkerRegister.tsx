@@ -75,13 +75,13 @@ export default function ServiceWorkerRegister() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed inset-x-3 bottom-3 z-[100] mx-auto flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-white/20 bg-[#1f1d20] px-4 py-3 text-sm text-white shadow-2xl"
+      className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom,0px)+84px)] z-[80] mx-auto flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-white/20 bg-[#1f1d20] px-4 py-3 text-sm text-white shadow-2xl"
     >
-      <span>Une nouvelle version de Revant est disponible.</span>
+      <span className="min-w-0">Une nouvelle version de Revant est disponible.</span>
       <button
         type="button"
         onClick={() => window.location.reload()}
-        className="shrink-0 rounded-xl bg-white px-3 py-2 font-semibold text-[#1f1d20]"
+        className="shrink-0 rounded-xl bg-brand-accent px-3 py-2 font-semibold text-white"
       >
         Actualiser
       </button>

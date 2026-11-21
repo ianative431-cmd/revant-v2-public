@@ -86,7 +86,7 @@ export default function GoogleSignInButton({ nextPath = "/compte", variant = "li
   }
 
   const buttonClass = variant === "dark"
-    ? "w-full rounded-full border border-white/20 bg-white px-5 py-3 text-sm font-semibold text-[#0B0B10] disabled:opacity-50"
+    ? "w-full rounded-full border border-white/20 bg-[#ffffff] px-5 py-3 text-sm font-semibold text-[#0B0B10] disabled:opacity-50"
     : "w-full rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm disabled:opacity-50";
 
   return (
