@@ -2,7 +2,20 @@
   "name": "revant-android",
   "version": "1.0.0",
   "private": true,
-  "scripts": {"sync": "cap sync android", "build:debug": "cap sync android && cd android && ./gradlew assembleDebug"},
-  "dependencies": {"@capacitor/core": "7.4.3", "@capacitor/android": "7.4.3"},
-  "devDependencies": {"@capacitor/cli": "7.4.3", "typescript": "^5.8.3"}
+  "scripts": {
+    "sync": "cap sync android",
+    "build:debug": "cap add android && cap sync android && npm run configure:deep-link && cd android && ./gradlew assembleDebug",
+    "add:android": "cap add android",
+    "configure:deep-link": "node scripts/configure-deep-link.mjs"
+  },
+  "dependencies": {
+    "@capacitor/core": "8.6.2",
+    "@capacitor/android": "8.6.2",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/browser": "8.0.5"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.2",
+    "typescript": "^5.8.3"
+  }
 }

@@ -4,13 +4,16 @@ import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type Props = {
-  nextPath?: "/compte" | "/compte/boutique" | "/admin";
+  nextPath?: "/compte" | "/compte/boutique";
   variant?: "light" | "dark";
 };
 
+const NATIVE_CALLBACK_SCHEME = "ne.revant.marketplace://auth/callback";
+
 /**
- * Google OAuth uses Supabase Auth + PKCE. The callback performs the
- * server-side code exchange; /admin is protected again by a database role check.
+ * Web uses the regular HTTPS callback. Capacitor opens Google in a system
+ * Custom Tab and returns to the same WebView through a registered app link,
+ * so Supabase PKCE is exchanged where its verifier cookie was created.
  */
 export default function GoogleSignInButton({ nextPath = "/compte", variant = "light" }: Props) {
   const [pending, setPending] = useState(false);
@@ -22,6 +25,45 @@ export default function GoogleSignInButton({ nextPath = "/compte", variant = "li
 
     try {
       const supabase = createSupabaseBrowserClient();
+      const { Capacitor } = await import("@capacitor/core");
+
+      if (Capacitor.isNativePlatform()) {
+        const { Browser } = await import("@capacitor/browser");
+        let browserFinished: { remove: () => Promise<void> } | null = null;
+        browserFinished = await Browser.addListener("browserFinished", () => {
+          setPending(false);
+          void browserFinished?.remove();
+        });
+
+        const callback = new URL(NATIVE_CALLBACK_SCHEME);
+        callback.searchParams.set("next", nextPath);
+
+        const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: callback.toString(),
+            skipBrowserRedirect: true,
+            queryParams: { prompt: "select_account" },
+          },
+        });
+
+        if (oauthError || !data.url) {
+          await browserFinished?.remove();
+          setError("La connexion Google native n'a pas pu démarrer. Vérifie l'autorisation du lien de retour dans Supabase.");
+          setPending(false);
+          return;
+        }
+
+        try {
+          await Browser.open({ url: data.url });
+        } catch {
+          await browserFinished?.remove();
+          setError("Le navigateur sécurisé de connexion n'est pas disponible. Mets à jour l'application Revant.");
+          setPending(false);
+        }
+        return;
+      }
+
       const callback = new URL("/auth/callback", window.location.origin);
       callback.searchParams.set("next", nextPath);
 
@@ -38,7 +80,7 @@ export default function GoogleSignInButton({ nextPath = "/compte", variant = "li
         setPending(false);
       }
     } catch {
-      setError("Connexion Google indisponible. Réessaie dans quelques instants.");
+      setError("Connexion Google indisponible. Mets à jour l'application si tu utilises Revant sur Android.");
       setPending(false);
     }
   }
