@@ -1,13 +1,14 @@
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
+import type { LucideIcon, ReactNode } from "lucide-react";
 import {
-  Bell, ChevronRight, CircleHelp, Eye, Globe2, Info, LockKeyhole,
-  Palette, ShieldCheck, Smartphone, UserRound, Zap,
+  Bell, ChevronRight, CircleHelp, Globe2, Info, LockKeyhole,
+  Palette, ShieldCheck, UserRound, Zap,
 } from "lucide-react";
 import BottomNav from "@/components/layout/BottomNav";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SettingsSearch from "@/components/layout/SettingsSearch";
 import SettingsExperienceControls from "@/components/layout/SettingsExperienceControls";
+import { getSitePalette } from "@/server/theme/site-palette";
 
 type SettingsItem = {
   href: string;
@@ -62,7 +63,7 @@ function SettingsRow({ item }: { item: SettingsItem }) {
   );
 }
 
-function SettingsSection({ title, id, children }: { title: string; id: string; children: React.ReactNode }) {
+function SettingsSection({ title, id, children }: { title: string; id: string; children: ReactNode }) {
   return (
     <section id={id} aria-labelledby={id + "-title"} className="scroll-mt-24">
       <h2 id={id + "-title"} className="mb-2 px-1 text-xs font-bold uppercase tracking-[0.14em] text-brand-muted">{title}</h2>
@@ -71,7 +72,8 @@ function SettingsSection({ title, id, children }: { title: string; id: string; c
   );
 }
 
-export default function ParametresPage() {
+export default async function ParametresPage() {
+  const palette = await getSitePalette();
   const searchEntries = GROUPS.flatMap((group) =>
     group.items.map(({ href, label, description }) => ({ href, label, description, group: group.title })),
   );
@@ -108,12 +110,12 @@ export default function ParametresPage() {
 
           <SettingsSection title="Apparence" id="apparence">
             <SettingsRow item={GROUPS[3].items[0]} />
-            <SettingsExperienceControls mode="appearance" />
+            <SettingsExperienceControls mode="appearance" currentPalette={palette} />
           </SettingsSection>
 
           <SettingsSection title="Affichage et interactions" id="interactions">
             <SettingsRow item={GROUPS[4].items[0]} />
-            <SettingsExperienceControls mode="interactions" />
+            <SettingsExperienceControls mode="interactions" currentPalette={palette} />
           </SettingsSection>
 
           <SettingsSection title="Langue et région" id="langue-region">

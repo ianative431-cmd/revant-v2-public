@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Check, Moon, Sun } from "lucide-react";
 import PaletteSwitcher from "@/components/layout/PaletteSwitcher";
+import type { SitePaletteId } from "@/content/theme/site-palette";
 
 type MotionMode = "ultra" | "reduced";
 type GlassLevel = "subtle" | "balanced" | "strong";
@@ -19,7 +20,13 @@ function applySettings(settings: Settings) {
   root.dataset.revantText = settings.text;
 }
 
-export default function SettingsExperienceControls({ mode }: { mode: "appearance" | "interactions" }) {
+export default function SettingsExperienceControls({
+  mode,
+  currentPalette,
+}: {
+  mode: "appearance" | "interactions";
+  currentPalette: SitePaletteId;
+}) {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [ready, setReady] = useState(false);
 
@@ -62,7 +69,7 @@ export default function SettingsExperienceControls({ mode }: { mode: "appearance
       <div className="space-y-4 border-t border-brand-border p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div><p className="text-sm font-semibold">Thème Revant</p><p className="mt-1 text-xs text-brand-muted">Clair ou sombre, selon votre préférence.</p></div>
-          <PaletteSwitcher current="terracotta" />
+          <PaletteSwitcher current={currentPalette} />
         </div>
         <fieldset>
           <legend className="text-sm font-semibold">Intensité Liquid Glass</legend>
@@ -86,7 +93,7 @@ export default function SettingsExperienceControls({ mode }: { mode: "appearance
         <legend className="text-sm font-semibold">Réactivité et animations</legend>
         <p className="mt-1 text-xs text-brand-muted">Le profil ultra-rapide privilégie le retour immédiat. Les transitions interactives restent plafonnées à 120 ms.</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <button type="button" aria-pressed={settings.motion === "ultra"} onClick={() => update("motion", "ultra")} className="flex min-h-11 items-center justify-center gap-1 rounded-xl border border-brand-border px-3 text-xs font-semibold aria-pressed:border-brand-accent aria-pressed:bg-brand-accent/10"><Sun size={14}/> Ultra-rapide</button>
+          <button type="button" aria-pressed={settings.motion === "ultra"} onClick={() => update("motion", "ultra")} className="flex min-h-11 items-center justify-center gap-1 rounded-xl border border-brand-border px-3 text-xs font-semibold aria-pressed:border-brand-accent aria-pressed:bg-brand-accent/10"><Zap size={14}/> Ultra-rapide</button>
           <button type="button" aria-pressed={settings.motion === "reduced"} onClick={() => update("motion", "reduced")} className="flex min-h-11 items-center justify-center gap-1 rounded-xl border border-brand-border px-3 text-xs font-semibold aria-pressed:border-brand-accent aria-pressed:bg-brand-accent/10"><Moon size={14}/> Minimal</button>
         </div>
       </fieldset>

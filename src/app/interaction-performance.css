@@ -1,58 +1,99 @@
 /*
- * Revant motion system — ultra-fast interaction feedback.
- * Common interactive transitions are capped at 120ms.
+ * Revant motion system — preserve the existing marketplace motion hooks.
+ * Interaction feedback is immediate; common transitions are capped at 120ms.
  * Reduced-motion preferences from the operating system always win.
  */
 :root {
-  --revant-motion-fast: 55ms;
-  --revant-motion-normal: 100ms;
+  --revant-motion-scale: 0.25;
+  --revant-motion-fast: 25ms;
+  --revant-motion-normal: 50ms;
   --revant-motion-ease: cubic-bezier(0.2, 0.7, 0.25, 1);
 }
 
+/* Immediate touch feedback. */
 a, button, [role="button"], summary {
-  transition-duration: 100ms !important;
+  transition-duration: 25ms !important;
   transition-timing-function: var(--revant-motion-ease);
   touch-action: manipulation;
 }
 
 button:active, [role="button"]:active, summary:active, a:active {
-  transition-duration: 35ms !important;
+  transition-duration: 15ms !important;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .revant-settings-row {
-    transition: background-color 90ms var(--revant-motion-ease), border-color 90ms var(--revant-motion-ease);
+  main > section, main > div, body > div > div > section, body > div > div > main {
+    animation-duration: 45ms !important;
+    animation-delay: 0ms !important;
   }
-
-  .revant-settings-page .revant-settings-glass {
-    background: color-mix(in srgb, var(--brand-surface) 88%, transparent);
-    border-color: color-mix(in srgb, var(--brand-border) 82%, transparent);
-    backdrop-filter: blur(var(--revant-settings-glass-blur, 8px)) saturate(1.12);
-    -webkit-backdrop-filter: blur(var(--revant-settings-glass-blur, 8px)) saturate(1.12);
+  section .grid > *, main .grid > *, [class*="grid-cols"] > * {
+    animation-duration: 37.5ms !important;
+    animation-delay: 0ms !important;
   }
-
-  html[data-revant-motion="reduced"] a,
-  html[data-revant-motion="reduced"] button,
-  html[data-revant-motion="reduced"] [role="button"],
-  html[data-revant-motion="reduced"] summary {
-    transition-duration: 0.01ms !important;
+  section img, main img, [role="img"] {
+    animation-duration: 45ms !important;
+    animation-delay: 0ms !important;
   }
+  header, .revant-card, details[open] > nav, .revant-cart-added, .revant-nav-item > span:first-child {
+    animation-duration: 37.5ms !important;
+    animation-delay: 0ms !important;
+  }
+  .revant-card-media img { transition-duration: 35ms !important; }
+  .revant-hero-copy { animation-duration: 162.5ms !important; }
+  .revant-hero-slide.is-active { animation-duration: 1.625s !important; }
+  .revant-shortcut, .revant-shortcut-icon { transition-duration: 60ms !important; }
+  .revant-product-card { transition-duration: 65ms !important; }
+  .revant-settings-row { transition-duration: 50ms !important; }
+  .revant-toast { animation-duration: 55ms !important; }
+  .revant-skeleton { animation-duration: 337.5ms !important; }
+  .revant-cart-added { animation-duration: 90ms !important; }
+  .revant-nav-item > span:first-child { transition-duration: 45ms !important; }
+}
 
+/* Keep palette switching fast without changing the palette itself. */
+html[data-site-palette] body,
+html[data-site-palette] body :where(
+  header, footer, nav, main, section, article, aside,
+  button, a, input, select, textarea,
+  [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]
+) {
+  transition-duration: 60ms !important;
+}
+
+@media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
+  html[data-site-palette] body :where(
+    header, footer, nav, main, section, article, aside,
+    button, a, input, select, textarea,
+    [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]
+  ) {
+    transition-duration: 25ms !important;
+  }
+  .revant-hero-copy { animation-duration: 45ms !important; filter: none !important; }
+  .revant-settings-row:hover { transform: none; }
+}
+
+/* Liquid Glass is intentionally scoped to settings surfaces only. */
+.revant-settings-page .revant-settings-glass {
+  background: color-mix(in srgb, var(--brand-surface) 88%, transparent);
+  border-color: color-mix(in srgb, var(--brand-border) 82%, transparent);
+  backdrop-filter: blur(var(--revant-settings-glass-blur, 6px)) saturate(1.12);
+  -webkit-backdrop-filter: blur(var(--revant-settings-glass-blur, 6px)) saturate(1.12);
+}
+html[data-revant-glass="subtle"] { --revant-settings-glass-blur: 6px; }
+html[data-revant-glass="balanced"] { --revant-settings-glass-blur: 10px; }
+html[data-revant-glass="strong"] { --revant-settings-glass-blur: 15px; }
+html[data-revant-text="large"] .revant-settings-page { font-size: 1.0625rem; }
+
+@media (prefers-reduced-motion: no-preference) {
   html[data-revant-motion="reduced"] .revant-settings-page *,
   html[data-revant-motion="reduced"] .revant-settings-page *::before,
   html[data-revant-motion="reduced"] .revant-settings-page *::after {
     animation: none !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-html[data-revant-glass="subtle"] { --revant-settings-glass-blur: 6px; }
-html[data-revant-glass="balanced"] { --revant-settings-glass-blur: 10px; }
-html[data-revant-glass="strong"] { --revant-settings-glass-blur: 15px; }
-
-html[data-revant-text="large"] .revant-settings-page {
-  font-size: 1.0625rem;
-}
-
+/* Never override accessibility settings for users who request reduced motion. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;
