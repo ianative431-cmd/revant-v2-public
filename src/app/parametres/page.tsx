@@ -6,7 +6,6 @@ import {
 } from "lucide-react";
 import BottomNav from "@/components/layout/BottomNav";
 import SiteHeader from "@/components/layout/SiteHeader";
-import SettingsExperienceControls from "@/components/layout/SettingsExperienceControls";
 import { getSitePalette } from "@/server/theme/site-palette";
 
 function SettingsSection({ title, children }: { title: string; children: ReactNode }) {
@@ -61,9 +60,6 @@ export default async function ParametresPage() {
                   <p className="mt-0.5 text-xs text-brand-muted">Choisissez le thème de Revant.</p>
                 </div>
                 <SettingsExperienceControls mode="appearance" currentPalette={palette} />
-              </div>
-              <div className="border-t border-brand-border pt-4">
-                <SettingsExperienceControls mode="interactions" currentPalette={palette} />
               </div>
             </div>
           </SettingsSection>
