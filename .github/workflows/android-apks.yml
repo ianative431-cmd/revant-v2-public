@@ -56,10 +56,11 @@ jobs:
       - name: Generate Android project
         working-directory: ${{ matrix.app.directory }}
         run: npx cap add android
-      - name: Verify Revant OAuth deep-link registration
+      - name: Register Revant OAuth deep link
         if: matrix.app.id == 'revant'
         working-directory: ${{ matrix.app.directory }}
         run: |
+          npm run configure:deep-link
           grep -q "ne.revant.marketplace" android/app/src/main/res/values/strings.xml
           grep -q "@string/custom_url_scheme" android/app/src/main/AndroidManifest.xml
       - name: Prepare official Revant launcher icon

@@ -24,6 +24,7 @@ From this directory:
 npm install
 npx cap add android
 npx cap sync android
+npm run configure:deep-link
 cd android
 ./gradlew assembleDebug
 ```
