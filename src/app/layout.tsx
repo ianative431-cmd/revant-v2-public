@@ -10,6 +10,7 @@ import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
 import NativePushRegistration from "@/components/native/NativePushRegistration";
 import NativeOAuthCallbackHandler from "@/components/auth/NativeOAuthCallbackHandler";
 import LaunchExperience from "@/components/pwa/LaunchExperience";
+import DisplayPreferencesBootstrap from "@/components/layout/DisplayPreferencesBootstrap";
 import { getSitePalette } from "@/server/theme/site-palette";
 
 export const metadata: Metadata = {
@@ -17,11 +18,7 @@ export const metadata: Metadata = {
   description: "Revant — seconde vie, nouvelle valeur",
   manifest: "/manifest.webmanifest",
   applicationName: "Revant",
-  appleWebApp: {
-    capable: true,
-    title: "Revant",
-    statusBarStyle: "default",
-  },
+  appleWebApp: { capable: true, title: "Revant", statusBarStyle: "default" },
   icons: {
     icon: [
       { url: "/images/logo-revant-officiel-192.png?v=20261121-carton-complet", sizes: "192x192", type: "image/png" },
@@ -47,14 +44,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="fr" className="h-full antialiased" data-site-palette={palette}>
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-text">
+        <DisplayPreferencesBootstrap />
         <GlobalDismissibleDetails />
         <ServiceWorkerRegister />
         <NativePushRegistration />
         <NativeOAuthCallbackHandler />
         <LaunchExperience />
-        <Suspense fallback={null}>
-          <FloatingBackButton />
-        </Suspense>
+        <Suspense fallback={null}><FloatingBackButton /></Suspense>
         <div className="flex-1 flex flex-col">{children}</div>
         <Footer />
         <CookieConsentBanner />
