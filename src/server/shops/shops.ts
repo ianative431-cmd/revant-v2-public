@@ -34,12 +34,14 @@ export async function resolveShopBySlug(
   supabase: SupabaseClient,
   slug: string
 ): Promise<ShopLookupResult> {
-  const { data: shop } = await supabase
+  const { data: shop, error } = await supabase
     .from("shops")
     .select("*")
     .eq("slug", slug)
     .eq("status", "active")
     .maybeSingle();
+
+  if (error) throw error;
 
   if (shop) return { kind: "found", shop: shop as Shop };
 
@@ -56,12 +58,13 @@ export async function resolveShopBySlug(
  * l'état vide honnête géré par la page).
  */
 export async function getActiveRestaurants(supabase: SupabaseClient): Promise<Shop[]> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("shops")
     .select("*")
     .eq("is_restaurant", true)
     .eq("status", "active")
     .order("created_at", { ascending: false });
+  if (error) throw error;
   return (data ?? []) as Shop[];
 }
 
@@ -74,11 +77,12 @@ export async function getActiveShops(
   supabase: SupabaseClient,
   options?: { limit?: number }
 ): Promise<Shop[]> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("shops")
     .select("*")
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(options?.limit ?? 8);
+  if (error) throw error;
   return (data ?? []) as Shop[];
 }

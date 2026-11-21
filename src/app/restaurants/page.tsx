@@ -33,6 +33,7 @@ function safeImageUrl(value: string | null | undefined): string | null {
 
 export default async function RestaurantsPage() {
   let restaurants: Awaited<ReturnType<typeof getActiveRestaurants>> = [];
+  let restaurantsUnavailable = false;
 
   // La découverte publique reste accessible même si Supabase est indisponible.
   try {
@@ -40,6 +41,7 @@ export default async function RestaurantsPage() {
     restaurants = await getActiveRestaurants(supabase);
   } catch {
     restaurants = [];
+    restaurantsUnavailable = true;
   }
 
   const publicRestaurants = restaurants.filter(
@@ -63,7 +65,13 @@ export default async function RestaurantsPage() {
           </span>
         </div>
 
-        {publicRestaurants.length === 0 ? (
+        {restaurantsUnavailable ? (
+          <section role="alert" className="rounded-[28px] border border-brand-border bg-brand-surface px-5 py-12 text-center shadow-sm sm:px-10">
+            <h2 className="text-lg font-extrabold">Les restaurants sont temporairement indisponibles</h2>
+            <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-brand-muted">La connexion au catalogue a échoué. Réessaie dans quelques instants.</p>
+            <Link href="/" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-brand-border px-5 text-xs font-bold">Retour à l’accueil</Link>
+          </section>
+        ) : publicRestaurants.length === 0 ? (
           <section className="rounded-[28px] border border-black/5 bg-brand-surface px-5 py-12 text-center shadow-sm sm:px-10">
             <div aria-hidden="true" className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-bg text-2xl">🍽️</div>
             <h2 className="mt-4 text-lg font-extrabold">Aucun restaurant public pour le moment</h2>

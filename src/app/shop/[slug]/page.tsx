@@ -43,20 +43,24 @@ function safeImageUrl(value: string | null | undefined): string | null {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createSupabaseServerClient();
-  const result = await resolveShopBySlug(supabase, slug);
-  if (result.kind !== "found") return { title: "Boutique — Revant" };
+  try {
+    const supabase = await createSupabaseServerClient();
+    const result = await resolveShopBySlug(supabase, slug);
+    if (result.kind !== "found") return { title: "Boutique — Revant" };
 
-  const image = safeImageUrl(result.shop.banner_url) ?? safeImageUrl(result.shop.logo_url);
-  return {
-    title: `${result.shop.name} — Revant`,
-    description: result.shop.description ?? `Découvrez les produits de ${result.shop.name} sur Revant.`,
-    openGraph: {
-      title: `${result.shop.name} — Revant`,
-      description: result.shop.description ?? undefined,
-      images: image ? [image] : [],
-    },
-  };
+    const image = safeImageUrl(result.shop.banner_url) ?? safeImageUrl(result.shop.logo_url);
+    return {
+      title: result.shop.name + " — Revant",
+      description: result.shop.description ?? "Découvrez les produits de " + result.shop.name + " sur Revant.",
+      openGraph: {
+        title: result.shop.name + " — Revant",
+        description: result.shop.description ?? undefined,
+        images: image ? [image] : [],
+      },
+    };
+  } catch {
+    return { title: "Boutique — Revant" };
+  }
 }
 
 export default async function ShopPublicPage({ params }: Props) {

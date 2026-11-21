@@ -74,7 +74,8 @@ export async function getActiveProducts(
     if (safeTerm) query = query.or(`name.ilike.%${safeTerm}%,description.ilike.%${safeTerm}%`);
   }
 
-  const { data } = await query.returns<ProductRow[]>();
+  const { data, error } = await query.returns<ProductRow[]>();
+  if (error) throw error;
   return (data ?? []).map(mapRow);
 }
 
@@ -112,7 +113,7 @@ export async function getActiveProductsForShop(
   supabase: SupabaseClient,
   shopId: string
 ): Promise<Product[]> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("shop_id", shopId)
@@ -120,5 +121,6 @@ export async function getActiveProductsForShop(
     .order("created_at", { ascending: false })
     .returns<ProductRow[]>();
 
+  if (error) throw error;
   return (data ?? []).map(mapRow);
 }

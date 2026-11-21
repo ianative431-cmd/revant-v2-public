@@ -15,11 +15,12 @@ export type Category = {
  * modification se fait désormais dans Supabase, pas dans le code.
  */
 export async function getActiveCategories(supabase: SupabaseClient): Promise<Category[]> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("categories")
     .select("id, name, slug, description, image_url")
     .eq("is_active", true)
     .order("sort_order");
 
+  if (error) throw error;
   return data ?? [];
 }

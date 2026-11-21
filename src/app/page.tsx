@@ -79,29 +79,46 @@ export default async function Home({ searchParams }: Props) {
   let loadedProducts: Awaited<ReturnType<typeof getActiveProducts>> = [];
   let shops: Awaited<ReturnType<typeof getActiveShops>> = [];
   let certifiedShopIds = new Set<string>();
+  let categoriesUnavailable = false;
+  let productsUnavailable = false;
+  let shopsUnavailable = false;
   try {
     const supabase = await createSupabaseServerClient();
-    categories = await getActiveCategories(supabase);
+    try {
+      categories = await getActiveCategories(supabase);
+    } catch {
+      categoriesUnavailable = true;
+    }
     const productType = categorie === "mode" ? "clothing" : categorie === "parfums" ? "perfume" : undefined;
     const categoryId = productType ? undefined : categories.find((c) => c.slug === categorie)?.id;
-    const productsPromise = categorie && !productType && !categoryId
-      ? Promise.resolve([])
-      : getActiveProducts(supabase, { categoryId, productType, limit: 24, searchTerm: q?.trim() || undefined });
-    [loadedProducts, shops] = await Promise.all([
-      productsPromise,
-      getActiveShops(supabase, { limit: 8 }),
-    ]);
+    if (categorie && !productType && categoriesUnavailable) {
+      productsUnavailable = true;
+    } else if (categorie && !productType && !categoryId) {
+      loadedProducts = [];
+    } else {
+      try {
+        loadedProducts = await getActiveProducts(supabase, { categoryId, productType, limit: 24, searchTerm: q?.trim() || undefined });
+      } catch {
+        productsUnavailable = true;
+      }
+    }
+    try {
+      shops = await getActiveShops(supabase, { limit: 8 });
+    } catch {
+      shopsUnavailable = true;
+    }
     if (shops.length > 0) {
-      const { data: certifications, error: certificationError } = await supabase.from("certifications").select("shop_id").eq("type", "shop").eq("status", "approved").in("shop_id", shops.map((shop) => shop.id));
-      if (!certificationError) certifiedShopIds = new Set((certifications ?? []).map((item) => item.shop_id));
+      try {
+        const { data: certifications, error: certificationError } = await supabase.from("certifications").select("shop_id").eq("type", "shop").eq("status", "approved").in("shop_id", shops.map((shop) => shop.id));
+        if (!certificationError) certifiedShopIds = new Set((certifications ?? []).map((item) => item.shop_id));
+      } catch {
+        certifiedShopIds = new Set();
+      }
     }
   } catch {
-    // On conserve la navigation publique et les états vides si le backend
-    // n'est pas configuré, sans renvoyer le visiteur vers la connexion.
-    categories = [];
-    loadedProducts = [];
-    shops = [];
-    certifiedShopIds = new Set();
+    categoriesUnavailable = true;
+    productsUnavailable = true;
+    shopsUnavailable = true;
   }
   const fallbackCategories = [
     { id: "virtual-mode", slug: "mode", name: "Mode", image_url: null },
@@ -114,7 +131,7 @@ export default async function Home({ searchParams }: Props) {
   ];
   const activeCategory = categories.find((c) => c.slug === categorie);
   const shortcutCategoryTitle = categorie === "mode" ? "Mode" : categorie === "parfums" ? "Parfums" : null;
-  const unknownCategory = Boolean(categorie && !shortcutCategoryTitle && !activeCategory);
+  const unknownCategory = !categoriesUnavailable && Boolean(categorie && !shortcutCategoryTitle && !activeCategory);
   const term = q?.trim();
 
   return (
@@ -140,6 +157,7 @@ export default async function Home({ searchParams }: Props) {
 
       <section id="categories" className="px-4 pt-7">
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">Catégories</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
+        {categoriesUnavailable && <p role="status" className="mb-3 rounded-xl border border-brand-border bg-brand-surface px-4 py-3 text-xs leading-relaxed text-brand-muted">La liste complète des catégories est temporairement indisponible. La sélection de base reste affichée.</p>}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {displayedCategories.map((category) => (
             <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-brand-surface-soft">
@@ -159,7 +177,13 @@ export default async function Home({ searchParams }: Props) {
       <section id="boutiques-paysannes" className="px-4 pt-7">
         <div className="mb-1 flex items-center justify-between"><h2 className="text-lg font-extrabold">Boutiques paysannes</h2><Link href="/boutiques/creer" className="text-xs font-medium">Vendre ici →</Link></div>
         <p className="mb-3 text-xs text-brand-muted">Des produits frais, locaux et de qualité.</p>
-        {shops.length > 0 ? (
+        {shopsUnavailable ? (
+          <div role="status" className="rounded-2xl border border-brand-border bg-brand-surface px-5 py-8 text-center">
+            <h3 className="text-sm font-extrabold">Boutiques temporairement indisponibles</h3>
+            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">Nous ne pouvons pas charger les vitrines pour le moment. Réessaie dans quelques instants.</p>
+            <Link href="/boutiques" className="mt-4 inline-flex rounded-full border border-brand-border px-5 py-3 text-xs font-bold text-brand-text">Réessayer</Link>
+          </div>
+        ) : shops.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {shops.slice(0, 4).map((shop) => (
               <Link key={shop.id} href={`/shop/${shop.slug}`} className="relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200">
@@ -191,7 +215,13 @@ export default async function Home({ searchParams }: Props) {
 
       <main id="produits" className="px-4 pt-7">
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? `Résultats pour « ${q} »` : unknownCategory ? "Catégorie indisponible" : shortcutCategoryTitle ?? (activeCategory ? activeCategory.name : "Produits populaires")}</h2><a href="#produits" className="text-xs font-medium">Voir tout →</a></div>
-        {loadedProducts.length === 0 ? (
+        {productsUnavailable ? (
+          <div role="status" className="rounded-xl border border-brand-border bg-brand-surface px-5 py-10 text-center">
+            <p className="text-sm font-semibold">Catalogue temporairement indisponible</p>
+            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">Nous n’avons pas pu charger les annonces. Réessaie dans quelques instants.</p>
+            <Link href="/categories" className="mt-4 inline-flex rounded-full border border-brand-border px-5 py-3 text-xs font-bold text-brand-text">Explorer les catégories</Link>
+          </div>
+        ) : loadedProducts.length === 0 ? (
           <div className="rounded-xl border border-brand-border bg-brand-surface px-5 py-10 text-center">
             <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : unknownCategory ? "Cette catégorie n’est pas disponible pour le moment." : "Les premières annonces arrivent bientôt."}</p>
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">{term ? "Essaie un autre mot ou explore les catégories." : unknownCategory ? "Choisis une catégorie actuellement proposée par Revant." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
