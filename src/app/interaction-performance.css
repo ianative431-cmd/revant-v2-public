@@ -41,6 +41,10 @@ html[data-site-palette] body :where(header, footer, nav, main, section, article,
   .revant-hero-copy { animation-duration: 45ms !important; filter: none !important; }
   .revant-settings-row:hover { transform: none; }
 }
+/* The Settings screen already contains its own legal/help entry and persistent
+   navigation; hide the global multi-link footer there to avoid duplicate actions. */
+body:has(.revant-settings-page) > footer { display: none; }
+
 .revant-settings-page .revant-settings-glass {
   background: color-mix(in srgb, var(--brand-surface) 88%, transparent);
   border-color: color-mix(in srgb, var(--brand-border) 82%, transparent);
