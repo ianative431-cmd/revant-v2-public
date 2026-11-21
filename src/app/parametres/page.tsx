@@ -13,14 +13,14 @@ function SettingsSection({ title, children }: { title: string; children: ReactNo
   return (
     <section className="space-y-2">
       <h2 className="px-1 text-xs font-bold uppercase tracking-[0.14em] text-brand-muted">{title}</h2>
-      <div className="overflow-hidden rounded-2xl border border-brand-border bg-brand-surface shadow-sm">{children}</div>
+      <div className="revant-settings-glass overflow-hidden rounded-2xl border border-brand-border bg-brand-surface shadow-sm">{children}</div>
     </section>
   );
 }
 
 function SettingsLink({ href, label, description, Icon }: { href: string; label: string; description?: string; Icon: LucideIcon }) {
   return (
-    <Link href={href} className="flex min-h-[60px] items-center gap-3 px-4 py-3 transition-colors hover:bg-brand-bg focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-brand-accent">
+    <Link href={href} className="revant-settings-row flex min-h-[60px] items-center gap-3 px-4 py-3 transition-colors hover:bg-brand-bg focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-brand-accent">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-bg text-brand-accent"><Icon size={18} strokeWidth={1.8} aria-hidden="true" /></span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold text-brand-text">{label}</span>
@@ -35,7 +35,7 @@ export default async function ParametresPage() {
   const palette = await getSitePalette();
 
   return (
-    <div className="min-h-screen bg-brand-bg pb-32 text-brand-text">
+    <div className="revant-settings-page min-h-screen bg-brand-bg pb-32 text-brand-text">
       <SiteHeader hideSearch />
       <main className="mx-auto w-full max-w-2xl px-4 pb-8 pt-20 sm:px-6">
         <header className="mb-6">
