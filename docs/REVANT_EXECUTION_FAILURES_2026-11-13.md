@@ -45,3 +45,19 @@
 ## 01:01 UTC — récupération des logs GitHub Actions
 - Le téléchargement des logs du job `131610798706` avant la fin du job a renvoyé HTTP 404 `BlobNotFound`.
 - Le suivi du job par l'API des étapes a ensuite confirmé la réussite complète de l'installation, de l'audit de production à sévérité modérée, d'ESLint, des tests Node et du build. Aucun échec du code n'a été constaté.
+
+
+## 13:45 UTC — création de branche via connexion GitHub directe refusée
+- Tentative de création de la branche `fix/floating-header-remove-banner-20261121` via l'outil GitHub direct : HTTP 403 `Resource not accessible by integration`.
+- Aucun fichier, branche ou commit n'a été modifié par cette tentative échouée.
+- Reprise via la connexion GitHub d'écriture Revant déjà autorisée ; la branche a ensuite été créée à partir du commit `76ada9d877ab6173bf5f3fc45ac3b9b30393e590`.
+
+
+## 13:47 UTC — mise à jour directe d'un fichier GitHub refusée
+- Tentative de correction de `SiteHeader.tsx` via l'outil GitHub direct : HTTP 403 `Resource not accessible by integration`.
+- Aucun fichier ni commit n'a été modifié par cette tentative.
+- La correction sera effectuée via la connexion GitHub d'écriture Revant.
+
+## 13:48 UTC — variable locale indisponible lors de la préparation du commit
+- Une tentative d'appel de commit a échoué avant l'exécution de l'outil car la variable locale `header` n'existait pas dans le nouvel environnement d'exécution.
+- Aucun fichier ni commit n'a été modifié par cette tentative. Le contenu a été redéfini dans l'appel suivant.
