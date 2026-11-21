@@ -57,7 +57,7 @@ const HERO_SLIDES = [
     title: "LE TERROIR À L’HONNEUR",
     description: "Découvre les produits frais et les saveurs de nos régions, réunis au même endroit.",
     ctaLabel: "DÉCOUVRIR LE TERROIR",
-    ctaHref: "#boutiques-paysannes",
+    ctaHref: "#boutiques-locales",
     image: FARM_PHOTOS[0].photo,
   },
   {
