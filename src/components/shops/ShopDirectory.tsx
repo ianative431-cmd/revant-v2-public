@@ -61,25 +61,25 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
 
   return (
     <section aria-label="Annuaire des boutiques Revant">
-      <div className="mb-5 rounded-[24px] border border-black/5 bg-white p-3 shadow-sm sm:p-4">
+      <div className="mb-5 rounded-[24px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-3 shadow-sm sm:p-4">
         <label htmlFor="shop-directory-search" className="sr-only">
           Rechercher une boutique, une ville ou un type de commerce
         </label>
-        <div className="flex min-h-12 items-center gap-3 rounded-2xl border border-neutral-200 bg-[#faf9f7] px-3 focus-within:border-[var(--brand-accent)] focus-within:ring-2 focus-within:ring-[var(--brand-accent)]/15">
-          <Search className="h-5 w-5 shrink-0 text-neutral-500" aria-hidden="true" />
+        <div className="flex min-h-12 items-center gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-3 focus-within:border-[var(--brand-accent)] focus-within:ring-2 focus-within:ring-[var(--brand-accent)]/15">
+          <Search className="h-5 w-5 shrink-0 text-[var(--brand-muted)]" aria-hidden="true" />
           <input
             id="shop-directory-search"
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Nom, ville ou type de boutique…"
-            className="min-w-0 flex-1 bg-transparent py-3 text-sm text-brand-text outline-none placeholder:text-neutral-400"
+            className="min-w-0 flex-1 bg-transparent py-3 text-sm text-brand-text outline-none placeholder:text-[var(--brand-muted)]"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="rounded-full px-2 py-1 text-xs font-semibold text-neutral-500 hover:bg-neutral-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]"
+              className="rounded-full px-2 py-1 text-xs font-semibold text-[var(--brand-muted)] hover:bg-[var(--brand-bg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]"
             >
               Effacer
             </button>
@@ -98,13 +98,13 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
                 onClick={() => setFilter(item.value)}
                 className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-xs font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] ${active
                   ? "border-[var(--brand-accent)] bg-[var(--brand-accent)] text-white shadow-sm"
-                  : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400"}`}
+                  : "border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-muted)] hover:border-[var(--brand-accent)]"}`}
               >
                 {item.value === "shops" && <Store className="h-3.5 w-3.5" aria-hidden="true" />}
                 {item.value === "restaurants" && <UtensilsCrossed className="h-3.5 w-3.5" aria-hidden="true" />}
                 {item.value === "premium" && <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />}
                 {item.label}
-                <span className={`rounded-full px-1.5 py-0.5 text-[10px] tabular-nums ${active ? "bg-white/20 text-white" : "bg-neutral-100 text-neutral-500"}`}>
+                <span className={`rounded-full px-1.5 py-0.5 text-[10px] tabular-nums ${active ? "bg-white/20 text-white" : "bg-[var(--brand-bg)] text-[var(--brand-muted)]"}`}>
                   {count}
                 </span>
               </button>
@@ -114,7 +114,7 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
       </div>
 
       <div className="mb-4 flex items-center justify-between gap-3 px-1">
-        <p className="text-xs text-neutral-500" aria-live="polite">
+        <p className="text-xs text-[var(--brand-muted)]" aria-live="polite">
           {visibleShops.length} résultat{visibleShops.length > 1 ? "s" : ""}
           {query.trim() ? ` pour « ${query.trim()} »` : ""}
         </p>
@@ -127,7 +127,7 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
               key={shop.id}
               href={`/shop/${encodeURIComponent(shop.slug)}`}
               aria-label={`Ouvrir la boutique ${shop.name}`}
-              className="group overflow-hidden rounded-[24px] border border-black/5 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]"
+              className="group overflow-hidden rounded-[24px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]"
             >
               <div className="relative h-36 overflow-hidden sm:h-40" style={{ backgroundColor: shop.color }}>
                 {shop.bannerUrl ? (
@@ -152,11 +152,12 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
               <div className="relative px-4 pb-5 pt-11">
                 <div
                   aria-hidden="true"
-                  className="absolute -top-9 left-4 flex h-[68px] w-[68px] items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white text-2xl font-black text-white shadow-md"
+                  className="absolute -top-9 left-4 flex h-[68px] w-[68px] items-center justify-center overflow-hidden rounded-2xl border-4 border-[var(--brand-surface)] bg-[var(--brand-surface)] p-1 text-2xl font-black text-white shadow-md"
                   style={{
                     backgroundColor: shop.color,
                     backgroundImage: shop.logoUrl ? `url("${shop.logoUrl}")` : undefined,
-                    backgroundSize: "cover",
+                    backgroundSize: "contain",
+                    backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",
                   }}
                 >
@@ -167,21 +168,21 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
                   <h2 className="line-clamp-1 text-base font-black tracking-tight text-brand-text">
                     {shop.name}
                   </h2>
-                  <span className="shrink-0 rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">
+                  <span className="shrink-0 rounded-full bg-[var(--brand-bg)] px-2.5 py-1 text-[10px] font-bold text-[var(--brand-muted)]">
                     {shop.typeLabel}
                   </span>
                 </div>
-                <p className="mt-1 flex items-center gap-1 text-xs text-neutral-500">
+                <p className="mt-1 flex items-center gap-1 text-xs text-[var(--brand-muted)]">
                   <MapPin className="h-3 w-3" aria-hidden="true" />
                   {shop.city ?? "Lieu non renseigné"}
                 </p>
                 {shop.description && (
-                  <p className="mt-3 line-clamp-2 min-h-9 text-xs leading-relaxed text-neutral-600">
+                  <p className="mt-3 line-clamp-2 min-h-9 text-xs leading-relaxed text-[var(--brand-muted)]">
                     {shop.description}
                   </p>
                 )}
-                <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
-                  <span className="text-[11px] font-semibold text-neutral-500">Voir la vitrine</span>
+                <div className="mt-4 flex items-center justify-between border-t border-[var(--brand-border)] pt-3">
+                  <span className="text-[11px] font-semibold text-[var(--brand-muted)]">Voir la vitrine</span>
                   <span aria-hidden="true" className="text-sm font-black transition-transform group-hover:translate-x-1">→</span>
                 </div>
               </div>
@@ -189,10 +190,10 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
           ))}
         </div>
       ) : (
-        <div className="rounded-[24px] border border-dashed border-neutral-300 bg-white px-5 py-12 text-center">
+        <div className="rounded-[24px] border border-dashed border-[var(--brand-border)] bg-[var(--brand-surface)] px-5 py-12 text-center">
           <div aria-hidden="true" className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-bg text-2xl">⌕</div>
           <h2 className="mt-4 text-base font-extrabold">Aucune boutique ne correspond</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-neutral-600">
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[var(--brand-muted)]">
             Essaie un autre nom, une autre ville ou un autre filtre.
           </p>
           <button
