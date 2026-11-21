@@ -27,8 +27,12 @@ Sources officielles :
 
 ## Intégration API confirmée
 
+### Divergence de base URL à résoudre avant tout test
+
+Le code actuel de Revant (`src/server/integrations/ipay-money.mjs`) utilise `https://i-pay.money/api/v1`. Une ancienne documentation sandbox iPayMoney publiée sur GitBook indique également cet hôte. Cependant, la page officielle développeurs iFUTUR consultée le 21 novembre 2026 présente désormais un exemple avec `https://api.imoney.ne/v1/payments`. Ces références peuvent correspondre à des versions ou produits différents ; ne pas remplacer l'URL dans le code sur simple supposition. iFUTUR doit confirmer par écrit les bases URL Sandbox et Live, les versions maintenues, les chemins d'encaissement, de payout et de remboursement, ainsi que la migration éventuelle depuis `i-pay.money`.
+
 ### Authentification et environnements
-- Base URL : `https://i-pay.money/api/v1`.
+- Base URL utilisée par l'adaptateur existant : `https://i-pay.money/api/v1` (à confirmer ; la page développeurs officielle récente affiche aussi `https://api.imoney.ne/v1/payments`).
 - API REST JSON.
 - En-têtes communs : `Authorization: Bearer <secret>`, `Content-Type: application/json`, `Ipay-Target-Environment: sandbox|live`.
 - `POST /payments` exige `Ipay-Payment-Type: mobile`.
