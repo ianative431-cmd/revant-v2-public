@@ -24,7 +24,7 @@ export default async function SiteHeader({ hideSearch = false }: { hideSearch?: 
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-3 z-[70] flex items-start justify-center px-3" aria-label="Commandes flottantes Revant">
+    <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+12px)] z-[70] flex items-start justify-center px-3" aria-label="Commandes flottantes Revant">
       <details className="pointer-events-auto absolute left-3 top-0 group">
         <summary aria-label="Ouvrir le menu principal" className="flex h-11 w-11 list-none cursor-pointer items-center justify-center rounded-full border border-brand-border bg-brand-surface/95 text-brand-text shadow-lg backdrop-blur-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent [&::-webkit-details-marker]:hidden">
           <Menu {...iconProps} size={22} />
