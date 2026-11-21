@@ -25,6 +25,7 @@ export default async function ComptePage() {
         <SignOutForm action={signOutAction} />
         <Link href="/compte/boutique" className="block text-center text-sm underline mt-4 text-brand-text/70">Ma boutique</Link>
         <Link href="/compte/commandes" className="block text-center text-sm underline mt-2 text-brand-text/70">Mes commandes</Link>
+        <Link href="/wallet" className="block text-center text-sm underline mt-2 text-brand-text/70">Mon Wallet</Link>
         <Link href="/compte/notifications" className="block text-center text-sm underline mt-2 text-brand-text/70">Notifications</Link>
         <Link href="/compte/livraisons" className="block text-center text-sm underline mt-2 text-brand-text/70">Espace livreur</Link>
         <Link href="/compte/blocages" className="block text-center text-sm underline mt-2 text-brand-text/70">Comptes bloqués</Link>
