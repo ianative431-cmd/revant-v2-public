@@ -31,6 +31,17 @@ export default async function LegalDocumentPage({
   const doc = getLegalDocument(slug);
   if (!doc) notFound();
 
+  const paymentFeaturesPending = [
+    "remboursement-annulation",
+    "vente-achat",
+    "litiges",
+    "paiements",
+    "payouts",
+    "kyc",
+    "suspension-compte",
+  ].includes(doc.slug);
+  const accountDeletionPending = doc.slug === "confidentialite";
+
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10">
       <div className="max-w-2xl mx-auto bg-white rounded-[22px] p-8">
@@ -40,13 +51,24 @@ export default async function LegalDocumentPage({
 
         <h1 className="text-2xl font-bold mt-4 mb-1">{doc.title}</h1>
         <p className="text-xs text-brand-text/60 mb-6">
-          Version {doc.version} — en vigueur depuis le{" "}
+          Version {doc.version} — document de travail préparé le{" "}
           {new Date(doc.effectiveDate).toLocaleDateString("fr-FR")}
         </p>
 
         <p className="text-xs bg-brand-text/5 rounded-xl p-3 mb-6 text-brand-text/70">
           {LEGAL_DISCLAIMER}
         </p>
+
+        {paymentFeaturesPending && (
+          <p role="status" className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+            Les paiements intégrés, le séquestre, les remboursements via Revant et les versements aux vendeurs ne sont pas encore activés. Les passages de ce document décrivent le fonctionnement prévu et ne signifient pas que ces services sont actuellement disponibles.
+          </p>
+        )}
+        {accountDeletionPending && (
+          <p role="status" className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+            La demande de suppression depuis les paramètres n&apos;est pas encore activée. Pour exercer tes droits, utilise le contact indiqué dans ce document.
+          </p>
+        )}
 
         {doc.sections.map((section) => (
           <div key={section.heading} className="mb-5">
