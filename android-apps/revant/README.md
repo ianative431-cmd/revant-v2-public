@@ -32,3 +32,5 @@ cd android
 The repository's Android build workflow performs the same generation and build on GitHub Actions. The generated `android/` directory is build output and is not committed; the package manifest and Capacitor config are the source of truth.
 
 A newly generated APK is required: an older installed APK without the App and Browser native plugins cannot complete this flow.
+
+The web bundle and Android wrapper now use Capacitor 8 (core/Android/CLI 8.6.2, App 8.1.2, Browser 8.0.5). Keep these major versions aligned when updating the native wrapper.
