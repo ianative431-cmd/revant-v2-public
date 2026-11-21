@@ -9,35 +9,18 @@
   --revant-motion-normal: 50ms;
   --revant-motion-ease: cubic-bezier(0.2, 0.7, 0.25, 1);
 }
-
-/* Immediate touch feedback. */
 a, button, [role="button"], summary {
   transition-duration: 25ms !important;
   transition-timing-function: var(--revant-motion-ease);
   touch-action: manipulation;
 }
-
-button:active, [role="button"]:active, summary:active, a:active {
-  transition-duration: 15ms !important;
-}
+button:active, [role="button"]:active, summary:active, a:active { transition-duration: 15ms !important; }
 
 @media (prefers-reduced-motion: no-preference) {
-  main > section, main > div, body > div > div > section, body > div > div > main {
-    animation-duration: 45ms !important;
-    animation-delay: 0ms !important;
-  }
-  section .grid > *, main .grid > *, [class*="grid-cols"] > * {
-    animation-duration: 37.5ms !important;
-    animation-delay: 0ms !important;
-  }
-  section img, main img, [role="img"] {
-    animation-duration: 45ms !important;
-    animation-delay: 0ms !important;
-  }
-  header, .revant-card, details[open] > nav, .revant-cart-added, .revant-nav-item > span:first-child {
-    animation-duration: 37.5ms !important;
-    animation-delay: 0ms !important;
-  }
+  main > section, main > div, body > div > div > section, body > div > div > main { animation-duration: 45ms !important; animation-delay: 0ms !important; }
+  section .grid > *, main .grid > *, [class*="grid-cols"] > * { animation-duration: 37.5ms !important; animation-delay: 0ms !important; }
+  section img, main img, [role="img"] { animation-duration: 45ms !important; animation-delay: 0ms !important; }
+  header, .revant-card, details[open] > nav, .revant-cart-added, .revant-nav-item > span:first-child { animation-duration: 37.5ms !important; animation-delay: 0ms !important; }
   .revant-card-media img { transition-duration: 35ms !important; }
   .revant-hero-copy { animation-duration: 162.5ms !important; }
   .revant-hero-slide.is-active { animation-duration: 1.625s !important; }
@@ -49,30 +32,15 @@ button:active, [role="button"]:active, summary:active, a:active {
   .revant-cart-added { animation-duration: 90ms !important; }
   .revant-nav-item > span:first-child { transition-duration: 45ms !important; }
 }
-
-/* Keep palette switching fast without changing the palette itself. */
 html[data-site-palette] body,
-html[data-site-palette] body :where(
-  header, footer, nav, main, section, article, aside,
-  button, a, input, select, textarea,
-  [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]
-) {
+html[data-site-palette] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) {
   transition-duration: 60ms !important;
 }
-
 @media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
-  html[data-site-palette] body :where(
-    header, footer, nav, main, section, article, aside,
-    button, a, input, select, textarea,
-    [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]
-  ) {
-    transition-duration: 25ms !important;
-  }
+  html[data-site-palette] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) { transition-duration: 25ms !important; }
   .revant-hero-copy { animation-duration: 45ms !important; filter: none !important; }
   .revant-settings-row:hover { transform: none; }
 }
-
-/* Liquid Glass is intentionally scoped to settings surfaces only. */
 .revant-settings-page .revant-settings-glass {
   background: color-mix(in srgb, var(--brand-surface) 88%, transparent);
   border-color: color-mix(in srgb, var(--brand-border) 82%, transparent);
@@ -82,24 +50,12 @@ html[data-site-palette] body :where(
 html[data-revant-glass="subtle"] { --revant-settings-glass-blur: 6px; }
 html[data-revant-glass="balanced"] { --revant-settings-glass-blur: 10px; }
 html[data-revant-glass="strong"] { --revant-settings-glass-blur: 15px; }
-html[data-revant-text="large"] .revant-settings-page { font-size: 1.0625rem; }
-
-@media (prefers-reduced-motion: no-preference) {
-  html[data-revant-motion="reduced"] .revant-settings-page *,
-  html[data-revant-motion="reduced"] .revant-settings-page *::before,
-  html[data-revant-motion="reduced"] .revant-settings-page *::after {
-    animation: none !important;
-    transition-duration: 0.01ms !important;
-  }
+html[data-revant-text="large"] { font-size: 106.25%; }
+html[data-revant-motion="reduced"] *, html[data-revant-motion="reduced"] *::before, html[data-revant-motion="reduced"] *::after {
+  animation: none !important;
+  transition-duration: 0.01ms !important;
 }
-
-/* Never override accessibility settings for users who request reduced motion. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   .revant-skeleton { background-image: none !important; }
 }
