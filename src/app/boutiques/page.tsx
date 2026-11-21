@@ -35,18 +35,24 @@ function safeImageUrl(value: string | null | undefined): string | null {
 export default async function BoutiquesPage() {
   let shops: Awaited<ReturnType<typeof getActiveShops>> = [];
   let certifiedShopIds = new Set<string>();
+  let shopsUnavailable = false;
 
   // Public badges are based only on approved certifications stored in the database.
   try {
     const supabase = await createSupabaseServerClient();
     shops = await getActiveShops(supabase, { limit: 100 });
     if (shops.length > 0) {
-      const { data: certifications, error: certificationError } = await supabase.from("certifications").select("shop_id").eq("type", "shop").eq("status", "approved").in("shop_id", shops.map((shop) => shop.id));
-      if (!certificationError) certifiedShopIds = new Set((certifications ?? []).map((item) => item.shop_id));
+      try {
+        const { data: certifications, error: certificationError } = await supabase.from("certifications").select("shop_id").eq("type", "shop").eq("status", "approved").in("shop_id", shops.map((shop) => shop.id));
+        if (!certificationError) certifiedShopIds = new Set((certifications ?? []).map((item) => item.shop_id));
+      } catch {
+        certifiedShopIds = new Set();
+      }
     }
   } catch {
     shops = [];
     certifiedShopIds = new Set();
+    shopsUnavailable = true;
   }
 
   const publicShops: PublicShopCard[] = shops
@@ -85,7 +91,13 @@ export default async function BoutiquesPage() {
           </span>
         </div>
 
-        {publicShops.length > 0 ? (
+        {shopsUnavailable ? (
+          <section role="alert" className="rounded-[28px] border border-brand-border bg-brand-surface px-5 py-12 text-center shadow-sm sm:px-10">
+            <h2 className="text-lg font-extrabold">Les boutiques sont temporairement indisponibles</h2>
+            <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-brand-muted">La connexion au catalogue a échoué. Réessaie dans quelques instants.</p>
+            <Link href="/" className="mt-5 inline-flex rounded-full border border-brand-border px-5 py-3 text-xs font-bold">Retour à l’accueil</Link>
+          </section>
+        ) : publicShops.length > 0 ? (
           <ShopDirectory shops={publicShops} />
         ) : (
           <section className="rounded-[28px] border border-black/5 bg-white px-5 py-12 text-center shadow-sm sm:px-10">

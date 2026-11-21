@@ -14,10 +14,12 @@ const virtualCategories = [
 
 export default async function CategoriesPage() {
   let categories: Awaited<ReturnType<typeof getActiveCategories>> = [];
+  let categoriesUnavailable = false;
   try {
     categories = await getActiveCategories(await createSupabaseServerClient());
   } catch {
     categories = [];
+    categoriesUnavailable = true;
   }
 
   const categoriesBySlug = new Map(categories.map((item) => [item.slug, item]));
@@ -75,6 +77,7 @@ export default async function CategoriesPage() {
             </div>
           </section>
 
+          {categoriesUnavailable && <p role="status" className="mt-6 rounded-2xl border border-brand-border bg-brand-surface px-4 py-3 text-xs leading-relaxed text-brand-muted">La liste complète des catégories est temporairement indisponible. Les catégories principales restent accessibles.</p>}
           <section className="mt-8 sm:mt-10" aria-labelledby="categories-list-title">
             <div className="mb-4 flex items-end justify-between gap-3">
               <div>

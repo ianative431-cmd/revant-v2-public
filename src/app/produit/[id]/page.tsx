@@ -18,11 +18,12 @@ export default async function ProductPage({ params }: Props) {
   const product = await getProductById(supabase, id);
   if (!product || product.status !== "active") notFound();
 
-  const { data: shop } = await supabase
+  const { data: shop, error: shopError } = await supabase
     .from("shops")
     .select("slug, name, owner_id")
     .eq("id", product.shop_id)
     .maybeSingle();
+  if (shopError) throw shopError;
   const currentUser = await getCurrentUser();
   const isOwner = !!currentUser && !!shop && shop.owner_id === currentUser.id;
   const outOfStock = product.stock_quantity <= 0;
