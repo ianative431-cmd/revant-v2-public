@@ -81,7 +81,7 @@ export default function ServiceWorkerRegister() {
       <button
         type="button"
         onClick={() => window.location.reload()}
-        className="shrink-0 rounded-xl bg-white px-3 py-2 font-semibold text-[#1f1d20]"
+        className="shrink-0 rounded-xl bg-brand-accent px-3 py-2 font-semibold text-white"
       >
         Actualiser
       </button>
