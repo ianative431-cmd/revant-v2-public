@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutGrid, MessageCircle, ShoppingCart, UserRound, Wallet } from "lucide-react";
+import { Home, LayoutGrid, MessageCircle, ShoppingCart, UserRound } from "lucide-react";
 
 type NavIcon = React.ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>;
 
@@ -31,9 +31,8 @@ export default function BottomNav() {
       <Item href="/" label="Accueil" active={pathname === "/"} icon={Home}/>
       <Item href="/categories" label="Catégorie" active={pathname === "/categories"} icon={LayoutGrid}/>
       <Item href="/messages" label="Message" active={pathname === "/messages" || pathname.startsWith("/messages/")} icon={MessageCircle}/>
-      <Item href="/wallet" label="Wallet" active={pathname === "/wallet" || pathname.startsWith("/wallet/")} icon={Wallet}/>
       <Item href="/panier" label="Panier" active={pathname === "/panier"} icon={ShoppingCart}/>
-      <Item href="/compte" label="Mon Revante" active={pathname === "/compte" || pathname.startsWith("/compte/") || pathname === "/parametres" || pathname.startsWith("/parametres/")} icon={UserRound}/>
+      <Item href="/compte" label="Mon Revante" active={pathname === "/compte" || pathname.startsWith("/compte/") || pathname === "/parametres" || pathname.startsWith("/parametres/") || pathname === "/wallet" || pathname.startsWith("/wallet/")} icon={UserRound}/>
     </nav>
   );
 }

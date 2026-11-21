@@ -143,7 +143,7 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
                 )}
                 {(shop.isCertified || shop.isPremium) && (
                   <div className="absolute right-3 top-3 flex flex-col items-end gap-2">
-                    {shop.isCertified && <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold text-white shadow-sm">✓ BOUTIQUE CERTIFIÉE</span>}
+                    {shop.isCertified && <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-600 px-3 py-1 text-[10px] font-extrabold text-white shadow-sm">✓ BOUTIQUE VÉRIFIÉE</span>}
                     {shop.isPremium && <span className="rounded-full bg-amber-100 px-3 py-1 text-[10px] font-extrabold text-amber-900 shadow-sm">PREMIUM</span>}
                   </div>
                 )}

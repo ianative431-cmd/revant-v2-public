@@ -65,7 +65,7 @@ export default async function BoutiquesPage() {
       logoUrl: safeImageUrl(shop.logo_url),
       color: shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
         ? shop.background_color
-        : "#FFFFFF",
+        : "var(--brand-accent)",
     }));
 
   return (
