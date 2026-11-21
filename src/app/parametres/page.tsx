@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import {
-  Bell, ChevronRight, CircleHelp, Globe2, LockKeyhole, ShieldCheck, UserRound,
+  Bell, ChevronRight, Globe2, LockKeyhole, ShieldCheck, UserRound,
 } from "lucide-react";
 import BottomNav from "@/components/layout/BottomNav";
 import SiteHeader from "@/components/layout/SiteHeader";
