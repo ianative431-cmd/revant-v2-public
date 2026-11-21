@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-const ALLOWED_DESTINATIONS = new Set(["/compte", "/compte/boutique", "/admin", "/reinitialiser-mot-de-passe"]);
+const ALLOWED_DESTINATIONS = new Set(["/compte", "/compte/boutique", "/reinitialiser-mot-de-passe"]);
 
 function redirectNoStore(url: URL) {
   const response = NextResponse.redirect(url);
@@ -20,10 +20,9 @@ export async function GET(request: Request) {
   const nativeFlow = requestUrl.searchParams.get("native") === "1";
   const requestedNext = requestUrl.searchParams.get("next") ?? "/compte";
   const next = ALLOWED_DESTINATIONS.has(requestedNext) ? requestedNext : "/compte";
-  const isAdminFlow = next === "/admin";
-
+  // Super Admin authentication is local-only; Google OAuth cannot target /admin.
   const errorUrl = new URL("/auth/erreur", appOrigin);
-  errorUrl.searchParams.set("flow", isAdminFlow ? "admin" : "seller");
+  errorUrl.searchParams.set("flow", "seller");
 
   const supabase = await createSupabaseServerClient();
 
@@ -45,7 +44,7 @@ export async function GET(request: Request) {
     }
   }
 
-  if (nativeFlow || isAdminFlow) {
+  if (nativeFlow) {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       console.error("[auth-callback] session missing after OAuth exchange", userError?.message);
@@ -54,19 +53,6 @@ export async function GET(request: Request) {
       return redirectNoStore(errorUrl);
     }
 
-    if (isAdminFlow) {
-      const { data: assignments, error: roleError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
-
-      if (roleError || !assignments?.some((assignment) => assignment.role === "super_admin")) {
-        console.error("[auth-callback] super-admin role check failed", roleError?.message);
-        await supabase.auth.signOut();
-        errorUrl.searchParams.set("reason", "not_admin");
-        return redirectNoStore(errorUrl);
-      }
-    }
   }
 
   return redirectNoStore(new URL(next, appOrigin));
