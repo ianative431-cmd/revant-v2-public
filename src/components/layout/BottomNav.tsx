@@ -11,12 +11,12 @@ function Item({ href, label, icon: Icon, active }: { href: string; label: string
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`revant-nav-item group flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 ${active ? "is-active text-[var(--brand-accent)]" : "text-[var(--brand-muted)] hover:text-[var(--brand-text)]"}`}
+      className={`revant-nav-item group flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full px-1 py-1.5 transition-colors ${active ? "is-active text-[var(--brand-accent)]" : "text-[var(--brand-muted)] hover:text-[var(--brand-text)]"}`}
     >
-      <span className={`flex h-7 w-10 items-center justify-center rounded-full ${active ? "bg-[var(--brand-accent)]/10" : ""}`}>
-        <Icon size={20} strokeWidth={1.65} aria-hidden />
+      <span className="flex h-6 w-8 items-center justify-center rounded-full">
+        <Icon size={18} strokeWidth={active ? 2 : 1.7} aria-hidden />
       </span>
-      <span className={`whitespace-nowrap text-[9px] tracking-[.01em] sm:text-[10px] ${active ? "font-extrabold" : "font-medium"}`}>{label}</span>
+      <span className={`whitespace-nowrap text-[9px] tracking-[.01em] sm:text-[10px] ${active ? "font-bold" : "font-medium"}`}>{label}</span>
     </Link>
   );
 }
@@ -26,7 +26,7 @@ export default function BottomNav() {
   return (
     <nav
       aria-label="Navigation principale"
-      className="fixed inset-x-0 bottom-2 z-50 mx-auto flex w-[calc(100%-16px)] max-w-lg items-stretch justify-around gap-1 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-nav)] px-2 pb-[env(safe-area-inset-bottom,0px)] pt-1 shadow-[0_8px_30px_rgba(0,0,0,.16)] backdrop-blur-md"
+      className="revant-bottom-nav fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+10px)] z-50 mx-auto flex min-h-[62px] w-[calc(100%-48px)] max-w-[560px] items-center justify-around gap-0.5 rounded-full border border-[var(--brand-border)] bg-[var(--brand-nav)] px-2 py-1.5 shadow-[0_8px_24px_rgba(0,0,0,.16)] backdrop-blur-xl"
     >
       <Item href="/" label="Accueil" active={pathname === "/"} icon={Home}/>
       <Item href="/categories" label="Catégorie" active={pathname === "/categories"} icon={LayoutGrid}/>

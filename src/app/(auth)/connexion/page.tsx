@@ -11,6 +11,13 @@ export default function ConnexionPage() {
 
   return (
     <div>
+      <Link
+        href="/"
+        aria-label="Retour à l’accueil Revant"
+        className="mb-4 inline-flex min-h-10 items-center gap-2 text-sm font-medium text-[var(--brand-muted)] transition-colors hover:text-brand-accent"
+      >
+        <span aria-hidden="true">←</span> Retour
+      </Link>
       <h1 className="text-xl font-bold mb-1">Connexion</h1>
       <p className="text-sm text-[var(--brand-muted)] mb-4">Accède à ton compte Revant.</p>
       <GoogleSignInButton nextPath="/compte" />

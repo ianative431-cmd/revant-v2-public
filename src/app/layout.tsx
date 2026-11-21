@@ -21,11 +21,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/images/logo-revant-app-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/images/logo-revant-app-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/images/revant-box-mark-192.png?v=20261115", sizes: "192x192", type: "image/png" },
+      { url: "/images/revant-box-mark-512.png?v=20261115", sizes: "512x512", type: "image/png" },
     ],
-    shortcut: "/images/logo-revant-app-192.png",
-    apple: "/images/logo-revant-app-512.png",
+    shortcut: "/images/revant-box-mark-192.png?v=20261115",
+    apple: "/images/revant-box-mark-512.png?v=20261115",
   },
 };
 

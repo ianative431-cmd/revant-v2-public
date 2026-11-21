@@ -43,7 +43,7 @@ export default async function SiteHeader({ hideSearch = false }: { hideSearch?: 
             </nav>
           </details>
           <Link href="/" aria-label="Revant — accueil" className="shrink-0 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
-            <Image src="/images/logo-revant-app-512.png" alt="Revant" width={40} height={40} priority className="h-8 w-8 object-contain sm:h-10 sm:w-10" />
+            <Image src="/images/revant-box-mark.svg" alt="Revant" width={40} height={40} priority unoptimized className="revant-brand-mark h-8 w-8 object-contain sm:h-10 sm:w-10" />
           </Link>
         </div>
 
