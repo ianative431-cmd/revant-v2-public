@@ -72,7 +72,7 @@ export default async function ParametresPage() {
           <SettingsSection title="Confidentialité et région">
             <div className="divide-y divide-brand-border">
               <SettingsLink href="/compte/blocages" label="Comptes bloqués" Icon={LockKeyhole} />
-              <SettingsLink href="/compte/suppression" label="Gestion du compte" description="Options et suppression du compte" Icon={UserRound} />
+              <SettingsLink href="/compte/suppression" label="Suppression du compte" description="Parcours en préparation — aucune donnée supprimée" Icon={UserRound} />
               <div className="flex items-center gap-3 px-4 py-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-bg text-brand-accent"><Globe2 size={18} strokeWidth={1.8} aria-hidden="true" /></span>
                 <div className="min-w-0 flex-1">

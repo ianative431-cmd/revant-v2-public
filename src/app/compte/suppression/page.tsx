@@ -79,7 +79,11 @@ export default async function AccountDeletionPage({
           <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted">Confidentialité et données</p>
           <h1 className="mt-2 text-2xl font-bold">Suppression du compte</h1>
           <p className="mt-2 text-sm leading-6 text-brand-muted">
-            Tu peux demander la suppression de ton compte Revant. La demande est vérifiée avant toute suppression afin de protéger les commandes, les paiements et les obligations légales.
+            {!enabled
+              ? "Le parcours de demande de suppression est en préparation. Aucune donnée n’est supprimée à cette étape."
+              : isAdmin
+                ? "La suppression autonome est réservée aux comptes clients. Les comptes administratifs suivent une procédure protégée."
+                : "Tu peux demander la suppression de ton compte Revant. La demande est vérifiée avant toute suppression afin de protéger les commandes, les paiements et les obligations légales."}
           </p>
         </header>
 
