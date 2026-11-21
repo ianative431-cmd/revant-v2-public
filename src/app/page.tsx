@@ -103,6 +103,15 @@ export default async function Home({ searchParams }: Props) {
     shops = [];
     certifiedShopIds = new Set();
   }
+  const fallbackCategories = [
+    { id: "virtual-mode", slug: "mode", name: "Mode", image_url: null },
+    { id: "virtual-parfums", slug: "parfums", name: "Parfums", image_url: null },
+  ];
+  const categoryBySlug = new Map(categories.map((category) => [category.slug, category]));
+  const displayedCategories = [
+    ...fallbackCategories.map((fallback) => categoryBySlug.get(fallback.slug) ?? fallback),
+    ...categories.filter((category) => !["mode", "parfums"].includes(category.slug)),
+  ];
   const activeCategory = categories.find((c) => c.slug === categorie);
   const shortcutCategoryTitle = categorie === "mode" ? "Mode" : categorie === "parfums" ? "Parfums" : null;
   const unknownCategory = Boolean(categorie && !shortcutCategoryTitle && !activeCategory);
@@ -132,7 +141,7 @@ export default async function Home({ searchParams }: Props) {
       <section id="categories" className="px-4 pt-7">
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">Catégories</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {categories.map((category) => (
+          {displayedCategories.map((category) => (
             <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-neutral-300">
               <div
                 role="img"
