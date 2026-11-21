@@ -34,8 +34,7 @@ function BuyerWallet() {
           <div className="mx-auto mt-5 max-w-sm text-center">
             <h3 className="text-sm font-bold">Aucune carte enregistrée</h3>
             <p className="mt-1 text-xs leading-relaxed text-brand-muted">L’ajout sécurisé sera activé dès que le prestataire de paiement de Revant permettra l’enregistrement et la réutilisation de cartes par jeton.</p>
-            <button type="button" disabled aria-disabled="true" className="mt-4 inline-flex min-h-11 cursor-not-allowed items-center justify-center gap-2 rounded-full bg-brand-accent/45 px-5 text-xs font-bold text-white"><CreditCard size={15}/> Ajouter une carte</button>
-            <p className="mt-2 text-[10px] text-brand-muted">Fonction en préparation · aucune donnée bancaire à saisir ici</p>
+            <p className="mt-4 text-[10px] leading-relaxed text-brand-muted">Fonction en préparation : l’ajout sécurisé sera activé après l’intégration du prestataire de paiement. Aucune donnée bancaire ne doit être saisie ici pour le moment.</p>
           </div>
         </div>
       </div>
@@ -67,9 +66,9 @@ function SellerWallet({ shopName }: { shopName: string }) {
           {balances.map(({ label, detail, icon: Icon }) => <div key={label} className="min-w-0 rounded-2xl border border-brand-border bg-brand-bg p-3"><Icon size={17} className="text-brand-accent"/><p className="mt-2 text-xs font-bold">{label}</p><p className="mt-1 text-base font-black">—</p><p className="mt-1 text-[9px] leading-snug text-brand-muted">{detail}</p></div>)}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
         <Link href="/compte/recus" className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border border-brand-border bg-brand-surface px-3 text-xs font-bold transition hover:border-brand-accent"><ReceiptText size={17}/> Mes reçus</Link>
-        <details className="group rounded-2xl border border-brand-border bg-brand-surface"><summary className="flex min-h-14 cursor-pointer list-none items-center justify-center gap-2 px-3 text-center text-xs font-bold"><WalletIcon size={17}/> Statistiques</summary><div className="border-t border-brand-border p-3 text-xs leading-relaxed text-brand-muted">Les ventes du jour, du mois et les revenus cumulés seront calculés à partir des écritures validées du ledger. Aucun chiffre estimatif ne sera présenté comme un revenu réel.</div></details>
+        <p className="rounded-2xl border border-brand-border bg-brand-surface p-4 text-xs leading-relaxed text-brand-muted">Les statistiques seront affichées après activation du journal financier. Aucun montant estimatif ne sera présenté comme un revenu réel.</p>
       </div>
       <div className="flex items-start gap-3 rounded-2xl border border-brand-border bg-brand-surface p-4"><ShieldCheck size={20} className="mt-0.5 shrink-0 text-brand-accent"/><p className="text-xs leading-relaxed text-brand-muted">Les montants et les retraits seront activés uniquement après mise en place du journal financier immuable, des confirmations de paiement et des contrôles de libération des fonds.</p></div>
     </section>

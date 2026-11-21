@@ -106,7 +106,7 @@ export default async function CategoriesPage() {
                         aria-label={`Illustration de la catégorie ${item.name}`}
                         className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105"
                         style={{
-                          backgroundImage: `url("${photo}")`,
+                          backgroundImage: `url("${photo}"), linear-gradient(135deg, var(--brand-accent), var(--brand-surface-soft))`,
                           backgroundColor: "var(--brand-surface)",
                         }}
                       />
