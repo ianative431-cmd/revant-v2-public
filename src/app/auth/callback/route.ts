@@ -1,12 +1,21 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 const ALLOWED_DESTINATIONS = new Set(["/compte", "/compte/boutique", "/admin", "/reinitialiser-mot-de-passe"]);
+
+function redirectNoStore(url: URL) {
+  const response = NextResponse.redirect(url);
+  response.headers.set("Cache-Control", "private, no-store");
+  return response;
+}
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  const appOrigin = configuredSiteUrl ? new URL(configuredSiteUrl).origin : requestUrl.origin;
+  // Preserve the exact host that initiated OAuth so the PKCE verifier and
+  // session cookies remain on the same origin (Render URL or custom domain).
+  const appOrigin = requestUrl.origin;
   const code = requestUrl.searchParams.get("code");
   const nativeFlow = requestUrl.searchParams.get("native") === "1";
   const requestedNext = requestUrl.searchParams.get("next") ?? "/compte";
@@ -21,7 +30,7 @@ export async function GET(request: Request) {
   if (!nativeFlow) {
     if (!code) {
       errorUrl.searchParams.set("reason", "callback");
-      return NextResponse.redirect(errorUrl);
+      return redirectNoStore(errorUrl);
     }
     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
     if (exchangeError) {
@@ -31,7 +40,8 @@ export async function GET(request: Request) {
         message: exchangeError.message,
       });
       errorUrl.searchParams.set("reason", "exchange");
-      return NextResponse.redirect(errorUrl);
+      if (exchangeError.code) errorUrl.searchParams.set("code", exchangeError.code);
+      return redirectNoStore(errorUrl);
     }
   }
 
@@ -41,7 +51,7 @@ export async function GET(request: Request) {
       console.error("[auth-callback] session missing after OAuth exchange", userError?.message);
       await supabase.auth.signOut();
       errorUrl.searchParams.set("reason", "session");
-      return NextResponse.redirect(errorUrl);
+      return redirectNoStore(errorUrl);
     }
 
     if (isAdminFlow) {
@@ -54,10 +64,10 @@ export async function GET(request: Request) {
         console.error("[auth-callback] super-admin role check failed", roleError?.message);
         await supabase.auth.signOut();
         errorUrl.searchParams.set("reason", "not_admin");
-        return NextResponse.redirect(errorUrl);
+        return redirectNoStore(errorUrl);
       }
     }
   }
 
-  return NextResponse.redirect(new URL(next, appOrigin));
+  return redirectNoStore(new URL(next, appOrigin));
 }
