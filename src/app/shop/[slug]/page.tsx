@@ -138,7 +138,7 @@ export default async function ShopPublicPage({ params }: Props) {
             <div
               role={logoUrl ? "img" : undefined}
               aria-label={logoUrl ? `Logo de ${shop.name}` : undefined}
-              className="absolute -top-11 left-4 flex h-[88px] w-[88px] items-center justify-center overflow-hidden rounded-[22px] border-[5px] border-[var(--brand-surface)] bg-cover bg-center text-3xl font-black text-white shadow-xl sm:left-8 sm:h-28 sm:w-28 sm:rounded-[26px]"
+              className="absolute -top-11 left-4 flex h-[88px] w-[88px] items-center justify-center overflow-hidden rounded-[22px] border-[5px] border-[var(--brand-surface)] bg-contain bg-center bg-no-repeat p-1 text-3xl font-black text-white shadow-xl sm:left-8 sm:h-28 sm:w-28 sm:rounded-[26px]"
               style={{
                 backgroundColor: shopColor,
                 backgroundImage: logoUrl ? `url("${logoUrl}")` : undefined,

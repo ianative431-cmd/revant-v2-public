@@ -27,7 +27,7 @@ export default async function SiteHeader({ hideSearch = false }: { hideSearch?: 
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--brand-header)] text-[var(--brand-header-text)] shadow-sm">
-      <div className="mx-auto flex h-[56px] min-h-[56px] max-w-[1500px] items-center justify-between gap-2 px-3 sm:h-16 sm:min-h-16 sm:px-7">
+      <div className="mx-auto flex h-12 min-h-12 max-w-[1500px] items-center justify-between gap-2 px-3 sm:h-14 sm:min-h-14 sm:px-7">
         <div className="flex shrink-0 items-center gap-2">
           <details className="relative md:hidden">
             <summary aria-label="Ouvrir le menu principal" className="flex min-h-10 min-w-10 list-none cursor-pointer items-center justify-center rounded-xl hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
@@ -43,7 +43,7 @@ export default async function SiteHeader({ hideSearch = false }: { hideSearch?: 
             </nav>
           </details>
           <Link href="/" aria-label="Revant — accueil" className="inline-flex shrink-0 items-center gap-2 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brand-accent)]">
-            <Image src="/images/logo-revant-officiel-512.png?v=20261121" alt="" width={40} height={40} priority unoptimized className="h-8 w-8 rounded-lg object-contain sm:h-10 sm:w-10" />
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl"><Image src="/images/logo-revant-officiel-512.png?v=20261121-carton-complet" alt="" width={56} height={56} priority unoptimized className="h-14 w-14 !max-w-none object-contain" /></span>
             <span className="text-sm font-semibold tracking-tight sm:text-base">Revant</span>
           </Link>
         </div>
@@ -58,7 +58,7 @@ export default async function SiteHeader({ hideSearch = false }: { hideSearch?: 
 
         <div className="flex items-center gap-1 sm:gap-2">
           {!hideSearch && (
-            <form action="/" method="get" role="search" className="hidden items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 backdrop-blur-md sm:flex">
+            <form action="/" method="get" role="search" className="hidden items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-md sm:flex">
               <Search {...iconProps} />
               <input name="q" aria-label="Rechercher des produits" placeholder="Rechercher" className="w-24 bg-transparent text-xs text-white outline-none placeholder:text-white/60 sm:w-32" />
               <PhotoActionMenu allowAdd={allowAdd} />
@@ -74,7 +74,7 @@ export default async function SiteHeader({ hideSearch = false }: { hideSearch?: 
       </div>
 
       {!hideSearch && (
-        <div className="px-3 pb-2 sm:hidden">
+        <div className="px-3 pb-1 sm:hidden">
           <form action="/" method="get" role="search" className="flex h-10 min-h-10 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-white shadow-sm backdrop-blur-md focus-within:ring-2 focus-within:ring-[var(--brand-accent)]">
             <Search {...iconProps} />
             <input name="q" aria-label="Rechercher des produits, boutiques et catégories" placeholder="Rechercher produits, boutiques…" className="h-full min-h-0 min-w-0 flex-1 bg-transparent py-0 text-sm text-white outline-none placeholder:text-white/60" />

@@ -21,13 +21,13 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/images/revant-box-mark-192.png?v=20261115",
+      "src": "/images/logo-revant-officiel-192.png?v=20261121-carton-complet",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/revant-box-mark-512.png?v=20261115",
+      "src": "/images/logo-revant-officiel-512.png?v=20261121-carton-complet",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
