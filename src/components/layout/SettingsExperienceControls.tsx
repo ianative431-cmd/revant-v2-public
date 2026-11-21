@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Moon, Sun, Zap } from "lucide-react";
+import { Check, Moon, Zap } from "lucide-react";
 import PaletteSwitcher from "@/components/layout/PaletteSwitcher";
 import type { SitePaletteId } from "@/content/theme/site-palette";
 
@@ -92,7 +92,7 @@ export default function SettingsExperienceControls({ mode, currentPalette }: { m
           <button type="button" aria-pressed={settings.text === "large"} onClick={() => update("text", "large")} className="min-h-11 rounded-xl border border-brand-border px-3 text-base font-semibold aria-pressed:border-brand-accent aria-pressed:bg-brand-accent/10">Plus grand</button>
         </div>
       </fieldset>
-      <p className="text-[11px] leading-relaxed text-brand-muted">Ces préférences d'affichage sont enregistrées sur cet appareil et ce navigateur. Elles ne sont pas encore synchronisées entre plusieurs appareils. Le réglage système « Réduire les animations » reste prioritaire.</p>
+      <p className="text-[11px] leading-relaxed text-brand-muted">Ces préférences d&apos;affichage sont enregistrées sur cet appareil et ce navigateur. Elles ne sont pas encore synchronisées entre plusieurs appareils. Le réglage système « Réduire les animations » reste prioritaire.</p>
     </div>
   );
 }
