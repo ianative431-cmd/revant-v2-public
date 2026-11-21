@@ -67,11 +67,14 @@ export default function LaunchExperience() {
       aria-label="Bienvenue sur Revant"
     >
       {stage === "logo" ? (
-        <img
-          src="/images/revant-box-mark.svg"
-          alt="Revant"
-          className="revant-brand-mark h-28 w-28 animate-[revant-logo-in_400ms_ease-out_both] object-contain"
-        />
+        <div className="flex flex-col items-center gap-3">
+          <img
+            src="/images/logo-revant-officiel-512.png?v=20261121"
+            alt="Logo officiel Revant"
+            className="h-28 w-28 rounded-3xl animate-[revant-logo-in_400ms_ease-out_both] object-contain"
+          />
+          <span className="text-xl font-semibold tracking-tight text-brand-text">Revant</span>
+        </div>
       ) : (
         <video
           key="revant-launch-video"

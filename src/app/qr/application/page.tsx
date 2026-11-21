@@ -16,7 +16,7 @@ export default async function ApplicationQrPage() {
     <main className="flex min-h-[70vh] items-center justify-center bg-brand-bg px-4 py-10">
       <section className="w-full max-w-md rounded-[28px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-6 text-center shadow-sm sm:p-9">
         <Link href="/" aria-label="Retour à l’accueil Revant" className="mx-auto inline-flex rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-accent">
-          <Image src="/images/revant-box-mark.svg" alt="Revant" width={64} height={64} priority unoptimized className="revant-brand-mark h-16 w-16 object-contain" />
+          <Image src="/images/logo-revant-officiel-512.png?v=20261121" alt="Logo officiel Revant" width={64} height={64} priority unoptimized className="h-16 w-16 rounded-2xl object-contain" />
         </Link>
         <p className="mt-5 text-[10px] font-extrabold uppercase tracking-[0.2em] text-neutral-500">Accès officiel</p>
         <h1 className="mt-2 text-2xl font-black tracking-tight text-brand-text sm:text-3xl">Découvrir Revant</h1>
