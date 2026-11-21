@@ -29,7 +29,7 @@ export default function LegalCenterPage() {
                     <p className="text-sm font-medium">{doc.title}</p>
                     <p className="text-xs text-brand-text/60 mt-0.5">{doc.summary}</p>
                     <p className="text-xs text-brand-text/40 mt-1">
-                      Version {doc.version} — en vigueur depuis le{" "}
+                      Version {doc.version} — document de travail préparé le{" "}
                       {new Date(doc.effectiveDate).toLocaleDateString("fr-FR")}
                     </p>
                   </div>
