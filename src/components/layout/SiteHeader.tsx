@@ -5,12 +5,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const iconProps = { size: 20, strokeWidth: 1.8, "aria-hidden": true as const };
 const quickLinks = [
-  { href: "/boutiques", label: "Toutes les boutiques" },
-  { href: "/#categories", label: "Catégories Revant Mega" },
-  { href: "/restaurants", label: "Restaurants" },
   { href: "/compte/commandes", label: "Mes commandes" },
   { href: "/boutiques/creer", label: "Vendre sur Revant" },
-  { href: "/parametres", label: "Paramètres" },
+  { href: "/legal", label: "Centre juridique" },
 ];
 
 export default async function SiteHeader({ hideSearch = false }: { hideSearch?: boolean }) {
