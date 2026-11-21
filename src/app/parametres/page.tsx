@@ -85,7 +85,7 @@ export default async function ParametresPage() {
 
           <SettingsSection title="Assistance et informations">
             <div className="divide-y divide-brand-border">
-              <SettingsLink href="/messages" label="Contacter Revant" description="Obtenir de l’aide par messagerie" Icon={CircleHelp} />
+              <SettingsLink href="/messages" label="Mes conversations" description="Échanger avec les vendeurs et les acheteurs" Icon={CircleHelp} />
               <Link href="/legal" className="flex min-h-[54px] items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-brand-text hover:bg-brand-bg">
                 <span>Informations légales et confidentialité</span>
                 <ChevronRight size={17} className="shrink-0 text-brand-muted" aria-hidden="true" />

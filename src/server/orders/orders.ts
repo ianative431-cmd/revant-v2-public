@@ -27,12 +27,13 @@ async function getDeliveriesForOrders(supabase: SupabaseClient, orderIds: string
     .from("deliveries")
     .select(DELIVERY_SELECT)
     .in("order_id", orderIds);
-  if (error) return [];
+  if (error) throw error;
   return (data ?? []) as DeliverySummary[];
 }
 
 export async function getOrdersForBuyer(supabase: SupabaseClient): Promise<Order[]> {
-  const { data: userResult } = await supabase.auth.getUser();
+  const { data: userResult, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
   const buyerId = userResult.user?.id;
   if (!buyerId) return [];
 
@@ -41,14 +42,15 @@ export async function getOrdersForBuyer(supabase: SupabaseClient): Promise<Order
     .select(ORDER_SELECT)
     .eq("buyer_id", buyerId)
     .order("created_at", { ascending: false });
-  if (error || !orders?.length) return [];
+  if (error) throw error;
+  if (!orders?.length) return [];
 
   const orderIds = orders.map((order) => order.id);
   const [{ data: items, error: itemsError }, deliveries] = await Promise.all([
     supabase.from("order_items").select(ITEM_SELECT).in("order_id", orderIds).order("created_at", { ascending: true }),
     getDeliveriesForOrders(supabase, orderIds),
   ]);
-  if (itemsError) return [];
+  if (itemsError) throw itemsError;
 
   return attachRelations(orders as Order[], (items ?? []) as OrderItem[], deliveries);
 }
@@ -61,14 +63,16 @@ export async function getOrdersForShop(supabase: SupabaseClient, shopId: string)
     .select(ITEM_SELECT)
     .eq("shop_id", shopId)
     .order("created_at", { ascending: false });
-  if (error || !items?.length) return [];
+  if (error) throw error;
+  if (!items?.length) return [];
 
   const orderIds = [...new Set(items.map((item) => item.order_id))];
   const [{ data: orders, error: ordersError }, deliveries] = await Promise.all([
     supabase.from("orders").select(ORDER_SELECT).in("id", orderIds).order("created_at", { ascending: false }),
     getDeliveriesForOrders(supabase, orderIds),
   ]);
-  if (ordersError || !orders?.length) return [];
+  if (ordersError) throw ordersError;
+  if (!orders?.length) return [];
 
   return attachRelations(orders as Order[], items as OrderItem[], deliveries);
 }
@@ -79,13 +83,14 @@ export async function getOrderById(supabase: SupabaseClient, id: string): Promis
     .select(ORDER_SELECT)
     .eq("id", id)
     .maybeSingle();
-  if (error || !order) return null;
+  if (error) throw error;
+  if (!order) return null;
 
   const [{ data: items, error: itemsError }, deliveries] = await Promise.all([
     supabase.from("order_items").select(ITEM_SELECT).eq("order_id", id).order("created_at", { ascending: true }),
     getDeliveriesForOrders(supabase, [id]),
   ]);
-  if (itemsError) return null;
+  if (itemsError) throw itemsError;
 
   return attachRelations([order as Order], (items ?? []) as OrderItem[], deliveries)[0];
 }
