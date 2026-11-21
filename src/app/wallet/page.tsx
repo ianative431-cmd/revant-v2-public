@@ -33,8 +33,7 @@ function BuyerWallet() {
           </div>
           <div className="mx-auto mt-5 max-w-sm text-center">
             <h3 className="text-sm font-bold">Aucune carte enregistrée</h3>
-            <p className="mt-1 text-xs leading-relaxed text-brand-muted">L’ajout sécurisé sera activé dès que le prestataire de paiement de Revant permettra l’enregistrement et la réutilisation de cartes par jeton.</p>
-            <p className="mt-4 text-[10px] leading-relaxed text-brand-muted">Fonction en préparation : l’ajout sécurisé sera activé après l’intégration du prestataire de paiement. Aucune donnée bancaire ne doit être saisie ici pour le moment.</p>
+            <p className="mt-1 text-xs leading-relaxed text-brand-muted">L’enregistrement sécurisé par jeton sera activé avec le prestataire de paiement. Ne saisis aucune donnée bancaire ici pour le moment.</p>
           </div>
         </div>
       </div>
