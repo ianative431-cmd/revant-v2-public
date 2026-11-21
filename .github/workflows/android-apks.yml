@@ -59,6 +59,9 @@ jobs:
       - name: Generate Android project
         working-directory: ${{ matrix.app.directory }}
         run: npx cap add android
+      - name: Sync Capacitor plugins and native configuration
+        working-directory: ${{ matrix.app.directory }}
+        run: npx cap sync android
       - name: Register Revant OAuth deep link
         if: matrix.app.id == 'revant'
         working-directory: ${{ matrix.app.directory }}
