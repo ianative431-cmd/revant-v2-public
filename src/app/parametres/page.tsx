@@ -1,170 +1,155 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
-  Accessibility,
-  Bell,
-  ChevronRight,
-  Globe,
-  Headset,
-  History,
-  Palette,
-  ReceiptText,
-  Scale,
-  ShieldCheck,
-  UserRound,
-  type LucideIcon,
+  Bell, ChevronRight, CircleHelp, Eye, Globe2, Info, LockKeyhole,
+  Palette, ShieldCheck, Smartphone, UserRound, Zap,
 } from "lucide-react";
 import BottomNav from "@/components/layout/BottomNav";
-import PaletteSwitcher from "@/components/layout/PaletteSwitcher";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SettingsSearch from "@/components/layout/SettingsSearch";
-import { SITE_PALETTES } from "@/content/theme/site-palette";
-import { getSitePalette } from "@/server/theme/site-palette";
+import SettingsExperienceControls from "@/components/layout/SettingsExperienceControls";
 
 type SettingsItem = {
   href: string;
   label: string;
   description: string;
   Icon: LucideIcon;
-  color: string;
 };
 
 const GROUPS: { title: string; items: SettingsItem[] }[] = [
-  {
-    title: "Compte et sécurité",
-    items: [
-      { href: "/compte", label: "Mon compte", description: "Tes informations personnelles et ton profil", Icon: UserRound, color: "var(--brand-accent)" },
-      { href: "#securite", label: "Sécurité et confidentialité", description: "Accès au compte et protection des données", Icon: ShieldCheck, color: "#57707A" },
-      { href: "/compte/notifications", label: "Notifications", description: "Commandes, paiements et informations Revant", Icon: Bell, color: "#E6A23C" },
-      { href: "#langue-region", label: "Langue et région", description: "Français · Niger · XOF", Icon: Globe, color: "#57707A" },
-    ],
-  },
-  {
-    title: "Activité",
-    items: [
-      { href: "/compte/historique", label: "Historique", description: "Achats, ventes et livraisons selon ton rôle", Icon: History, color: "var(--brand-accent)" },
-      { href: "/compte/recus", label: "Mes reçus", description: "Consulter les reçus des commandes livrées", Icon: ReceiptText, color: "#E6A23C" },
-    ],
-  },
-  {
-    title: "Préférences",
-    items: [
-      { href: "#apparence", label: "Apparence", description: "Choisir le thème de Revant", Icon: Palette, color: "#989DAA" },
-      { href: "#accessibilite", label: "Accessibilité", description: "Navigation et animations adaptées", Icon: Accessibility, color: "#57707A" },
-    ],
-  },
-  {
-    title: "Assistance et informations",
-    items: [
-      { href: "#aide", label: "Aide et assistance", description: "Messagerie et ressources utiles", Icon: Headset, color: "var(--brand-accent)" },
-      { href: "/legal", label: "Informations légales", description: "Conditions, confidentialité et documents Revant", Icon: Scale, color: "#989DAA" },
-    ],
-  },
+  { title: "Compte", items: [
+    { href: "/compte", label: "Mon compte", description: "Informations personnelles, coordonnées et profil", Icon: UserRound },
+  ]},
+  { title: "Sécurité", items: [
+    { href: "#securite", label: "Sécurité et appareils", description: "Accès au compte, mot de passe et appareils", Icon: ShieldCheck },
+  ]},
+  { title: "Notifications", items: [
+    { href: "/compte/notifications", label: "Centre de notifications", description: "Commandes, paiements, messages et alertes", Icon: Bell },
+  ]},
+  { title: "Apparence", items: [
+    { href: "#apparence", label: "Thème et effets visuels", description: "Thème Revant et finition Liquid Glass", Icon: Palette },
+  ]},
+  { title: "Affichage et interactions", items: [
+    { href: "#interactions", label: "Vitesse et affichage", description: "Réactivité, animations et confort de lecture", Icon: Zap },
+  ]},
+  { title: "Langue et région", items: [
+    { href: "#langue-region", label: "Préférences régionales", description: "Langue, pays et devise", Icon: Globe2 },
+  ]},
+  { title: "Confidentialité", items: [
+    { href: "#confidentialite", label: "Données et autorisations", description: "Visibilité, comptes bloqués et gestion des données", Icon: LockKeyhole },
+  ]},
+  { title: "Aide et assistance", items: [
+    { href: "#aide", label: "Centre d'aide", description: "Messagerie et ressources utiles", Icon: CircleHelp },
+  ]},
+  { title: "À propos de Revant", items: [
+    { href: "#apropos", label: "Informations sur Revant", description: "Identité du service et informations légales", Icon: Info },
+  ]},
 ];
 
 function SettingsRow({ item }: { item: SettingsItem }) {
   const Icon = item.Icon;
   return (
-    <Link href={item.href} className="revant-settings-row flex min-h-[76px] items-center gap-3 px-4 py-3 transition hover:bg-brand-accent/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent sm:px-5">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ color: item.color, backgroundColor: `color-mix(in srgb, ${item.color} 9%, transparent)` }}>
-        <Icon size={21} strokeWidth={1.8} aria-hidden="true" />
+    <Link href={item.href} className="revant-settings-row flex min-h-[68px] items-center gap-3 px-4 py-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent sm:px-5">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-bg text-brand-accent">
+        <Icon size={19} strokeWidth={1.8} aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold text-brand-text">{item.label}</span>
         <span className="mt-1 block text-xs leading-relaxed text-brand-muted">{item.description}</span>
       </span>
-      <ChevronRight size={18} className="shrink-0 text-brand-muted" aria-hidden="true" />
+      <ChevronRight size={17} className="shrink-0 text-brand-muted" aria-hidden="true" />
     </Link>
   );
 }
 
-function SettingsInfoCard({ children, id }: { children: ReactNode; id: string }) {
-  return <section id={id} className="scroll-mt-24 rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-sm sm:p-6">{children}</section>;
+function SettingsSection({ title, id, children }: { title: string; id: string; children: React.ReactNode }) {
+  return (
+    <section id={id} aria-labelledby={id + "-title"} className="scroll-mt-24">
+      <h2 id={id + "-title"} className="mb-2 px-1 text-xs font-bold uppercase tracking-[0.14em] text-brand-muted">{title}</h2>
+      <div className="overflow-hidden rounded-2xl border border-brand-border bg-brand-surface shadow-sm">{children}</div>
+    </section>
+  );
 }
 
-export default async function ParametresPage() {
-  const palette = await getSitePalette();
-
+export default function ParametresPage() {
   const searchEntries = GROUPS.flatMap((group) =>
-    group.items.map(({ href, label, description }) => ({
-      href,
-      label,
-      description,
-      group: group.title,
-    })),
+    group.items.map(({ href, label, description }) => ({ href, label, description, group: group.title })),
   );
 
   return (
-    <div className="min-h-screen bg-brand-bg pb-28 text-brand-text">
+    <div className="revant-settings-page min-h-screen bg-brand-bg pb-28 text-brand-text">
       <SiteHeader hideSearch />
-      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:py-10">
-        <header className="mb-7">
+      <main className="mx-auto w-full max-w-3xl px-4 pb-8 pt-20 sm:px-6">
+        <header className="mb-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-accent">REVANT</p>
           <h1 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">Paramètres</h1>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-brand-muted">Retrouve ton compte, ton activité et les préférences de ton application.</p>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-brand-muted">Gérez votre compte et votre expérience Revant.</p>
         </header>
 
         <SettingsSearch entries={searchEntries} />
 
-        <div className="space-y-6">
-          {GROUPS.map((group) => (
-            <section key={group.title} aria-label={group.title}>
-              <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-[0.14em] text-brand-muted">{group.title}</h2>
-              <div className="overflow-hidden rounded-2xl border border-brand-border bg-brand-surface shadow-sm">
-                {group.items.map((item, index) => (
-                  <div key={item.label}>
-                    {index > 0 && <div className="mx-4 border-t border-brand-border sm:mx-5" />}
-                    <SettingsRow item={item} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
+        <div className="space-y-5">
+          <SettingsSection title="Mon compte" id="compte">
+            <SettingsRow item={GROUPS[0].items[0]} />
+          </SettingsSection>
 
-        <div className="mt-8 space-y-4">
-          <SettingsInfoCard id="securite">
-            <h2 className="text-base font-bold">Sécurité et confidentialité</h2>
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted">Garde l’accès à ton compte sous contrôle et consulte les informations relatives à tes données.</p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Link href="/mot-de-passe-oublie" className="rounded-full border border-brand-border px-4 py-2.5 text-xs font-semibold text-brand-text transition hover:border-brand-accent hover:text-brand-accent">Réinitialiser mon mot de passe</Link>
-              <Link href="/legal" className="rounded-full border border-brand-border px-4 py-2.5 text-xs font-semibold text-brand-text transition hover:border-brand-accent hover:text-brand-accent">Confidentialité et données</Link>
+          <SettingsSection title="Sécurité" id="securite">
+            <SettingsRow item={GROUPS[1].items[0]} />
+            <div className="border-t border-brand-border px-4 py-4 sm:px-5">
+              <p className="text-sm font-semibold">Protéger l'accès au compte</p>
+              <p className="mt-1 text-xs leading-relaxed text-brand-muted">Utilisez la récupération officielle du mot de passe. La liste des sessions et la fermeture à distance seront proposées lorsqu'un contrôle de sessions sécurisé sera disponible.</p>
+              <Link href="/mot-de-passe-oublie" className="mt-3 inline-flex min-h-10 items-center rounded-full border border-brand-border px-4 text-xs font-semibold text-brand-text hover:border-brand-accent hover:text-brand-accent">Réinitialiser mon mot de passe</Link>
             </div>
-          </SettingsInfoCard>
+          </SettingsSection>
 
-          <SettingsInfoCard id="langue-region">
-            <h2 className="text-base font-bold">Langue et région</h2>
-            <p className="mt-1 text-sm text-brand-muted">Configuration régionale actuelle de Revant.</p>
-            <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-brand-bg p-3"><dt className="text-xs text-brand-muted">Langue</dt><dd className="mt-1 text-sm font-semibold">Français</dd></div>
-              <div className="rounded-xl bg-brand-bg p-3"><dt className="text-xs text-brand-muted">Région</dt><dd className="mt-1 text-sm font-semibold">Niger</dd></div>
-              <div className="rounded-xl bg-brand-bg p-3"><dt className="text-xs text-brand-muted">Devise</dt><dd className="mt-1 text-sm font-semibold">FCFA (XOF)</dd></div>
-            </dl>
-            <p className="mt-3 text-xs leading-relaxed text-brand-muted">La sélection d’autres langues ou régions n’est pas encore activée dans l’application.</p>
-          </SettingsInfoCard>
+          <SettingsSection title="Notifications" id="notifications">
+            <SettingsRow item={GROUPS[2].items[0]} />
+          </SettingsSection>
 
-          <SettingsInfoCard id="apparence">
-            <h2 className="text-base font-bold">Apparence</h2>
-            <p className="mt-1 text-sm text-brand-muted">Choisis le thème visuel de Revant.</p>
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-              <span className="text-sm font-medium">{SITE_PALETTES[palette].label}</span>
-              <PaletteSwitcher current={palette} />
+          <SettingsSection title="Apparence" id="apparence">
+            <SettingsRow item={GROUPS[3].items[0]} />
+            <SettingsExperienceControls mode="appearance" />
+          </SettingsSection>
+
+          <SettingsSection title="Affichage et interactions" id="interactions">
+            <SettingsRow item={GROUPS[4].items[0]} />
+            <SettingsExperienceControls mode="interactions" />
+          </SettingsSection>
+
+          <SettingsSection title="Langue et région" id="langue-region">
+            <SettingsRow item={GROUPS[5].items[0]} />
+            <div className="grid grid-cols-3 gap-2 border-t border-brand-border p-4 sm:p-5">
+              <div className="rounded-xl bg-brand-bg p-3"><p className="text-[10px] text-brand-muted">Langue</p><p className="mt-1 text-sm font-semibold">Français</p></div>
+              <div className="rounded-xl bg-brand-bg p-3"><p className="text-[10px] text-brand-muted">Pays</p><p className="mt-1 text-sm font-semibold">Niger</p></div>
+              <div className="rounded-xl bg-brand-bg p-3"><p className="text-[10px] text-brand-muted">Devise</p><p className="mt-1 text-sm font-semibold">XOF</p></div>
             </div>
-          </SettingsInfoCard>
+            <p className="px-4 pb-4 text-xs text-brand-muted sm:px-5">Les autres langues, pays et devises ne sont pas encore activés.</p>
+          </SettingsSection>
 
-          <SettingsInfoCard id="accessibilite">
-            <h2 className="text-base font-bold">Accessibilité</h2>
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted">Revant respecte le réglage de réduction des animations de ton appareil. Les commandes conservent un contour visible lors de la navigation au clavier.</p>
-          </SettingsInfoCard>
-
-          <SettingsInfoCard id="aide">
-            <h2 className="text-base font-bold">Aide et assistance</h2>
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted">Retrouve tes échanges dans la messagerie et consulte tes commandes pour suivre leur avancement.</p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Link href="/messages" className="rounded-full bg-brand-accent px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[var(--brand-accent-hover)]">Ouvrir la messagerie</Link>
-              <Link href="/compte/commandes" className="rounded-full border border-brand-border px-4 py-2.5 text-xs font-semibold text-brand-text transition hover:border-brand-accent hover:text-brand-accent">Voir mes commandes</Link>
+          <SettingsSection title="Confidentialité" id="confidentialite">
+            <SettingsRow item={GROUPS[6].items[0]} />
+            <div className="flex flex-wrap gap-2 border-t border-brand-border p-4 sm:px-5">
+              <Link href="/compte/blocages" className="inline-flex min-h-10 items-center rounded-full border border-brand-border px-4 text-xs font-semibold hover:border-brand-accent">Comptes bloqués</Link>
+              <Link href="/compte/suppression" className="inline-flex min-h-10 items-center rounded-full border border-brand-border px-4 text-xs font-semibold hover:border-brand-accent">Gestion et suppression du compte</Link>
+              <Link href="/legal" className="inline-flex min-h-10 items-center rounded-full border border-brand-border px-4 text-xs font-semibold hover:border-brand-accent">Politique de confidentialité</Link>
             </div>
-          </SettingsInfoCard>
+          </SettingsSection>
+
+          <SettingsSection title="Aide et assistance" id="aide">
+            <SettingsRow item={GROUPS[7].items[0]} />
+            <div className="border-t border-brand-border p-4 sm:px-5">
+              <Link href="/messages" className="inline-flex min-h-10 items-center rounded-full bg-brand-accent px-4 text-xs font-bold text-white hover:bg-brand-accent-hover">Ouvrir la messagerie</Link>
+            </div>
+          </SettingsSection>
+
+          <SettingsSection title="À propos de Revant" id="apropos">
+            <SettingsRow item={GROUPS[8].items[0]} />
+            <div className="border-t border-brand-border p-4 sm:px-5">
+              <p className="text-sm font-semibold">Revant — seconde vie, nouvelle valeur</p>
+              <p className="mt-1 text-xs leading-relaxed text-brand-muted">Marketplace conçue pour rapprocher acheteurs, boutiques et services de livraison.</p>
+              <Link href="/legal" className="mt-3 inline-flex min-h-10 items-center rounded-full border border-brand-border px-4 text-xs font-semibold hover:border-brand-accent">Consulter les informations légales</Link>
+            </div>
+          </SettingsSection>
         </div>
       </main>
       <BottomNav />
