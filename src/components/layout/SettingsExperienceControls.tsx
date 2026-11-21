@@ -61,7 +61,7 @@ export default function SettingsExperienceControls({ mode, currentPalette }: { m
         </div>
         <fieldset>
           <legend className="text-sm font-semibold">Intensité Liquid Glass</legend>
-          <p className="mt-1 text-xs text-brand-muted">L'effet reste limité aux surfaces de paramètres.</p>
+          <p className="mt-1 text-xs text-brand-muted">L&apos;effet reste limité aux surfaces de paramètres.</p>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {(["subtle", "balanced", "strong"] as const).map((value) => (
               <button key={value} type="button" aria-pressed={settings.glass === value} onClick={() => update("glass", value)} className="flex min-h-11 items-center justify-center gap-1 rounded-xl border border-brand-border px-2 text-xs font-semibold aria-pressed:border-brand-accent aria-pressed:bg-brand-accent/10">
