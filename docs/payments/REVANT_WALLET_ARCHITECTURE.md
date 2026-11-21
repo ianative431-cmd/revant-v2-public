@@ -40,12 +40,12 @@
 - Si le mécanisme de paiement fractionné ou de reversement multi-vendeurs n'est pas autorisé par le contrat et le cadre réglementaire, chaque vendeur devra être enrôlé selon le modèle approuvé par le prestataire ou Revant devra utiliser un partenaire autorisé proposant explicitement cette fonctionnalité.
 
 ## État vérifié au 21 novembre 2026
-- BottomNav contenait cinq entrées ; l'entrée Wallet n'existait pas.
-- Aucune route /wallet n'existait.
+- La navigation mobile comprend désormais une entrée Wallet unique pour les acheteurs et les vendeurs connectés.
+- La route `/wallet` est intégrée et exige une session utilisateur ainsi qu’un consentement légal à jour.
 - src/server/ledger/README.md précise que le ledger financier n'est pas implémenté.
 - Aucun module de portefeuille acheteur ou de cartes enregistrées n'a été trouvé dans le dépôt.
 - La documentation publique iMoney décrit l'acceptation de Visa, Mastercard et GIM UEMOA au Niger, mais aucune fonction de tokenisation réutilisable n'a été vérifiée.
-- Les écrans peuvent être préparés, mais l'ajout réel de cartes et les soldes vendeurs ne doivent pas être simulés.
+- La navigation et les écrans de présentation sont intégrés ; l’ajout réel de cartes et les soldes vendeurs ne doivent pas être simulés.
 
 ## Blocages externes et prochaines étapes
 1. Obtenir d'iFUTUR une réponse écrite sur le modèle marketplace, sous-marchands, split et reversements multi-vendeurs.
@@ -55,4 +55,4 @@
 5. Tester les cartes et paiements en sandbox avant activation réelle.
 
 ## État de cette livraison
-La navigation et la page de présentation Wallet sont intégrées. Les CTA d’ajout de carte, les soldes et les statistiques financières restent non opérationnels tant que les fondations externes et comptables ne sont pas disponibles. Les CTA d'ajout de carte, les soldes et les statistiques financières restent non opérationnels tant que les fondations externes et comptables ne sont pas disponibles. Aucun déploiement Render n'est déclenché.
+La navigation et la page de présentation Wallet sont intégrées. Les CTA d’ajout de carte, les soldes et les statistiques financières restent non opérationnels tant que les fondations externes et comptables ne sont pas disponibles. Aucun déploiement Render n’est déclenché.
