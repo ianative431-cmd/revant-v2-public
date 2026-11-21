@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import "./interaction-performance.css";
 import Footer from "@/components/layout/Footer";
 import GlobalDismissibleDetails from "@/components/layout/GlobalDismissibleDetails";
+import FloatingBackButton from "@/components/layout/FloatingBackButton";
 import CookieConsentBanner from "@/components/cookie-consent/CookieConsentBanner";
 import ServiceWorkerRegister from "@/components/pwa/ServiceWorkerRegister";
 import NativePushRegistration from "@/components/native/NativePushRegistration";
@@ -50,6 +52,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <NativePushRegistration />
         <NativeOAuthCallbackHandler />
         <LaunchExperience />
+        <Suspense fallback={null}>
+          <FloatingBackButton />
+        </Suspense>
         <div className="flex-1 flex flex-col">{children}</div>
         <Footer />
         <CookieConsentBanner />
