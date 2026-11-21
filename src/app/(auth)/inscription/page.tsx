@@ -9,9 +9,9 @@ function LegalSummaryAndConsent() {
   return (
     <div className="bg-[var(--brand-bg)] rounded-xl p-3 mb-3">
       <p className="text-xs text-[var(--brand-muted)] mb-2">
-        En créant un compte, tu acceptes notamment : une commission Revant de 0,5 % sur chaque
-        vente, la mise en séquestre des fonds jusqu&apos;à confirmation de la remise du produit, et
-        le traitement de tes données décrit dans notre politique de confidentialité.
+        En créant un compte, tu acceptes les conditions générales et la politique de confidentialité.
+        Les paiements en ligne, le séquestre et les versements automatisés ne sont pas encore activés.
+        La commission prévue de 0,5 % ne s&apos;appliquera qu&apos;après l&apos;activation du paiement intégré.
       </p>
       <label className="flex items-start gap-2 text-xs mb-1">
         <input type="checkbox" name="acceptCgu" required className="mt-0.5" />
