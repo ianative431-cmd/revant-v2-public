@@ -10,7 +10,7 @@ export const SITE_PALETTES: Record<
     label: "Éditorial Revant — ivoire & forêt",
     bg: "#F5F1E8",
     surface: "#FFFCF6",
-    accent: "#F36B21",
+    accent: "#B9470F",
     text: "#18251F",
   },
   "slate-lilac": {

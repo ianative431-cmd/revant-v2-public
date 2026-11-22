@@ -16,7 +16,7 @@ Create a visibly distinct, premium and commercially effective Revant marketplace
 - Replace generic rounded-card repetition with editorial feature panels, compact product tiles, structured data panels and clear navigation landmarks.
 - Use real product/shop media only when it exists in Supabase. When absent, use a designed neutral/brand placeholder, never a fake shop/product photograph.
 - Maintain the alternate dark theme with the same identity.
-- Respect reduced motion, keyboard navigation, focus visibility, contrast, safe areas and touch targets.
+- Respect reduced motion, keyboard navigation, focus visibility, WCAG AA text contrast for orange labels/actions, safe areas and touch targets.
 
 ## Scope
 All 31 experiences in `docs/REVANT_COMPLETE_VISUAL_DESIGN_SPEC.md` remain in scope. Deliver in coherent vertical slices: shared visual foundation; buyer discovery and storefront; buyer conversion; seller workspace; courier workspace; shared experiences; Super Admin; cross-device verification.

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type LaunchStage = "logo" | "video" | null;
@@ -68,9 +69,12 @@ export default function LaunchExperience() {
     >
       {stage === "logo" ? (
         <div className="flex flex-col items-center gap-3">
-          <img
+          <Image
             src="/images/logo-revant-officiel-512.png?v=20261121"
             alt="Logo officiel Revant"
+            width={112}
+            height={112}
+            priority
             className="h-28 w-28 rounded-3xl animate-[revant-logo-in_400ms_ease-out_both] object-contain"
           />
           <span className="text-xl font-semibold tracking-tight text-brand-text">Revant</span>
