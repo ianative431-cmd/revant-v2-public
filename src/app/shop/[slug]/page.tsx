@@ -169,7 +169,14 @@ export default async function ShopPublicPage({ params }: Props) {
                   <p className="max-w-3xl whitespace-pre-line text-sm leading-7 text-[var(--brand-muted)]">{shop.description}</p>
                 )}
               </div>
-
+              <div className="flex w-full shrink-0 flex-col gap-2 sm:flex-row lg:w-auto">
+                <a href="#produits" className="inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--brand-accent)] px-5 py-3 text-xs font-extrabold text-white shadow-sm transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">
+                  Découvrir les produits
+                </a>
+                <a href="#contact" className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-5 py-3 text-xs font-bold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">
+                  Contacter la boutique
+                </a>
+              </div>
             </div>
           </div>
         </section>
