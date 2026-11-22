@@ -138,9 +138,12 @@ Le code actuel possède déjà :
 - confirmation de remise par code à 4 ou 6 chiffres ;
 - alertes et Live Activity.
 
-Limite constatée dans la base :
-- `driver_update_delivery_status(p_delivery_id, p_status)` accepte le statut `failed`, mais ne reçoit aucun motif d'incident ;
-- la fonction privée ne renseigne pas `failure_reason` lors de ce changement de statut ;
-- l'interface livreur n'offre pas encore de formulaire de déclaration d'incident.
+### Déclaration d'incident — implémentation sur la branche
+- Le livreur peut déclarer un incident depuis une mission qui lui est attribuée, avec une catégorie et une description factuelle.
+- Le serveur vérifie la catégorie et la longueur de la description ; le RPC vérifie à nouveau que le livreur actif est bien celui affecté à la livraison.
+- Le RPC exige un motif pour le statut `failed`, contrôle les transitions et écrit le motif dans la colonne existante `deliveries.failure_reason`.
+- L'acheteur et les propriétaires des boutiques concernées reçoivent une notification.
+- Les espaces livreur, vendeur et acheteur peuvent afficher le motif enregistré.
+- La migration `20261122150000_delivery_incident_reason.sql` remplace le RPC à deux paramètres par une version à trois paramètres et retire l'ancien point d'entrée. Elle reste dans la branche GitHub : elle n'a pas été appliquée à Supabase production.
+- La table possédait déjà `failure_reason` ; aucune nouvelle colonne n'est nécessaire.
 
-La déclaration complète d'incident nécessite donc une évolution du RPC et de ses contrôles, pas un simple bouton qui afficherait un motif fictif. Aucun changement de schéma n'a été appliqué.
