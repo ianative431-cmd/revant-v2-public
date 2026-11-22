@@ -39,7 +39,7 @@ export async function generateViewport(): Promise<Viewport> {
     width: "device-width",
     initialScale: 1,
     viewportFit: "cover",
-    themeColor: palette === "slate-lilac" ? "#0B211A" : "#B9470F",
+    themeColor: palette === "slate-lilac" ? "#0B211A" : "#F36B21",
   };
 }
 

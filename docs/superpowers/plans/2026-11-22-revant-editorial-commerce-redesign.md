@@ -40,7 +40,7 @@
 **Files:** `src/app/globals.css`, `src/app/revant-editorial.css`, `src/app/layout.tsx`, `src/content/theme/site-palette.ts`, shared navigation/footer components.
 - [x] Define editorial ivory/forest/tangerine tokens while preserving dark mode.
 - [x] Redesign desktop/mobile navigation with accessible search and account entry points.
-- [x] Add shared surface, form, button, focus and motion primitives, with theme-aware orange foregrounds for WCAG AA contrast; full route-by-route verification remains pending.
+- [x] Add shared surface, form, button, focus and motion primitives, with bright tangerine action surfaces and darker WCAG AA-compliant orange text; full route-by-route verification remains pending.
 - [ ] Confirm all routes still render their shared shell.
 
 ### Task 3: Buyer discovery and storefront
