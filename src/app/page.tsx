@@ -138,6 +138,11 @@ export default async function Home({ searchParams }: Props) {
     <div className="min-h-screen bg-brand-bg text-brand-text pb-28">
       <SiteHeader />
       <HeroCarousel slides={HERO_SLIDES} />
+      <section aria-label="À la une Revant" className="mx-3 mt-3 overflow-hidden rounded-2xl border border-[#d9a34c]/30 shadow-sm sm:mx-5">
+        <Link href="/boutiques" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">
+          <img src="/images/hero/revant-promo-banner.svg" alt="Revant — Les bonnes trouvailles commencent ici. Mode, maison et terroir." className="block h-auto w-full" width="1440" height="360" />
+        </Link>
+      </section>
 
       <RevantMegaShortcuts />
 
