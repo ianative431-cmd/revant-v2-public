@@ -147,3 +147,30 @@ Le code actuel possède déjà :
 - La migration `20261122150000_delivery_incident_reason.sql` remplace le RPC à deux paramètres par une version à trois paramètres et retire l'ancien point d'entrée. Elle reste dans la branche GitHub : elle n'a pas été appliquée à Supabase production.
 - La table possédait déjà `failure_reason` ; aucune nouvelle colonne n'est nécessaire.
 
+
+
+## 10. Variantes de produits — audit avant implémentation
+
+### État réel constaté
+- Les produits ont `product_type` et `size_stock` en JSONB. Pour les vêtements, `size_stock` associe un libellé de taille à une quantité.
+- Il n'existe pas de table `product_variants` dans le schéma actuellement interrogé.
+- `order_items` ne contient ni `variant_id` ni `variant_label`.
+- La fiche produit montre les tailles et les quantités, mais elles sont uniquement informatives et ne sont pas sélectionnables.
+- `AddToCartButton` identifie une ligne par le seul identifiant du produit : deux tailles d'un même article ne peuvent donc pas être représentées comme deux lignes distinctes.
+- Le checkout invité accepte une quantité, mais aucun paramètre de taille.
+- La confirmation vendeur réserve le stock global `products.stock_quantity`, et l'annulation le restitue. Ces fonctions ne modifient pas `size_stock`.
+
+### Conséquence
+Le stock global est protégé lors de la confirmation, mais le stock par taille n'est pas transactionnel. Afficher un sélecteur de taille sans corriger la commande et les RPC donnerait une fausse garantie de réservation.
+
+### Conditions nécessaires avant d'activer le sélecteur
+1. Définir une identité stable de variante ou, à défaut pour le modèle actuel, un `variant_label` validé côté serveur.
+2. Transporter le choix dans le panier, l'idempotence et le checkout.
+3. Enregistrer le choix dans chaque ligne de commande, avec un instantané lisible pour l'acheteur et le vendeur.
+4. Vérifier atomiquement la disponibilité de la taille au moment de la confirmation vendeur.
+5. Décrémenter simultanément `size_stock[variant_label]` et le stock global, dans une seule transaction.
+6. Restituer exactement la même variante lors d'une annulation autorisée.
+7. Préserver les commandes historiques sans variante et définir le comportement des anciennes versions de l'application.
+8. Ajouter des tests de concurrence, d'idempotence, de quantité insuffisante, de confirmation et d'annulation.
+
+Aucun sélecteur de taille n'a été ajouté à ce stade : l'implémentation doit être livrée avec le flux serveur complet, et non comme une simple amélioration visuelle.
