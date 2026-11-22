@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
   Bell, ChevronRight, CircleHelp, LockKeyhole, ShieldCheck, UserRound,
   SlidersHorizontal, Globe2, FileText,
@@ -18,7 +19,7 @@ function SettingsGroup({ title, children }: { title: string; children: ReactNode
   );
 }
 
-function SettingsLink({ href, label, description, Icon }: { href: string; label: string; description?: string; Icon: typeof UserRound }) {
+function SettingsLink({ href, label, description, Icon }: { href: string; label: string; description?: string; Icon: LucideIcon }) {
   return (
     <Link href={href} className="flex min-h-14 items-center gap-3 py-3 transition-colors hover:bg-brand-surface/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent">
       <Icon size={18} strokeWidth={1.8} className="shrink-0 text-brand-accent" aria-hidden="true" />
@@ -76,7 +77,7 @@ export default async function ParametresPage() {
             <div className="flex min-h-14 items-center gap-3 py-3">
               <Globe2 size={18} className="shrink-0 text-brand-accent" aria-hidden="true" />
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-medium">Langue et région</span>
+                <span className="block text-sm font-medium">Région actuelle</span>
                 <span className="mt-0.5 block text-xs text-brand-muted">Français · Niger · XOF</span>
               </span>
             </div>
