@@ -105,3 +105,76 @@ input:not([type="checkbox"]):not([type="radio"]),select,textarea{border-radius:1
   .revant-checkout-form > div, .revant-checkout-form > button, .revant-checkout-form > p { grid-column: 1; }
   .revant-cart-group article { padding: 12px !important; }
 }
+
+.revant-hero__dots{position:absolute;left:clamp(22px,5vw,76px);bottom:22px;z-index:5;display:flex;align-items:center;gap:5px}.revant-hero__dots button{display:flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:999px}.revant-hero__dots button span{display:block;width:7px;height:7px;border:1px solid rgba(255,255,255,.9);border-radius:999px;background:rgba(255,255,255,.28);transition:width 220ms ease,background-color 220ms ease}.revant-hero__dots button span.is-active{width:24px;border-color:var(--brand-accent);background:var(--brand-accent)}.revant-hero__dots button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:640px){.revant-hero__dots{left:18px;bottom:13px}.revant-hero__dots button{width:25px;height:25px}.revant-hero__index{right:18px;bottom:16px}}
+@media(prefers-reduced-motion:reduce){.revant-hero__dots button span{transition:none!important}}
+
+/* Seller workspace and catalogue operations */
+.revant-seller-dashboard,.revant-seller-orders,.revant-seller-products,.revant-seller-customize{overflow:clip}
+.revant-seller-layout,.revant-seller-orders-layout,.revant-seller-products-layout,.revant-seller-customize-layout{width:min(calc(100% - 24px),1360px)}
+.revant-seller-dashboard h1,.revant-seller-orders h1,.revant-seller-products h1,.revant-seller-customize h1{font-size:clamp(28px,4vw,46px);font-weight:950;letter-spacing:-.065em;line-height:1}
+.revant-seller-metrics{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px!important}
+.revant-seller-metric{position:relative;min-height:126px;overflow:hidden;border:1px solid var(--brand-border)!important;border-radius:14px!important;background:var(--brand-surface)!important;box-shadow:none!important}
+.revant-seller-metric:before{position:absolute;inset:0 auto 0 0;width:3px;background:var(--brand-accent);content:""}
+.revant-seller-metric p:nth-child(2){font-size:clamp(26px,3vw,36px);letter-spacing:-.06em}
+.revant-seller-management,.revant-seller-share,.revant-seller-order,.revant-seller-customize form,.revant-seller-customize-layout>div.bg-\[var\(--brand-surface\)\]{border:1px solid var(--brand-border)!important;border-radius:16px!important;background:var(--brand-surface)!important;box-shadow:var(--brand-shadow)!important}
+.revant-seller-management h2,.revant-seller-share h2{font-size:18px;font-weight:950;letter-spacing:-.04em}
+.revant-seller-management a,.revant-seller-products-layout a{border-radius:11px!important}
+.revant-seller-orders article{border-left:3px solid var(--brand-accent)!important}
+.revant-seller-products article{border-radius:14px!important;box-shadow:none!important}
+
+/* Buyer order history and real event timeline */
+.revant-buyer-orders,.revant-buyer-order-detail{overflow:clip}
+.revant-buyer-orders-layout,.revant-buyer-order-detail-layout{width:min(calc(100% - 24px),1100px)}
+.revant-buyer-orders h1,.revant-buyer-order-detail h1{font-size:clamp(28px,4vw,44px);font-weight:950;letter-spacing:-.06em;line-height:1.02}
+.revant-buyer-order-card,.revant-order-status-panel,.revant-order-content-panel{border:1px solid var(--brand-border)!important;border-radius:17px!important;background:var(--brand-surface)!important;box-shadow:var(--brand-shadow)!important}
+.revant-buyer-order-card{padding:clamp(15px,2.5vw,24px)!important}
+.revant-buyer-order-card>div:first-child span,.revant-order-status-panel>div:first-child>span{border:1px solid var(--brand-border);background:var(--brand-bg)!important;color:var(--brand-text)!important}
+.revant-order-status-panel{background:var(--revant-forest)!important;color:#fff9f0!important}
+.revant-order-status-panel p{color:rgba(255,249,240,.72)}
+.revant-order-status-panel>div:first-child>span{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.1)!important;color:#fff9f0!important}
+.revant-order-content-panel{padding:clamp(16px,3vw,28px)!important;box-shadow:none!important}
+.revant-order-content-panel h2{font-size:18px;font-weight:950;letter-spacing:-.04em}
+
+/* Courier: high-contrast mission cards, clear state progression */
+.revant-driver-dashboard,.revant-driver-disabled{overflow:clip;background:var(--brand-bg)!important;color:var(--brand-text)}
+.revant-driver-layout,.revant-driver-disabled-panel{width:min(calc(100% - 20px),900px)}
+.revant-driver-dashboard h1,.revant-driver-disabled h1{font-size:clamp(28px,4vw,42px);font-weight:950;letter-spacing:-.06em}
+.revant-driver-section,.revant-driver-disabled-panel{border:1px solid var(--brand-border)!important;border-radius:16px!important;background:var(--brand-surface)!important;color:var(--brand-text);box-shadow:var(--brand-shadow)}
+.revant-driver-section h2{font-size:16px;font-weight:900;letter-spacing:-.035em}
+.revant-driver-mission,.revant-driver-available-mission{border:1px solid var(--brand-border)!important;border-radius:13px!important;background:var(--brand-bg)!important;padding:15px!important}
+.revant-driver-mission{border-left:3px solid var(--brand-accent)!important}
+.revant-driver-mission button,.revant-driver-available-mission button{min-height:42px;border-radius:10px!important}
+
+/* Messaging: readable conversation list and compact chat surface */
+.revant-messages-page,.revant-message-thread{overflow:clip}
+.revant-messages-layout,.revant-message-thread-layout{width:min(calc(100% - 16px),1000px)}
+.revant-messages-page h1{font-size:clamp(28px,4vw,42px);font-weight:950;letter-spacing:-.06em}
+.revant-conversation-row{min-height:76px;border-radius:13px!important;box-shadow:none!important;transition:border-color 160ms ease,transform 160ms ease}
+.revant-conversation-row:hover{border-color:var(--brand-accent)!important;transform:translateY(-1px)}
+.revant-message-thread-header,.revant-message-thread-body,.revant-message-composer{border-color:var(--brand-border)!important;background:var(--brand-surface)!important}
+.revant-message-thread-header{border-radius:16px 16px 0 0!important}
+.revant-message-thread-body{min-height:42vh}
+.revant-message-composer{border-radius:0 0 16px 16px!important}
+.revant-message-composer textarea{min-height:48px;background:var(--brand-bg)!important}
+
+/* Super Admin moderation and delivery operations */
+.revant-admin-reports{overflow:clip}
+.revant-admin-reports-layout{width:min(calc(100% - 20px),1100px)}
+.revant-admin-reports h1{font-size:clamp(28px,4vw,42px);font-weight:950;letter-spacing:-.06em}
+.revant-admin-report,.revant-admin-panel{border:1px solid var(--brand-border)!important;border-radius:15px!important;background:var(--brand-surface)!important;color:var(--brand-text);box-shadow:var(--brand-shadow)!important}
+.revant-admin-report h2,.revant-admin-panel h2{font-size:15px;font-weight:900;letter-spacing:-.025em}
+.revant-admin-report input,.revant-admin-report select{min-height:44px;border:1px solid var(--brand-border)!important;background:var(--brand-bg)!important;color:var(--brand-text)!important}
+.revant-admin-report button{min-height:44px;border-radius:10px!important}
+.revant-admin-deliveries table{border-collapse:collapse}
+.revant-admin-deliveries th{font-size:10px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.revant-admin-deliveries td{color:var(--brand-text)}
+
+@media(max-width:900px){.revant-seller-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){
+ .revant-seller-layout,.revant-seller-orders-layout,.revant-seller-products-layout,.revant-seller-customize-layout,.revant-buyer-orders-layout,.revant-buyer-order-detail-layout{width:calc(100% - 16px)}
+ .revant-seller-metric{min-height:108px;padding:12px!important}.revant-seller-metric p:nth-child(2){font-size:28px}
+ .revant-driver-section{padding:13px!important}.revant-driver-mission,.revant-driver-available-mission{padding:12px!important}
+ .revant-message-thread-body{min-height:48vh;padding-inline:12px!important}
+}

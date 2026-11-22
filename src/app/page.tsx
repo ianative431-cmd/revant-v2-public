@@ -34,18 +34,33 @@ function safeShopBanner(value: string | null | undefined): string | null {
   }
 }
 
-const HERO_SLIDES = [{
-  id: "revant-editorial",
-  eyebrow: "DÉCOUVRIR · ACHETER · VENDRE",
-  title: "Le commerce local,",
-  accent: "autrement.",
-  description: "Des boutiques, des produits et des savoir-faire à découvrir. Une nouvelle façon de faire son marché, simplement et avec confiance.",
-  ctaLabel: "Explorer les produits",
-  ctaHref: "#produits",
-  secondaryLabel: "Voir les boutiques",
-  secondaryHref: "/boutiques",
-  image: HERO_PHOTO,
-}] as const;
+const HERO_SLIDES = [
+  {
+    id: "marketplace",
+    eyebrow: "DÉCOUVRIR · ACHETER · VENDRE",
+    title: "Le commerce local,",
+    accent: "autrement.",
+    description: "Des boutiques, des produits et des savoir-faire à découvrir. Une nouvelle façon de faire son marché, simplement et avec confiance.",
+    ctaLabel: "Explorer les produits",
+    ctaHref: "#produits",
+    secondaryLabel: "Voir les boutiques",
+    secondaryHref: "/boutiques",
+    image: HERO_PHOTO,
+  },
+  {
+    id: "boutiques",
+    eyebrow: "BOUTIQUES · DÉCOUVERTES · PROXIMITÉ",
+    title: "Des vitrines à découvrir,",
+    accent: "des idées à saisir.",
+    description: "Parcours les boutiques actives, découvre leurs univers et trouve les produits qui te correspondent.",
+    ctaLabel: "Voir les boutiques",
+    ctaHref: "/boutiques",
+    secondaryLabel: "Explorer les catégories",
+    secondaryHref: "/categories",
+    image: "/images/hero/revant-promo-banner.svg",
+    imageFit: "contain",
+  },
+] as const;
 
 export default async function Home({ searchParams }: Props) {
   const { categorie, q } = await searchParams;
