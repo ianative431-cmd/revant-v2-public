@@ -118,7 +118,7 @@ export default async function ShopPublicPage({ params }: Props) {
               backgroundColor: shopColor,
               backgroundImage: bannerUrl
                 ? `linear-gradient(100deg, rgba(20,29,38,.62), rgba(20,29,38,.08)), url("${bannerUrl}")`
-                : "linear-gradient(115deg, var(--brand-accent), #F9A36B 58%, #F7D7BD)",
+                : "linear-gradient(115deg, var(--brand-accent), #FF914D 58%, #F8F5EF)",
             }}
           >
             {!bannerUrl && (
