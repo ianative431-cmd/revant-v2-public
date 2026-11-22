@@ -16,6 +16,7 @@ export default function BuyerOrderActions({ orderId }: { orderId: string }) {
         {pending ? "..." : "Annuler la commande"}
       </button>
       {state.error && <p role="alert" className="mt-1 text-[10px] text-red-600">{state.error}</p>}
+      {state.success && <p role="status" className="mt-1 text-[10px] text-green-700">Commande annulée.</p>}
     </form>
   );
 }
