@@ -104,7 +104,8 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
                 <p className="mt-1 text-xs text-[var(--brand-muted)]">Un livreur est associé à cette livraison. Ses coordonnées ne sont affichées que lorsqu’elles sont disponibles et autorisées.</p>
               )}
               {deliveryStatus === "failed" && (
-                <p className="mt-2 text-xs text-[var(--brand-muted)]">Un incident a été signalé. Le suivi sera actualisé lorsque la situation sera prise en charge.</p>
+                <p className="mt-2 text-xs text-[var(--brand-muted)]">Un incident a été signalé. La boutique et Revant peuvent suivre la situation.</p>
+                {delivery.failure_reason && <p className="mt-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs leading-relaxed text-red-900">Motif communiqué : {delivery.failure_reason}</p>}
               )}
             </div>
           )}
