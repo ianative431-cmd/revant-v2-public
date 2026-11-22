@@ -78,7 +78,7 @@ export async function getActiveShops(
   if (options?.searchTerm) {
     const safeTerm = options.searchTerm
       .replace(/[%,()_*\\]/g, " ")
-      .replace(/\\s+/g, " ")
+      .replace(/\s+/g, " ")
       .trim();
     if (safeTerm) {
       query = query.or(`name.ilike.%${safeTerm}%,description.ilike.%${safeTerm}%,city.ilike.%${safeTerm}%`);

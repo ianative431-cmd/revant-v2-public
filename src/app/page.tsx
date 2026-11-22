@@ -172,9 +172,9 @@ export default async function Home({ searchParams }: Props) {
               .filter(Boolean)
               .join(" ")
               .normalize("NFD")
-              .replace(/[\\u0300-\\u036f]/g, "")
+              .replace(/[\u0300-\u036f]/g, "")
               .toLocaleLowerCase("fr");
-            const normalizedTerm = term.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLocaleLowerCase("fr");
+            const normalizedTerm = term.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("fr");
             return searchable.includes(normalizedTerm);
           }) : displayedCategories).map((category) => (
             <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-brand-surface-soft">
