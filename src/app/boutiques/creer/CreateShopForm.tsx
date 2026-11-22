@@ -44,13 +44,6 @@ export default function CreateShopForm() {
         placeholder="Nom de la boutique"
         className="border rounded-xl px-4 py-3 text-sm"
       />
-      <input
-        name="slogan"
-        type="text"
-        maxLength={120}
-        placeholder="Slogan (facultatif)"
-        className="border rounded-xl px-4 py-3 text-sm"
-      />
       <textarea
         name="description"
         maxLength={1000}
