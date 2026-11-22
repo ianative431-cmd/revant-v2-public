@@ -20,8 +20,8 @@ export default function PhotoSearchPage() {
     event.preventDefault();
     if (query.trim()) router.push(`/?q=${encodeURIComponent(query.trim())}#produits`);
   }
-  return <main className="min-h-screen bg-brand-bg px-4 py-8 text-brand-text">
-    <div className="mx-auto max-w-lg rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-sm sm:p-7">
+  return <main className="revant-photo-search-page min-h-screen bg-brand-bg px-4 py-8 text-brand-text">
+    <div className="revant-photo-search-panel mx-auto max-w-lg rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-sm sm:p-7">
       <Link href="/" className="text-sm text-brand-muted hover:text-brand-text">← Retour à l’accueil</Link>
       <h1 className="mt-5 text-2xl font-black">Rechercher par photo</h1>
       <p className="mt-2 text-sm leading-relaxed text-brand-muted">{photo ? "Ta photo est prête. La reconnaissance automatique d’images n’est pas encore activée ; décris le produit par mots-clés pour lancer la recherche." : "Choisis une photo depuis l’icône appareil photo. La reconnaissance automatique d’images n’est pas encore activée ; tu peux aussi décrire le produit par mots-clés."}</p>

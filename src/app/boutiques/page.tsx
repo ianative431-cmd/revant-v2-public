@@ -75,10 +75,10 @@ export default async function BoutiquesPage() {
     }));
 
   return (
-    <div className="min-h-screen bg-brand-bg pb-24 text-brand-text">
+    <div className="revant-directory-page min-h-screen bg-brand-bg pb-24 text-brand-text">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-[1440px] px-3 py-8 sm:px-6 sm:py-12">
-        <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
+      <main className="revant-directory-page__main mx-auto w-full max-w-[1440px] px-3 py-8 sm:px-6 sm:py-12">
+        <div className="revant-directory-heading mb-7 flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[var(--brand-muted)]">Marketplace Revant</p>
             <h1 className="mt-1 text-3xl font-black tracking-tight text-[var(--brand-text)] sm:text-4xl">Les boutiques</h1>

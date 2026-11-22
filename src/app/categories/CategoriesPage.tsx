@@ -43,9 +43,9 @@ export default async function CategoriesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-brand-bg pb-28 text-brand-text">
+    <div className="revant-category-page min-h-screen bg-brand-bg pb-28 text-brand-text">
       <SiteHeader />
-      <main className="px-4 pb-10 pt-5 sm:pt-9">
+      <main className="revant-category-page__main px-4 pb-10 pt-5 sm:pt-9">
         <div className="mx-auto max-w-6xl">
           <Link
             href="/"
@@ -55,7 +55,7 @@ export default async function CategoriesPage() {
             Accueil
           </Link>
 
-          <section className="relative mt-5 overflow-hidden rounded-[28px] border border-[var(--brand-border)] bg-[var(--brand-surface)] px-5 py-7 shadow-sm sm:px-8 sm:py-9">
+          <section className="revant-category-hero relative mt-5 overflow-hidden rounded-[28px] border border-[var(--brand-border)] bg-[var(--brand-surface)] px-5 py-7 shadow-sm sm:px-8 sm:py-9">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-brand-accent/10 blur-3xl"
@@ -93,7 +93,7 @@ export default async function CategoriesPage() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            <div className="revant-category-directory-grid grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {items.map((item) => {
                 const photo = getCategoryCoverImage(item.slug, item.image_url);
                 return (
@@ -101,7 +101,7 @@ export default async function CategoriesPage() {
                     key={item.slug}
                     href={`/?categorie=${encodeURIComponent(item.slug)}#produits`}
                     aria-label={`Voir les produits de la catégorie ${item.name}`}
-                    className="group overflow-hidden rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(20,43,69,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]"
+                    className="revant-category-directory-card group overflow-hidden rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(20,43,69,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]"
                   >
                     <div className="relative aspect-[1.18] overflow-hidden bg-brand-bg sm:aspect-[1.25]">
                       <div
