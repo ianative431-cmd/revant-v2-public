@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { safeProductImageUrl } from "@/lib/product-image";
@@ -152,7 +153,7 @@ export default function CartPage() {
                       return (
                         <article key={item.id} className="flex items-start gap-3 p-3 sm:gap-4 sm:p-4">
                           {imageUrl ? (
-                            <img src={imageUrl} alt="" className="h-20 w-20 shrink-0 rounded-xl bg-[var(--brand-bg)] object-cover sm:h-24 sm:w-24" />
+                            <div className="revant-cart-product-image relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[var(--brand-bg)] sm:h-24 sm:w-24"><Image src={imageUrl} alt="" fill sizes="96px" unoptimized className="object-cover" /></div>
                           ) : (
                             <div className="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-[var(--brand-bg)] text-xl text-[var(--brand-muted)] sm:h-24 sm:w-24">◇</div>
                           )}
