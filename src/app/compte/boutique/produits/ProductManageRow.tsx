@@ -79,7 +79,7 @@ export default function ProductManageRow({ product, shopStatus }: { product: Pro
     <div className="flex min-w-0 gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-3 shadow-sm sm:p-4">
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)] sm:h-24 sm:w-24">
         {imageUrl ? (
-          <Image src={imageUrl} alt={product.name} fill sizes="64px" className="object-cover" />
+          <Image src={imageUrl} alt={product.name} fill sizes="64px" className="object-contain" />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center px-1 text-center text-[10px] text-[var(--brand-muted)]">
             Pas de photo

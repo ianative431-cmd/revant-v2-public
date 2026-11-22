@@ -30,7 +30,7 @@ export default function ProductGallery({
             fill
             priority={selectedIndex === 0}
             sizes="(max-width: 640px) 100vw, 50vw"
-            className="object-cover"
+            className="object-contain"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-sm text-[var(--brand-muted)]">
@@ -61,7 +61,7 @@ export default function ProductGallery({
                 selectedIndex === index ? "border-[var(--brand-accent)] ring-2 ring-[var(--brand-accent)]/15" : "border-[var(--brand-border)] opacity-75 hover:opacity-100"
               }`}
             >
-              <Image src={image} alt="" fill sizes="20vw" className="object-cover" />
+              <Image src={image} alt="" fill sizes="20vw" className="object-contain" />
             </button>
           ))}
         </div>

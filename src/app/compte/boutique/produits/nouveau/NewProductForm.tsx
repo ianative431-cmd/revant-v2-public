@@ -286,7 +286,7 @@ export default function NewProductForm({
           {previewUrls.map((url, index) => (
             <div key={url} className="relative aspect-square overflow-hidden rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)]">
               {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local (blob URL) */}
-              <img src={url} alt={"Aperçu photo " + (index + 1)} className="h-full w-full object-cover" />
+              <img src={url} alt={"Aperçu photo " + (index + 1)} className="h-full w-full object-contain" />
               <button type="button" onClick={() => removeImage(index)} aria-label={"Retirer la photo " + (index + 1)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-sm text-white">×</button>
               <button type="button" onClick={() => setEditingIndex(index)} className="absolute bottom-1 right-1 rounded-full bg-white/95 px-2 py-1 text-[10px] font-semibold text-black">Améliorer</button>
               {index === 0 && <span className="absolute bottom-1 left-1 rounded bg-black/70 px-2 py-1 text-[10px] text-white">Principale</span>}

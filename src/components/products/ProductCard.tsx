@@ -26,7 +26,7 @@ export default function ProductCard({ product }: { product: Product }) {
               alt={product.name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.055]"
+              className="object-contain transition-transform duration-500 group-hover:scale-[1.055]"
             />
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[var(--brand-surface)] via-[var(--brand-bg)] to-[var(--brand-border)] px-2 text-center text-xs font-medium text-[var(--brand-muted)]">
