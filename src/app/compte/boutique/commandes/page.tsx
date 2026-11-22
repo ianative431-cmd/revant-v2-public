@@ -67,7 +67,7 @@ export default async function BoutiqueCommandesPage() {
                     {order.delivery?.status === "unassigned" && order.delivery.requested_at && <p className="mt-1">Demande envoyée aux livreurs actifs.</p>}
                     {order.delivery?.status === "assigned" && <p className="mt-1">Un livreur a accepté la course.</p>}
                     {order.delivery?.status === "in_transit" && <p className="mt-1">Le colis est en route vers l’acheteur.</p>}
-                    {order.delivery?.status === "failed" && <p className="mt-1">Le support doit examiner cet incident.</p>}
+                    {order.delivery?.status === "failed" && <p className="mt-1 text-red-800">Incident signalé : {order.delivery.failure_reason || "Motif non renseigné"}</p>}
                   </div>}
                 </article>
               );
