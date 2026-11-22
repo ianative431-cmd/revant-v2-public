@@ -49,7 +49,27 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
 
   const delivery = order.delivery;
   const deliveryStatus = delivery?.status ?? null;
-  const address = [order.guest_city, order.guest_address].filter(Boolean).join(" — ");
+  let savedAddress: {
+    label: string | null;
+    recipient_name: string;
+    phone: string;
+    address_line: string;
+    city: string;
+    country_code: string;
+  } | null = null;
+  if (order.shipping_address_id) {
+    const { data, error } = await supabase
+      .from("addresses")
+      .select("label,recipient_name,phone,address_line,city,country_code")
+      .eq("id", order.shipping_address_id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (error) throw error;
+    savedAddress = data;
+  }
+  const address = delivery?.delivery_address ||
+    [order.guest_city, order.guest_address].filter(Boolean).join(" — ") ||
+    [savedAddress?.address_line, savedAddress?.city, savedAddress?.country_code].filter(Boolean).join(" — ");
   const timeline = [
     { label: "Demande de commande créée", at: order.placed_at ?? order.created_at },
     { label: "Commande confirmée par le vendeur", at: order.confirmed_at },
@@ -130,10 +150,13 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
           )}
         </section>
 
-        {address && (
+        {(address || savedAddress) && (
           <section className="mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm" aria-labelledby="order-address-title">
             <h2 id="order-address-title" className="text-sm font-black">Adresse de livraison enregistrée</h2>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--brand-muted)]">{address}</p>
+            {savedAddress?.label && <p className="mt-2 text-xs font-bold text-[var(--brand-muted)]">{savedAddress.label}</p>}
+            {savedAddress?.recipient_name && <p className="mt-2 text-sm font-semibold">{savedAddress.recipient_name}</p>}
+            {savedAddress?.phone && <p className="mt-1 text-xs text-[var(--brand-muted)]">{savedAddress.phone}</p>}
+            {address && <p className="mt-2 text-sm leading-relaxed text-[var(--brand-muted)]">{address}</p>}
           </section>
         )}
 
