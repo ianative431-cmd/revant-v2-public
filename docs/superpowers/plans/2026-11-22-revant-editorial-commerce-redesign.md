@@ -55,7 +55,8 @@
 - [x] Apply the first shared editorial styling layer to cart, guest checkout and confirmation; full responsive flow review remains pending.
 - [x] Preserve one-order-per-item behavior until a multi-shop transaction contract exists.
 - [x] Preserve indicative labels and server-side validation.
-- [ ] Improve order history, details, tracking, cancellation, returns and dispute states.
+- [x] Add first visual layer to order history, detail and tracking; cancellation already exists server-side for pending buyer orders.
+- [ ] Implement dedicated return/refund and buyer dispute flows only after server-side eligibility, evidence, financial and audit contracts are specified.
 
 ### Task 5: Seller workspace
 **Files:** `src/app/compte/boutique/**` and seller shared components.
@@ -75,8 +76,8 @@
 - [x] Apply the editorial visual layer to notifications and account settings; loyalty, coupons and review flows remain pending.
 - [x] Apply the editorial shell to photo search and directory filtering; search behavior remains unchanged and deeper filter QA is pending.
 - [x] Add first visual pass to product reviews and messaging.
-- [ ] Complete coupons/loyalty once existing buyer-facing routes and real data contracts are mapped.
-- [x] Apply the forest/tangerine console styling to the Super Admin overview and delivery operations panel; remaining modules are pending. (Dashboard overview received its first visual layer; remaining modules are pending.)
+- [ ] Complete coupons/loyalty only after real buyer-facing routes, point ledger, coupon rules and server-side contracts are specified; no such buyer system was confirmed in the current repository.
+- [x] Apply the forest/tangerine console styling to the Super Admin overview, delivery operations and report moderation panels; remaining modules are pending. (Dashboard overview received its first visual layer; remaining modules are pending.)
 
 ### Task 8: Visual and technical verification
 - [ ] Map each of the 31 requirements to a route/component and evidence status.
