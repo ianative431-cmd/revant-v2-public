@@ -80,13 +80,13 @@ export default async function BoutiquesPage() {
       <main className="mx-auto w-full max-w-[1440px] px-3 py-8 sm:px-6 sm:py-12">
         <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-neutral-500">Marketplace Revant</p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">Les boutiques</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-neutral-600">
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[var(--brand-muted)]">Marketplace Revant</p>
+            <h1 className="mt-1 text-3xl font-black tracking-tight text-[var(--brand-text)] sm:text-4xl">Les boutiques</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--brand-muted)]">
               Découvre les boutiques publiques, leurs univers et leurs produits. Tu peux parcourir les vitrines sans créer de compte.
             </p>
           </div>
-          <span className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold text-neutral-600">
+          <span className="rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-2 text-xs font-bold text-[var(--brand-muted)]">
             {publicShops.length} boutique{publicShops.length > 1 ? "s" : ""}
           </span>
         </div>
@@ -100,15 +100,15 @@ export default async function BoutiquesPage() {
         ) : publicShops.length > 0 ? (
           <ShopDirectory shops={publicShops} />
         ) : (
-          <section className="rounded-[28px] border border-black/5 bg-white px-5 py-12 text-center shadow-sm sm:px-10">
+          <section className="rounded-[28px] border border-[var(--brand-border)] bg-[var(--brand-surface)] px-5 py-12 text-center shadow-sm sm:px-10">
             <div aria-hidden="true" className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-bg text-2xl">🛍️</div>
             <h2 className="mt-4 text-lg font-extrabold">Aucune boutique publique pour le moment</h2>
-            <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-neutral-600">
+            <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-[var(--brand-muted)]">
               Les vitrines apparaîtront ici dès que des boutiques seront actives. Tu peux déjà parcourir les produits publiés.
             </p>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
               <Link href="/#produits" className="rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white hover:brightness-95">Explorer les produits</Link>
-              <Link href="/boutiques/creer" className="rounded-full border border-neutral-300 px-5 py-3 text-xs font-bold text-neutral-800 hover:bg-neutral-50">Ouvrir une boutique</Link>
+              <Link href="/boutiques/creer" className="rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-5 py-3 text-xs font-bold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">Ouvrir une boutique</Link>
             </div>
           </section>
         )}

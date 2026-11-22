@@ -8,23 +8,23 @@ export default async function ComptePage() {
   const user = await requireUserWithLegalConsent();
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-sm bg-brand-surface border border-brand-border rounded-[22px] p-8 shadow-sm">
+      <div className="w-full max-w-xl rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-8">
         <AvatarUploader
           userId={user.id}
           initialAvatarUrl={(user.user_metadata?.avatar_url as string | undefined) ?? null}
           email={user.email}
           phone={user.phone}
         />
-        <h1 className="text-xl font-bold mb-1 text-center">Mon compte</h1>
-        <p className="text-sm text-brand-text/60 mb-6 text-center">Connecté avec succès.</p>
-        <dl className="text-sm mb-6 space-y-2">
-          {user.email && <div className="flex justify-between"><dt className="text-brand-text/60">E-mail</dt><dd>{user.email}</dd></div>}
+        <h1 className="mb-1 text-center text-2xl font-black tracking-tight text-[var(--brand-text)]">Mon compte</h1>
+        <p className="mb-6 text-center text-sm text-[var(--brand-muted)]">Connecté avec succès.</p>
+        <dl className="mb-6 space-y-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-4 text-sm">
+          {user.email && <div className="flex justify-between"><dt className="text-[var(--brand-muted)]">E-mail</dt><dd>{user.email}</dd></div>}
           {user.phone && <div className="flex justify-between"><dt className="text-brand-text/60">Téléphone</dt><dd>+{user.phone}</dd></div>}
           <div className="flex justify-between"><dt className="text-brand-text/60">Compte créé le</dt><dd>{new Date(user.created_at).toLocaleDateString("fr-FR")}</dd></div>
         </dl>
         <SignOutForm action={signOutAction} />
-        <Link href="/compte/boutique" className="block text-center text-sm underline mt-4 text-brand-text/70">Ma boutique</Link>
-        <Link href="/compte/commandes" className="block text-center text-sm underline mt-2 text-brand-text/70">Mes commandes</Link>
+        <Link href="/compte/boutique" className="mt-4 block rounded-xl border border-[var(--brand-border)] px-4 py-3 text-center text-sm font-semibold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">Ma boutique</Link>
+        <Link href="/compte/commandes" className="mt-2 block rounded-xl border border-[var(--brand-border)] px-4 py-3 text-center text-sm font-semibold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">Mes commandes</Link>
         <Link href="/wallet" className="block text-center text-sm underline mt-2 text-brand-text/70">Mon Wallet</Link>
         <Link href="/compte/notifications" className="block text-center text-sm underline mt-2 text-brand-text/70">Notifications</Link>
         <Link href="/compte/livraisons" className="block text-center text-sm underline mt-2 text-brand-text/70">Espace livreur</Link>

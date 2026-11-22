@@ -29,9 +29,9 @@ export default async function AbonnementBoutiquePage() {
 
   if (!shop) {
     return (
-      <section className="mx-auto max-w-lg rounded-2xl bg-white p-6">
+      <section className="mx-auto max-w-2xl rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-6 shadow-sm">
         <h1 className="text-xl font-bold">Abonnement boutique</h1>
-        <p className="mt-2 text-sm text-black/60">Crée d&apos;abord ta boutique pour consulter son abonnement.</p>
+        <p className="mt-2 text-sm text-[var(--brand-muted)]">Crée d&apos;abord ta boutique pour consulter son abonnement.</p>
         <Link href="/boutiques/creer" className="mt-4 inline-block underline">Créer ma boutique</Link>
       </section>
     );
@@ -53,23 +53,23 @@ export default async function AbonnementBoutiquePage() {
   }
 
   return (
-    <section className="mx-auto max-w-lg space-y-4">
-      <Link href="/compte/boutique" className="text-sm underline text-black/60">← Ma boutique</Link>
+    <section className="mx-auto max-w-2xl space-y-4 px-4 py-6">
+      <Link href="/compte/boutique" className="text-sm font-semibold text-[var(--brand-muted)] underline underline-offset-4">← Ma boutique</Link>
       <header>
-        <h1 className="mt-3 text-xl font-bold">Abonnement de {shop.name}</h1>
-        <p className="mt-1 text-sm text-black/60">Consulte le statut réellement enregistré pour ta boutique.</p>
+        <h1 className="mt-3 text-2xl font-black tracking-tight text-[var(--brand-text)]">Abonnement de {shop.name}</h1>
+        <p className="mt-1 text-sm text-[var(--brand-muted)]">Consulte le statut réellement enregistré pour ta boutique.</p>
       </header>
 
       {subscription ? (
-        <div className="rounded-2xl border border-black/10 bg-white p-5">
+        <div className="rounded-[24px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-sm text-black/60">Statut</span>
-            <span className="rounded-full bg-black/5 px-3 py-1 text-sm font-medium">
+            <span className="text-sm text-[var(--brand-muted)]">Statut</span>
+            <span className="rounded-full bg-[var(--brand-bg)] px-3 py-1.5 text-sm font-bold text-[var(--brand-text)]">
               {STATUS_LABELS[subscription.status] ?? subscription.status}
             </span>
           </div>
-          <dl className="mt-5 space-y-3 text-sm">
-            <div className="flex justify-between gap-4"><dt className="text-black/55">Offre</dt><dd className="font-medium">{subscription.plan_name}</dd></div>
+          <dl className="mt-5 space-y-3 border-t border-[var(--brand-border)] pt-4 text-sm">
+            <div className="flex justify-between gap-4"><dt className="text-[var(--brand-muted)]">Offre</dt><dd className="font-medium">{subscription.plan_name}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-black/55">Montant enregistré</dt><dd className="font-medium">{Number(subscription.amount).toLocaleString("fr-FR")} {subscription.currency}/mois</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-black/55">Début</dt><dd>{formatDate(subscription.started_at)}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-black/55">Début de période</dt><dd>{formatDate(subscription.current_period_start)}</dd></div>
@@ -85,8 +85,8 @@ export default async function AbonnementBoutiquePage() {
         </div>
       )}
 
-      <div className="rounded-2xl bg-black/5 p-4 text-sm text-black/65">
-        <p className="font-semibold text-black">Information importante</p>
+      <div className="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-4 text-sm leading-6 text-[var(--brand-muted)]">
+        <p className="font-extrabold text-[var(--brand-text)]">Information importante</p>
         <p className="mt-1">Le tarif de référence prévu est de 5 000 XOF par mois. Le paiement, le renouvellement automatique et l&apos;activation de l&apos;offre ne sont pas encore disponibles. Cette page est uniquement consultative : aucun prélèvement ni changement de statut n&apos;est effectué ici.</p>
       </div>
     </section>
