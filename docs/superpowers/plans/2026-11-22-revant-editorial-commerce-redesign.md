@@ -60,7 +60,7 @@
 ### Task 5: Seller workspace
 **Files:** `src/app/compte/boutique/**` and seller shared components.
 - [ ] Rebuild seller dashboard around verified operational metrics.
-- [ ] Improve order management and catalogue density.
+- [x] Improve order management and catalogue density.
 - [ ] Upgrade storefront customization, messaging and social calendar visuals.
 - [ ] Preserve permissions and official API constraints.
 
@@ -74,7 +74,7 @@
 **Files:** notification, preference, loyalty, coupon, review, search and `/admin/**` screens.
 - [ ] Apply design system to notifications, preferences, loyalty, coupons and reviews.
 - [ ] Improve search results and filtering.
-- [ ] Redesign Super Admin overview and modules without changing permission boundaries.
+- [ ] Redesign Super Admin overview and modules without changing permission boundaries. (Dashboard overview received its first visual layer; remaining modules are pending.)
 
 ### Task 8: Visual and technical verification
 - [ ] Map each of the 31 requirements to a route/component and evidence status.

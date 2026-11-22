@@ -66,8 +66,8 @@ export default async function MaBoutiquePage() {
   const hasContact = Boolean(shop.phone?.trim() || shop.whatsapp?.trim());
 
   return (
-    <main className="min-h-screen bg-brand-bg px-4 py-8 text-brand-text sm:py-10">
-      <div className="mx-auto max-w-5xl space-y-6">
+    <main className="revant-seller-dashboard min-h-screen bg-brand-bg px-4 py-8 text-brand-text sm:py-10">
+      <div className="revant-seller-layout mx-auto max-w-6xl space-y-6">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Espace vendeur</p>
@@ -83,9 +83,9 @@ export default async function MaBoutiquePage() {
 
         <ShopReviewPanel status={shop.status} hasContact={hasContact} />
 
-        <section aria-label="Indicateurs réels de la boutique" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <section aria-label="Indicateurs réels de la boutique" className="revant-seller-metrics grid grid-cols-2 gap-3 sm:grid-cols-3">
           {metrics.map((metric) => (
-            <article key={metric.label} className="rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:p-5">
+            <article key={metric.label} className="revant-seller-metric rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:p-5">
               <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-[var(--brand-muted)]">{metric.label}</p>
               <p className="mt-2 text-3xl font-black tabular-nums">{metric.value.toLocaleString("fr-FR")}</p>
               <p className="mt-1 text-[10px] leading-relaxed text-[var(--brand-muted)]">{metric.detail}</p>
@@ -93,8 +93,8 @@ export default async function MaBoutiquePage() {
           ))}
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-          <div className="rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-6">
+        <section className="revant-seller-workspace grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="revant-seller-management rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-black">Gestion de la boutique</h2>
@@ -127,7 +127,7 @@ export default async function MaBoutiquePage() {
             </div>
           </div>
 
-          <aside className="rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm">
+          <aside className="revant-seller-share rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm">
             <h2 className="text-sm font-black">Partager la boutique</h2>
             {qrCodeDataUrl ? (
               <div className="mt-4 flex flex-col items-center">

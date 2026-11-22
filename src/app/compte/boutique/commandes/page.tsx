@@ -38,8 +38,8 @@ export default async function BoutiqueCommandesPage() {
   const orders = await getOrdersForShop(supabase, shop.id);
 
   return (
-    <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-4xl">
+    <div className="revant-seller-orders min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
+      <div className="revant-seller-orders-layout w-full max-w-5xl">
         <Link href="/compte/boutique" className="text-sm font-semibold text-[var(--brand-muted)] underline decoration-[var(--brand-accent)] underline-offset-4">← Ma boutique</Link>
         <h1 className="mb-1 mt-4 text-2xl font-black tracking-tight text-[var(--brand-text)]">Commandes</h1>
         <p className="mb-6 text-sm leading-6 text-[var(--brand-muted)]">Confirme la prise en charge ou annule une commande avant son départ. Cette action ne valide ni le paiement ni la livraison.</p>
@@ -49,7 +49,7 @@ export default async function BoutiqueCommandesPage() {
               const sellerTotal = order.items.reduce((sum, item) => sum + Number(item.line_total), 0);
               const currency = order.items[0]?.currency.trim() || order.currency.trim();
               return (
-                <article key={order.id} className="rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:p-5">
+                <article key={order.id} className="revant-seller-order rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0"><p className="text-sm font-extrabold text-[var(--brand-text)]">Commande {order.order_number}</p><p className="mt-1 text-xs text-[var(--brand-muted)]">{new Date(order.created_at).toLocaleDateString("fr-FR")}</p></div>
                     <span className="shrink-0 rounded-full bg-[var(--brand-bg)] px-3 py-1.5 text-[11px] font-semibold text-[var(--brand-muted)]">{STATUS_LABEL[order.status]}</span>

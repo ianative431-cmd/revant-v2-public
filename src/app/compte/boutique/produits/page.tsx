@@ -18,8 +18,8 @@ export default async function MesProduitsPage() {
   const products = await getProductsForShop(supabase, shop.id);
 
   return (
-    <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-5xl">
+    <div className="revant-seller-products min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
+      <div className="revant-seller-products-layout w-full max-w-6xl">
         <Link href="/compte/boutique" className="text-sm underline text-brand-text/60">
           ← Ma boutique
         </Link>
@@ -37,7 +37,7 @@ export default async function MesProduitsPage() {
         {products.length === 0 ? (
           <p className="text-sm text-brand-text/60 text-center py-10">Aucune annonce pour l&apos;instant.</p>
         ) : (
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <div className="revant-seller-product-grid grid grid-cols-1 gap-3 lg:grid-cols-2">
             {products.map((product) => (
               <ProductManageRow key={product.id} product={product} shopStatus={shop.status} />
             ))}

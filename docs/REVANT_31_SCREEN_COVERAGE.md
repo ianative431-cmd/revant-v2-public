@@ -16,9 +16,9 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 | 10 | Annulation | Parcours de commande à localiser | À cartographier | À capturer |
 | 11 | Retour et remboursement | Parcours de commande à localiser | À cartographier | À capturer |
 | 12 | Litiges et assistance | Parcours assistance/admin à localiser | À cartographier | À capturer |
-| 13 | Tableau de bord Ma boutique | `/compte/boutique` | À traiter | À capturer |
-| 14 | Gestion des commandes vendeur | `/compte/boutique/commandes` | À traiter | À capturer |
-| 15 | Catalogue vendeur | `/compte/boutique/produits` | À traiter | À capturer |
+| 13 | Tableau de bord Ma boutique | `/compte/boutique` | Refonte partielle : indicateurs et espace de gestion vendeur | À capturer |
+| 14 | Gestion des commandes vendeur | `/compte/boutique/commandes` | Refonte partielle : cartes et hiérarchie opérationnelle | À capturer |
+| 15 | Catalogue vendeur | `/compte/boutique/produits` | Refonte partielle : conteneur et grille de gestion | À capturer |
 | 16 | Gestion de la vitrine | `/compte/boutique/personnaliser`, `/shop/[slug]` | Vitrine publique : bannière, identité, navigation et produits (première couche) | À capturer |
 | 17 | Messagerie vendeur | `/messages`, `/messages/[conversationId]` | À traiter | À capturer |
 | 18 | Calendrier commercial | `/compte/boutique/calendrier-social` | À traiter | À capturer |
@@ -34,7 +34,7 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 | 28 | Coupons et promotions | `/admin/promotions` et parcours acheteur à localiser | À cartographier | À capturer |
 | 29 | Avis et évaluations | `/admin/avis`, section produit | À traiter | À capturer |
 | 30 | Recherche et recommandations | `/`, `/recherche-photo`, `/categories` | Navigation de recherche et découverte retravaillées partiellement | À capturer |
-| 31 | Supervision Super Admin | `/admin` et modules `/admin/**` | À traiter | À capturer |
+| 31 | Supervision Super Admin | `/admin` et modules `/admin/**` | Première couche visuelle sur le tableau de bord ; modules à traiter | À capturer |
 
 ## État de validation
 - Tests unitaires après la première tranche : 29 réussis.
@@ -43,5 +43,5 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 - TypeScript local : non conclu, processus arrêté par la limite mémoire du poste distant.
 - Build local : non conclu, limite mémoire/temps du poste distant.
 - CI GitHub du nouveau commit : à attendre.
-- Captures navigateur réelles de la branche : non disponibles dans cette session.
+- Captures navigateur réelles de la branche : non disponibles dans cette session (Playwright/Puppeteer non installés dans le poste distant).
 - Validation réelle iPhone/iPad/Android/Safari : en attente.
