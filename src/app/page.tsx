@@ -103,7 +103,10 @@ export default async function Home({ searchParams }: Props) {
       }
     }
     try {
-      shops = await getActiveShops(supabase, { limit: 8 });
+      shops = await getActiveShops(supabase, {
+        limit: q?.trim() ? 24 : 8,
+        searchTerm: q?.trim() || undefined,
+      });
     } catch {
       shopsUnavailable = true;
     }
@@ -133,6 +136,21 @@ export default async function Home({ searchParams }: Props) {
   const shortcutCategoryTitle = categorie === "mode" ? "Mode" : categorie === "parfums" ? "Parfums" : null;
   const unknownCategory = !categoriesUnavailable && Boolean(categorie && !shortcutCategoryTitle && !activeCategory);
   const term = q?.trim();
+  const normalizedTerm = term
+    ?.normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .toLocaleLowerCase("fr");
+  const matchingCategories = term
+    ? displayedCategories.filter((category) => {
+        const searchable = [category.name, category.slug]
+          .filter(Boolean)
+          .join(" ")
+          .normalize("NFD")
+          .replace(/[\\u0300-\\u036f]/g, "")
+          .toLocaleLowerCase("fr");
+        return searchable.includes(normalizedTerm ?? "");
+      })
+    : displayedCategories;
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text pb-28">
@@ -161,26 +179,32 @@ export default async function Home({ searchParams }: Props) {
       </section>
 
       <section id="categories" className="px-4 pt-7">
-        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">Catégories</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
+        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? "Catégories correspondantes" : "Catégories"}</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
         {categoriesUnavailable && <p role="status" className="mb-3 rounded-xl border border-brand-border bg-brand-surface px-4 py-3 text-xs leading-relaxed text-brand-muted">La liste complète des catégories est temporairement indisponible. La sélection de base reste affichée.</p>}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {displayedCategories.map((category) => (
-            <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-brand-surface-soft">
-              <div
-                role="img"
-                aria-label={`Illustration de la catégorie ${category.name}`}
-                className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
-                style={{ backgroundImage: `url("${getCategoryCoverImage(category.slug, category.image_url)}"), linear-gradient(135deg, var(--brand-accent), var(--brand-surface-soft))` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
-              <span className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white">{category.name}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+        {term && matchingCategories.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-brand-border bg-brand-surface px-4 py-5 text-xs text-brand-muted">
+            Aucune catégorie ne correspond à cette recherche.
+          </p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {matchingCategories.map((category) => (
+              <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-brand-surface-soft">
+                <div
+                  role="img"
+                  aria-label={`Illustration de la catégorie ${category.name}`}
+                  className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
+                  style={{ backgroundImage: `url("${getCategoryCoverImage(category.slug, category.image_url)}"), linear-gradient(135deg, var(--brand-accent), var(--brand-surface-soft))` }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
+                <span className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white">{category.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
+        </section>
 
       <section id="boutiques-locales" className="px-4 pt-7">
-        <div className="mb-1"><h2 className="text-lg font-extrabold">Boutiques locales</h2></div>
+        <div className="mb-1"><h2 className="text-lg font-extrabold">{term ? "Boutiques correspondantes" : "Boutiques locales"}</h2></div>
         <p className="mb-3 text-xs text-brand-muted">Découvre les vendeurs et leurs univers.</p>
         {shopsUnavailable ? (
           <div role="status" className="rounded-2xl border border-brand-border bg-brand-surface px-5 py-8 text-center">
@@ -204,6 +228,10 @@ export default async function Home({ searchParams }: Props) {
               </Link>
             ))}
           </div>
+        ) : term ? (
+          <p className="rounded-xl border border-dashed border-brand-border bg-brand-surface px-4 py-5 text-xs text-brand-muted">
+            Aucune boutique ne correspond à cette recherche. Essaie un autre nom ou une autre ville.
+          </p>
         ) : (
           <div className="rounded-2xl border border-dashed border-brand-border bg-brand-surface px-5 py-8 text-center">
             <div aria-hidden="true" className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-bg text-2xl">🌾</div>
@@ -228,7 +256,7 @@ export default async function Home({ searchParams }: Props) {
           </div>
         ) : loadedProducts.length === 0 ? (
           <div className="rounded-xl border border-brand-border bg-brand-surface px-5 py-10 text-center">
-            <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : unknownCategory ? "Cette catégorie n’est pas disponible pour le moment." : "Les premières annonces arrivent bientôt."}</p>
+            <p className="text-sm font-semibold">{term ? "Aucun produit correspondant à cette recherche." : unknownCategory ? "Cette catégorie n’est pas disponible pour le moment." : "Les premières annonces arrivent bientôt."}</p>
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">{term ? "Essaie un autre mot ou explore les catégories." : unknownCategory ? "Choisis une catégorie actuellement proposée par Revant." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
             {unknownCategory && <Link href="/categories" className="mt-4 inline-flex rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white">Explorer les catégories</Link>}
           </div>

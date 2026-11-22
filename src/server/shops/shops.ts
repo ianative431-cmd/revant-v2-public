@@ -43,21 +43,13 @@ export async function resolveShopBySlug(
     .maybeSingle();
 
   if (error) throw error;
-
   if (shop) return { kind: "found", shop: shop as Shop };
 
-  // NB : l'archivage des anciens slugs (table shop_slug_history) n'existe
-  // plus dans le schéma actuel — un ancien lien renvoie directement
-  // "introuvable" plutôt qu'une redirection.
+  // L'historique des anciens slugs n'existe pas dans le schéma actuel.
   return { kind: "not_found" };
 }
 
-/**
- * Restaurants réels et actifs, pour la page de découverte publique
- * /restaurants. Aucune boutique fictive : si aucun vendeur n'a encore
- * créé de restaurant, la liste renvoyée est simplement vide (voir
- * l'état vide honnête géré par la page).
- */
+/** Restaurants réels et actifs pour la page de découverte publique. */
 export async function getActiveRestaurants(supabase: SupabaseClient): Promise<Shop[]> {
   const { data, error } = await supabase
     .from("shops")
@@ -70,20 +62,30 @@ export async function getActiveRestaurants(supabase: SupabaseClient): Promise<Sh
 }
 
 /**
- * Boutiques réelles et actives (tous types confondus), pour la
- * section "Boutiques en vedette" de l'accueil. Aucune boutique
- * fictive : liste vide tant qu'aucun vendeur n'est actif.
+ * Boutiques actives uniquement. La recherche facultative couvre le nom,
+ * la description et la ville, sans exposer les boutiques non actives.
  */
 export async function getActiveShops(
   supabase: SupabaseClient,
-  options?: { limit?: number }
+  options?: { limit?: number; searchTerm?: string }
 ): Promise<Shop[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from("shops")
     .select("*")
     .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(options?.limit ?? 8);
+    .order("created_at", { ascending: false });
+
+  if (options?.searchTerm) {
+    const safeTerm = options.searchTerm
+      .replace(/[%,()_*\\]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (safeTerm) {
+      query = query.or(`name.ilike.%${safeTerm}%,description.ilike.%${safeTerm}%,city.ilike.%${safeTerm}%`);
+    }
+  }
+
+  const { data, error } = await query.limit(options?.limit ?? 8);
   if (error) throw error;
   return (data ?? []) as Shop[];
 }
