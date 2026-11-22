@@ -4,6 +4,8 @@ import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import ProductCard from "@/components/products/ProductCard";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
+import { getPaletteById } from "@/content/shops/color-palettes";
+import type { CSSProperties } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveProductsForShop } from "@/server/products/products";
 import {
@@ -87,9 +89,12 @@ export default async function ShopPublicPage({ params }: Props) {
     ? normalizeShopPhone(shop.whatsapp, defaultCallingCode) ?? null
     : phone;
   const whatsappDigits = whatsapp?.replace(/\D/g, "");
-  const shopColor = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
+  const savedPalette = shop.background_color ? getPaletteById(shop.background_color) : undefined;
+  const customShopColor = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
     ? shop.background_color
-    : "var(--brand-accent)";
+    : null;
+  const shopColor = customShopColor ?? savedPalette?.colors[2] ?? "var(--brand-accent)";
+  const shopAccent = savedPalette?.colors[1] ?? shopColor;
   const socials = SOCIAL_NETWORKS.flatMap((network) => {
     const value = shop[network.key];
     const href = normalizeShopSocialUrl(value, network.key) ?? null;
@@ -100,7 +105,14 @@ export default async function ShopPublicPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[var(--brand-bg)] pb-24 text-[var(--brand-text)]">
       <SiteHeader />
-      <main className="revant-storefront pb-10 pt-3 sm:pt-5">
+      <main
+        className="revant-storefront pb-10 pt-3 sm:pt-5"
+        style={savedPalette ? ({
+          "--brand-accent": shopAccent,
+          "--brand-accent-hover": savedPalette.colors[2] ?? shopAccent,
+          "--brand-accent-text": shopAccent,
+        } as CSSProperties & Record<"--brand-accent" | "--brand-accent-hover" | "--brand-accent-text", string>) : undefined}
+      >
         <nav aria-label="Fil d’Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-xs text-[var(--brand-muted)]">
           <Link href="/" className="transition hover:text-[var(--brand-accent)]">Accueil</Link>
           <span aria-hidden="true">/</span>
