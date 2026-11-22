@@ -21,15 +21,15 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 | 15 | Catalogue vendeur | `/compte/boutique/produits` | Refonte partielle : conteneur et grille de gestion | À capturer |
 | 16 | Gestion de la vitrine | `/compte/boutique/personnaliser`, `/shop/[slug]` | Vitrine publique : bannière, identité, navigation et produits (première couche) | À capturer |
 | 17 | Messagerie vendeur | `/messages`, `/messages/[conversationId]` | À traiter | À capturer |
-| 18 | Calendrier commercial | `/compte/boutique/calendrier-social` | À traiter | À capturer |
-| 19 | Tableau de bord livreur | `/compte/livraisons` | À traiter | À capturer |
+| 18 | Calendrier commercial | `/compte/boutique/reseaux` (URL historique redirigée) | Refonte partielle du shell calendrier | À capturer |
+| 19 | Tableau de bord livreur | `/compte/livraisons` | Refonte partielle : missions et états de livraison mobile-first | À capturer |
 | 20 | Détail d'une mission et navigation | Espace livreur à cartographier | À cartographier | À capturer |
-| 21 | Prise en charge et progression | Espace livreur à cartographier | À cartographier | À capturer |
-| 22 | Preuve de livraison | Espace livreur à cartographier | À cartographier | À capturer |
-| 23 | Incident de livraison | Espace livreur à cartographier | À traiter | À capturer |
-| 24 | Administration des livreurs | `/admin/livraisons` | À traiter | À capturer |
-| 25 | Centre de notifications | `/compte/notifications` | À traiter | À capturer |
-| 26 | Préférences de notifications | `/parametres` | À traiter | À capturer |
+| 21 | Prise en charge et progression | `/compte/livraisons` | Refonte partielle des zones d’action | À capturer |
+| 22 | Preuve de livraison | `/compte/livraisons` | Parcours existant, QA visuelle à faire | À capturer |
+| 23 | Incident de livraison | `/compte/livraisons` | Refonte partielle des cartes d’incident | À capturer |
+| 24 | Administration des livreurs | `/admin/livraisons` | Refonte partielle : tableau et panneau opérationnel | À capturer |
+| 25 | Centre de notifications | `/compte/notifications` | Refonte partielle : cartes, hiérarchie et états de lecture | À capturer |
+| 26 | Préférences de notifications | `/parametres` | Refonte partielle : groupes de réglages et navigation | À capturer |
 | 27 | Fidélité et récompenses | Route à localiser | À cartographier | À capturer |
 | 28 | Coupons et promotions | `/admin/promotions` et parcours acheteur à localiser | À cartographier | À capturer |
 | 29 | Avis et évaluations | `/admin/avis`, section produit | À traiter | À capturer |

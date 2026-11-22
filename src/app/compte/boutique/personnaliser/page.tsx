@@ -20,8 +20,8 @@ export default async function PersonnaliserBoutiquePage() {
   const palettes = getPalettesForShopType(shop);
 
   return (
-    <div className="min-h-screen bg-brand-bg px-4 py-8 sm:py-10">
-      <div className="mx-auto w-full max-w-3xl">
+    <div className="revant-seller-customize min-h-screen bg-brand-bg px-4 py-8 sm:py-10">
+      <div className="revant-seller-customize-layout mx-auto w-full max-w-3xl">
         <Link href="/compte/boutique" className="text-sm underline text-[var(--brand-muted)]">
           ← Ma boutique
         </Link>

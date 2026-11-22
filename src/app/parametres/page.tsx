@@ -12,7 +12,7 @@ import { getSitePalette } from "@/server/theme/site-palette";
 
 function SettingsGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="space-y-1">
+    <section className="revant-settings-group space-y-1">
       <h2 className="px-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-muted">{title}</h2>
       <div className="divide-y divide-brand-border border-y border-brand-border">{children}</div>
     </section>
@@ -21,7 +21,7 @@ function SettingsGroup({ title, children }: { title: string; children: ReactNode
 
 function SettingsLink({ href, label, description, Icon }: { href: string; label: string; description?: string; Icon: LucideIcon }) {
   return (
-    <Link href={href} className="flex min-h-14 items-center gap-3 py-3 transition-colors hover:bg-brand-surface/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent">
+    <Link href={href} className="revant-settings-link flex min-h-14 items-center gap-3 py-3 transition-colors hover:bg-brand-surface/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent">
       <Icon size={18} strokeWidth={1.8} className="shrink-0 text-brand-accent" aria-hidden="true" />
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-medium text-brand-text">{label}</span>
@@ -36,9 +36,9 @@ export default async function ParametresPage() {
   const palette = await getSitePalette();
 
   return (
-    <div className="min-h-screen bg-brand-bg pb-32 text-brand-text">
+    <div className="revant-settings-page min-h-screen bg-brand-bg pb-32 text-brand-text">
       <SiteHeader hideSearch />
-      <main className="mx-auto w-full max-w-2xl px-4 pb-8 pt-20 sm:px-6">
+      <main className="revant-settings-layout mx-auto w-full max-w-3xl px-4 pb-8 pt-20 sm:px-6">
         <header className="mb-7">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-accent">REVANT</p>
           <h1 className="mt-1 text-2xl font-bold tracking-tight">Paramètres</h1>

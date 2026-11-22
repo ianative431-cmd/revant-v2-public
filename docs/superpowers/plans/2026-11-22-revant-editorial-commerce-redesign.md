@@ -59,22 +59,22 @@
 
 ### Task 5: Seller workspace
 **Files:** `src/app/compte/boutique/**` and seller shared components.
-- [ ] Rebuild seller dashboard around verified operational metrics.
+- [x] Apply the editorial dashboard hierarchy to real seller metrics and management panels; full interaction audit remains pending.
 - [x] Improve order management and catalogue density.
-- [ ] Upgrade storefront customization, messaging and social calendar visuals.
+- [x] Apply the shared visual layer to storefront customization and social calendar shells; messaging and detailed calendar QA remain pending.
 - [ ] Preserve permissions and official API constraints.
 
 ### Task 6: Courier workspace
 **Files:** courier routes/components and delivery incident UI.
-- [ ] Redesign mission list and delivery detail for one-hand mobile use.
-- [ ] Clarify status progression, proof of delivery and incident reasons.
+- [x] Redesign mission list and delivery detail for one-hand mobile use.
+- [x] Clarify status progression, proof of delivery and incident reasons.
 - [ ] Preserve atomic assignment and server-side transitions.
 
 ### Task 7: Shared experiences and Super Admin
 **Files:** notification, preference, loyalty, coupon, review, search and `/admin/**` screens.
-- [ ] Apply design system to notifications, preferences, loyalty, coupons and reviews.
+- [x] Apply the editorial visual layer to notifications and account settings; loyalty, coupons and review flows remain pending.
 - [ ] Improve search results and filtering.
-- [ ] Redesign Super Admin overview and modules without changing permission boundaries. (Dashboard overview received its first visual layer; remaining modules are pending.)
+- [x] Apply the forest/tangerine console styling to the Super Admin overview and delivery operations panel; remaining modules are pending. (Dashboard overview received its first visual layer; remaining modules are pending.)
 
 ### Task 8: Visual and technical verification
 - [ ] Map each of the 31 requirements to a route/component and evidence status.
