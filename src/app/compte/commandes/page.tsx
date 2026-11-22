@@ -73,7 +73,8 @@ export default async function MesCommandesPage() {
                   {activeDelivery && <NativeDeliveryActivityButton action="start" orderReference={order.order_number} itemTitle={itemTitle} status={DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? "Livraison en cours"} detail={DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? "Livraison en cours"} progress={progress} />}
                   {CLOSED_ORDER_STATES.has(order.status) && <NativeDeliveryActivityButton action="end" orderReference={order.order_number} />}
                   {order.status === "pending" && <div className="mt-3"><BuyerOrderActions orderId={order.id} /></div>}
-                  {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
+                  <Link href={`/compte/commandes/${order.id}`} className="mt-3 inline-block rounded-full border border-brand-text/15 px-3 py-2 text-xs font-semibold text-brand-text/70">Voir le détail</Link>
+                  {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 ml-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
                 </article>
               );
             })}
