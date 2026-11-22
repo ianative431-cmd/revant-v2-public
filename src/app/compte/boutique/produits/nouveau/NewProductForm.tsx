@@ -28,7 +28,7 @@ type Status =
 
 const ERROR_MESSAGES: Record<string, string> = {
   "error-type": "Cette image n'est pas valide (JPEG, PNG ou WebP attendus).",
-  "error-size": "Une image dépasse la taille maximale autorisée (8 Mo).",
+  "error-size": "Une image dépasse la taille maximale autorisée (25 Mo).",
   "error-network": "L'envoi a échoué. Vérifie ta connexion et réessaie.",
   "error-generic": "Une erreur est survenue. Réessaie dans un instant.",
   "error-validation": "Vérifie le titre, le prix et ajoute au moins une photo.",

@@ -13,7 +13,7 @@ type Props = {
   bannerUrl: string | null;
 };
 
-const MAX_BYTES = 8 * 1024 * 1024;
+const MAX_BYTES = 25 * 1024 * 1024;
 
 function extractOwnedShopMediaPath(value: string | null, userId: string, shopId: string): string | null {
   if (!value) return null;
@@ -60,7 +60,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
     setMessage(null);
 
     if (file.size === 0 || file.size > MAX_BYTES) {
-      setMessage("Choisis une image de moins de 8 Mo.");
+      setMessage("Choisis une image de moins de 25 Mo.");
       return;
     }
 
@@ -164,7 +164,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
           )}
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-[var(--brand-text)]">Logo</p>
-            <p className="mb-2 text-xs leading-5 text-[var(--brand-muted)]">Carré recommandé · 8 Mo maximum</p>
+            <p className="mb-2 text-xs leading-5 text-[var(--brand-muted)]">Carré recommandé · 25 Mo maximum</p>
             <label className="inline-flex cursor-pointer rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-2 text-xs font-bold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">
               {busy === "logo" ? "Envoi..." : "Ajouter / remplacer"}
               <input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy !== null} onChange={onChange("logo")} />
@@ -179,7 +179,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
           ) : (
             <div className="flex aspect-[16/5] w-full items-center justify-center rounded-xl border border-dashed border-[var(--brand-border)] bg-[var(--brand-surface)] text-xs font-semibold text-[var(--brand-muted)]">Aucune bannière</div>
           )}
-          <p className="text-xs leading-5 text-[var(--brand-muted)]">Format paysage recommandé · 8 Mo maximum</p>
+          <p className="text-xs leading-5 text-[var(--brand-muted)]">Format paysage recommandé · 25 Mo maximum</p>
           <label className="inline-flex w-fit cursor-pointer rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-2 text-xs font-bold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">
             {busy === "banner" ? "Envoi..." : "Ajouter / remplacer"}
             <input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy !== null} onChange={onChange("banner")} />
