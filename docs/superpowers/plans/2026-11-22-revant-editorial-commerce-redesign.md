@@ -77,7 +77,7 @@
 - [x] Apply the editorial shell to photo search and directory filtering; search behavior remains unchanged and deeper filter QA is pending.
 - [x] Add first visual pass to product reviews and messaging.
 - [ ] Complete coupons/loyalty only after real buyer-facing routes, point ledger, coupon rules and server-side contracts are specified; no such buyer system was confirmed in the current repository.
-- [x] Apply the forest/tangerine console styling to the Super Admin overview, delivery operations and report moderation panels; remaining modules are pending. (Dashboard overview received its first visual layer; remaining modules are pending.)
+- [x] Apply the forest/tangerine console styling to the Super Admin overview, delivery operations, report moderation, reviews and promotions; remaining modules are pending. (Dashboard overview received its first visual layer; remaining modules are pending.)
 
 ### Task 8: Visual and technical verification
 - [ ] Map each of the 31 requirements to a route/component and evidence status.
