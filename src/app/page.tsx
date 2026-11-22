@@ -103,7 +103,10 @@ export default async function Home({ searchParams }: Props) {
       }
     }
     try {
-      shops = await getActiveShops(supabase, { limit: 8 });
+      shops = await getActiveShops(supabase, {
+        limit: q?.trim() ? 24 : 8,
+        searchTerm: q?.trim() || undefined,
+      });
     } catch {
       shopsUnavailable = true;
     }
@@ -161,10 +164,19 @@ export default async function Home({ searchParams }: Props) {
       </section>
 
       <section id="categories" className="px-4 pt-7">
-        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">Catégories</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
+        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? "Catégories correspondantes" : "Catégories"}</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
         {categoriesUnavailable && <p role="status" className="mb-3 rounded-xl border border-brand-border bg-brand-surface px-4 py-3 text-xs leading-relaxed text-brand-muted">La liste complète des catégories est temporairement indisponible. La sélection de base reste affichée.</p>}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {displayedCategories.map((category) => (
+          {(term ? displayedCategories.filter((category) => {
+            const searchable = [category.name, category.slug, category.description]
+              .filter(Boolean)
+              .join(" ")
+              .normalize("NFD")
+              .replace(/[\\u0300-\\u036f]/g, "")
+              .toLocaleLowerCase("fr");
+            const normalizedTerm = term.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLocaleLowerCase("fr");
+            return searchable.includes(normalizedTerm);
+          }) : displayedCategories).map((category) => (
             <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-brand-surface-soft">
               <div
                 role="img"
@@ -180,7 +192,7 @@ export default async function Home({ searchParams }: Props) {
       </section>
 
       <section id="boutiques-locales" className="px-4 pt-7">
-        <div className="mb-1"><h2 className="text-lg font-extrabold">Boutiques locales</h2></div>
+        <div className="mb-1"><h2 className="text-lg font-extrabold">{term ? "Boutiques correspondantes" : "Boutiques locales"}</h2></div>
         <p className="mb-3 text-xs text-brand-muted">Découvre les vendeurs et leurs univers.</p>
         {shopsUnavailable ? (
           <div role="status" className="rounded-2xl border border-brand-border bg-brand-surface px-5 py-8 text-center">
@@ -228,7 +240,7 @@ export default async function Home({ searchParams }: Props) {
           </div>
         ) : loadedProducts.length === 0 ? (
           <div className="rounded-xl border border-brand-border bg-brand-surface px-5 py-10 text-center">
-            <p className="text-sm font-semibold">{term ? "Aucun résultat pour cette recherche." : unknownCategory ? "Cette catégorie n’est pas disponible pour le moment." : "Les premières annonces arrivent bientôt."}</p>
+            <p className="text-sm font-semibold">{term ? "Aucun produit correspondant à cette recherche." : unknownCategory ? "Cette catégorie n’est pas disponible pour le moment." : "Les premières annonces arrivent bientôt."}</p>
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-brand-muted">{term ? "Essaie un autre mot ou explore les catégories." : unknownCategory ? "Choisis une catégorie actuellement proposée par Revant." : "Aucun produit actif n’est encore publié. Les annonces réelles apparaîtront ici dès leur publication."}</p>
             {unknownCategory && <Link href="/categories" className="mt-4 inline-flex rounded-full bg-brand-accent px-5 py-3 text-xs font-bold text-white">Explorer les catégories</Link>}
           </div>
