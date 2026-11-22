@@ -102,8 +102,8 @@ export default function CartPage() {
   const totalUnits = items.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
 
   return (
-    <main className="min-h-screen bg-brand-bg px-4 py-8 text-brand-text">
-      <div className="mx-auto max-w-3xl">
+    <main className="revant-cart-page min-h-screen bg-brand-bg px-4 py-8 text-brand-text">
+      <div className="revant-cart-layout mx-auto max-w-5xl">
         <Link href="/" className="text-sm text-[var(--brand-muted)]">← Continuer les achats</Link>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -130,7 +130,7 @@ export default function CartPage() {
               const totals = currencyTotals(group.items);
               const groupUnits = group.items.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
               return (
-                <section key={group.id} className="overflow-hidden rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-sm">
+                <section key={group.id} className="revant-cart-group overflow-hidden rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-sm">
                   <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--brand-border)] bg-[var(--brand-bg)] px-4 py-4 sm:px-5">
                     <div className="min-w-0">
                       <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-[var(--brand-muted)]">Vendeur</p>
@@ -180,7 +180,7 @@ export default function CartPage() {
         )}
 
         {items.length > 0 && (
-          <aside className="mt-5 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 text-xs leading-relaxed text-[var(--brand-muted)]">
+          <aside className="revant-cart-note mt-5 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 text-xs leading-relaxed text-[var(--brand-muted)]">
             Les sous-totaux affichés sont indicatifs. Les prix et stocks sont revérifiés côté serveur. Les frais de livraison sont confirmés par la boutique. Pour le moment, chaque article crée une demande distincte et le paiement en ligne n’est pas activé.
           </aside>
         )}

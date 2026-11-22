@@ -59,9 +59,9 @@ export default async function ProductPage({ params }: Props) {
   });
 
   return (
-    <div className="min-h-screen bg-brand-bg pb-28 text-brand-text">
+    <div className="revant-product-page min-h-screen bg-brand-bg pb-28 text-brand-text">
       <SiteHeader />
-      <main className="mx-auto max-w-6xl px-3 py-5 sm:px-5 sm:py-8">
+      <main className="revant-product-layout mx-auto max-w-6xl px-3 py-5 sm:px-5 sm:py-8">
         <nav aria-label="Fil d’Ariane" className="mb-5 flex flex-wrap items-center gap-2 text-xs font-medium text-[var(--brand-muted)] sm:text-sm">
           <Link href="/" className="transition hover:text-brand-accent">Accueil</Link>
           <span aria-hidden="true">/</span>
@@ -71,7 +71,7 @@ export default async function ProductPage({ params }: Props) {
         </nav>
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] lg:items-start lg:gap-8">
-          <section aria-label="Photos du produit" className="min-w-0 lg:sticky lg:top-24">
+          <section aria-label="Photos du produit" className="revant-product-gallery-panel min-w-0 lg:sticky lg:top-24">
             <div className="overflow-hidden rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-2 shadow-sm sm:rounded-[30px] sm:p-3">
               <ProductGallery images={product.images} productName={product.name} outOfStock={outOfStock} />
             </div>
@@ -80,7 +80,7 @@ export default async function ProductPage({ params }: Props) {
             </p>
           </section>
 
-          <section className="min-w-0 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-6 lg:p-7">
+          <section className="revant-product-info-panel min-w-0 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-6 lg:p-7">
             <div className="flex flex-wrap items-center gap-2">
               {product.categoryName && (
                 <span className="rounded-full bg-[var(--brand-bg)] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--brand-muted)]">
@@ -99,7 +99,7 @@ export default async function ProductPage({ params }: Props) {
               <p className="mt-2 text-sm font-medium text-[var(--brand-muted)]">Format : {product.perfume_volume_ml} ml</p>
             )}
 
-            <div className="mt-5 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-4 py-4 sm:px-5">
+            <div className="revant-product-price mt-5 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-4 py-4 sm:px-5">
               <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[var(--brand-muted)]">Prix du produit</p>
               <p className="mt-1 text-3xl font-black tracking-tight text-brand-accent sm:text-[34px]">
                 {product.base_price.toLocaleString("fr-FR")} {product.currency}

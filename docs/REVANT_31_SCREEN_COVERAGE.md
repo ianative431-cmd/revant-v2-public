@@ -4,13 +4,13 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 
 | # | Expérience | Route ou composant repéré | État de refonte | Preuve visuelle |
 |---:|---|---|---|---|
-| 1 | Fiche produit | `/produit/[id]` | À traiter | À capturer |
-| 2 | Produits similaires | `ProductCard` / recommandations | Refonte partielle des cartes partagées | À capturer |
-| 3 | Découvrir sur Revant | Accueil `/` / `InfiniteProductFeed` | Refonte partielle de l'accueil | À capturer |
-| 4 | Panier | `/panier` | À traiter | À capturer |
-| 5 | Achat direct | `/commande/visiteur` | À traiter | À capturer |
-| 6 | Validation de commande | `/commande/visiteur` | À traiter | À capturer |
-| 7 | Confirmation de commande | `/commande/confirmation` | À traiter | À capturer |
+| 1 | Fiche produit | `/produit/[id]` | Refonte partielle : colonne achat, galerie et prix éditorialisés | À capturer |
+| 2 | Produits similaires | `ProductCard` / recommandations | Refonte partielle des cartes et de la grille partagée | À capturer |
+| 3 | Découvrir sur Revant | Accueil `/` / `InfiniteProductFeed` | Première tranche éditoriale : hero, navigation, catégories, boutiques et grille | À capturer |
+| 4 | Panier | `/panier` | Refonte partielle : groupes vendeur et hiérarchie du panier | À capturer |
+| 5 | Achat direct | `/commande/visiteur` | Refonte partielle : panneau et formulaire responsive | À capturer |
+| 6 | Validation de commande | `/commande/visiteur` | Refonte partielle : structure de formulaire et états conservés | À capturer |
+| 7 | Confirmation de commande | `/commande/confirmation` | Refonte partielle : panneau de confirmation et statut | À capturer |
 | 8 | Liste Mes commandes | `/compte/commandes` | À traiter | À capturer |
 | 9 | Détail et suivi de commande | `/compte/commandes/[id]` | À traiter | À capturer |
 | 10 | Annulation | Parcours de commande à localiser | À cartographier | À capturer |
@@ -19,7 +19,7 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 | 13 | Tableau de bord Ma boutique | `/compte/boutique` | À traiter | À capturer |
 | 14 | Gestion des commandes vendeur | `/compte/boutique/commandes` | À traiter | À capturer |
 | 15 | Catalogue vendeur | `/compte/boutique/produits` | À traiter | À capturer |
-| 16 | Gestion de la vitrine | `/compte/boutique/personnaliser`, `/shop/[slug]` | Vitrine publique refondue partiellement | À capturer |
+| 16 | Gestion de la vitrine | `/compte/boutique/personnaliser`, `/shop/[slug]` | Vitrine publique : bannière, identité, navigation et produits (première couche) | À capturer |
 | 17 | Messagerie vendeur | `/messages`, `/messages/[conversationId]` | À traiter | À capturer |
 | 18 | Calendrier commercial | `/compte/boutique/calendrier-social` | À traiter | À capturer |
 | 19 | Tableau de bord livreur | `/compte/livraisons` | À traiter | À capturer |
@@ -33,12 +33,13 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 | 27 | Fidélité et récompenses | Route à localiser | À cartographier | À capturer |
 | 28 | Coupons et promotions | `/admin/promotions` et parcours acheteur à localiser | À cartographier | À capturer |
 | 29 | Avis et évaluations | `/admin/avis`, section produit | À traiter | À capturer |
-| 30 | Recherche et recommandations | `/`, `/recherche-photo`, `/categories` | Refonte partielle de l'accueil | À capturer |
+| 30 | Recherche et recommandations | `/`, `/recherche-photo`, `/categories` | Navigation de recherche et découverte retravaillées partiellement | À capturer |
 | 31 | Supervision Super Admin | `/admin` et modules `/admin/**` | À traiter | À capturer |
 
 ## État de validation
 - Tests unitaires après la première tranche : 29 réussis.
-- ESLint après la première tranche : 0 erreur, 7 avertissements.
+- ESLint après la première tranche : 0 erreur, 7 avertissements (8 avant les changements).
+- `git diff --check` : réussi.
 - TypeScript local : non conclu, processus arrêté par la limite mémoire du poste distant.
 - Build local : non conclu, limite mémoire/temps du poste distant.
 - CI GitHub du nouveau commit : à attendre.

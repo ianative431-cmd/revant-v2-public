@@ -20,10 +20,10 @@ export default async function GuestCheckoutPage({ searchParams }: Props) {
   const subtotal = product.base_price * quantity;
 
   return (
-    <main className="min-h-screen bg-brand-bg px-4 py-8 text-brand-text">
-      <div className="mx-auto max-w-2xl">
+    <main className="revant-checkout-page min-h-screen bg-brand-bg px-4 py-8 text-brand-text">
+      <div className="revant-checkout-layout mx-auto max-w-4xl">
         <Link href={`/produit/${product.id}`} className="text-sm text-brand-muted">← Retour au produit</Link>
-        <div className="mt-5 rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-sm sm:p-8">
+        <div className="revant-checkout-panel mt-5 rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-sm sm:p-8">
           <p className="text-xs font-bold tracking-widest text-brand-muted">COMMANDE INVITÉ</p>
           <h1 className="mt-2 text-2xl font-black">Commander sans compte</h1>
           <p className="mt-2 text-sm text-brand-muted">Remplis tes coordonnées de livraison. Aucun mot de passe ni inscription ne sont nécessaires.</p>
@@ -34,7 +34,7 @@ export default async function GuestCheckoutPage({ searchParams }: Props) {
           {stockUnavailable && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">La quantité demandée dépasse le stock disponible. Retourne au panier pour la modifier.</p>}
           {erreur && erreur !== "stock" && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{erreur === "validation" ? "Vérifie les informations saisies." : "La commande n’a pas pu être créée. Vérifie les informations et réessaie."}</p>}
           <div role="note" className="mt-5 rounded-xl border border-brand-border bg-brand-bg p-4 text-xs leading-relaxed text-brand-muted"><strong className="text-brand-text">Paiement en ligne indisponible pour le moment.</strong> La commande sera envoyée au vendeur et restera en attente de confirmation. Revant n’encaisse aucun paiement à cette étape : attends les instructions de la boutique avant tout règlement.</div>
-          <form action={createGuestOrder} className="mt-6 grid gap-4">
+          <form action={createGuestOrder} className="revant-checkout-form mt-6 grid gap-4">
             <input type="hidden" name="productId" value={product.id} />
             <input type="hidden" name="quantity" value={quantity} />
             <input type="hidden" name="idempotencyKey" value={idempotencyKey} />

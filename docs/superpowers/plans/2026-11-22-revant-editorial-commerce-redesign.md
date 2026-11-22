@@ -52,9 +52,9 @@
 
 ### Task 4: Buyer conversion
 **Files:** cart, checkout, confirmation, orders, tracking and support views.
-- [ ] Apply shared design system to cart and checkout.
-- [ ] Preserve one-order-per-item behavior until a multi-shop transaction contract exists.
-- [ ] Preserve indicative labels and server-side validation.
+- [x] Apply the first shared editorial styling layer to cart, guest checkout and confirmation; full responsive flow review remains pending.
+- [x] Preserve one-order-per-item behavior until a multi-shop transaction contract exists.
+- [x] Preserve indicative labels and server-side validation.
 - [ ] Improve order history, details, tracking, cancellation, returns and dispute states.
 
 ### Task 5: Seller workspace

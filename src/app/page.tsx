@@ -238,7 +238,7 @@ export default async function Home({ searchParams }: Props) {
       </main>
 
       <section className="revant-home-section pb-8">
-        <div className="revant-editorial-strip">
+        <div className="revant-editorial-strip revant-editorial-strip--three">
           <div><strong>Un marché ouvert à tous</strong><span>Découvre les annonces et les boutiques actives sur Revant.</span></div>
           <div><strong>Tu es vendeur ?</strong><span>Présente tes produits et développe ta boutique.</span><Link href="/boutiques/creer" className="mt-3 inline-flex text-xs font-extrabold text-brand-accent">Ouvrir ma boutique ↗</Link></div>
           <div><strong>Un achat en confiance</strong><span>Les disponibilités et les paiements sont confirmés au moment de la commande.</span></div>

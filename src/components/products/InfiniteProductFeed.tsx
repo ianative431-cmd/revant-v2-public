@@ -118,7 +118,7 @@ export default function InfiniteProductFeed({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="revant-product-feed-grid grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {products.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
       <div ref={sentinel} aria-live="polite" className="flex min-h-16 items-center justify-center py-5">

@@ -64,8 +64,8 @@ export default async function GuestOrderConfirmation({ searchParams }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-brand-bg px-4 py-10 text-brand-text">
-      <div className="mx-auto max-w-xl rounded-2xl border border-brand-border bg-brand-surface p-6 text-center shadow-sm sm:p-10">
+    <main className="revant-order-confirmation min-h-screen bg-brand-bg px-4 py-10 text-brand-text">
+      <div className="revant-confirmation-panel mx-auto max-w-2xl rounded-2xl border border-brand-border bg-brand-surface p-6 text-center shadow-sm sm:p-10">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-surface-soft text-2xl text-brand-accent">✓</div>
         <p className="mt-5 text-xs font-bold tracking-widest text-brand-muted">COMMANDE ENREGISTRÉE</p>
         <h1 className="mt-2 text-2xl font-black">Merci pour ta commande.</h1>
