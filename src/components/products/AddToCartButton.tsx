@@ -39,5 +39,5 @@ export default function AddToCartButton({ item, compact = false }: { item: CartI
     }
   }
 
-  return <button type="button" onClick={add} aria-live="polite" className={`revant-cart-action block w-full rounded-full border border-neutral-300 bg-white text-center font-bold text-neutral-900 transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)] ${added ? "revant-cart-added" : ""} ${compact ? "py-2.5 text-[10px]" : "mt-3 px-6 py-4 text-sm"}`}>{added ? "AJOUTÉ AU PANIER ✓" : "AJOUTER AU PANIER"}</button>;
+  return <button type="button" onClick={add} aria-live="polite" className={`revant-cart-action block w-full rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] text-center font-bold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] disabled:cursor-not-allowed ${added ? "revant-cart-added" : ""} ${compact ? "py-2.5 text-[10px]" : "mt-3 px-6 py-4 text-sm"}`}>{added ? "AJOUTÉ AU PANIER ✓" : "AJOUTER AU PANIER"}</button>;
 }

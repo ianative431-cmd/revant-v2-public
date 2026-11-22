@@ -49,7 +49,7 @@ export default function ProductGallery({
         )}
       </div>
       {safeImages.length > 1 && (
-        <div className="mt-3 grid grid-cols-5 gap-2" aria-label="Autres photos du produit">
+        <div className="mt-3 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]" aria-label="Autres photos du produit">
           {safeImages.map((image, index) => (
             <button
               key={`${image}-${index}`}
@@ -57,8 +57,8 @@ export default function ProductGallery({
               onClick={() => setActiveIndex(index)}
               aria-label={`Afficher la photo ${index + 1}`}
               aria-pressed={selectedIndex === index}
-              className={`relative aspect-square overflow-hidden rounded-lg border-2 ${
-                selectedIndex === index ? "border-[var(--brand-accent)]" : "border-transparent"
+              className={`relative aspect-square w-[68px] shrink-0 snap-start overflow-hidden rounded-xl border-2 transition sm:w-[76px] ${
+                selectedIndex === index ? "border-[var(--brand-accent)] ring-2 ring-[var(--brand-accent)]/15" : "border-[var(--brand-border)] opacity-75 hover:opacity-100"
               }`}
             >
               <Image src={image} alt="" fill sizes="20vw" className="object-cover" />

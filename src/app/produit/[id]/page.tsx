@@ -99,7 +99,7 @@ export default async function ProductPage({ params }: Props) {
               <p className="mt-2 text-sm font-medium text-[var(--brand-muted)]">Format : {product.perfume_volume_ml} ml</p>
             )}
 
-            <div className="mt-5 rounded-2xl bg-[var(--brand-bg)] px-4 py-4 sm:px-5">
+            <div className="mt-5 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-4 py-4 sm:px-5">
               <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[var(--brand-muted)]">Prix du produit</p>
               <p className="mt-1 text-3xl font-black tracking-tight text-brand-accent sm:text-[34px]">
                 {product.base_price.toLocaleString("fr-FR")} {product.currency}
@@ -114,9 +114,9 @@ export default async function ProductPage({ params }: Props) {
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {Object.entries(product.size_stock).sort(([a], [b]) => a.localeCompare(b, "fr")).map(([size, quantity]) => (
-                    <div key={size} className="rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-3 py-3">
+                    <div key={size} className="flex min-h-[76px] flex-col justify-between rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-3 py-3">
                       <span className="block text-sm font-extrabold">{size}</span>
-                      <span className="mt-1 block text-[11px] font-medium text-[var(--brand-muted)]">
+                      <span className={`mt-1 block text-[11px] font-semibold ${quantity > 0 ? "text-[var(--brand-muted)]" : "text-[var(--brand-accent)]"}`}>
                         {quantity > 0 ? `${quantity} disponible${quantity > 1 ? "s" : ""}` : "Épuisé"}
                       </span>
                     </div>
