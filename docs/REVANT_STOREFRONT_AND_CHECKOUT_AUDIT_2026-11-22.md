@@ -110,3 +110,6 @@ La réponse vendeur reste explicitement hors périmètre tant que la migration, 
 - Le frais de livraison nul est présenté comme « À confirmer » et non comme un frais gratuit, car le checkout invité actuel initialise le frais à zéro.
 - Aucun nom ou contact de livreur n'est inventé ; aucun événement intermédiaire sans horodatage n'est simulé.
 - La base ne contient pas de table d'historique `delivery_events` ; la chronologie repose donc sur les seuls horodatages existants dans `orders` et `deliveries`.
+
+
+- La page de détail récupère également l'adresse enregistrée liée à `shipping_address_id`, avec filtre explicite sur `user_id` et respect de la politique RLS « users manage own addresses ». Les commandes invitées utilisent les coordonnées présentes sur la commande ou l'adresse de livraison enregistrée dans `deliveries`.
