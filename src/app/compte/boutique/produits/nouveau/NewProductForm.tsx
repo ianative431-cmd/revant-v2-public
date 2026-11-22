@@ -270,7 +270,7 @@ export default function NewProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <section className="grid gap-2 text-sm font-medium" aria-label="Photos du produit">
+      <section className="grid gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-4 text-sm font-medium" aria-label="Photos du produit">
         <p>Photos du produit (jusqu&apos;à 5)</p>
         <div className="flex flex-wrap gap-2">
           <button type="button" disabled={status === "submitting" || files.length >= MAX_PRODUCT_IMAGES} onClick={() => { if (cameraInputRef.current) { cameraInputRef.current.value = ""; cameraInputRef.current.click(); } }} className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold disabled:opacity-50">Prendre une photo</button>
@@ -278,13 +278,13 @@ export default function NewProductForm({
         </div>
         <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={(event) => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; if (file) void handleFilesSelected([file]); }} />
         <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={(event) => { const selected = Array.from(event.currentTarget.files ?? []); event.currentTarget.value = ""; void handleFilesSelected(selected); }} />
-        <span className="text-xs font-normal text-neutral-500">Prends une photo directement ou sélectionne plusieurs images dans la galerie.</span>
+        <span className="text-xs font-normal text-[var(--brand-muted)]">Prends une photo directement ou sélectionne plusieurs images dans la galerie.</span>
       </section>
 
       {previewUrls.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
           {previewUrls.map((url, index) => (
-            <div key={url} className="relative aspect-square overflow-hidden rounded-xl bg-neutral-100">
+            <div key={url} className="relative aspect-square overflow-hidden rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)]">
               {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local (blob URL) */}
               <img src={url} alt={"Aperçu photo " + (index + 1)} className="h-full w-full object-cover" />
               <button type="button" onClick={() => removeImage(index)} aria-label={"Retirer la photo " + (index + 1)} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-sm text-white">×</button>
@@ -305,14 +305,14 @@ export default function NewProductForm({
         minLength={2}
         maxLength={120}
         placeholder="Titre de l'annonce"
-        className="border rounded-xl px-4 py-3 text-sm"
+        className="w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-muted)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15"
       />
 
       <select
         name="categoryId"
         required
         defaultValue=""
-        className="border rounded-xl px-4 py-3 text-sm bg-white"
+        className="w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15"
       >
         <option value="" disabled>
           Catégorie
@@ -335,8 +335,8 @@ export default function NewProductForm({
         <input name="stockQuantity" type="number" min={0} step={1} defaultValue={1} className="border rounded-xl px-4 py-3 text-sm" />
       </label>
       <label className="grid gap-1 text-sm font-medium">Tailles et quantités (vêtements)
-        <textarea name="sizeStock" rows={3} placeholder={"S: 5\nM: 8\nL: 3"} className="border rounded-xl px-4 py-3 text-sm resize-y" />
-        <span className="text-xs font-normal text-neutral-500">Une taille par ligne, au format Taille : quantité. Les quantités peuvent être 0.</span>
+        <textarea name="sizeStock" rows={3} placeholder={"S: 5\nM: 8\nL: 3"} className="w-full resize-y rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-muted)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15" />
+        <span className="text-xs font-normal text-[var(--brand-muted)]">Une taille par ligne, au format Taille : quantité. Les quantités peuvent être 0.</span>
       </label>
       <label className="grid gap-1 text-sm font-medium">Volume du parfum (ml, facultatif)
         <input name="perfumeVolumeMl" type="number" min={1} max={5000} step={1} placeholder="Ex. 100" className="border rounded-xl px-4 py-3 text-sm" />
@@ -357,7 +357,7 @@ export default function NewProductForm({
         maxLength={2000}
         rows={4}
         placeholder="Description (facultatif)"
-        className="border rounded-xl px-4 py-3 text-sm resize-none"
+        className="w-full resize-none rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-muted)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15"
       />
 
       {status !== "idle" && status !== "submitting" && (

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Product } from "@/types/product";
+import { safeProductImageUrl } from "@/lib/product-image";
 
 export default function ProductManageRow({ product, shopStatus }: { product: Product; shopStatus: "draft" | "pending" | "active" | "suspended" | "closed" }) {
   const router = useRouter();
@@ -72,26 +73,26 @@ export default function ProductManageRow({ product, shopStatus }: { product: Pro
     router.refresh();
   }
 
-  const imageUrl = product.images[0] ?? null;
+  const imageUrl = safeProductImageUrl(product.images[0]);
 
   return (
-    <div className="flex gap-3 bg-white rounded-2xl p-3">
-      <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-black/5 shrink-0">
+    <div className="flex min-w-0 gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-3 shadow-sm sm:p-4">
+      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)] sm:h-24 sm:w-24">
         {imageUrl ? (
           <Image src={imageUrl} alt={product.name} fill sizes="64px" className="object-cover" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-[10px] text-black/30">
+          <div className="absolute inset-0 flex items-center justify-center px-1 text-center text-[10px] text-[var(--brand-muted)]">
             Pas de photo
           </div>
         )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{product.name}</p>
+        <p className="truncate text-sm font-extrabold text-[var(--brand-text)]">{product.name}</p>
         {product.categoryName && (
-          <p className="text-xs text-black/60">{product.categoryName}</p>
+          <p className="text-xs text-[var(--brand-muted)]">{product.categoryName}</p>
         )}
-        <p className="text-sm font-semibold">
+        <p className="text-sm font-black text-[var(--brand-accent)]">
           {product.base_price.toLocaleString("fr-FR")} {product.currency}
         </p>
 
