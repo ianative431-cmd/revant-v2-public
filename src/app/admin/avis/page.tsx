@@ -73,7 +73,7 @@ export default async function AdminAvisPage() {
             </div>
             {report.status === "reviewing" && (
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <form action={updateReportAction} className="space-y-2"><input type="hidden" name="reportId" value={report.id} /><input type="hidden" name="action" value="resolve" /><textarea name="note" required minLength={5} maxLength={500} placeholder="Décision et motif (obligatoire)" className="w-full rounded-xl border border-black/10 p-3 text-xs" /><button className="rounded-full bg-[#803e2f] px-3 py-2 text-xs font-semibold text-white">Résoudre</button></form>
+                <form action={updateReportAction} className="space-y-2"><input type="hidden" name="reportId" value={report.id} /><input type="hidden" name="action" value="resolve" /><textarea name="note" required minLength={5} maxLength={500} placeholder="Décision et motif (obligatoire)" className="w-full rounded-xl border border-black/10 p-3 text-xs" /><button className="rounded-full bg-brand-accent px-3 py-2 text-xs font-semibold text-white">Résoudre</button></form>
                 <form action={updateReportAction} className="space-y-2"><input type="hidden" name="reportId" value={report.id} /><input type="hidden" name="action" value="dismiss" /><textarea name="note" required minLength={5} maxLength={500} placeholder="Motif du classement (obligatoire)" className="w-full rounded-xl border border-black/10 p-3 text-xs" /><button className="rounded-full border border-black/15 px-3 py-2 text-xs font-semibold">Classer sans suite</button></form>
               </div>
             )}

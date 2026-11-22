@@ -26,9 +26,9 @@ function BuyerWallet() {
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-bg text-brand-accent"><CreditCard size={22}/></span>
         </div>
         <div className="mt-6 overflow-hidden rounded-[22px] border border-dashed border-brand-border bg-brand-bg p-5 sm:p-7">
-          <div className="mx-auto flex min-h-[150px] max-w-sm flex-col justify-between rounded-[20px] border border-white/30 bg-gradient-to-br from-[#e8e2ee] via-[#d9d1e3] to-[#c7c3d6] p-5 text-[#24212b] shadow-[0_14px_35px_rgba(65,50,85,.14)]">
+          <div className="mx-auto flex min-h-[150px] max-w-sm flex-col justify-between rounded-[20px] border border-white/30 bg-gradient-to-br from-[#123b30] via-[#1f5947] to-[#0b2b23] p-5 text-white shadow-[0_14px_35px_rgba(65,50,85,.14)]">
             <div className="flex items-center justify-between"><span className="text-[10px] font-extrabold tracking-[.2em]">REVANT WALLET</span><LockKeyhole size={17}/></div>
-            <div><p className="text-sm font-semibold">Tes cartes apparaîtront ici</p><p className="mt-1 text-[10px] text-[#4f4a59]">Visa · Mastercard · autres réseaux compatibles</p></div>
+            <div><p className="text-sm font-semibold">Tes cartes apparaîtront ici</p><p className="mt-1 text-[10px] text-white/70">Visa · Mastercard · autres réseaux compatibles</p></div>
             <div className="flex items-center justify-between text-[10px] font-bold"><span>MOYENS DE PAIEMENT SÉCURISÉS</span><span className="tracking-wider">••••</span></div>
           </div>
           <div className="mx-auto mt-5 max-w-sm text-center">
@@ -56,7 +56,7 @@ function SellerWallet({ shopName }: { shopName: string }) {
       <div className="rounded-[26px] border border-brand-border bg-brand-surface p-5 shadow-sm sm:p-7">
         <p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-brand-accent">REVANT · ESPACE VENDEUR</p>
         <div className="mt-2 flex items-center justify-between gap-3"><div><h2 id="seller-wallet-title" className="text-xl font-black tracking-tight sm:text-2xl">Wallet vendeur</h2><p className="mt-1 text-xs text-brand-muted">{shopName}</p></div><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-bg text-brand-accent"><WalletIcon size={22}/></span></div>
-        <div className="mt-6 rounded-[22px] bg-gradient-to-br from-[#20232d] via-[#303344] to-[#4b4660] p-5 text-white shadow-lg sm:p-6">
+        <div className="mt-6 rounded-[22px] bg-gradient-to-br from-[#0b211a] via-[#123b30] to-[#1f5947] p-5 text-white shadow-lg sm:p-6">
           <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-white/65">Solde total</p>
           <p className="mt-2 text-3xl font-black tracking-tight">— <span className="text-sm font-semibold text-white/70">FCFA</span></p>
           <div className="mt-4 flex items-center gap-2 text-[11px] text-white/75"><span className="h-2 w-2 rounded-full bg-amber-300"/>Affichage en attente de l’activation du ledger financier</div>
