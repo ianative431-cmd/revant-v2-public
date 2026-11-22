@@ -79,3 +79,11 @@ Projet Supabase contrôlé : `Revant` (`xugcmpnrigqfszyfufoc`), état `ACTIVE_HE
 La branche de travail ajoute l'affichage des avis publiés, la mention d'achat vérifié lorsque `order_id` est présent, et une pagination par lots. L'API ne renvoie ni `user_id` ni `order_id`. Aucun avis fictif n'est affiché.
 
 La réponse vendeur reste explicitement hors périmètre tant que la migration, les règles d'autorisation et le parcours de réponse du propriétaire de boutique ne sont pas définis.
+
+
+## 6. Limites restantes du parcours d'avis
+
+- Le dépôt ne contient pas encore de formulaire côté acheteur pour créer un avis après livraison.
+- La base autorise l'insertion d'avis liés à une commande livrée, mais le parcours applicatif de saisie n'a pas encore été construit.
+- Le schéma ne contient pas de champ de réponse vendeur ; cette partie nécessite une migration et des règles RLS spécifiques.
+- Le composant de fiche produit n'affirme donc plus qu'un formulaire est déjà disponible : il indique seulement que les avis publiés apparaîtront dans cette section.
