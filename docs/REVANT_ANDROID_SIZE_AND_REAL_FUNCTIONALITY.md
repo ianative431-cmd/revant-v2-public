@@ -25,7 +25,12 @@ Toujours afficher les unités en octets et MB décimaux (1 MB = 1 000 000 octets
 - `capacitor.config.ts` pointe encore vers le site Render en distant : `https://revant-v2-ui-premium.onrender.com/?source=android-app`.
 - `www` est donc un shell/placeholder et l'expérience principale dépend du réseau et du serveur distant. Le paquet actuel est un wrapper, pas une application marketplace complète autonome.
 - Le workflow `.github/workflows/android-apks.yml` produit des APK debug pour Revant et Super Admin, avec une limite CI actuelle de 60 MB. Ce seuil est une limite de garde-fou, pas la taille mesurée des APK.
-- Aucun poids réel actuel n'est déclaré dans les sources examinées. Une exécution de référence du workflow est en cours avant de définir une nouvelle limite stricte.
+- Build de référence debug exécuté le 22 novembre 2026 sur `main`, commit `68454e1156fa94fa859cd03ce4835ec2ce220af3`, workflow GitHub Actions run `45023532204`.
+- Revant debug APK : `6 150 594` octets, soit `6,15 MB` (environ `5,87 MiB`).
+- Super Admin debug APK : `6 441 001` octets, soit `6,44 MB` (environ `6,14 MiB`).
+- Ces tailles sont les tailles des APK mesurées dans les logs de build, et non les tailles ZIP compressées des artefacts.
+- Le workflow mesure uniquement `assembleDebug` à ce stade. Aucun APK release signé ni AAB release n'a encore été mesuré.
+- La limite CI actuelle reste `60 000 000` octets ; elle n'a pas été abaissée.
 
 ## Objectif proposé
 
