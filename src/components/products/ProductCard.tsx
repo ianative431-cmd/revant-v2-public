@@ -68,6 +68,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 price: product.base_price,
                 currency: product.currency,
                 image: imageUrl,
+                shopId: product.shop_id,
               }}
             />
             <Link
