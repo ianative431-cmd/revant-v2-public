@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { safeProductImageUrl } from "@/lib/product-image";
 
 type CartItem = {
   id: string;
@@ -15,17 +16,18 @@ type CartItem = {
 };
 
 type CartGroup = { id: string; name: string; items: CartItem[] };
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function normalizeItems(value: unknown): CartItem[] {
   if (!Array.isArray(value)) return [];
   return value.filter((item): item is CartItem =>
     Boolean(item) && typeof item === "object" &&
     typeof item.id === "string" && typeof item.name === "string" &&
-    typeof item.price === "number" && Number.isFinite(item.price) &&
+    typeof item.price === "number" && Number.isFinite(item.price) && item.price >= 0 &&
     typeof item.currency === "string"
   ).map((item) => ({
     ...item,
-    shopId: typeof item.shopId === "string" ? item.shopId : undefined,
+    shopId: typeof item.shopId === "string" && UUID_PATTERN.test(item.shopId) ? item.shopId : undefined,
     shopName: typeof item.shopName === "string" ? item.shopName.slice(0, 100) : null,
     quantity: Math.max(1, Math.min(99, Math.floor(Number(item.quantity) || 1))),
   }));
@@ -38,6 +40,7 @@ function groupItems(items: CartItem[]): CartGroup[] {
     const key = item.shopId ? `shop:${item.shopId}` : `unresolved:${item.id}`;
     const existing = groups.get(key);
     if (existing) {
+      if ((!existing.name || existing.name === "Boutique") && item.shopName) existing.name = item.shopName;
       existing.items.push(item);
     } else {
       groups.set(key, {
@@ -145,11 +148,11 @@ export default function CartPage() {
                   <div className="divide-y divide-[var(--brand-border)]">
                     {group.items.map((item) => {
                       const quantity = item.quantity ?? 1;
+                      const imageUrl = safeProductImageUrl(item.image);
                       return (
                         <article key={item.id} className="flex items-start gap-3 p-3 sm:gap-4 sm:p-4">
-                          {item.image ? (
-                            // Product images are public URLs saved when the buyer adds the product.
-                            <img src={item.image} alt="" className="h-20 w-20 shrink-0 rounded-xl bg-[var(--brand-bg)] object-cover sm:h-24 sm:w-24" />
+                          {imageUrl ? (
+                            <img src={imageUrl} alt="" className="h-20 w-20 shrink-0 rounded-xl bg-[var(--brand-bg)] object-cover sm:h-24 sm:w-24" />
                           ) : (
                             <div className="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-[var(--brand-bg)] text-xl text-[var(--brand-muted)] sm:h-24 sm:w-24">◇</div>
                           )}
