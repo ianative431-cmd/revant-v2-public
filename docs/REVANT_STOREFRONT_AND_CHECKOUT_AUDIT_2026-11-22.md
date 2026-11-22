@@ -113,3 +113,34 @@ La réponse vendeur reste explicitement hors périmètre tant que la migration, 
 
 
 - La page de détail récupère également l'adresse enregistrée liée à `shipping_address_id`, avec filtre explicite sur `user_id` et respect de la politique RLS « users manage own addresses ». Les commandes invitées utilisent les coordonnées présentes sur la commande ou l'adresse de livraison enregistrée dans `deliveries`.
+
+
+## 9. Tableau de bord vendeur et espace livreur
+
+### Ma boutique
+La page `/compte/boutique` reçoit un tableau de bord avec des indicateurs réels :
+- commandes reçues dans cette boutique ;
+- commandes à confirmer ;
+- commandes en cours ;
+- commandes livrées ;
+- annonces actives ;
+- annonces en attente de validation ;
+- annonces actives sans stock.
+
+Les commandes sont obtenues par `getOrdersForShop(supabase, shop.id)`, qui filtre les lignes par boutique avant de compter les commandes uniques. Cela évite de compter les achats personnels du vendeur ou les commandes d'une autre boutique. Aucun chiffre d'affaires n'est affiché, car un montant de commande ne constitue pas une recette encaissée.
+
+### Espace livreur
+Le code actuel possède déjà :
+- contrôle d'un profil livreur actif ;
+- listes RPC des livraisons disponibles et attribuées ;
+- prise en charge atomique d'une livraison ;
+- progression assignée → récupérée → en route ;
+- confirmation de remise par code à 4 ou 6 chiffres ;
+- alertes et Live Activity.
+
+Limite constatée dans la base :
+- `driver_update_delivery_status(p_delivery_id, p_status)` accepte le statut `failed`, mais ne reçoit aucun motif d'incident ;
+- la fonction privée ne renseigne pas `failure_reason` lors de ce changement de statut ;
+- l'interface livreur n'offre pas encore de formulaire de déclaration d'incident.
+
+La déclaration complète d'incident nécessite donc une évolution du RPC et de ses contrôles, pas un simple bouton qui afficherait un motif fictif. Aucun changement de schéma n'a été appliqué.
