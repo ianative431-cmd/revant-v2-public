@@ -4,9 +4,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/server/auth/session";
 import { getActiveProducts } from "@/server/products/products";
 import { getProductById } from "@/server/products/products";
+import { getPublishedProductReviews } from "@/server/products/reviews";
 import AddToCartButton from "@/components/products/AddToCartButton";
 import ProductCard from "@/components/products/ProductCard";
 import ProductGallery from "@/components/products/ProductGallery";
+import ProductReviews from "@/components/products/ProductReviews";
 import InfiniteProductFeed from "@/components/products/InfiniteProductFeed";
 import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
@@ -28,6 +30,7 @@ export default async function ProductPage({ params }: Props) {
     .maybeSingle();
   if (shopError) throw shopError;
   const currentUser = await getCurrentUser();
+  const reviewData = await getPublishedProductReviews(supabase, product.id, 0, 10);
   const isOwner = !!currentUser && !!shop && shop.owner_id === currentUser.id;
   const outOfStock = product.stock_quantity <= 0;
   const imageUrl = product.images[0] ?? null;
@@ -171,6 +174,8 @@ export default async function ProductPage({ params }: Props) {
             </div>
           </section>
         </div>
+
+        <ProductReviews productId={product.id} initialReviews={reviewData.reviews} totalReviews={reviewData.total} />
 
         {relatedProducts.length > 0 && (
           <section aria-labelledby="related-products-title" className="mt-7 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-7">
