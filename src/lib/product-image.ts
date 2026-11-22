@@ -1,7 +1,7 @@
 import { compressImageKeepingAspect } from "./image";
 
 export const PRODUCT_IMAGE_BUCKET = "product-images";
-export const PRODUCT_IMAGE_MAX_BYTES = 25 * 1024 * 1024; // 8 Mo avant compression
+export const PRODUCT_IMAGE_MAX_BYTES = 25 * 1024 * 1024; // 25 Mo maximum pour le fichier source avant compression
 export const PRODUCT_IMAGE_MAX_DIMENSION = 1600; // px, plus grand côté après compression
 export const PRODUCT_IMAGE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
