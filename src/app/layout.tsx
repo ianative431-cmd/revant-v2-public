@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import "./interaction-performance.css";
 import "./revant-editorial.css";
+import "./revant-editorial-extended.css";
 import Footer from "@/components/layout/Footer";
 import GlobalDismissibleDetails from "@/components/layout/GlobalDismissibleDetails";
 import FloatingBackButton from "@/components/layout/FloatingBackButton";
