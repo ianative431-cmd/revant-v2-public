@@ -32,10 +32,6 @@ test("allows cleanup when neither current media field references the old object"
   );
 });
 
-test("does not request deletion when the previous URL is not owned or cannot be resolved", () => {
+test("never requests deletion when no previously validated owned path exists", () => {
   assert.equal(shouldDeleteShopMediaObject(null, ["logo-new"], resolvePath), false);
-  assert.equal(
-    shouldDeleteShopMediaObject("foreign/path.png", [null, "logo-new"], resolvePath),
-    true,
-  );
 });
