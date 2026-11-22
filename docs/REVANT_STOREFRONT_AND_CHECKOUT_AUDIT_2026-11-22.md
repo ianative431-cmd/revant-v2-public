@@ -87,3 +87,14 @@ La réponse vendeur reste explicitement hors périmètre tant que la migration, 
 - La base autorise l'insertion d'avis liés à une commande livrée, mais le parcours applicatif de saisie n'a pas encore été construit.
 - Le schéma ne contient pas de champ de réponse vendeur ; cette partie nécessite une migration et des règles RLS spécifiques.
 - Le composant de fiche produit n'affirme donc plus qu'un formulaire est déjà disponible : il indique seulement que les avis publiés apparaîtront dans cette section.
+
+
+## 7. Panier — première évolution visuelle sur la branche
+
+- Les nouvelles entrées ajoutées depuis une carte produit enregistrent l'identifiant de boutique ; celles ajoutées depuis la fiche produit enregistrent également son nom.
+- Le panier regroupe visuellement les lignes par identifiant boutique.
+- Les anciens éléments de `localStorage` sans métadonnées vendeur sont conservés et affichés dans des groupes séparés « Boutique à confirmer » : aucune boutique n'est devinée.
+- Les sous-totaux sont calculés par devise et explicitement qualifiés d'indicatifs.
+- Les URL d'images locales sont filtrées par `safeProductImageUrl` avant affichage.
+- Le parcours conserve une demande de commande par article. Aucun paiement consolidé, frais de livraison fictifs ou total final multi-boutiques n'est affiché.
+- Le prix et le stock restent à revalider côté serveur au moment de chaque commande.
