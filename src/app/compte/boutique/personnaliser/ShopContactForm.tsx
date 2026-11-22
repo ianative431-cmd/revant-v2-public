@@ -29,14 +29,14 @@ export default function ShopContactForm({
   const phonePlaceholder = countryCode === "NE" ? "90 12 34 56 ou +227..." : "+indicatif numéro";
 
   return (
-    <section id="contacts" className="mt-6 rounded-2xl border border-black/10 bg-white p-4">
-      <h2 className="text-sm font-semibold">Coordonnées et réseaux sociaux</h2>
-      <p className="mt-1 text-xs text-black/55">
+    <section id="contacts" className="mt-6 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:p-6">
+      <h2 className="text-base font-extrabold text-[var(--brand-text)]">Coordonnées et réseaux sociaux</h2>
+      <p className="mt-1 text-xs leading-5 text-[var(--brand-muted)]">
         Ces informations apparaissent sur la vitrine publique de ta boutique.
       </p>
 
       <form action={formAction} className="mt-4 flex flex-col gap-3">
-        <label className="text-xs text-black/65">
+        <label className="text-xs font-semibold text-[var(--brand-muted)]">
           Téléphone
           <input
             name="phone"
@@ -45,7 +45,7 @@ export default function ShopContactForm({
             maxLength={25}
             defaultValue={phone ?? ""}
             placeholder={phonePlaceholder}
-            className="mt-1 w-full rounded-xl border px-4 py-3 text-sm"
+            className="mt-1 w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-muted)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15"
           />
         </label>
 
@@ -61,7 +61,7 @@ export default function ShopContactForm({
             className="mt-1 w-full rounded-xl border px-4 py-3 text-sm"
           />
         </label>
-        <p className="-mt-2 text-[11px] text-black/45">
+        <p className="-mt-2 text-[11px] leading-5 text-[var(--brand-muted)]">
           Au Niger, un numéro local est enregistré avec +227. Pour un autre pays, saisis le numéro avec son indicatif international. Si WhatsApp reste vide, le numéro de téléphone sera utilisé.
         </p>
 
@@ -113,7 +113,7 @@ export default function ShopContactForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-full bg-black py-3 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded-full bg-[var(--brand-accent)] py-3 text-sm font-bold text-[var(--brand-accent-contrast)] transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pending ? "Enregistrement..." : "Enregistrer les coordonnées"}
         </button>

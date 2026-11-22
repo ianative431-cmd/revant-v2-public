@@ -18,7 +18,7 @@ export default function EditShopForm({
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
-      <label className="text-xs text-black/60">
+      <label className="text-xs font-semibold text-[var(--brand-muted)]">
         Nom
         <input
           name="name"
@@ -27,7 +27,7 @@ export default function EditShopForm({
           minLength={2}
           maxLength={80}
           defaultValue={initialName}
-          className="mt-1 w-full border rounded-xl px-4 py-3 text-sm"
+          className="mt-1 w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-muted)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15"
         />
       </label>
 
@@ -38,7 +38,7 @@ export default function EditShopForm({
           maxLength={1000}
           rows={4}
           defaultValue={initialDescription}
-          className="mt-1 w-full border rounded-xl px-4 py-3 text-sm resize-none"
+          className="mt-1 w-full resize-none rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-muted)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15"
         />
       </label>
 
@@ -55,7 +55,7 @@ export default function EditShopForm({
           className="mt-1 w-full border rounded-xl px-4 py-3 text-sm"
         />
       </label>
-      <p className="text-xs text-black/40 -mt-2">
+      <p className="text-xs text-[var(--brand-muted)] -mt-2">
         Attention : les anciens liens ne seront plus redirigés après un changement d&apos;adresse.
       </p>
 
@@ -64,7 +64,7 @@ export default function EditShopForm({
       <button
         type="submit"
         disabled={pending}
-        className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
+        className="rounded-full bg-[var(--brand-accent)] py-3 text-sm font-bold text-[var(--brand-accent-contrast)] transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? "Enregistrement..." : "Enregistrer"}
       </button>

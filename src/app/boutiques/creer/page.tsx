@@ -16,9 +16,9 @@ export default async function CreerBoutiquePage() {
 
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-sm bg-white rounded-[22px] p-8 shadow-sm">
-        <h1 className="text-xl font-bold mb-1">Créer ma boutique</h1>
-        <p className="text-sm text-brand-text/60 mb-6">
+      <div className="w-full max-w-xl rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-8">
+        <h1 className="mb-1 text-2xl font-black tracking-tight text-[var(--brand-text)]">Créer ma boutique</h1>
+        <p className="mb-6 text-sm leading-6 text-[var(--brand-muted)]">
           Ton adresse publique sera générée automatiquement à partir du nom — tu pourras la
           changer plus tard.
         </p>

@@ -26,8 +26,8 @@ export default async function PersonnaliserBoutiquePage() {
           ← Ma boutique
         </Link>
 
-        <h1 className="text-xl font-bold mt-4 mb-1">Personnaliser {shop.name}</h1>
-        <p className="text-sm text-[var(--brand-muted)] mb-6">
+        <h1 className="mb-1 mt-4 text-2xl font-black tracking-tight text-[var(--brand-text)]">Personnaliser {shop.name}</h1>
+        <p className="mb-6 text-sm leading-6 text-[var(--brand-muted)]">
           Gère les informations visibles sur la vitrine publique de ta boutique.
         </p>
 
