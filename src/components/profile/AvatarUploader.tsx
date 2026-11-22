@@ -189,25 +189,25 @@ export default function AvatarUploader({
         </button>
 
         {menuOpen && status !== "cropping" && (
-          <div className="absolute z-10 top-full mt-2 left-1/2 -translate-x-1/2 bg-white border border-brand-text/10 rounded-xl shadow-md text-sm overflow-hidden w-48">
+          <div className="absolute z-10 top-full mt-2 left-1/2 -translate-x-1/2 bg-[var(--brand-surface)] border border-[var(--brand-border)] text-brand-text rounded-xl shadow-md text-sm overflow-hidden w-48">
             <label
               htmlFor="revant-avatar-gallery"
               onClick={() => setMenuOpen(false)}
-              className="block w-full text-left px-4 py-3 hover:bg-brand-text/[0.03] cursor-pointer"
+              className="block w-full text-left px-4 py-3 hover:bg-[var(--brand-bg)] cursor-pointer"
             >
               Choisir dans la galerie
             </label>
             <label
               htmlFor="revant-avatar-camera"
               onClick={() => setMenuOpen(false)}
-              className="block w-full text-left px-4 py-3 hover:bg-brand-text/[0.03] border-t border-brand-text/[0.06] cursor-pointer"
+              className="block w-full text-left px-4 py-3 hover:bg-[var(--brand-bg)] border-t border-[var(--brand-border)] cursor-pointer"
             >
               Prendre une photo
             </label>
             {avatarUrl && (
               <button
                 type="button"
-                className="w-full text-left px-4 py-3 hover:bg-brand-text/[0.03] border-t border-brand-text/[0.06] text-red-600"
+                className="w-full text-left px-4 py-3 hover:bg-[var(--brand-bg)] border-t border-[var(--brand-border)] text-red-600"
                 onClick={() => {
                   setMenuOpen(false);
                   setConfirmDelete(true);
@@ -275,14 +275,14 @@ export default function AvatarUploader({
       )}
 
       {confirmDelete && (
-        <div className="fixed inset-0 bg-brand-text/40 flex items-center justify-center z-20 px-6">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-xs text-center">
+        <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-20 px-6">
+          <div className="bg-[var(--brand-surface)] text-brand-text border border-[var(--brand-border)] rounded-2xl p-5 w-full max-w-xs text-center shadow-xl">
             <p className="text-sm mb-4">Supprimer définitivement ta photo de profil ?</p>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setConfirmDelete(false)}
-                className="flex-1 py-2 rounded-full border border-brand-text/15 text-sm"
+                className="flex-1 py-2 rounded-full border border-[var(--brand-border)] text-sm"
               >
                 Annuler
               </button>
