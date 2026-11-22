@@ -98,3 +98,15 @@ La réponse vendeur reste explicitement hors périmètre tant que la migration, 
 - Les URL d'images locales sont filtrées par `safeProductImageUrl` avant affichage.
 - Le parcours conserve une demande de commande par article. Aucun paiement consolidé, frais de livraison fictifs ou total final multi-boutiques n'est affiché.
 - Le prix et le stock restent à revalider côté serveur au moment de chaque commande.
+
+
+## 8. Détail et suivi acheteur — première implémentation
+
+- La liste des commandes mène maintenant à une page de détail réservée au propriétaire de la commande.
+- La route vérifie explicitement `order.buyer_id === user.id`, même si les politiques RLS permettent aussi aux vendeurs de lire les commandes contenant leurs articles.
+- La page réutilise `getOrderById`, qui récupère la commande, ses lignes et son éventuel enregistrement de livraison.
+- La chronologie n'affiche que les événements disposant d'un horodatage réellement enregistré : création, confirmation, demande de livraison, attribution, récupération, livraison et annulation.
+- Le fuseau d'affichage est `Africa/Niamey`.
+- Le frais de livraison nul est présenté comme « À confirmer » et non comme un frais gratuit, car le checkout invité actuel initialise le frais à zéro.
+- Aucun nom ou contact de livreur n'est inventé ; aucun événement intermédiaire sans horodatage n'est simulé.
+- La base ne contient pas de table d'historique `delivery_events` ; la chronologie repose donc sur les seuls horodatages existants dans `orders` et `deliveries`.
