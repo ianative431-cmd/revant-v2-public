@@ -48,6 +48,7 @@ async function runOrderTransition(
 
   revalidatePath("/compte/boutique/commandes");
   revalidatePath("/compte/commandes");
+  revalidatePath(`/compte/commandes/${orderId}`);
   revalidatePath(`/compte/commandes/${orderId}/recu`);
   return { error: null, success: true };
 }
