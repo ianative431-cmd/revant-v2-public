@@ -142,7 +142,7 @@ export default async function Home({ searchParams }: Props) {
     .toLocaleLowerCase("fr");
   const matchingCategories = term
     ? displayedCategories.filter((category) => {
-        const searchable = [category.name, category.slug, category.description]
+        const searchable = [category.name, category.slug]
           .filter(Boolean)
           .join(" ")
           .normalize("NFD")
