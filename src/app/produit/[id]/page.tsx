@@ -153,7 +153,7 @@ export default async function ProductPage({ params }: Props) {
                 <p className="rounded-2xl bg-[var(--brand-bg)] p-4 text-sm leading-relaxed">Ce produit est actuellement épuisé. Consulte la boutique pour découvrir les autres articles.</p>
               ) : (
                 <div className="grid gap-3">
-                  <AddToCartButton item={{ id: product.id, name: product.name, price: product.base_price, currency: product.currency, image: imageUrl }} />
+                  <AddToCartButton item={{ id: product.id, name: product.name, price: product.base_price, currency: product.currency, image: imageUrl, shopId: product.shop_id, shopName: shop?.name ?? null }} />
                   <Link href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`} className="block w-full rounded-full bg-brand-accent px-6 py-4 text-center text-sm font-extrabold text-white shadow-sm transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
                     Commander sans créer de compte
                   </Link>
