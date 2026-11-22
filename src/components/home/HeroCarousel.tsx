@@ -1,106 +1,42 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 type HeroSlide = {
   id: string;
   eyebrow: string;
   title: string;
+  accent: string;
   description: string;
   ctaLabel: string;
   ctaHref: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
   image: string;
 };
 
-const AUTOPLAY_INTERVAL = 6500;
-
 export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] }) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [reducedMotion, setReducedMotion] = useState<boolean | null>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [hasFocus, setHasFocus] = useState(false);
-  const shouldPause = isHovered || hasFocus;
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updatePreference = () => setReducedMotion(mediaQuery.matches);
-    updatePreference();
-    mediaQuery.addEventListener("change", updatePreference);
-    return () => mediaQuery.removeEventListener("change", updatePreference);
-  }, []);
-
-  useEffect(() => {
-    if (reducedMotion !== false || shouldPause || slides.length < 2) return;
-    const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % slides.length);
-    }, AUTOPLAY_INTERVAL);
-    return () => window.clearInterval(timer);
-  }, [reducedMotion, shouldPause, slides.length]);
-
-  if (slides.length === 0) return null;
-  const activeSlide = slides[activeIndex] ?? slides[0];
-  if (!activeSlide) return null;
+  const slide = slides[0];
+  if (!slide) return null;
 
   return (
-    <section
-      className="relative mx-3 mt-1 min-h-[270px] overflow-hidden rounded-2xl bg-[#142B45] text-white sm:min-h-[360px]"
-      role="region"
-      aria-roledescription="carrousel"
-      aria-label="À la une"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onFocusCapture={() => setHasFocus(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setHasFocus(false);
-      }}
-    >
-      <div className="absolute inset-0" aria-hidden="true">
-        {slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className={`revant-hero-slide absolute inset-0 bg-cover bg-[center_35%] transition-[opacity,transform] duration-700 ease-in-out ${index === activeIndex ? "is-active opacity-80" : "opacity-0"} ${reducedMotion ? "duration-0" : ""}`}
-            style={{ backgroundImage: `url("${slide.image}")` }}
-          />
-        ))}
+    <section className="revant-hero" aria-labelledby="revant-home-title">
+      <div className="revant-hero__image" aria-hidden="true">
+        <Image src={slide.image} alt="" fill priority sizes="(max-width: 640px) 100vw, 58vw" />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/15" aria-hidden="true" />
-      <div className="relative z-10 flex min-h-[270px] items-center px-5 py-6 sm:min-h-[360px] sm:px-12 sm:py-10">
-        <div
-          key={activeSlide.id}
-          role="group"
-          aria-roledescription="diapositive"
-          aria-label={`Diapositive ${activeIndex + 1} sur ${slides.length}`}
-          aria-live="off"
-          className="revant-hero-copy max-w-lg"
-        >
-          <p className="mb-2 text-[9px] font-semibold tracking-[0.2em] text-white/75 sm:mb-3 sm:text-[11px]">{activeSlide.eyebrow}</p>
-          <h1 className="mb-3 text-2xl font-black leading-[1.04] tracking-tight sm:mb-4 sm:text-5xl">{activeSlide.title}</h1>
-          <p className="mb-4 max-w-sm text-xs leading-relaxed text-white/85 sm:mb-6 sm:text-sm">{activeSlide.description}</p>
-          <Link href={activeSlide.ctaHref} className="inline-flex items-center gap-3 rounded-md bg-[var(--brand-accent)] px-4 py-2.5 text-[11px] font-bold text-white transition hover:bg-[var(--brand-accent-hover)] sm:px-5 sm:py-3 sm:text-xs">
-            {activeSlide.ctaLabel} <span aria-hidden="true">→</span>
-          </Link>
+      <div className="revant-hero__veil" aria-hidden="true" />
+      <div className="revant-hero__copy">
+        <p className="revant-hero__eyebrow">{slide.eyebrow}</p>
+        <h1 id="revant-home-title" className="revant-hero__title">{slide.title} <em>{slide.accent}</em></h1>
+        <p className="revant-hero__description">{slide.description}</p>
+        <div className="revant-hero__actions">
+          <Link href={slide.ctaHref} className="revant-hero__cta">{slide.ctaLabel} <ArrowRight size={16} aria-hidden="true" /></Link>
+          {slide.secondaryLabel && slide.secondaryHref && <Link href={slide.secondaryHref} className="revant-hero__cta revant-hero__cta--quiet">{slide.secondaryLabel}</Link>}
         </div>
       </div>
-      {slides.length > 1 && (
-        <div className="absolute bottom-1 left-1/2 z-20 flex -translate-x-1/2 items-center sm:bottom-2" role="group" aria-label="Choisir une bannière">
-          {slides.map((slide, index) => {
-            const isActive = index === activeIndex;
-            return (
-              <button
-                key={slide.id}
-                type="button"
-                aria-label={`Afficher la bannière ${index + 1} : ${slide.title}`}
-                aria-pressed={isActive}
-                onClick={() => setActiveIndex(index)}
-                className="flex h-9 w-9 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:h-11 sm:w-11"
-              >
-                <span className={`h-2.5 rounded-full transition-all duration-300 ${isActive ? "w-6 bg-[var(--brand-accent)]" : "w-2.5 border border-white/90 bg-white/35"}`} />
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <span className="revant-hero__index" aria-hidden="true">Le marché, autrement · Niger</span>
     </section>
   );
 }

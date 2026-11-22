@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import "./globals.css";
 import "./interaction-performance.css";
+import "./revant-editorial.css";
 import Footer from "@/components/layout/Footer";
 import GlobalDismissibleDetails from "@/components/layout/GlobalDismissibleDetails";
 import FloatingBackButton from "@/components/layout/FloatingBackButton";
@@ -35,7 +36,7 @@ export async function generateViewport(): Promise<Viewport> {
     width: "device-width",
     initialScale: 1,
     viewportFit: "cover",
-    themeColor: palette === "slate-lilac" ? "#101923" : "#D94F0B",
+    themeColor: palette === "slate-lilac" ? "#0B211A" : "#F36B21",
   };
 }
 

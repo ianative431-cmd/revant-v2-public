@@ -100,7 +100,7 @@ export default async function ShopPublicPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[var(--brand-bg)] pb-24 text-[var(--brand-text)]">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-[1440px] px-3 pb-10 pt-4 sm:px-6 sm:pt-6">
+      <main className="revant-storefront pb-10 pt-3 sm:pt-5">
         <nav aria-label="Fil d’Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-xs text-[var(--brand-muted)]">
           <Link href="/" className="transition hover:text-[var(--brand-accent)]">Accueil</Link>
           <span aria-hidden="true">/</span>
@@ -109,11 +109,11 @@ export default async function ShopPublicPage({ params }: Props) {
           <span aria-current="page" className="max-w-[55vw] truncate font-semibold text-[var(--brand-text)]">{shop.name}</span>
         </nav>
 
-        <section id="accueil" aria-labelledby="shop-title" className="overflow-hidden rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-[0_14px_42px_rgba(20,43,69,0.08)] sm:rounded-[32px]">
+        <section id="accueil" aria-labelledby="shop-title" className="revant-storefront__hero">
           <div
             role={bannerUrl ? "img" : undefined}
             aria-label={bannerUrl ? `Bannière de ${shop.name}` : undefined}
-            className="relative h-40 overflow-hidden bg-cover bg-center sm:h-56 lg:h-64"
+            className="revant-storefront__banner relative overflow-hidden bg-cover bg-center"
             style={{
               backgroundColor: shopColor,
               backgroundImage: bannerUrl
@@ -138,7 +138,7 @@ export default async function ShopPublicPage({ params }: Props) {
             </div>
           </div>
 
-          <div className="relative px-4 pb-5 pt-14 sm:px-8 sm:pb-7 sm:pt-16">
+          <div className="revant-storefront__identity relative">
             <div
               role={logoUrl ? "img" : undefined}
               aria-label={logoUrl ? `Logo de ${shop.name}` : undefined}
@@ -181,13 +181,13 @@ export default async function ShopPublicPage({ params }: Props) {
           </div>
         </section>
 
-        <nav aria-label="Navigation de la boutique" className="mt-4 flex items-center gap-1 overflow-x-auto rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] p-1.5 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav aria-label="Navigation de la boutique" className="revant-storefront__nav mt-4 flex items-center gap-1 overflow-x-auto rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] p-1.5 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <a href="#accueil" className="shrink-0 rounded-full bg-[var(--brand-accent)] px-4 py-2.5 text-[11px] font-extrabold text-white">Accueil boutique</a>
           <a href="#produits" className="shrink-0 rounded-full px-4 py-2.5 text-[11px] font-bold text-[var(--brand-muted)] transition hover:bg-[var(--brand-bg)] hover:text-[var(--brand-text)]">Produits ({products.length})</a>
           <a href="#contact" className="shrink-0 rounded-full px-4 py-2.5 text-[11px] font-bold text-[var(--brand-muted)] transition hover:bg-[var(--brand-bg)] hover:text-[var(--brand-text)]">Contact & réseaux</a>
         </nav>
 
-        <section id="produits" aria-labelledby="products-title" className="mt-5 scroll-mt-24 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:mt-7 sm:rounded-[30px] sm:p-7">
+        <section id="produits" aria-labelledby="products-title" className="revant-storefront__products scroll-mt-24">
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">La sélection de la boutique</p>
@@ -212,7 +212,7 @@ export default async function ShopPublicPage({ params }: Props) {
           )}
         </section>
 
-        <section id="contact" aria-labelledby="contact-title" className="mt-5 scroll-mt-24">
+        <section id="contact" aria-labelledby="contact-title" className="revant-storefront__contact mt-5 scroll-mt-24">
           <div className="rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:rounded-[30px] sm:p-7">
             <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Échangez avec le vendeur</p>
             <h2 id="contact-title" className="mt-1 text-xl font-black tracking-tight">Contact & réseaux</h2>
