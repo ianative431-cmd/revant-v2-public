@@ -53,7 +53,7 @@ export default function ProductReviews({
   }, [hasMore, loading, productId, reviews.length]);
 
   return (
-    <section aria-labelledby="product-reviews-title" className="mt-7 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-7">
+    <section aria-labelledby="product-reviews-title" className="revant-product-reviews mt-7 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-7">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Retours des acheteurs</p>

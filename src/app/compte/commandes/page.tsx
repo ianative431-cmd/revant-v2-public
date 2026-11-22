@@ -37,8 +37,8 @@ export default async function MesCommandesPage() {
   const orders = await getOrdersForBuyer(supabase);
 
   return (
-    <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-2xl">
+    <div className="revant-buyer-orders min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
+      <div className="revant-buyer-orders-layout w-full max-w-5xl">
         <Link href="/compte" className="text-sm underline text-brand-text/60">← Mon compte</Link>
         <h1 className="mt-4 mb-6 text-xl font-bold">Mes commandes</h1>
         {orders.length === 0 ? (
@@ -52,7 +52,7 @@ export default async function MesCommandesPage() {
               const itemTitle = order.items[0]?.product_name ?? "Commande Revant";
 
               return (
-                <article key={order.id} className="rounded-2xl bg-white p-4">
+                <article key={order.id} className="revant-buyer-order-card rounded-2xl bg-white p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <p className="text-sm font-semibold">Commande {order.order_number}</p>

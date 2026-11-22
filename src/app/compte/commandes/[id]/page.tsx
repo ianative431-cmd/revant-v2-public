@@ -82,11 +82,11 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
     .sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime());
 
   return (
-    <main className="min-h-screen bg-brand-bg px-4 py-8 text-brand-text">
-      <div className="mx-auto max-w-3xl">
+    <main className="revant-buyer-order-detail min-h-screen bg-brand-bg px-4 py-8 text-brand-text">
+      <div className="revant-buyer-order-detail-layout mx-auto max-w-4xl">
         <Link href="/compte/commandes" className="text-sm text-[var(--brand-muted)] transition hover:text-brand-accent">← Mes commandes</Link>
 
-        <header className="mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-7">
+        <header className="revant-order-status-panel mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-[var(--brand-accent)]">Suivi de commande</p>
@@ -113,7 +113,7 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
           )}
         </header>
 
-        <section className="mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-6" aria-labelledby="order-items-title">
+        <section className="revant-order-content-panel mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-6" aria-labelledby="order-items-title">
           <h2 id="order-items-title" className="text-base font-black">Articles commandés</h2>
           <div className="mt-4 divide-y divide-[var(--brand-border)]">
             {order.items.map((item) => (
@@ -134,7 +134,7 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
           </div>
         </section>
 
-        <section className="mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-6" aria-labelledby="order-timeline-title">
+        <section className="revant-order-content-panel mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-6" aria-labelledby="order-timeline-title">
           <h2 id="order-timeline-title" className="text-base font-black">Historique réel</h2>
           {timeline.length === 0 ? (
             <p className="mt-4 text-sm text-[var(--brand-muted)]">Aucun événement horodaté n’est encore enregistré.</p>

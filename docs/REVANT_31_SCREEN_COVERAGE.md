@@ -11,8 +11,8 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 | 5 | Achat direct | `/commande/visiteur` | Refonte partielle : panneau et formulaire responsive | À capturer |
 | 6 | Validation de commande | `/commande/visiteur` | Refonte partielle : structure de formulaire et états conservés | À capturer |
 | 7 | Confirmation de commande | `/commande/confirmation` | Refonte partielle : panneau de confirmation et statut | À capturer |
-| 8 | Liste Mes commandes | `/compte/commandes` | À traiter | À capturer |
-| 9 | Détail et suivi de commande | `/compte/commandes/[id]` | À traiter | À capturer |
+| 8 | Liste Mes commandes | `/compte/commandes` | Refonte partielle : cartes et hiérarchie de suivi | À capturer |
+| 9 | Détail et suivi de commande | `/compte/commandes/[id]` | Refonte partielle : statut, articles, historique et adresse | À capturer |
 | 10 | Annulation | Parcours de commande à localiser | À cartographier | À capturer |
 | 11 | Retour et remboursement | Parcours de commande à localiser | À cartographier | À capturer |
 | 12 | Litiges et assistance | Parcours assistance/admin à localiser | À cartographier | À capturer |
@@ -20,7 +20,7 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 | 14 | Gestion des commandes vendeur | `/compte/boutique/commandes` | Refonte partielle : cartes et hiérarchie opérationnelle | À capturer |
 | 15 | Catalogue vendeur | `/compte/boutique/produits` | Refonte partielle : conteneur et grille de gestion | À capturer |
 | 16 | Gestion de la vitrine | `/compte/boutique/personnaliser`, `/shop/[slug]` | Vitrine publique : bannière, identité, navigation et produits (première couche) | À capturer |
-| 17 | Messagerie vendeur | `/messages`, `/messages/[conversationId]` | À traiter | À capturer |
+| 17 | Messagerie vendeur | `/messages`, `/messages/[conversationId]` | Refonte partielle : liste des conversations et fil de discussion | À capturer |
 | 18 | Calendrier commercial | `/compte/boutique/reseaux` (URL historique redirigée) | Refonte partielle du shell calendrier | À capturer |
 | 19 | Tableau de bord livreur | `/compte/livraisons` | Refonte partielle : missions et états de livraison mobile-first | À capturer |
 | 20 | Détail d'une mission et navigation | Espace livreur à cartographier | À cartographier | À capturer |
@@ -31,8 +31,8 @@ Ce tableau reprend sans réduction l'inventaire de `docs/REVANT_COMPLETE_VISUAL_
 | 25 | Centre de notifications | `/compte/notifications` | Refonte partielle : cartes, hiérarchie et états de lecture | À capturer |
 | 26 | Préférences de notifications | `/parametres` | Refonte partielle : groupes de réglages et navigation | À capturer |
 | 27 | Fidélité et récompenses | Route à localiser | À cartographier | À capturer |
-| 28 | Coupons et promotions | `/admin/promotions` et parcours acheteur à localiser | À cartographier | À capturer |
-| 29 | Avis et évaluations | `/admin/avis`, section produit | À traiter | À capturer |
+| 28 | Coupons et promotions | `/admin/promotions` et parcours acheteur à localiser | Première couche visuelle sur le suivi des placements sponsorisés ; aucun système de coupons acheteur confirmé | À capturer |
+| 29 | Avis et évaluations | `/admin/avis`, section produit | Refonte partielle : présentation des avis sur la fiche produit | À capturer |
 | 30 | Recherche et recommandations | `/`, `/recherche-photo`, `/categories` | Navigation de recherche et découverte retravaillées partiellement | À capturer |
 | 31 | Supervision Super Admin | `/admin` et modules `/admin/**` | Première couche visuelle sur le tableau de bord ; modules à traiter | À capturer |
 

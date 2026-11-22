@@ -149,4 +149,97 @@ input:not([type="checkbox"]):not([type="radio"]),select,textarea{border-radius:1
 .revant-driver-layout{max-width:900px}.revant-driver-dashboard header h1{font-size:clamp(28px,4vw,40px);font-weight:950;letter-spacing:-.06em}.revant-driver-section{border:0!important;border-radius:18px!important;background:var(--brand-surface)!important;box-shadow:var(--brand-shadow)!important;padding:clamp(16px,3vw,24px)!important}.revant-driver-section h2{font-size:15px;font-weight:950;letter-spacing:-.025em}.revant-driver-mission,.revant-driver-available-mission{border-color:var(--brand-border)!important;border-radius:14px!important;background:var(--brand-bg);padding:14px!important}.revant-driver-mission>div:first-child span{background:var(--brand-surface-soft)!important;color:var(--brand-text)}.revant-driver-disabled-panel{border:0;border-radius:18px;background:var(--brand-surface)!important;box-shadow:var(--brand-shadow)}
 
 /* Super Admin â€” consistent forest/tangerine console without changing permissions */
-.revant-admin-dashboard{color:var(--brand-text)}.revant-admin-dashboard>header h1{font-size:clamp(27px,3.5vw,40px);font-weight:950;letter-spacing:-.06em}.revant-admin-stat{border:1px solid var(--brand-border)!important;border-left:4px solid var(--brand-accent)!important;border-radius:15px!important;background:var(--brand-surface)!important;box-shadow:0 8px 26px rgba(18,59,48,.05)!important}.revant-admin-stat p{color:var(--brand-text)!important}.revant-admin-stat p:last-child{color:var(--brand-muted)!important}.revant-admin-panel{border:0!important;border-radius:18px!important;background:var(--brand-surface)!important;box-shadow:var(--brand-shadow)!important}.revant-admin-deliveries{color:var(--brand-text)}.revant-admin-deliveries header h1{font-size:clamp(26px,3.5vw,38px);font-weight:950;letter-spacing:-.06em}.revant-admin-deliveries table th{color:var(--brand-muted)}.revant-admin-deliveries table td{border-¢ëiºÛkºwµç_ºYhºÚn¶Æ¯yÛhþiíýø¥zÏÜ¢jh²*?¢ëiºßÛjÈ\jYlµÚ.¶ÜmFéÜjßæžßßŠW¬ýÊ&¦‹"£ú.¶›­ý¶¬…Æ¥–Ë]¢ëmÆÛh¾'°¶ŸºYhºÚn¶Šî±è^iÙõÓOæžßßŠW¬ýÊ&¦‹"£ú.¶›­ý¶¬…Æ¥–Ë]¢ëmÆßíj)g×M?š{~)^³÷(šš,ŠèºÚn·öÚ²–[-v‹­·m¢øžÂ–«¶ÊŠ
+.revant-admin-dashboard{color:var(--brand-text)}.revant-admin-dashboard>header h1{font-size:clamp(27px,3.5vw,40px);font-weight:950;letter-spacing:-.06em}.revant-admin-stat{border:1px solid var(--brand-border)!important;border-left:4px solid var(--brand-accent)!important;border-radius:15px!important;background:var(--brand-surface)!important;box-shadow:0 8px 26px rgba(18,59,48,.05)!important}.revant-admin-stat p{color:var(--brand-text)!important}.revant-admin-stat p:last-child{color:var(--brand-muted)!important}.revant-admin-panel{border:0!important;border-radius:18px!important;background:var(--brand-surface)!important;box-shadow:var(--brand-shadow)!important}.revant-admin-deliveries{color:var(--brand-text)}.revant-admin-deliveries header h1{font-size:clamp(26px,3.5vw,38px);font-weight:950;letter-spacing:-.06em}.revant-admin-deliveries table th{color:var(--brand-muted)}.revant-admin-deliveries table td{border-color:var(--brand-border)}
+@media(max-width:900px){.revant-seller-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.revant-seller-share{position:static}}
+@media(max-width:640px){.revant-seller-layout{width:calc(100% - 4px)}.revant-seller-metrics{gap:9px}.revant-seller-metric{padding:13px!important}.revant-seller-metric p:nth-child(2){font-size:27px}.revant-seller-workspace{gap:12px}.revant-seller-management,.revant-seller-share{padding:16px!important}.revant-seller-order{padding:14px!important}.revant-driver-dashboard{padding-inline:12px}.revant-driver-section{padding:14px!important}}
+/* Courier console â€” compact, high-contrast, one-hand operational use */
+.revant-driver-dashboard, .revant-driver-disabled { overflow: clip; }
+.revant-driver-layout { width: min(calc(100% - 20px), 1100px); }
+.revant-driver-dashboard header h1, .revant-driver-disabled h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 950; letter-spacing: -.06em; }
+.revant-driver-section { border: 1px solid var(--brand-border) !important; border-radius: 16px !important; background: var(--brand-surface) !important; box-shadow: var(--brand-shadow); padding: clamp(14px, 2vw, 22px) !important; }
+.revant-driver-section h2 { font-size: 17px; font-weight: 950; letter-spacing: -.035em; }
+.revant-driver-mission, .revant-driver-available-mission { border: 1px solid var(--brand-border) !important; border-radius: 13px !important; background: var(--brand-bg); padding: 14px !important; }
+.revant-driver-mission { border-left: 3px solid var(--brand-accent) !important; }
+.revant-driver-mission button, .revant-driver-available-mission button { min-height: 44px; border-radius: 10px !important; }
+.revant-driver-disabled-panel { border: 1px solid var(--brand-border); border-radius: 16px; background: var(--brand-surface) !important; box-shadow: var(--brand-shadow); }
+
+/* Notifications and settings */
+.revant-notifications-layout { width: min(calc(100% - 20px), 1100px); }
+.revant-notifications-layout h1, .revant-settings-layout h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 950; letter-spacing: -.06em; }
+.revant-notification-card { border: 1px solid var(--brand-border); border-left: 3px solid var(--brand-accent) !important; border-radius: 13px !important; background: var(--brand-surface) !important; box-shadow: none; padding: 17px !important; }
+.revant-notification-card.opacity-75 { border-left-color: var(--brand-border) !important; }
+.revant-settings-layout { padding-top: 36px !important; }
+.revant-settings-group { border: 1px solid var(--brand-border); border-radius: 15px; background: var(--brand-surface); padding: 14px 17px; }
+.revant-settings-group h2 { padding: 0 0 8px; color: var(--brand-accent) !important; font-size: 9px; font-weight: 900; letter-spacing: .18em; }
+.revant-settings-group > div { border: 0 !important; }
+.revant-settings-link { border-radius: 9px; padding-inline: 7px; }
+.revant-settings-link:hover { background: var(--brand-bg) !important; }
+.revant-settings-page details > summary { border-radius: 9px; padding: 5px 7px; }
+.revant-settings-page details[open] > summary { background: var(--brand-bg); }
+.revant-settings-page details > div { margin: 8px 0 2px 7px; }
+.revant-admin-deliveries .revant-admin-panel { border: 1px solid var(--brand-border) !important; border-radius: 15px !important; background: var(--brand-surface) !important; color: var(--brand-text); }
+.revant-admin-deliveries .revant-admin-panel p, .revant-admin-deliveries .revant-admin-panel th { color: var(--brand-muted) !important; }
+.revant-admin-deliveries .revant-admin-panel td { color: var(--brand-text); }
+.revant-admin-deliveries .revant-admin-panel tr { border-color: var(--brand-border) !important; }
+@media (max-width: 640px) {
+  .revant-driver-layout { width: calc(100% - 12px); }
+  .revant-driver-mission, .revant-driver-available-mission { padding: 12px !important; }
+  .revant-settings-layout { padding-top: 24px !important; }
+  .revant-settings-group { padding: 12px; }
+}
+
+/* Shared account experiences */
+.revant-notifications-layout,.revant-settings-layout{max-width:920px}.revant-notification-card{border:1px solid var(--brand-border);border-radius:16px!important;background:var(--brand-surface)!important;box-shadow:0 8px 24px rgba(18,59,48,.045)}.revant-notifications-page header h1,.revant-settings-layout h1{font-size:clamp(26px,3.5vw,38px);font-weight:950;letter-spacing:-.06em}.revant-settings-group{margin-top:20px}.revant-settings-group>div{overflow:hidden;border:1px solid var(--brand-border);border-radius:15px;background:var(--brand-surface)}.revant-settings-group>div>*{padding-inline:14px}.revant-settings-link{min-height:64px;padding-block:12px}.revant-settings-link:hover{background:var(--brand-bg)!important}
+/* Seller storefront editor and social calendar */
+.revant-seller-customize { overflow: clip; }
+.revant-seller-customize-layout { width: min(calc(100% - 20px), 1100px); }
+.revant-seller-customize h1, .revant-seller-social h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 950; letter-spacing: -.06em; }
+.revant-seller-customize :where(form, [role="group"], article) { border-color: var(--brand-border); border-radius: 14px; }
+.revant-seller-customize :where(input, select, textarea) { border-radius: 10px !important; }
+.revant-seller-customize :where(button, [type="submit"]) { min-height: 44px; border-radius: 10px !important; }
+.revant-seller-customize > div > div:last-child { border-radius: 13px !important; }
+.revant-seller-social-layout { width: min(calc(100% - 20px), 1100px); }
+.revant-social-composer, .revant-social-agenda { border: 1px solid var(--brand-border) !important; border-radius: 16px !important; background: var(--brand-surface) !important; box-shadow: var(--brand-shadow) !important; }
+.revant-social-composer h2, .revant-social-agenda h2 { font-size: 20px; font-weight: 950; letter-spacing: -.04em; }
+.revant-social-composer form :where(input:not([type="checkbox"]), textarea) { min-height: 46px; border-radius: 10px !important; background: var(--brand-bg) !important; }
+.revant-social-composer form textarea { min-height: 120px; }
+.revant-social-composer form button[type="submit"] { min-height: 48px; border-radius: 10px !important; }
+.revant-social-composer fieldset label { min-height: 46px; border-radius: 10px !important; }
+.revant-social-post { border: 1px solid var(--brand-border) !important; border-radius: 13px !important; background: var(--brand-bg); }
+.revant-social-post button { min-height: 40px; border-radius: 9px !important; }
+@media (max-width: 640px) {
+  .revant-seller-customize-layout, .revant-seller-social-layout { width: calc(100% - 12px); }
+  .revant-social-composer, .revant-social-agenda { padding: 14px !important; }
+}
+/* Buyer account: orders, tracking, reviews and conversations */
+.revant-buyer-orders, .revant-buyer-order-detail, .revant-messages-page, .revant-message-thread { overflow: clip; }
+.revant-buyer-orders-layout, .revant-buyer-order-detail-layout, .revant-messages-layout { width: min(calc(100% - 20px), 1180px); }
+.revant-buyer-orders h1, .revant-buyer-order-detail h1, .revant-messages-page h1, .revant-message-thread h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 950; letter-spacing: -.06em; }
+.revant-buyer-order-card, .revant-order-status-panel, .revant-order-content-panel { border: 1px solid var(--brand-border) !important; border-radius: 15px !important; background: var(--brand-surface) !important; box-shadow: var(--brand-shadow) !important; }
+.revant-buyer-order-card { border-left: 3px solid var(--brand-accent) !important; }
+.revant-order-status-panel { border-top: 4px solid var(--brand-accent) !important; }
+.revant-order-status-panel > div > span { border: 1px solid var(--brand-border); border-radius: 9px !important; background: var(--brand-bg) !important; }
+.revant-order-content-panel h2 { font-size: 18px; font-weight: 950; letter-spacing: -.04em; }
+.revant-product-reviews { border: 0 !important; border-top: 1px solid var(--brand-border) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding-inline: 0 !important; }
+.revant-product-reviews article { padding-block: 18px; }
+.revant-messages-layout { display: flex; flex-direction: column; }
+.revant-conversation-row { border: 1px solid var(--brand-border) !important; border-radius: 13px !important; background: var(--brand-surface) !important; box-shadow: none !important; padding: 16px !important; }
+.revant-conversation-row:hover { border-color: var(--brand-accent) !important; }
+.revant-message-thread-layout { width: min(calc(100% - 12px), 1050px); }
+.revant-message-thread-header, .revant-message-thread-body, .revant-message-composer { border-color: var(--brand-border) !important; background: var(--brand-surface) !important; }
+.revant-message-thread-header { border-radius: 15px 15px 0 0 !important; }
+.revant-message-thread-body { min-height: 48vh; }
+.revant-message-thread-body > div > div { border-radius: 14px !important; }
+.revant-message-thread-body > div > div.bg-brand-accent { background: var(--revant-forest) !important; color: #fff9f0 !important; }
+.revant-message-composer { border-radius: 0 0 15px 15px !important; }
+.revant-message-composer textarea { min-height: 48px; border-radius: 10px !important; }
+.revant-message-composer button { min-height: 48px; border-radius: 10px !important; }
+.revant-admin-promotions .revant-admin-dashboard { color: var(--brand-text); }
+.revant-admin-promotions header h1 { color: var(--brand-text) !important; font-size: clamp(26px, 3vw, 38px); font-weight: 950; letter-spacing: -.06em; }
+.revant-admin-promotions header p { color: var(--brand-muted) !important; }
+@media (max-width: 640px) {
+  .revant-buyer-orders-layout, .revant-buyer-order-detail-layout, .revant-messages-layout { width: calc(100% - 12px); }
+  .revant-buyer-order-card { padding: 13px !important; }
+  .revant-order-status-panel, .revant-order-content-panel { padding: 15px !important; }
+  .revant-message-thread-body { min-height: 55vh; }
+}

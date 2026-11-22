@@ -74,6 +74,8 @@
 **Files:** notification, preference, loyalty, coupon, review, search and `/admin/**` screens.
 - [x] Apply the editorial visual layer to notifications and account settings; loyalty, coupons and review flows remain pending.
 - [ ] Improve search results and filtering.
+- [x] Add first visual pass to product reviews and messaging.
+- [ ] Complete coupons/loyalty once existing buyer-facing routes and real data contracts are mapped.
 - [x] Apply the forest/tangerine console styling to the Super Admin overview and delivery operations panel; remaining modules are pending. (Dashboard overview received its first visual layer; remaining modules are pending.)
 
 ### Task 8: Visual and technical verification

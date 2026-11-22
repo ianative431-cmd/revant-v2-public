@@ -41,10 +41,10 @@ export default async function MessageThreadPage({ params, searchParams }: { para
   }
 
   return (
-    <main className="min-h-screen bg-brand-bg px-3 py-5 pb-8 text-brand-text sm:px-4">
-      <div className="mx-auto flex min-h-[82vh] max-w-2xl flex-col">
+    <main className="revant-message-thread min-h-screen bg-brand-bg px-3 py-5 pb-8 text-brand-text sm:px-4">
+      <div className="revant-message-thread-layout mx-auto flex min-h-[82vh] max-w-3xl flex-col">
         <Link href="/messages" className="text-sm text-brand-muted">← Tous les messages</Link>
-        <header className="mt-4 rounded-t-2xl border border-brand-border bg-brand-surface p-4 shadow-sm">
+        <header className="revant-message-thread-header mt-4 rounded-t-2xl border border-brand-border bg-brand-surface p-4 shadow-sm">
           <h1 className="text-lg font-black">{title}</h1>
           <p className="mt-1 text-xs text-brand-muted">Échanges privés entre les participants de cette conversation.</p>
           <details className="mt-3">
@@ -58,7 +58,7 @@ export default async function MessageThreadPage({ params, searchParams }: { para
             <p className="mt-2 text-[11px] text-brand-muted">Le blocage empêche les nouveaux messages et masque cette conversation des deux côtés.</p>
           </details>
         </header>
-        <section className="flex-1 space-y-3 border-x border-brand-border bg-brand-surface px-4 py-5">
+        <section className="revant-message-thread-body flex-1 space-y-3 border-x border-brand-border bg-brand-surface px-4 py-5">
           {messages.length === 0 ? (
             <p className="py-12 text-center text-sm text-neutral-500">Aucun message. Tu peux commencer la conversation ci-dessous.</p>
           ) : messages.map((message) => (
@@ -73,7 +73,7 @@ export default async function MessageThreadPage({ params, searchParams }: { para
           ))}
         </section>
         {status === "error" && <p role="status" className="bg-red-50 px-4 py-2 text-xs text-red-700">Le message n’a pas pu être envoyé. Réessaie.</p>}
-        <form action={sendTextMessage} className="flex items-end gap-2 rounded-b-2xl border border-brand-border bg-brand-surface p-3 shadow-sm">
+        <form action={sendTextMessage} className="revant-message-composer flex items-end gap-2 rounded-b-2xl border border-brand-border bg-brand-surface p-3 shadow-sm">
           <input type="hidden" name="conversationId" value={conversationId} />
           <label className="flex-1">
             <span className="sr-only">Ton message</span>
