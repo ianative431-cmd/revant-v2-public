@@ -1,10 +1,11 @@
-import Link from "next/link";
+"import Link from "next/link";
 import { Menu, Search } from "lucide-react";
 import PhotoActionMenu from "./PhotoActionMenu";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const iconProps = { size: 20, strokeWidth: 1.8, "aria-hidden": true as const };
 const quickLinks = [
+  { href: "/parametres", label: "Paramètres" },
   { href: "/compte/commandes", label: "Mes commandes" },
   { href: "/boutiques/creer", label: "Vendre sur Revant" },
   { href: "/legal", label: "Centre juridique" },
