@@ -2,9 +2,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/server/auth/session";
+import { getActiveProducts } from "@/server/products/products";
 import { getProductById } from "@/server/products/products";
 import AddToCartButton from "@/components/products/AddToCartButton";
+import ProductCard from "@/components/products/ProductCard";
 import ProductGallery from "@/components/products/ProductGallery";
+import InfiniteProductFeed from "@/components/products/InfiniteProductFeed";
 import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import ReportContentButton from "@/components/reports/ReportContentButton";
@@ -36,6 +39,21 @@ export default async function ProductPage({ params }: Props) {
       { type: "user" as const, id: shop.owner_id, label: "Le compte vendeur" },
     ] : []),
   ] : [];
+
+  const relatedProducts = product.category_id
+    ? await getActiveProducts(supabase, {
+        categoryId: product.category_id,
+        limit: 8,
+        inStockOnly: true,
+        excludeIds: [product.id],
+      })
+    : [];
+  const excludedRecommendationIds = [product.id, ...relatedProducts.map((item) => item.id)];
+  const discoveryProducts = await getActiveProducts(supabase, {
+    limit: 24,
+    inStockOnly: true,
+    excludeIds: excludedRecommendationIds,
+  });
 
   return (
     <div className="min-h-screen bg-brand-bg pb-28 text-brand-text">
@@ -153,6 +171,36 @@ export default async function ProductPage({ params }: Props) {
             </div>
           </section>
         </div>
+
+        {relatedProducts.length > 0 && (
+          <section aria-labelledby="related-products-title" className="mt-7 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-7">
+            <div className="mb-5">
+              <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Dans la même catégorie</p>
+              <h2 id="related-products-title" className="mt-1 text-xl font-black tracking-tight sm:text-2xl">Vous aimerez aussi</h2>
+              <p className="mt-1 text-xs text-[var(--brand-muted)]">D’autres articles disponibles, publiés par les vendeurs sur Revant.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
+              {relatedProducts.map((item) => <ProductCard key={item.id} product={item} />)}
+            </div>
+          </section>
+        )}
+
+        {discoveryProducts.length > 0 && (
+          <section aria-labelledby="discover-products-title" className="mt-7 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-7">
+            <div className="mb-5">
+              <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Le catalogue Revant</p>
+              <h2 id="discover-products-title" className="mt-1 text-xl font-black tracking-tight sm:text-2xl">À découvrir sur Revant</h2>
+              <p className="mt-1 text-xs text-[var(--brand-muted)]">Parcours les autres articles réellement disponibles. La liste se prolonge au fil du défilement.</p>
+            </div>
+            <InfiniteProductFeed
+              initialProducts={discoveryProducts}
+              category=""
+              search=""
+              excludeIds={excludedRecommendationIds}
+              inStockOnly
+            />
+          </section>
+        )}
       </main>
       <BottomNav />
     </div>
