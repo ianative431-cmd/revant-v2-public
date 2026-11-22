@@ -7,7 +7,7 @@ const shortcuts = [
   { label: "Beauté", href: "/?categorie=beaute#produits", icon: ShoppingBag },
   { label: "Électronique", href: "/?categorie=electronique#produits", icon: Smartphone },
   { label: "Boutiques", href: "/boutiques", icon: Store },
-  { label: "Terroir", href: "/#boutiques-paysannes", icon: Leaf },
+  { label: "Terroir", href: "/?categorie=alimentation#produits", icon: Leaf },
   { label: "Restaurants", href: "/restaurants", icon: Utensils },
 ];
 
