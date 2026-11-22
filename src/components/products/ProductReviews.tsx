@@ -68,7 +68,7 @@ export default function ProductReviews({
         <div className="rounded-2xl border border-dashed border-[var(--brand-border)] bg-[var(--brand-bg)] px-5 py-8 text-center">
           <p className="text-sm font-bold">Aucun avis publié pour le moment.</p>
           <p className="mt-2 text-xs leading-relaxed text-[var(--brand-muted)]">
-            Les acheteurs pourront partager leur expérience après la livraison de leur commande.
+            Les avis publiés après une commande livrée apparaîtront ici.
           </p>
         </div>
       ) : (
