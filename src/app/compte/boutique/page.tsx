@@ -49,11 +49,13 @@ export default async function MaBoutiquePage() {
   }
   const pendingOrders = orders.filter((order) => order.status === "pending").length;
   const inProgressOrders = orders.filter((order) => ["confirmed", "processing", "ready_for_delivery", "shipped"].includes(order.status)).length;
+  const deliveredOrders = orders.filter((order) => order.status === "delivered").length;
 
   const metrics: Metric[] = [
     { label: "Commandes reçues", value: orders.length, detail: "Commandes visibles pour cette boutique" },
     { label: "À confirmer", value: pendingOrders, detail: "En attente de ta décision" },
     { label: "En cours", value: inProgressOrders, detail: "Confirmées ou en livraison" },
+    { label: "Livrées", value: deliveredOrders, detail: "Commandes terminées" },
     { label: "Annonces actives", value: activeProductsResult.count ?? 0, detail: `Sur ${productTotalResult.count ?? 0} annonces enregistrées` },
     { label: "À valider", value: pendingProductsResult.count ?? 0, detail: "Annonces en attente de modération" },
     { label: "Stock épuisé", value: outOfStockResult.count ?? 0, detail: "Annonces actives sans stock" },
