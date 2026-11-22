@@ -9,6 +9,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import RevantMegaShortcuts from "@/components/layout/RevantMegaShortcuts";
 import InfiniteProductFeed from "@/components/products/InfiniteProductFeed";
 import HeroCarousel from "@/components/home/HeroCarousel";
+import RevantPromoBanner from "@/components/home/RevantPromoBanner";
 
 type Props = { searchParams: Promise<{ categorie?: string; q?: string }> };
 
@@ -138,6 +139,7 @@ export default async function Home({ searchParams }: Props) {
     <div className="min-h-screen bg-brand-bg text-brand-text pb-28">
       <SiteHeader />
       <HeroCarousel slides={HERO_SLIDES} />
+      <RevantPromoBanner />
 
       <RevantMegaShortcuts />
 
