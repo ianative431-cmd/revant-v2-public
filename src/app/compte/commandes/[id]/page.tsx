@@ -34,6 +34,7 @@ function formatDate(value: string): string {
   return new Date(value).toLocaleString("fr-FR", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Africa/Niamey",
   });
 }
 
