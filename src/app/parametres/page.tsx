@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import {
-  Bell, ChevronRight, Globe2, LockKeyhole, ShieldCheck, UserRound,
+  Bell, ChevronRight, CircleHelp, Globe2, LockKeyhole, ShieldCheck, UserRound,
 } from "lucide-react";
 import BottomNav from "@/components/layout/BottomNav";
 import SiteHeader from "@/components/layout/SiteHeader";
@@ -45,8 +45,12 @@ export default async function ParametresPage() {
         </header>
 
         <div className="space-y-5">
+          <SettingsSection title="Compte">
+            <SettingsLink href="/compte" label="Mon compte" description="Profil et coordonnées" Icon={UserRound} />
+          </SettingsSection>
+
           <SettingsSection title="Sécurité">
-            <SettingsLink href="/mot-de-passe-oublie" label="Mot de passe" description="Recevoir un lien de réinitialisation par e-mail" Icon={ShieldCheck} />
+            <SettingsLink href="/mot-de-passe-oublie" label="Mot de passe" description="Modifier ou récupérer l’accès au compte" Icon={ShieldCheck} />
           </SettingsSection>
 
           <SettingsSection title="Préférences">
@@ -58,6 +62,9 @@ export default async function ParametresPage() {
                 </div>
                 <SettingsExperienceControls mode="appearance" currentPalette={palette} />
               </div>
+              <div className="border-t border-brand-border pt-4">
+                <SettingsExperienceControls mode="interactions" currentPalette={palette} />
+              </div>
             </div>
           </SettingsSection>
 
@@ -68,18 +75,14 @@ export default async function ParametresPage() {
           <SettingsSection title="Confidentialité et région">
             <div className="divide-y divide-brand-border">
               <SettingsLink href="/compte/blocages" label="Comptes bloqués" Icon={LockKeyhole} />
-              {process.env.ACCOUNT_DELETION_REQUESTS_ENABLED === "true" ? (
-                <SettingsLink href="/compte/suppression" label="Suppression du compte" description="Consulter et gérer une demande de suppression" Icon={UserRound} />
-              ) : (
-                <div className="flex min-h-[60px] items-center gap-3 px-4 py-3" aria-disabled="true">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-bg text-brand-muted"><UserRound size={18} strokeWidth={1.8} aria-hidden="true" /></span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold text-brand-text">Suppression du compte</span>
-                    <span className="mt-0.5 block text-xs leading-relaxed text-brand-muted">Indisponible pour le moment · aucune donnée supprimée</span>
-                  </span>
-                  <span className="shrink-0 rounded-full bg-brand-bg px-2.5 py-1 text-[10px] font-semibold text-brand-muted">Bientôt</span>
-                </div>
-              )}
+              <div className="flex min-h-[60px] items-center gap-3 px-4 py-3" aria-disabled="true">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-bg text-brand-muted"><UserRound size={18} strokeWidth={1.8} aria-hidden="true" /></span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-brand-text">Gestion du compte</span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-brand-muted">Options de gestion en préparation · aucune donnée supprimée</span>
+                </span>
+                <span className="shrink-0 rounded-full bg-brand-bg px-2.5 py-1 text-[10px] font-semibold text-brand-muted">Bientôt</span>
+              </div>
               <div className="flex items-center gap-3 px-4 py-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-bg text-brand-accent"><Globe2 size={18} strokeWidth={1.8} aria-hidden="true" /></span>
                 <div className="min-w-0 flex-1">
@@ -92,6 +95,7 @@ export default async function ParametresPage() {
 
           <SettingsSection title="Assistance et informations">
             <div className="divide-y divide-brand-border">
+              <SettingsLink href="/messages" label="Contacter Revant" description="Obtenir de l’aide par messagerie" Icon={CircleHelp} />
               <Link href="/legal" className="flex min-h-[54px] items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-brand-text hover:bg-brand-bg">
                 <span>Informations légales et confidentialité</span>
                 <ChevronRight size={17} className="shrink-0 text-brand-muted" aria-hidden="true" />
