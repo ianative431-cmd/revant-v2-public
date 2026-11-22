@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { ClaimDeliveryButton, DeliveryCodeForm, DeliveryStepButton } from "./DriverActions";
+import { ClaimDeliveryButton, DeliveryCodeForm, DeliveryStepButton, DeliveryIncidentForm } from "./DriverActions";
 
 type AvailableDelivery = {
   delivery_id: string;
@@ -73,7 +73,7 @@ export default async function DriverDeliveriesPage() {
           {delivery.pickup_address && <p className="mt-3 text-sm"><span className="font-semibold">Retrait : </span>{delivery.pickup_address}</p>}
           {delivery.delivery_address && <p className="mt-2 text-sm"><span className="font-semibold">Destination : </span>{delivery.delivery_address}</p>}
           {delivery.delivery_code_hint && delivery.status === "in_transit" && <p className="mt-2 text-xs text-brand-text/50">Le code de remise se termine par {delivery.delivery_code_hint}.</p>}
-          <div className="mt-3">{delivery.status === "assigned" && <DeliveryStepButton deliveryId={delivery.delivery_id} status="picked_up" />}{delivery.status === "picked_up" && <DeliveryStepButton deliveryId={delivery.delivery_id} status="in_transit" />}{delivery.status === "in_transit" && <DeliveryCodeForm deliveryId={delivery.delivery_id} />}{delivery.status === "failed" && <p className="text-xs text-red-700">{delivery.failure_reason || "Contacte le support pour résoudre cet incident."}</p>}</div>
+          <div className="mt-3">{delivery.status === "assigned" && <DeliveryStepButton deliveryId={delivery.delivery_id} status="picked_up" />}{delivery.status === "picked_up" && <DeliveryStepButton deliveryId={delivery.delivery_id} status="in_transit" />}{delivery.status === "in_transit" && <DeliveryCodeForm deliveryId={delivery.delivery_id} />}{delivery.status !== "failed" && <DeliveryIncidentForm deliveryId={delivery.delivery_id} />}{delivery.status === "failed" && <p className="text-xs text-red-700">{delivery.failure_reason || "Contacte le support pour résoudre cet incident."}</p>}</div>
         </article>)}</div>}
       </section>
       <section className="rounded-2xl bg-white p-4">
