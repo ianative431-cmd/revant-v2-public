@@ -39,28 +39,28 @@ export default async function BoutiqueCommandesPage() {
 
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-2xl">
-        <Link href="/compte/boutique" className="text-sm underline text-brand-text/60">← Ma boutique</Link>
-        <h1 className="mt-4 mb-1 text-xl font-bold">Commandes</h1>
-        <p className="mb-6 text-sm text-brand-text/60">Confirme la prise en charge ou annule une commande avant son départ. Cette action ne valide ni le paiement ni la livraison.</p>
+      <div className="w-full max-w-4xl">
+        <Link href="/compte/boutique" className="text-sm font-semibold text-[var(--brand-muted)] underline decoration-[var(--brand-accent)] underline-offset-4">← Ma boutique</Link>
+        <h1 className="mb-1 mt-4 text-2xl font-black tracking-tight text-[var(--brand-text)]">Commandes</h1>
+        <p className="mb-6 text-sm leading-6 text-[var(--brand-muted)]">Confirme la prise en charge ou annule une commande avant son départ. Cette action ne valide ni le paiement ni la livraison.</p>
         {orders.length === 0 ? <p className="py-10 text-center text-sm text-brand-text/60">Aucune commande pour l’instant.</p> : (
           <div className="flex flex-col gap-3">
             {orders.map((order) => {
               const sellerTotal = order.items.reduce((sum, item) => sum + Number(item.line_total), 0);
               const currency = order.items[0]?.currency.trim() || order.currency.trim();
               return (
-                <article key={order.id} className="rounded-2xl bg-white p-4">
+                <article key={order.id} className="rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:p-5">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0"><p className="text-sm font-semibold">Commande {order.order_number}</p><p className="mt-1 text-xs text-brand-text/50">{new Date(order.created_at).toLocaleDateString("fr-FR")}</p></div>
-                    <span className="shrink-0 rounded-full bg-brand-text/5 px-2.5 py-1 text-[11px] text-brand-text/70">{STATUS_LABEL[order.status]}</span>
+                    <div className="min-w-0"><p className="text-sm font-extrabold text-[var(--brand-text)]">Commande {order.order_number}</p><p className="mt-1 text-xs text-[var(--brand-muted)]">{new Date(order.created_at).toLocaleDateString("fr-FR")}</p></div>
+                    <span className="shrink-0 rounded-full bg-[var(--brand-bg)] px-3 py-1.5 text-[11px] font-semibold text-[var(--brand-muted)]">{STATUS_LABEL[order.status]}</span>
                   </div>
-                  <div className="mt-3 space-y-2 border-t border-brand-text/10 pt-3">
+                  <div className="mt-3 space-y-2 border-t border-[var(--brand-border)] pt-3">
                     {order.items.map((item) => <div key={item.id} className="flex items-center justify-between gap-3 text-sm"><span className="min-w-0 truncate">{item.product_name} × {item.quantity}</span><span className="shrink-0 font-semibold">{Number(item.line_total).toLocaleString("fr-FR")} {item.currency.trim()}</span></div>)}
                   </div>
-                  <p className="mt-3 text-sm font-bold">Total de tes articles : {sellerTotal.toLocaleString("fr-FR")} {currency}</p>
-                  {(order.guest_name || order.guest_phone || order.guest_city || order.guest_address) && <div className="mt-3 rounded-xl bg-brand-bg/70 p-3 text-xs text-brand-text/70"><p className="font-semibold">Coordonnées de livraison</p>{order.guest_name && <p className="mt-1">{order.guest_name}</p>}{order.guest_phone && <p>{order.guest_phone}</p>}{order.guest_city && <p>{order.guest_city}</p>}{order.guest_address && <p className="whitespace-pre-line">{order.guest_address}</p>}</div>}
+                  <p className="mt-3 text-sm font-extrabold text-[var(--brand-text)]">Total de tes articles : {sellerTotal.toLocaleString("fr-FR")} {currency}</p>
+                  {(order.guest_name || order.guest_phone || order.guest_city || order.guest_address) && <div className="mt-3 rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-3 text-xs text-[var(--brand-muted)]"><p className="font-semibold">Coordonnées de livraison</p>{order.guest_name && <p className="mt-1">{order.guest_name}</p>}{order.guest_phone && <p>{order.guest_phone}</p>}{order.guest_city && <p>{order.guest_city}</p>}{order.guest_address && <p className="whitespace-pre-line">{order.guest_address}</p>}</div>}
                   {(order.status === "pending" || order.status === "confirmed") && <div className="mt-4 flex flex-wrap gap-2">{order.status === "pending" && <ConfirmOrderButton orderId={order.id} />}<CancelOrderButton orderId={order.id} /></div>}
-                  {(order.delivery || order.status === "confirmed") && <div className="mt-3 rounded-xl bg-brand-bg/70 p-3 text-xs text-brand-text/70">
+                  {(order.delivery || order.status === "confirmed") && <div className="mt-3 rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-3 text-xs text-[var(--brand-muted)]">
                     {order.delivery && <p className="font-semibold">Livraison : {DELIVERY_STATUS_LABEL[order.delivery.status] ?? order.delivery.status}</p>}
                     {order.delivery?.delivery_address && <p className="mt-1">Destination : {order.delivery.delivery_address}</p>}
                     {order.status === "confirmed" && (!order.delivery || (order.delivery.status === "unassigned" && !order.delivery.requested_at)) && <div className="mt-2"><RequestDeliveryButton orderId={order.id} /></div>}
