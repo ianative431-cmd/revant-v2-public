@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getShopByOwnerId } from "@/server/shops/shops";
+import { getOrdersForShop } from "@/server/orders/orders";
 import { generateQrCodeDataUrl } from "@/lib/qr";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
 import { env } from "@/lib/env";
@@ -33,34 +34,26 @@ export default async function MaBoutiquePage() {
     activeProductsResult,
     pendingProductsResult,
     outOfStockResult,
-    totalOrdersResult,
-    pendingOrdersResult,
-    inProgressOrdersResult,
-    deliveredOrdersResult,
+    orders,
   ] = await Promise.all([
     supabase.from("products").select("id", { count: "exact", head: true }).eq("shop_id", shop.id),
     supabase.from("products").select("id", { count: "exact", head: true }).eq("shop_id", shop.id).eq("status", "active"),
     supabase.from("products").select("id", { count: "exact", head: true }).eq("shop_id", shop.id).eq("status", "pending"),
     supabase.from("products").select("id", { count: "exact", head: true }).eq("shop_id", shop.id).eq("status", "active").lte("stock_quantity", 0),
-    // The seller SELECT policy on orders scopes these counts to orders containing this shop's items.
-    supabase.from("orders").select("id", { count: "exact", head: true }),
-    supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "pending"),
-    supabase.from("orders").select("id", { count: "exact", head: true }).in("status", ["confirmed", "processing", "ready_for_delivery", "shipped"]),
-    supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "delivered"),
+    getOrdersForShop(supabase, shop.id),
   ]);
 
-  const results = [
-    productTotalResult, activeProductsResult, pendingProductsResult, outOfStockResult,
-    totalOrdersResult, pendingOrdersResult, inProgressOrdersResult, deliveredOrdersResult,
-  ];
+  const results = [productTotalResult, activeProductsResult, pendingProductsResult, outOfStockResult];
   if (results.some((result) => result.error)) {
     throw new Error("Impossible de calculer les indicateurs réels de la boutique.");
   }
+  const pendingOrders = orders.filter((order) => order.status === "pending").length;
+  const inProgressOrders = orders.filter((order) => ["confirmed", "processing", "ready_for_delivery", "shipped"].includes(order.status)).length;
 
   const metrics: Metric[] = [
-    { label: "Commandes reçues", value: totalOrdersResult.count ?? 0, detail: "Commandes visibles pour cette boutique" },
-    { label: "À confirmer", value: pendingOrdersResult.count ?? 0, detail: "En attente de ta décision" },
-    { label: "En cours", value: inProgressOrdersResult.count ?? 0, detail: "Confirmées ou en livraison" },
+    { label: "Commandes reçues", value: orders.length, detail: "Commandes visibles pour cette boutique" },
+    { label: "À confirmer", value: pendingOrders, detail: "En attente de ta décision" },
+    { label: "En cours", value: inProgressOrders, detail: "Confirmées ou en livraison" },
     { label: "Annonces actives", value: activeProductsResult.count ?? 0, detail: `Sur ${productTotalResult.count ?? 0} annonces enregistrées` },
     { label: "À valider", value: pendingProductsResult.count ?? 0, detail: "Annonces en attente de modération" },
     { label: "Stock épuisé", value: outOfStockResult.count ?? 0, detail: "Annonces actives sans stock" },
