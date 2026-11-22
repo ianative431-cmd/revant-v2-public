@@ -58,3 +58,24 @@ Le modèle actuel suggère une évolution prudente : regrouper visuellement les 
 2. Auditer le modèle exact des variantes avant de permettre leur sélection et leur transmission au checkout.
 3. Concevoir le panier groupé par boutique comme une expérience multi-commandes, sans promettre un paiement consolidé tant que les paiements multi-vendeurs ne le permettent pas.
 4. Vérifier la page boutique en production avec une boutique active et ses médias réels avant de conclure que l'affichage est identique au code.
+
+
+## 5. Avis produit — vérification Supabase en lecture seule
+
+Projet Supabase contrôlé : `Revant` (`xugcmpnrigqfszyfufoc`), état `ACTIVE_HEALTHY`.
+
+- La table `public.reviews` existe et RLS est activé.
+- La lecture `SELECT` est accordée à `anon` et `authenticated`.
+- La politique publique ne laisse lire que les lignes `is_published = true`.
+- L'insertion est réservée à `authenticated` et la politique exige l'utilisateur courant, un `order_id`, un `product_id`, une ligne correspondante dans `order_items`, et une commande au statut `delivered`.
+- La table contient les colonnes `id`, `user_id`, `product_id`, `shop_id`, `order_id`, `rating`, `title`, `body`, `is_published`, `created_at`, `updated_at`.
+- Il n'existe actuellement aucune colonne de réponse vendeur ni date de réponse. La réponse publique du vendeur ne peut donc pas être affichée ou enregistrée sans évolution du schéma et de ses politiques.
+
+État réel au moment du contrôle :
+- 0 avis au total ;
+- 0 avis publiés ;
+- 0 avis publiés liés à un produit.
+
+La branche de travail ajoute l'affichage des avis publiés, la mention d'achat vérifié lorsque `order_id` est présent, et une pagination par lots. L'API ne renvoie ni `user_id` ni `order_id`. Aucun avis fictif n'est affiché.
+
+La réponse vendeur reste explicitement hors périmètre tant que la migration, les règles d'autorisation et le parcours de réponse du propriétaire de boutique ne sont pas définis.
