@@ -4,6 +4,7 @@ import { useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { compressImageKeepingAspect } from "@/lib/image";
+import { shouldDeleteShopMediaObject } from "@/lib/shop-media.mjs";
 
 type MediaKind = "logo" | "banner";
 type Props = {
@@ -123,13 +124,39 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
         return;
       }
 
-      // L'ancien fichier n'est supprimé qu'après confirmation de la mise à jour en base.
+      // Ne supprimer l'ancien objet qu'après avoir vérifié qu'aucun autre champ
+      // (logo ou bannière) ne référence encore la même image.
       const oldPath = extractOwnedShopMediaPath(previousUrl, userId, shopId);
+      let cleanupWarning = false;
       if (oldPath && oldPath !== path) {
-        await supabase.storage.from("shop-media").remove([oldPath]);
+        const { data: currentMedia, error: mediaReadError } = await supabase
+          .from("shops")
+          .select("logo_url, banner_url")
+          .eq("id", shopId)
+          .eq("owner_id", userId)
+          .maybeSingle();
+
+        if (mediaReadError || !currentMedia) {
+          // En cas de doute, conserver le fichier plutôt que casser une image encore utilisée.
+          cleanupWarning = true;
+        } else {
+          const stillReferenced = !shouldDeleteShopMediaObject(
+            oldPath,
+            [currentMedia.logo_url, currentMedia.banner_url],
+            (url) => extractOwnedShopMediaPath(url, userId, shopId),
+          );
+          if (!stillReferenced) {
+            const { error: removeError } = await supabase.storage.from("shop-media").remove([oldPath]);
+            if (removeError) cleanupWarning = true;
+          }
+        }
       }
 
-      setMessage(kind === "logo" ? "Logo mis à jour." : "Bannière mise à jour.");
+      setMessage(
+        cleanupWarning
+          ? "Image mise à jour. L'ancien fichier a été conservé car son nettoyage n'a pas pu être confirmé."
+          : kind === "logo" ? "Logo mis à jour." : "Bannière mise à jour.",
+      );
       router.refresh();
     } catch {
       setMessage("Une erreur est survenue pendant l'envoi.");
