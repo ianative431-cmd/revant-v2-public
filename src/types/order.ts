@@ -38,6 +38,7 @@ export type DeliverySummary = {
   created_at: string;
   delivery_address: string | null;
   pickup_address: string | null;
+  failure_reason: string | null;
 };
 
 // Deliberately excludes idempotency keys, tracking-token hashes and stock flags.
