@@ -143,7 +143,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
           const stillReferenced = !shouldDeleteShopMediaObject(
             oldPath,
             [currentMedia.logo_url, currentMedia.banner_url],
-            (url) => extractOwnedShopMediaPath(url, userId, shopId),
+            (url: string | null) => extractOwnedShopMediaPath(url, userId, shopId),
           );
           if (!stillReferenced) {
             const { error: removeError } = await supabase.storage.from("shop-media").remove([oldPath]);
