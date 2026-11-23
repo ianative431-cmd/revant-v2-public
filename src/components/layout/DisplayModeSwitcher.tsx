@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { DISPLAY_MODE_COOKIE, type DisplayMode } from "@/content/theme/display-mode";
 
@@ -13,10 +13,13 @@ const OPTIONS: { id: DisplayMode; label: string; Icon: typeof Monitor }[] = [
 export default function DisplayModeSwitcher({ current }: { current: DisplayMode }) {
   const [active, setActive] = useState(current);
 
+  useEffect(() => {
+    document.documentElement.dataset.themeMode = active;
+    document.cookie = `${DISPLAY_MODE_COOKIE}=${active}; path=/; max-age=31536000; samesite=lax`;
+  }, [active]);
+
   function choose(mode: DisplayMode) {
     if (mode === active) return;
-    document.documentElement.dataset.themeMode = mode;
-    document.cookie = `${DISPLAY_MODE_COOKIE}=${mode}; path=/; max-age=31536000; samesite=lax`;
     setActive(mode);
   }
 
