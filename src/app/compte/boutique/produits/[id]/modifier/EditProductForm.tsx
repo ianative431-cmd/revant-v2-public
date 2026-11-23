@@ -14,6 +14,7 @@ import {
 } from "@/lib/product-image";
 import type { Product } from "@/types/product";
 import type { Category } from "@/server/catalog/categories";
+import ProductPhotoStudio from "@/components/products/ProductPhotoStudio";
 
 const MAX_PRODUCT_IMAGES = 5;
 
