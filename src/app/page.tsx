@@ -12,7 +12,14 @@ import HeroCarousel from "@/components/home/HeroCarousel";
 
 type Props = { searchParams: Promise<{ categorie?: string; q?: string }> };
 
-const HERO_PHOTO = "/images/hero/accueil-dunes.jpg";
+const FARM_PHOTOS = [
+  { title: "Produits frais", subtitle: "Du champ à la maison", photo: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80" },
+  { title: "Céréales locales", subtitle: "Le savoir-faire de nos régions", photo: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=900&q=80" },
+  { title: "Élevage", subtitle: "Des filières locales", photo: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=900&q=80" },
+  { title: "Fruits du Niger", subtitle: "Récoltes de saison", photo: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=900&q=80" },
+];
+
+const HERO_PHOTO = "https://images.unsplash.com/photo-1514435116008-a80913c597af?auto=format&fit=crop&w=1800&q=85";
 
 function safeShopBanner(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -37,28 +44,30 @@ function safeShopBanner(value: string | null | undefined): string | null {
 const HERO_SLIDES = [
   {
     id: "marketplace",
-    eyebrow: "DÉCOUVRIR · ACHETER · VENDRE",
-    title: "Le commerce local,",
-    accent: "autrement.",
-    description: "Des boutiques, des produits et des savoir-faire à découvrir. Une nouvelle façon de faire son marché, simplement et avec confiance.",
-    ctaLabel: "Explorer les produits",
+    eyebrow: "MODE • MAISON • TERROIR",
+    title: "STYLE. QUALITÉ. REVANT.",
+    description: "Des trouvailles du quotidien, des boutiques locales et des produits qui font avancer nos communautés.",
+    ctaLabel: "ACHETER MAINTENANT",
     ctaHref: "#produits",
-    secondaryLabel: "Voir les boutiques",
-    secondaryHref: "/boutiques",
     image: HERO_PHOTO,
   },
   {
+    id: "terroir",
+    eyebrow: "PRODUITS FRAIS • CIRCUITS LOCAUX",
+    title: "LE TERROIR À L’HONNEUR",
+    description: "Découvre les produits frais et les saveurs de nos régions, réunis au même endroit.",
+    ctaLabel: "DÉCOUVRIR LE TERROIR",
+    ctaHref: "#boutiques-locales",
+    image: FARM_PHOTOS[0].photo,
+  },
+  {
     id: "boutiques",
-    eyebrow: "BOUTIQUES · DÉCOUVERTES · PROXIMITÉ",
-    title: "Des vitrines à découvrir,",
-    accent: "des idées à saisir.",
-    description: "Parcours les boutiques actives, découvre leurs univers et trouve les produits qui te correspondent.",
-    ctaLabel: "Voir les boutiques",
+    eyebrow: "BOUTIQUES • DÉCOUVERTES • PROXIMITÉ",
+    title: "TES TROUVAILLES COMMENCENT ICI",
+    description: "Explore les boutiques locales et trouve les produits qui te correspondent.",
+    ctaLabel: "EXPLORER LES BOUTIQUES",
     ctaHref: "/boutiques",
-    secondaryLabel: "Explorer les catégories",
-    secondaryHref: "/categories",
-    image: "/images/hero/revant-promo-banner.svg",
-    imageFit: "contain",
+    image: FARM_PHOTOS[3].photo,
   },
 ] as const;
 
@@ -144,12 +153,18 @@ export default async function Home({ searchParams }: Props) {
     : displayedCategories;
 
   return (
-    <div className="revant-home min-h-screen bg-brand-bg text-brand-text pb-28">
+    <div className="min-h-screen bg-brand-bg text-brand-text pb-28">
       <SiteHeader />
       <HeroCarousel slides={HERO_SLIDES} />
+      <section aria-label="À la une Revant" className="mx-3 mt-3 overflow-hidden rounded-2xl border border-[#d9a34c]/30 shadow-sm sm:mx-5">
+        <Link href="/boutiques" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">
+          <img src="/images/hero/revant-promo-banner.svg" alt="Revant — Les bonnes trouvailles commencent ici. Mode, maison et terroir." className="block h-auto w-full" width="1440" height="360" />
+        </Link>
+      </section>
+
       <RevantMegaShortcuts />
 
-      <section id="a-propos" className="revant-home-section revant-editorial-strip">
+      <section id="a-propos" className="grid grid-cols-2 gap-px border-b border-brand-border bg-brand-surface px-3 sm:grid-cols-4">
         {[
           ["↗", "LIVRAISON", "Options selon la boutique"],
           ["◇", "ACHAT SIMPLE", "Sans compte obligatoire"],
@@ -163,33 +178,34 @@ export default async function Home({ searchParams }: Props) {
         ))}
       </section>
 
-      <section id="categories" className="revant-home-section">
-        <div className="revant-home-section__head"><div><p className="revant-home-section__eyebrow">Explorer les univers</p><h2 className="revant-home-section__title">{term ? "Catégories correspondantes" : "Choisir son univers"}</h2></div><Link href="/categories" className="revant-home-section__link">Toutes les catégories <span aria-hidden="true">↗</span></Link></div>
+      <section id="categories" className="px-4 pt-7">
+        <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? "Catégories correspondantes" : "Catégories"}</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
         {categoriesUnavailable && <p role="status" className="mb-3 rounded-xl border border-brand-border bg-brand-surface px-4 py-3 text-xs leading-relaxed text-brand-muted">La liste complète des catégories est temporairement indisponible. La sélection de base reste affichée.</p>}
         {term && matchingCategories.length === 0 ? (
           <p className="rounded-xl border border-dashed border-brand-border bg-brand-surface px-4 py-5 text-xs text-brand-muted">
             Aucune catégorie ne correspond à cette recherche.
           </p>
         ) : (
-          <div className="revant-category-grid">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {matchingCategories.map((category) => (
-              <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="revant-category-card group">
+              <Link key={category.id} href={`/?categorie=${encodeURIComponent(category.slug)}#produits`} className="group relative aspect-[1.05] overflow-hidden rounded-lg bg-brand-surface-soft">
                 <div
                   role="img"
                   aria-label={`Illustration de la catégorie ${category.name}`}
                   className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-105"
                   style={{ backgroundImage: `url("${getCategoryCoverImage(category.slug, category.image_url)}"), linear-gradient(135deg, var(--brand-accent), var(--brand-surface-soft))` }}
                 />
-                <div className="revant-category-card__veil" />
-                <span className="revant-category-card__name">{category.name}</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
+                <span className="absolute bottom-3 left-3 right-3 text-sm font-bold text-white">{category.name}</span>
               </Link>
             ))}
           </div>
         )}
         </section>
 
-      <section id="boutiques-locales" className="revant-home-section">
-        <div className="revant-home-section__head"><div><p className="revant-home-section__eyebrow">Les vendeurs de la communauté</p><h2 className="revant-home-section__title">{term ? "Boutiques correspondantes" : "Des boutiques à découvrir"}</h2><p className="mt-2 text-xs text-brand-muted">Des vitrines actives, des catalogues réels.</p></div><Link href="/boutiques" className="revant-home-section__link">Toutes les boutiques <span aria-hidden="true">↗</span></Link></div>
+      <section id="boutiques-locales" className="px-4 pt-7">
+        <div className="mb-1"><h2 className="text-lg font-extrabold">{term ? "Boutiques correspondantes" : "Boutiques locales"}</h2></div>
+        <p className="mb-3 text-xs text-brand-muted">Découvre les vendeurs et leurs univers.</p>
         {shopsUnavailable ? (
           <div role="status" className="rounded-2xl border border-brand-border bg-brand-surface px-5 py-8 text-center">
             <h3 className="text-sm font-extrabold">Boutiques temporairement indisponibles</h3>
@@ -197,23 +213,20 @@ export default async function Home({ searchParams }: Props) {
             <Link href="/boutiques" className="mt-4 inline-flex rounded-full border border-brand-border px-5 py-3 text-xs font-bold text-brand-text">Réessayer</Link>
           </div>
         ) : shops.length > 0 ? (
-          <div className="revant-shop-grid">
-            {shops.slice(0, 4).map((shop) => {
-              const shopImage = safeShopBanner(shop.banner_url) ?? safeShopBanner(shop.background_image_url) ?? safeShopBanner(shop.logo_url);
-              return (
-              <Link key={shop.id} href={`/shop/${shop.slug}`} className="revant-shop-card">
-                <div className="revant-shop-card__image" style={{ backgroundImage: shopImage ? `url("${shopImage}")` : undefined }} />
-                <div className="revant-shop-card__veil" />
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {shops.slice(0, 4).map((shop) => (
+              <Link key={shop.id} href={`/shop/${shop.slug}`} className="relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200">
+                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${safeShopBanner(shop.banner_url) ?? safeShopBanner(shop.background_image_url) ?? safeShopBanner(shop.logo_url) ?? FARM_PHOTOS[0].photo}")` }} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 {(certifiedShopIds.has(shop.id) || shop.is_premium) && (
                   <div className="absolute right-2 top-2 flex flex-col items-end gap-1.5">
                     {certifiedShopIds.has(shop.id) && <span className="rounded-full bg-violet-600 px-2.5 py-1 text-[9px] font-extrabold text-white">✓ BOUTIQUE VÉRIFIÉE</span>}
                     {shop.is_premium && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[9px] font-extrabold text-amber-900">PREMIUM</span>}
                   </div>
                 )}
-                <div className="revant-shop-card__copy"><strong className="revant-shop-card__name">{shop.name}</strong><span className="revant-shop-card__meta">{shop.city ?? "Niger"}</span></div>
+                <div className="absolute bottom-3 left-3 text-white"><strong className="block text-sm">{shop.name}</strong><span className="text-[11px]">{shop.city ?? "Niger"}</span></div>
               </Link>
-            );
-            })}
+            ))}
           </div>
         ) : term ? (
           <p className="rounded-xl border border-dashed border-brand-border bg-brand-surface px-4 py-5 text-xs text-brand-muted">
@@ -233,7 +246,7 @@ export default async function Home({ searchParams }: Props) {
         )}
       </section>
 
-      <main id="produits" className="revant-home-section">
+      <main id="produits" className="px-4 pt-7">
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? `Résultats pour « ${q} »` : unknownCategory ? "Catégorie indisponible" : shortcutCategoryTitle ?? (activeCategory ? activeCategory.name : "Produits populaires")}</h2><a href="#produits" className="text-xs font-medium">Voir tout →</a></div>
         {productsUnavailable ? (
           <div role="status" className="rounded-xl border border-brand-border bg-brand-surface px-5 py-10 text-center">
@@ -252,12 +265,18 @@ export default async function Home({ searchParams }: Props) {
         )}
       </main>
 
-      <section className="revant-home-section pb-8">
-        <div className="revant-editorial-strip revant-editorial-strip--three">
-          <div><strong>Un marché ouvert à tous</strong><span>Découvre les annonces et les boutiques actives sur Revant.</span></div>
-          <div><strong>Tu es vendeur ?</strong><span>Présente tes produits et développe ta boutique.</span><Link href="/boutiques/creer" className="mt-3 inline-flex text-xs font-extrabold text-brand-accent">Ouvrir ma boutique ↗</Link></div>
-          <div><strong>Un achat en confiance</strong><span>Les disponibilités et les paiements sont confirmés au moment de la commande.</span></div>
-        </div>
+      <section className={`grid gap-3 px-4 pt-7 ${shops.length > 0 && !shopsUnavailable ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+        <Link href="#produits" className="relative flex min-h-32 items-end overflow-hidden rounded-xl bg-black p-5 text-white">
+          <div className="absolute inset-0 bg-cover bg-center opacity-65" style={{ backgroundImage: `url("${HERO_PHOTO}")` }} /><div className="relative"><strong className="text-sm font-extrabold">NOUVEAUTÉS</strong><p className="mt-1 text-xs text-white/80">Explore les dernières annonces.</p><span className="mt-3 inline-block rounded bg-white px-3 py-2 text-[10px] font-bold text-black">VOIR LES PRODUITS →</span></div>
+        </Link>
+        <Link href="#boutiques-locales" className="relative flex min-h-32 items-end overflow-hidden rounded-xl bg-black p-5 text-white">
+          <div className="absolute inset-0 bg-cover bg-center opacity-65" style={{ backgroundImage: `url("${FARM_PHOTOS[1].photo}")` }} /><div className="relative"><strong className="text-sm font-extrabold">ACHETER LOCAL</strong><p className="mt-1 text-xs text-white/80">Découvre les produits de nos régions.</p><span className="mt-3 inline-block rounded bg-white px-3 py-2 text-[10px] font-bold text-black">DÉCOUVRIR →</span></div>
+        </Link>
+        {shops.length > 0 && !shopsUnavailable && (
+          <Link href="/boutiques/creer" className="relative flex min-h-32 items-end overflow-hidden rounded-xl bg-black p-5 text-white">
+          <div className="absolute inset-0 bg-cover bg-center opacity-65" style={{ backgroundImage: `url("${FARM_PHOTOS[0].photo}")` }} /><div className="relative"><strong className="text-sm font-extrabold">VENDS SUR REVANT</strong><p className="mt-1 text-xs text-white/80">Présente tes produits à de nouveaux clients.</p><span className="mt-3 inline-block rounded bg-white px-3 py-2 text-[10px] font-bold text-black">CRÉER MA BOUTIQUE →</span></div>
+        </Link>
+        )}
       </section>
       <BottomNav />
     </div>
