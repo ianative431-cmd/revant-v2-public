@@ -95,6 +95,7 @@ export default async function ShopPublicPage({ params }: Props) {
     : null;
   const shopColor = customShopColor ?? savedPalette?.colors[2] ?? "var(--brand-accent)";
   const shopAccent = savedPalette?.colors[1] ?? shopColor;
+  const shopAccentHover = savedPalette?.colors[2] ?? customShopColor ?? shopAccent;
   const socials = SOCIAL_NETWORKS.flatMap((network) => {
     const value = shop[network.key];
     const href = normalizeShopSocialUrl(value, network.key) ?? null;
@@ -107,9 +108,9 @@ export default async function ShopPublicPage({ params }: Props) {
       <SiteHeader />
       <main
         className="revant-storefront pb-10 pt-3 sm:pt-5"
-        style={savedPalette ? ({
+        style={savedPalette || customShopColor ? ({
           "--brand-accent": shopAccent,
-          "--brand-accent-hover": savedPalette.colors[2] ?? shopAccent,
+          "--brand-accent-hover": shopAccentHover,
           "--brand-accent-text": shopAccent,
         } as CSSProperties & Record<"--brand-accent" | "--brand-accent-hover" | "--brand-accent-text", string>) : undefined}
       >
