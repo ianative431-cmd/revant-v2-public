@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import "./globals.css";
 import "./interaction-performance.css";
-import "./revant-editorial.css";
 import "./revant-editorial-layouts.css";
 import "./revant-editorial-extended.css";
 import "./revant-editorial-experience.css";
