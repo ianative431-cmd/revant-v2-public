@@ -14,7 +14,7 @@ import NativePushRegistration from "@/components/native/NativePushRegistration";
 import NativeOAuthCallbackHandler from "@/components/auth/NativeOAuthCallbackHandler";
 import LaunchExperience from "@/components/pwa/LaunchExperience";
 import DisplayPreferencesBootstrap from "@/components/layout/DisplayPreferencesBootstrap";
-import { getSitePalette } from "@/server/theme/site-palette";
+import { getDisplayMode } from "@/server/theme/display-mode";
 
 export const metadata: Metadata = {
   title: "Revant",
@@ -33,19 +33,27 @@ export const metadata: Metadata = {
 };
 
 export async function generateViewport(): Promise<Viewport> {
-  const palette = await getSitePalette();
+  const mode = await getDisplayMode();
+  const themeColor = mode === "dark"
+    ? "#080808"
+    : mode === "light"
+      ? "#F46A18"
+      : [
+          { media: "(prefers-color-scheme: light)", color: "#F46A18" },
+          { media: "(prefers-color-scheme: dark)", color: "#080808" },
+        ];
   return {
     width: "device-width",
     initialScale: 1,
     viewportFit: "cover",
-    themeColor: palette === "slate-lilac" ? "#080808" : "#F46A18",
+    themeColor,
   };
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const palette = await getSitePalette();
+  const mode = await getDisplayMode();
   return (
-    <html lang="fr" className="h-full antialiased" data-site-palette={palette}>
+    <html lang="fr" className="h-full antialiased" data-theme-mode={mode}>
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-text">
         <DisplayPreferencesBootstrap />
         <GlobalDismissibleDetails />
