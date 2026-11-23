@@ -8,7 +8,7 @@ import {
 import BottomNav from "@/components/layout/BottomNav";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SettingsExperienceControls from "@/components/layout/SettingsExperienceControls";
-import { getSitePalette } from "@/server/theme/site-palette";
+import { getDisplayMode } from "@/server/theme/display-mode";
 
 function SettingsGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -33,7 +33,7 @@ function SettingsLink({ href, label, description, Icon }: { href: string; label:
 }
 
 export default async function ParametresPage() {
-  const palette = await getSitePalette();
+  const displayMode = await getDisplayMode();
 
   return (
     <div className="revant-settings-page min-h-screen bg-brand-bg pb-32 text-brand-text">
@@ -67,10 +67,10 @@ export default async function ParametresPage() {
               <div className="space-y-4 border-l border-brand-border py-4 pl-8">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-sm font-medium">Apparence</p>
-                  <SettingsExperienceControls mode="appearance" currentPalette={palette} />
+                  <SettingsExperienceControls mode="appearance" currentMode={displayMode} />
                 </div>
                 <div className="border-t border-brand-border pt-4">
-                  <SettingsExperienceControls mode="interactions" currentPalette={palette} />
+                  <SettingsExperienceControls mode="interactions" currentMode={displayMode} />
                 </div>
               </div>
             </details>

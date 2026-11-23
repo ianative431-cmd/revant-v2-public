@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { Moon, Zap } from "lucide-react";
-import PaletteSwitcher from "@/components/layout/PaletteSwitcher";
-import type { SitePaletteId } from "@/content/theme/site-palette";
+import DisplayModeSwitcher from "@/components/layout/DisplayModeSwitcher";
+import type { DisplayMode } from "@/content/theme/display-mode";
 
 type MotionMode = "ultra" | "reduced";
 type TextScale = "normal" | "large";
@@ -46,7 +46,7 @@ function applySettings(settings: Settings) {
   root.dataset.revantText = settings.text;
 }
 
-export default function SettingsExperienceControls({ mode, currentPalette }: { mode: "appearance" | "interactions"; currentPalette: SitePaletteId }) {
+export default function SettingsExperienceControls({ mode, currentMode }: { mode: "appearance" | "interactions"; currentMode: DisplayMode }) {
   const raw = useSyncExternalStore(subscribe, getSnapshot, () => "");
   const settings = useMemo(() => readSettings(raw), [raw]);
 
@@ -64,7 +64,24 @@ export default function SettingsExperienceControls({ mode, currentPalette }: { m
   }
 
   if (mode === "appearance") {
-    return <PaletteSwitcher current={currentPalette} />;
+    return (
+      <div className="space-y-4">
+        <fieldset>
+          <legend className="text-sm font-semibold">Mode d’affichage</legend>
+          <p className="mt-0.5 text-xs text-brand-muted">Automatique selon ton appareil, ou choix manuel.</p>
+          <div className="mt-2">
+            <DisplayModeSwitcher current={currentMode} />
+          </div>
+        </fieldset>
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-brand-border bg-brand-surface p-3">
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold">Palette de marque</span>
+            <span className="mt-0.5 block text-xs text-brand-muted">Tangerine électrique</span>
+          </span>
+          <span className="h-7 w-7 shrink-0 rounded-full border border-brand-border bg-[#F46A18]" aria-hidden="true" />
+        </div>
+      </div>
+    );
   }
 
   return (
