@@ -158,7 +158,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
         <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-3">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- public Supabase Storage image
-            <img src={logoUrl} alt="Logo actuel" className="h-16 w-16 shrink-0 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] object-cover" />
+            <img src={logoUrl} alt="Logo actuel" className="h-16 w-16 shrink-0 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] object-contain p-2" />
           ) : (
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-dashed border-[var(--brand-border)] bg-[var(--brand-surface)] text-xs font-semibold text-[var(--brand-muted)]">Logo</div>
           )}
