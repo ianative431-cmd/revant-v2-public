@@ -149,7 +149,7 @@ export default function EditProductForm({
         uploadedPaths.push(path);
       }
 
-      const { error: updateError } = await supabase
+      const { data: updatedProduct, error: updateError } = await supabase
         .from("products")
         .update({
           name,
@@ -164,16 +164,30 @@ export default function EditProductForm({
             : stockQuantity,
         })
         .eq("id", product.id)
-        .eq("shop_id", shopId);
+        .eq("shop_id", shopId)
+        .select("id")
+        .maybeSingle();
 
       if (updateError) throw updateError;
+      if (!updatedProduct) {
+        if (uploadedPaths.length > 0) {
+          await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedPaths);
+        }
+        setError("Aucune modification n'a été enregistrée. Vérifie que cette annonce appartient toujours à ta boutique.");
+        setSaving(false);
+        return;
+      }
 
+      const firstNewSortOrder = keptImages.reduce(
+        (highest, image) => Math.max(highest, image.sort_order),
+        -1,
+      ) + 1;
       const newRows = uploadedPaths.map((path, index) => {
         const { data } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
         return {
           product_id: product.id,
           image_url: data.publicUrl,
-          sort_order: keptImages.length + index,
+          sort_order: firstNewSortOrder + index,
         };
       });
 
