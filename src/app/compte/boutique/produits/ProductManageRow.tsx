@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Product } from "@/types/product";
@@ -59,12 +60,12 @@ export default function ProductManageRow({ product, shopStatus }: { product: Pro
       setError("Impossible de supprimer l'annonce.");
       return;
     }
-    const storagePrefix = `/storage/v1/object/public/product-images/`;
+    const storagePrefix = "/storage/v1/object/public/product-images/";
     const imagePaths = (imageRows ?? []).flatMap((row) => {
       const marker = row.image_url.indexOf(storagePrefix);
       if (marker < 0) return [];
       const path = decodeURIComponent(row.image_url.slice(marker + storagePrefix.length));
-      return path.startsWith(`${product.shop_id}/`) && !path.includes("..") ? [path] : [];
+      return path.startsWith(product.shop_id + "/") && !path.includes("..") ? [path] : [];
     });
     if (imagePaths.length > 0) {
       const { error: storageError } = await supabase.storage.from("product-images").remove(imagePaths);
@@ -87,46 +88,41 @@ export default function ProductManageRow({ product, shopStatus }: { product: Pro
         )}
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-extrabold text-[var(--brand-text)]">{product.name}</p>
-        {product.categoryName && (
-          <p className="text-xs text-[var(--brand-muted)]">{product.categoryName}</p>
-        )}
+        {product.categoryName && <p className="text-xs text-[var(--brand-muted)]">{product.categoryName}</p>}
         <p className="text-sm font-black text-[var(--brand-accent)]">
           {product.base_price.toLocaleString("fr-FR")} {product.currency}
         </p>
 
-        <div className="flex gap-2 mt-2">
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Link
+            href={"/compte/boutique/produits/" + product.id + "/modifier"}
+            className="rounded-full border border-[var(--brand-border)] px-3 py-1 text-xs font-semibold text-[var(--brand-text)]"
+          >
+            Modifier
+          </Link>
           <button
             type="button"
             onClick={toggleStatus}
             disabled={pending || shopStatus !== "active" || status === "pending" || status === "rejected"}
-            className="text-xs border border-black rounded-full px-3 py-1 disabled:opacity-50"
+            className="rounded-full border border-black px-3 py-1 text-xs disabled:opacity-50"
           >
             {status === "active" ? "Retirer de la vente" : status === "archived" ? "Remettre en vente" : status === "pending" ? "En attente" : status === "rejected" ? "Refusée" : "Publier"}
           </button>
 
           {confirmDelete ? (
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={pending}
-              className="text-xs bg-red-600 text-white rounded-full px-3 py-1 disabled:opacity-50"
-            >
+            <button type="button" onClick={handleDelete} disabled={pending} className="rounded-full bg-red-600 px-3 py-1 text-xs text-white disabled:opacity-50">
               Confirmer
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => setConfirmDelete(true)}
-              className="text-xs text-red-600 underline"
-            >
+            <button type="button" onClick={() => setConfirmDelete(true)} className="text-xs text-red-600 underline">
               Supprimer
             </button>
           )}
         </div>
 
-        {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       </div>
     </div>
   );
