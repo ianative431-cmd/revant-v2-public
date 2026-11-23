@@ -12,7 +12,7 @@ create or replace function private.driver_update_delivery_status(
 returns boolean
 language plpgsql
 security definer
-set search_path to 'public', 'private'
+set search_path to ''
 as $function$
 declare
   v_uid uuid := auth.uid();
