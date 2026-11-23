@@ -3,6 +3,7 @@ import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import ShopDirectory, { type PublicShopCard } from "@/components/shops/ShopDirectory";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
+import { getPaletteById } from "@/content/shops/color-palettes";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveShops } from "@/server/shops/shops";
 
@@ -57,22 +58,27 @@ export default async function BoutiquesPage() {
 
   const publicShops: PublicShopCard[] = shops
     .filter((shop) => typeof shop.slug === "string" && shop.slug.length > 0)
-    .map((shop) => ({
-      id: shop.id,
-      slug: shop.slug,
-      name: shop.name,
-      city: shop.city,
-      description: shop.description,
-      typeLabel: getShopTypeLabel(shop),
-      isRestaurant: shop.is_restaurant,
-      isPremium: shop.is_premium,
-      isCertified: certifiedShopIds.has(shop.id),
-      bannerUrl: safeImageUrl(shop.banner_url) ?? safeImageUrl(shop.background_image_url),
-      logoUrl: safeImageUrl(shop.logo_url),
-      color: shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
+    .map((shop) => {
+      const savedPalette = shop.background_color ? getPaletteById(shop.background_color) : undefined;
+      const customColor = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
         ? shop.background_color
-        : "var(--brand-accent)",
-    }));
+        : null;
+
+      return {
+        id: shop.id,
+        slug: shop.slug,
+        name: shop.name,
+        city: shop.city,
+        description: shop.description,
+        typeLabel: getShopTypeLabel(shop),
+        isRestaurant: shop.is_restaurant,
+        isPremium: shop.is_premium,
+        isCertified: certifiedShopIds.has(shop.id),
+        bannerUrl: safeImageUrl(shop.banner_url) ?? safeImageUrl(shop.background_image_url),
+        logoUrl: safeImageUrl(shop.logo_url),
+        color: customColor ?? savedPalette?.colors[2] ?? "var(--brand-accent)",
+      };
+    });
 
   return (
     <div className="revant-directory-page min-h-screen bg-brand-bg pb-24 text-brand-text">
