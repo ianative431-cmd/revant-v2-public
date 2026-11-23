@@ -4,6 +4,7 @@ import { getActiveCategories } from "@/server/catalog/categories";
 import { getActiveProducts } from "@/server/products/products";
 
 const PAGE_SIZE = 24;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -15,6 +16,12 @@ export async function GET(request: NextRequest) {
     : PAGE_SIZE;
   const categorySlug = (searchParams.get("categorie") ?? searchParams.get("categories") ?? "").trim();
   const searchTerm = (searchParams.get("q") ?? "").trim();
+  const rawExcludeIds = (searchParams.get("excludeIds") ?? "").split(",").filter(Boolean);
+  if (rawExcludeIds.length > 32 || rawExcludeIds.some((id) => !UUID_PATTERN.test(id))) {
+    return NextResponse.json({ error: "Paramètres de recommandation invalides." }, { status: 400 });
+  }
+  const excludeIds = [...new Set(rawExcludeIds)];
+  const inStockOnly = searchParams.get("stock") === "1";
 
   try {
     const supabase = await createSupabaseServerClient();
@@ -38,6 +45,8 @@ export async function GET(request: NextRequest) {
       offset,
       limit,
       searchTerm: searchTerm || undefined,
+      inStockOnly,
+      excludeIds,
     });
 
     return NextResponse.json(

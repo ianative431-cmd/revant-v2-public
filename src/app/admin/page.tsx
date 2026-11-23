@@ -10,10 +10,10 @@ import DashboardOverviewCharts from "./DashboardOverviewCharts";
 
 function StatCard({ label, value, sub, href }: { label: string; value: number; sub: string; href: string }) {
   return (
-    <Link href={href} className="group rounded-2xl border border-[#485330]/15 border-l-4 border-l-[#687650] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <p className="mb-1 text-xs font-medium text-[#485330]/75">{label}</p>
-      <p className="text-2xl font-bold tracking-tight text-[#171013]">{value.toLocaleString("fr-FR")}</p>
-      <p className="mt-1 text-[11px] text-[#485330]/65">{sub}</p>
+    <Link href={href} className="revant-admin-stat group rounded-2xl border border-brand-border border-l-4 border-l-brand-accent bg-brand-surface p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <p className="mb-1 text-xs font-medium text-brand-muted">{label}</p>
+      <p className="text-2xl font-bold tracking-tight text-brand-text">{value.toLocaleString("fr-FR")}</p>
+      <p className="mt-1 text-[11px] text-brand-muted">{sub}</p>
     </Link>
   );
 }
@@ -29,11 +29,11 @@ export default async function AdminDashboardPage() {
       db.from("products").select("id", { count: "exact", head: true }),
     ]);
     return (
-      <div className="space-y-4">
+      <div className="revant-admin-dashboard space-y-4">
         <header>
-          <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-[#687650]">Revant · Équipe</p>
-          <h1 className="mt-2 text-2xl font-semibold text-[#171013]">Espace associé</h1>
-          <p className="mt-1 text-sm text-black/50">Consultation limitée aux boutiques et au catalogue.</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-brand-accent">Revant · Équipe</p>
+          <h1 className="mt-2 text-2xl font-semibold text-brand-text">Espace associé</h1>
+          <p className="mt-1 text-sm text-brand-muted">Consultation limitée aux boutiques et au catalogue.</p>
         </header>
         <div className="grid grid-cols-2 gap-3">
           <StatCard label="Boutiques" value={shops ?? 0} sub="Toutes les boutiques" href="/admin/boutiques" />
@@ -79,20 +79,20 @@ export default async function AdminDashboardPage() {
   }));
 
   return (
-    <div className="space-y-5">
+    <div className="revant-admin-dashboard space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-[#687650]">Revant · Overview</p>
-          <h1 className="mt-2 text-2xl font-semibold text-[#171013]">Vue d’ensemble</h1>
-          <p className="mt-1 text-sm text-black/50">Données réelles de la marketplace, actualisées à chaque chargement.</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-brand-accent">Revant · Overview</p>
+          <h1 className="mt-2 text-2xl font-semibold text-brand-text">Vue d’ensemble</h1>
+          <p className="mt-1 text-sm text-brand-muted">Données réelles de la marketplace, actualisées à chaque chargement.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {canManageReports && (
-            <Link href="/admin/signalements" className="rounded-xl border border-[#485330]/20 px-4 py-2 text-xs font-semibold text-[#203426] hover:bg-[#687650]/10">
+            <Link href="/admin/signalements" className="rounded-xl border border-brand-border px-4 py-2 text-xs font-semibold text-brand-text hover:bg-brand-bg">
               Signalements
             </Link>
           )}
-          <Link href="/admin/analytics" className="rounded-xl border border-[#485330]/20 px-4 py-2 text-xs font-semibold text-[#203426] hover:bg-[#687650]/10">
+          <Link href="/admin/analytics" className="rounded-xl border border-brand-border px-4 py-2 text-xs font-semibold text-brand-text hover:bg-brand-bg">
             Ouvrir l’analytique globale
           </Link>
         </div>

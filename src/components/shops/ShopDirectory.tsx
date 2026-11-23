@@ -60,8 +60,8 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
   }, [filter, query, shops]);
 
   return (
-    <section aria-label="Annuaire des boutiques Revant">
-      <div className="mb-5 rounded-[24px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-3 shadow-sm sm:p-4">
+    <section className="revant-shop-directory" aria-label="Annuaire des boutiques Revant">
+      <div className="revant-shop-directory-toolbar mb-5 rounded-[24px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-3 shadow-sm sm:p-4">
         <label htmlFor="shop-directory-search" className="sr-only">
           Rechercher une boutique, une ville ou un type de commerce
         </label>
@@ -127,9 +127,9 @@ export default function ShopDirectory({ shops }: { shops: PublicShopCard[] }) {
               key={shop.id}
               href={`/shop/${encodeURIComponent(shop.slug)}`}
               aria-label={`Ouvrir la boutique ${shop.name}`}
-              className="group overflow-hidden rounded-[24px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]"
+              className="revant-directory-card group overflow-hidden rounded-[24px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]"
             >
-              <div className="relative h-36 overflow-hidden sm:h-40" style={{ backgroundColor: shop.color }}>
+              <div className="revant-directory-card__banner relative h-36 overflow-hidden sm:h-40" style={{ backgroundColor: shop.color }}>
                 {shop.bannerUrl ? (
                   <div
                     aria-hidden="true"

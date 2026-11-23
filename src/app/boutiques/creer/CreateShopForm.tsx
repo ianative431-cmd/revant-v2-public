@@ -16,19 +16,20 @@ export default function CreateShopForm() {
   return (
     <form action={formAction} className="flex flex-col gap-3">
       <div>
-        <p className="text-xs font-semibold text-black/60 mb-2">Type de commerce</p>
+        <p className="mb-2 text-xs font-semibold text-[var(--brand-muted)]">Type de commerce</p>
         <div className="grid grid-cols-2 gap-2">
           {SHOP_TYPE_OPTIONS.map((option) => (
             <button
               key={option.value}
               type="button"
               onClick={() => setShopType(option.value)}
-              className={`text-left rounded-xl px-3 py-2.5 border ${
-                shopType === option.value ? "border-black bg-black/5" : "border-black/15"
+              className={`rounded-xl border px-3 py-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] ${
+                shopType === option.value ? "border-[var(--brand-accent)] bg-[var(--brand-accent-soft)] ring-1 ring-[var(--brand-accent)]/20" : "border-[var(--brand-border)] bg-[var(--brand-surface)] hover:border-[var(--brand-accent)]"
               }`}
+              aria-pressed={shopType === option.value}
             >
-              <span className="block text-sm font-medium">{option.label}</span>
-              <span className="block text-[11px] text-black/50">{option.hint}</span>
+              <span className="block text-sm font-bold text-[var(--brand-text)]">{option.label}</span>
+              <span className="mt-1 block text-[11px] leading-4 text-[var(--brand-muted)]">{option.hint}</span>
             </button>
           ))}
         </div>
@@ -42,7 +43,7 @@ export default function CreateShopForm() {
         minLength={2}
         maxLength={80}
         placeholder="Nom de la boutique"
-        className="border rounded-xl px-4 py-3 text-sm"
+        className="w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-muted)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15"
       />
       <input
         name="slogan"
@@ -56,13 +57,13 @@ export default function CreateShopForm() {
         maxLength={1000}
         rows={4}
         placeholder="Description (facultatif)"
-        className="border rounded-xl px-4 py-3 text-sm resize-none"
+        className="w-full resize-none rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-muted)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15"
       />
       {state.error && <p className="text-red-600 text-sm">{state.error}</p>}
       <button
         type="submit"
         disabled={pending}
-        className="bg-black text-white rounded-full py-3 text-sm font-medium disabled:opacity-50"
+        className="rounded-full bg-[var(--brand-accent)] py-3 text-sm font-bold text-[var(--brand-accent-contrast)] transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? "Création..." : "Créer ma boutique"}
       </button>

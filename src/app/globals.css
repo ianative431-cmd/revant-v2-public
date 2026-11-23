@@ -1,22 +1,24 @@
 @import "tailwindcss";
 
+/* Tangerine électrique. The legacy "terracotta" selector is retained so
+   existing saved palette preferences continue to work without migration. */
 :root,
 :root[data-site-palette="terracotta"] {
   color-scheme: light;
-  --brand-bg: #F7F4EE;
+  --brand-bg: #F8F5EF;
   --brand-surface: #FFFFFF;
   --brand-surface-raised: #FFFFFF;
-  --brand-surface-soft: #EEEAE2;
-  --brand-accent: #D94F0B;
-  --brand-accent-hover: #B94308;
+  --brand-surface-soft: #F0EBE3;
+  --brand-accent: #F46A18;
+  --brand-accent-hover: #D95812;
   --brand-accent-soft: #FFF0E6;
   --brand-accent-contrast: #FFFFFF;
-  --brand-text: #202832;
-  --brand-on-surface: #202832;
+  --brand-text: #20252B;
+  --brand-on-surface: #20252B;
   --brand-header: #142B45;
   --brand-header-text: #FFF9F2;
-  --brand-border: #D8DDE3;
-  --brand-muted: #586575;
+  --brand-border: #DED9D1;
+  --brand-muted: #5D6570;
   --brand-nav: rgba(255, 255, 255, .97);
   --brand-shadow: 0 8px 28px rgba(20, 43, 69, .10);
 }

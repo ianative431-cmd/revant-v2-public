@@ -28,7 +28,7 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
   const role = await getCurrentUserRole();
 
   return (
-    <div className="min-h-screen bg-brand-bg md:flex">
+    <div className="revant-admin-shell min-h-screen bg-brand-bg md:flex">
       <AdminPwaRegister />
       <AdminSidebar adminEmail={user.email ?? "—"} adminRole={role} />
       <div className="flex-1 min-w-0">

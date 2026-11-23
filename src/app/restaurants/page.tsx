@@ -49,10 +49,10 @@ export default async function RestaurantsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-brand-bg pb-24 text-brand-text">
+    <div className="revant-restaurant-directory min-h-screen bg-brand-bg pb-24 text-brand-text">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-[1440px] px-3 py-8 sm:px-6 sm:py-12">
-        <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
+      <main className="revant-restaurant-directory__main mx-auto w-full max-w-[1440px] px-3 py-8 sm:px-6 sm:py-12">
+        <div className="revant-directory-heading mb-7 flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-neutral-500">Marketplace Revant</p>
             <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">Restaurants</h1>
@@ -99,9 +99,9 @@ export default async function RestaurantsPage() {
                   key={shop.id}
                   href={`/shop/${encodeURIComponent(shop.slug)}`}
                   aria-label={`Ouvrir le restaurant ${shop.name}`}
-                  className="group overflow-hidden rounded-[24px] border border-black/5 bg-brand-surface shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+                  className="revant-directory-card revant-restaurant-card group overflow-hidden rounded-[24px] border border-black/5 bg-brand-surface shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
                 >
-                  <div className="relative h-36 overflow-hidden sm:h-40" style={{ backgroundColor: color }}>
+                  <div className="revant-directory-card__banner relative h-36 overflow-hidden sm:h-40" style={{ backgroundColor: color }}>
                     {bannerUrl ? (
                       <div
                         aria-hidden="true"

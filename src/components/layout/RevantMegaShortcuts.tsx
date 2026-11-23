@@ -7,19 +7,19 @@ const shortcuts = [
   { label: "Beauté", href: "/?categorie=beaute#produits", icon: ShoppingBag },
   { label: "Électronique", href: "/?categorie=electronique#produits", icon: Smartphone },
   { label: "Boutiques", href: "/boutiques", icon: Store },
-  { label: "Terroir", href: "/#boutiques-paysannes", icon: Leaf },
+  { label: "Terroir", href: "/?categorie=alimentation#produits", icon: Leaf },
   { label: "Restaurants", href: "/restaurants", icon: Utensils },
 ];
 
 export default function RevantMegaShortcuts() {
   return (
-    <section aria-label="Explorer Revant Mega" className="px-3 pb-3 pt-5 sm:px-5 sm:pt-8">
-      <div className="mb-3 flex items-end justify-between gap-3 px-1 sm:mb-4">
+    <section aria-label="Explorer Revant Mega" className="revant-home-section revant-shortcuts">
+      <div className="revant-home-section__head mb-3 px-1 sm:mb-4">
         <div>
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--brand-accent)]">À découvrir</p>
-          <h2 className="text-base font-extrabold tracking-tight sm:text-lg">Explorer Revant Mega</h2>
+          <p className="revant-home-section__eyebrow">Accès rapide</p>
+          <h2 className="revant-home-section__title">Explorer les univers</h2>
         </div>
-        <Link href="/boutiques" className="shrink-0 px-2 py-2 text-xs font-bold text-[var(--brand-accent)] transition hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">
+        <Link href="/boutiques" className="revant-home-section__link shrink-0 px-2 py-2">
           Tout explorer <span aria-hidden="true">→</span>
         </Link>
       </div>

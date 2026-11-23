@@ -10,7 +10,9 @@ function formatPrice(amount: number, currency: string): string {
 
 export default function ProductCard({ product }: { product: Product }) {
   const imageUrl = safeProductImageUrl(product.images[0]);
-  const outOfStock = product.stock_quantity <= 0;
+  const hasSizeVariants = product.product_type === "clothing" && Object.keys(product.size_stock).length > 0;
+  const availableSizeStock = Object.values(product.size_stock).reduce((sum, value) => sum + (Number.isFinite(value) ? Math.max(0, value) : 0), 0);
+  const outOfStock = product.stock_quantity <= 0 || (hasSizeVariants && availableSizeStock <= 0);
 
   return (
     <article className="revant-card revant-product-card group relative overflow-hidden rounded-[22px] border border-[var(--brand-border)] bg-[var(--brand-surface)] text-[var(--brand-text)] shadow-[0_5px_20px_rgba(20,43,69,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(20,43,69,0.13)] focus-within:border-[var(--brand-accent)]">
@@ -26,7 +28,7 @@ export default function ProductCard({ product }: { product: Product }) {
               alt={product.name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.055]"
+              className="object-contain transition-opacity duration-300 group-hover:opacity-95"
             />
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[var(--brand-surface)] via-[var(--brand-bg)] to-[var(--brand-border)] px-2 text-center text-xs font-medium text-[var(--brand-muted)]">
@@ -59,24 +61,34 @@ export default function ProductCard({ product }: { product: Product }) {
             INDISPONIBLE
           </span>
         ) : (
-          <>
-            <AddToCartButton
-              compact
-              item={{
-                id: product.id,
-                name: product.name,
-                price: product.base_price,
-                currency: product.currency,
-                image: imageUrl,
-              }}
-            />
+          hasSizeVariants ? (
             <Link
-              href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`}
-              className="mt-2 block rounded-full bg-[var(--brand-accent)] py-2.5 text-center text-[10px] font-extrabold tracking-wide text-white shadow-sm transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]"
+              href={`/produit/${product.id}`}
+              className="block rounded-full bg-[var(--brand-accent)] py-2.5 text-center text-[10px] font-extrabold tracking-wide text-white shadow-sm transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]"
             >
-              ACHETER SANS COMPTE
+              CHOISIR UNE TAILLE
             </Link>
-          </>
+          ) : (
+            <>
+              <AddToCartButton
+                compact
+                item={{
+                  id: product.id,
+                  name: product.name,
+                  price: product.base_price,
+                  currency: product.currency,
+                  image: imageUrl,
+                  shopId: product.shop_id,
+                }}
+              />
+              <Link
+                href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`}
+                className="mt-2 block rounded-full bg-[var(--brand-accent)] py-2.5 text-center text-[10px] font-extrabold tracking-wide text-white shadow-sm transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]"
+              >
+                ACHETER SANS COMPTE
+              </Link>
+            </>
+          )
         )}
       </div>
     </article>

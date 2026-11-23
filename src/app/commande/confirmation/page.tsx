@@ -11,6 +11,7 @@ type GuestOrderSummary = {
   total_amount: number;
   currency: string;
   product_name: string;
+  variant_label?: string | null;
   shop_name: string;
   created_at: string;
   delivery_status?: string | null;
@@ -64,8 +65,8 @@ export default async function GuestOrderConfirmation({ searchParams }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-brand-bg px-4 py-10 text-brand-text">
-      <div className="mx-auto max-w-xl rounded-2xl border border-brand-border bg-brand-surface p-6 text-center shadow-sm sm:p-10">
+    <main className="revant-order-confirmation min-h-screen bg-brand-bg px-4 py-10 text-brand-text">
+      <div className="revant-confirmation-panel mx-auto max-w-2xl rounded-2xl border border-brand-border bg-brand-surface p-6 text-center shadow-sm sm:p-10">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-surface-soft text-2xl text-brand-accent">✓</div>
         <p className="mt-5 text-xs font-bold tracking-widest text-brand-muted">COMMANDE ENREGISTRÉE</p>
         <h1 className="mt-2 text-2xl font-black">Merci pour ta commande.</h1>
@@ -74,6 +75,7 @@ export default async function GuestOrderConfirmation({ searchParams }: Props) {
         <p className="mt-3 rounded-xl border border-brand-border bg-brand-bg p-3 text-left text-xs leading-relaxed text-brand-muted">Aucun paiement en ligne n’a été encaissé par Revant. Attends la confirmation de la boutique et ses instructions avant tout règlement.</p>
         <div className="mt-5 rounded-xl border border-brand-border p-4 text-left">
           <p className="text-sm font-bold">{data.product_name}</p>
+          {data.variant_label && <p className="mt-1 text-xs font-semibold text-brand-muted">Taille : {data.variant_label}</p>}
           <p className="mt-1 text-xs text-brand-muted">Boutique : {data.shop_name}</p>
           <p className="mt-3 text-lg font-black">{Number(data.total_amount).toLocaleString("fr-FR")} {data.currency}</p>
           <p className="mt-2 text-xs text-brand-muted">Statut : {STATUS_LABEL[data.status] ?? data.status}</p>

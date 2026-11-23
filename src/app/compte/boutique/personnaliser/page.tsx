@@ -20,14 +20,14 @@ export default async function PersonnaliserBoutiquePage() {
   const palettes = getPalettesForShopType(shop);
 
   return (
-    <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-sm">
+    <div className="revant-seller-customize min-h-screen bg-brand-bg px-4 py-8 sm:py-10">
+      <div className="revant-seller-customize-layout mx-auto w-full max-w-3xl">
         <Link href="/compte/boutique" className="text-sm underline text-[var(--brand-muted)]">
           ← Ma boutique
         </Link>
 
-        <h1 className="text-xl font-bold mt-4 mb-1">Personnaliser {shop.name}</h1>
-        <p className="text-sm text-[var(--brand-muted)] mb-6">
+        <h1 className="mb-1 mt-4 text-2xl font-black tracking-tight text-[var(--brand-text)]">Personnaliser {shop.name}</h1>
+        <p className="mb-6 text-sm leading-6 text-[var(--brand-muted)]">
           Gère les informations visibles sur la vitrine publique de ta boutique.
         </p>
 

@@ -20,7 +20,7 @@ type OrderRow = {
   total_amount: number;
   currency: string;
   created_at: string;
-  order_items: { product_name: string; shops: { name: string } | null }[];
+  order_items: { product_name: string; variant_label: string | null; shops: { name: string } | null }[];
 };
 
 export default async function AdminCommandesPage() {
@@ -29,7 +29,7 @@ export default async function AdminCommandesPage() {
   const { data } = await supabase
     .from("orders")
     .select(
-      "id, order_number, status, total_amount, currency, created_at, order_items(product_name, shops(name))"
+      "id, order_number, status, total_amount, currency, created_at, order_items(product_name, variant_label, shops(name))"
     )
     .order("created_at", { ascending: false })
     .limit(200)
@@ -57,7 +57,7 @@ export default async function AdminCommandesPage() {
               <div key={order.id} className="bg-white rounded-2xl p-4 flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate">
-                    {firstItem?.product_name ?? "Article indisponible"}
+                    {firstItem?.product_name ?? "Article indisponible"}{firstItem?.variant_label ? ` · Taille : ${firstItem.variant_label}` : ""}
                     {extraCount > 0 ? ` +${extraCount}` : ""}
                   </p>
                   <p className="text-xs text-black/50 mt-0.5">

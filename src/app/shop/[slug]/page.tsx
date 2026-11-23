@@ -4,6 +4,8 @@ import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import ProductCard from "@/components/products/ProductCard";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
+import { getPaletteById } from "@/content/shops/color-palettes";
+import type { CSSProperties } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveProductsForShop } from "@/server/products/products";
 import {
@@ -87,9 +89,13 @@ export default async function ShopPublicPage({ params }: Props) {
     ? normalizeShopPhone(shop.whatsapp, defaultCallingCode) ?? null
     : phone;
   const whatsappDigits = whatsapp?.replace(/\D/g, "");
-  const shopColor = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
+  const savedPalette = shop.background_color ? getPaletteById(shop.background_color) : undefined;
+  const customShopColor = shop.background_color && /^#[0-9a-fA-F]{6}$/.test(shop.background_color)
     ? shop.background_color
-    : "var(--brand-accent)";
+    : null;
+  const shopColor = customShopColor ?? savedPalette?.colors[2] ?? "var(--brand-accent)";
+  const shopAccent = savedPalette?.colors[1] ?? shopColor;
+  const shopAccentHover = savedPalette?.colors[2] ?? customShopColor ?? shopAccent;
   const socials = SOCIAL_NETWORKS.flatMap((network) => {
     const value = shop[network.key];
     const href = normalizeShopSocialUrl(value, network.key) ?? null;
@@ -100,7 +106,14 @@ export default async function ShopPublicPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-[var(--brand-bg)] pb-24 text-[var(--brand-text)]">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-[1440px] px-3 pb-10 pt-4 sm:px-6 sm:pt-6">
+      <main
+        className="revant-storefront pb-10 pt-3 sm:pt-5"
+        style={savedPalette || customShopColor ? ({
+          "--brand-accent": shopAccent,
+          "--brand-accent-hover": shopAccentHover,
+          "--brand-accent-text": shopAccent,
+        } as CSSProperties & Record<"--brand-accent" | "--brand-accent-hover" | "--brand-accent-text", string>) : undefined}
+      >
         <nav aria-label="Fil d’Ariane" className="mb-4 flex flex-wrap items-center gap-2 text-xs text-[var(--brand-muted)]">
           <Link href="/" className="transition hover:text-[var(--brand-accent)]">Accueil</Link>
           <span aria-hidden="true">/</span>
@@ -109,16 +122,16 @@ export default async function ShopPublicPage({ params }: Props) {
           <span aria-current="page" className="max-w-[55vw] truncate font-semibold text-[var(--brand-text)]">{shop.name}</span>
         </nav>
 
-        <section id="accueil" aria-labelledby="shop-title" className="overflow-hidden rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-[0_14px_42px_rgba(20,43,69,0.08)] sm:rounded-[32px]">
+        <section id="accueil" aria-labelledby="shop-title" className="revant-storefront__hero">
           <div
             role={bannerUrl ? "img" : undefined}
             aria-label={bannerUrl ? `Bannière de ${shop.name}` : undefined}
-            className="relative h-40 overflow-hidden bg-cover bg-center sm:h-56 lg:h-64"
+            className="revant-storefront__banner relative overflow-hidden bg-cover bg-center"
             style={{
               backgroundColor: shopColor,
               backgroundImage: bannerUrl
                 ? `linear-gradient(100deg, rgba(20,29,38,.62), rgba(20,29,38,.08)), url("${bannerUrl}")`
-                : "linear-gradient(115deg, var(--brand-accent), #F9A36B 58%, #F7D7BD)",
+                : "linear-gradient(115deg, var(--brand-accent), #FF914D 58%, #F8F5EF)",
             }}
           >
             {!bannerUrl && (
@@ -138,7 +151,7 @@ export default async function ShopPublicPage({ params }: Props) {
             </div>
           </div>
 
-          <div className="relative px-4 pb-5 pt-14 sm:px-8 sm:pb-7 sm:pt-16">
+          <div className="revant-storefront__identity relative">
             <div
               role={logoUrl ? "img" : undefined}
               aria-label={logoUrl ? `Logo de ${shop.name}` : undefined}
@@ -169,18 +182,25 @@ export default async function ShopPublicPage({ params }: Props) {
                   <p className="max-w-3xl whitespace-pre-line text-sm leading-7 text-[var(--brand-muted)]">{shop.description}</p>
                 )}
               </div>
-
+              <div className="flex w-full shrink-0 flex-col gap-2 sm:flex-row lg:w-auto">
+                <a href="#produits" className="inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--brand-accent)] px-5 py-3 text-xs font-extrabold text-white shadow-sm transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">
+                  Découvrir les produits
+                </a>
+                <a href="#contact" className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-5 py-3 text-xs font-bold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">
+                  Contacter la boutique
+                </a>
+              </div>
             </div>
           </div>
         </section>
 
-        <nav aria-label="Navigation de la boutique" className="mt-4 flex items-center gap-1 overflow-x-auto rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] p-1.5 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav aria-label="Navigation de la boutique" className="revant-storefront__nav mt-4 flex items-center gap-1 overflow-x-auto rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] p-1.5 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <a href="#accueil" className="shrink-0 rounded-full bg-[var(--brand-accent)] px-4 py-2.5 text-[11px] font-extrabold text-white">Accueil boutique</a>
           <a href="#produits" className="shrink-0 rounded-full px-4 py-2.5 text-[11px] font-bold text-[var(--brand-muted)] transition hover:bg-[var(--brand-bg)] hover:text-[var(--brand-text)]">Produits ({products.length})</a>
           <a href="#contact" className="shrink-0 rounded-full px-4 py-2.5 text-[11px] font-bold text-[var(--brand-muted)] transition hover:bg-[var(--brand-bg)] hover:text-[var(--brand-text)]">Contact & réseaux</a>
         </nav>
 
-        <section id="produits" aria-labelledby="products-title" className="mt-5 scroll-mt-24 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:mt-7 sm:rounded-[30px] sm:p-7">
+        <section id="produits" aria-labelledby="products-title" className="revant-storefront__products scroll-mt-24">
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">La sélection de la boutique</p>
@@ -205,7 +225,7 @@ export default async function ShopPublicPage({ params }: Props) {
           )}
         </section>
 
-        <section id="contact" aria-labelledby="contact-title" className="mt-5 scroll-mt-24">
+        <section id="contact" aria-labelledby="contact-title" className="revant-storefront__contact mt-5 scroll-mt-24">
           <div className="rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:rounded-[30px] sm:p-7">
             <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Échangez avec le vendeur</p>
             <h2 id="contact-title" className="mt-1 text-xl font-black tracking-tight">Contact & réseaux</h2>

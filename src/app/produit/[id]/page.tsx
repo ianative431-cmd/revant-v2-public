@@ -2,9 +2,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/server/auth/session";
+import { getActiveProducts } from "@/server/products/products";
 import { getProductById } from "@/server/products/products";
-import AddToCartButton from "@/components/products/AddToCartButton";
+import { getPublishedProductReviews } from "@/server/products/reviews";
+import ProductPurchaseOptions from "@/components/products/ProductPurchaseOptions";
+import ProductCard from "@/components/products/ProductCard";
 import ProductGallery from "@/components/products/ProductGallery";
+import ProductReviews from "@/components/products/ProductReviews";
+import InfiniteProductFeed from "@/components/products/InfiniteProductFeed";
 import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import ReportContentButton from "@/components/reports/ReportContentButton";
@@ -25,8 +30,11 @@ export default async function ProductPage({ params }: Props) {
     .maybeSingle();
   if (shopError) throw shopError;
   const currentUser = await getCurrentUser();
+  const reviewData = await getPublishedProductReviews(supabase, product.id, 0, 10);
   const isOwner = !!currentUser && !!shop && shop.owner_id === currentUser.id;
-  const outOfStock = product.stock_quantity <= 0;
+  const hasSizeVariants = product.product_type === "clothing" && Object.keys(product.size_stock).length > 0;
+  const availableSizeStock = Object.values(product.size_stock).reduce((sum, value) => sum + (Number.isFinite(value) ? Math.max(0, value) : 0), 0);
+  const outOfStock = product.stock_quantity <= 0 || (hasSizeVariants && availableSizeStock <= 0);
   const imageUrl = product.images[0] ?? null;
 
   const reportTargets = !isOwner && currentUser ? [
@@ -37,10 +45,25 @@ export default async function ProductPage({ params }: Props) {
     ] : []),
   ] : [];
 
+  const relatedProducts = product.category_id
+    ? await getActiveProducts(supabase, {
+        categoryId: product.category_id,
+        limit: 8,
+        inStockOnly: true,
+        excludeIds: [product.id],
+      })
+    : [];
+  const excludedRecommendationIds = [product.id, ...relatedProducts.map((item) => item.id)];
+  const discoveryProducts = await getActiveProducts(supabase, {
+    limit: 24,
+    inStockOnly: true,
+    excludeIds: excludedRecommendationIds,
+  });
+
   return (
-    <div className="min-h-screen bg-brand-bg pb-28 text-brand-text">
+    <div className="revant-product-page min-h-screen bg-brand-bg pb-28 text-brand-text">
       <SiteHeader />
-      <main className="mx-auto max-w-6xl px-3 py-5 sm:px-5 sm:py-8">
+      <main className="revant-product-layout mx-auto max-w-6xl px-3 py-5 sm:px-5 sm:py-8">
         <nav aria-label="Fil d’Ariane" className="mb-5 flex flex-wrap items-center gap-2 text-xs font-medium text-[var(--brand-muted)] sm:text-sm">
           <Link href="/" className="transition hover:text-brand-accent">Accueil</Link>
           <span aria-hidden="true">/</span>
@@ -50,7 +73,7 @@ export default async function ProductPage({ params }: Props) {
         </nav>
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] lg:items-start lg:gap-8">
-          <section aria-label="Photos du produit" className="min-w-0 lg:sticky lg:top-24">
+          <section aria-label="Photos du produit" className="revant-product-gallery-panel min-w-0 lg:sticky lg:top-24">
             <div className="overflow-hidden rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-2 shadow-sm sm:rounded-[30px] sm:p-3">
               <ProductGallery images={product.images} productName={product.name} outOfStock={outOfStock} />
             </div>
@@ -59,7 +82,7 @@ export default async function ProductPage({ params }: Props) {
             </p>
           </section>
 
-          <section className="min-w-0 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-6 lg:p-7">
+          <section className="revant-product-info-panel min-w-0 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-6 lg:p-7">
             <div className="flex flex-wrap items-center gap-2">
               {product.categoryName && (
                 <span className="rounded-full bg-[var(--brand-bg)] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--brand-muted)]">
@@ -78,7 +101,7 @@ export default async function ProductPage({ params }: Props) {
               <p className="mt-2 text-sm font-medium text-[var(--brand-muted)]">Format : {product.perfume_volume_ml} ml</p>
             )}
 
-            <div className="mt-5 rounded-2xl bg-[var(--brand-bg)] px-4 py-4 sm:px-5">
+            <div className="revant-product-price mt-5 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-4 py-4 sm:px-5">
               <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[var(--brand-muted)]">Prix du produit</p>
               <p className="mt-1 text-3xl font-black tracking-tight text-brand-accent sm:text-[34px]">
                 {product.base_price.toLocaleString("fr-FR")} {product.currency}
@@ -93,9 +116,9 @@ export default async function ProductPage({ params }: Props) {
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {Object.entries(product.size_stock).sort(([a], [b]) => a.localeCompare(b, "fr")).map(([size, quantity]) => (
-                    <div key={size} className="rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-3 py-3">
+                    <div key={size} className="flex min-h-[76px] flex-col justify-between rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-3 py-3">
                       <span className="block text-sm font-extrabold">{size}</span>
-                      <span className="mt-1 block text-[11px] font-medium text-[var(--brand-muted)]">
+                      <span className={`mt-1 block text-[11px] font-semibold ${quantity > 0 ? "text-[var(--brand-muted)]" : "text-[var(--brand-accent)]"}`}>
                         {quantity > 0 ? `${quantity} disponible${quantity > 1 ? "s" : ""}` : "Épuisé"}
                       </span>
                     </div>
@@ -131,12 +154,11 @@ export default async function ProductPage({ params }: Props) {
               ) : outOfStock ? (
                 <p className="rounded-2xl bg-[var(--brand-bg)] p-4 text-sm leading-relaxed">Ce produit est actuellement épuisé. Consulte la boutique pour découvrir les autres articles.</p>
               ) : (
-                <div className="grid gap-3">
-                  <AddToCartButton item={{ id: product.id, name: product.name, price: product.base_price, currency: product.currency, image: imageUrl }} />
-                  <Link href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`} className="block w-full rounded-full bg-brand-accent px-6 py-4 text-center text-sm font-extrabold text-white shadow-sm transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
-                    Commander sans créer de compte
-                  </Link>
-                </div>
+                <ProductPurchaseOptions
+                  item={{ id: product.id, name: product.name, price: product.base_price, currency: product.currency, image: imageUrl, shopId: product.shop_id, shopName: shop?.name ?? null }}
+                  sizeStock={hasSizeVariants ? product.size_stock : {}}
+                  stockQuantity={product.stock_quantity}
+                />
               )}
 
               {!isOwner && shop && (
@@ -153,6 +175,38 @@ export default async function ProductPage({ params }: Props) {
             </div>
           </section>
         </div>
+
+        <ProductReviews productId={product.id} initialReviews={reviewData.reviews} totalReviews={reviewData.total} />
+
+        {relatedProducts.length > 0 && (
+          <section aria-labelledby="related-products-title" className="mt-7 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-7">
+            <div className="mb-5">
+              <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Dans la même catégorie</p>
+              <h2 id="related-products-title" className="mt-1 text-xl font-black tracking-tight sm:text-2xl">Vous aimerez aussi</h2>
+              <p className="mt-1 text-xs text-[var(--brand-muted)]">D’autres articles disponibles, publiés par les vendeurs sur Revant.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
+              {relatedProducts.map((item) => <ProductCard key={item.id} product={item} />)}
+            </div>
+          </section>
+        )}
+
+        {discoveryProducts.length > 0 && (
+          <section aria-labelledby="discover-products-title" className="mt-7 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-7">
+            <div className="mb-5">
+              <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Le catalogue Revant</p>
+              <h2 id="discover-products-title" className="mt-1 text-xl font-black tracking-tight sm:text-2xl">À découvrir sur Revant</h2>
+              <p className="mt-1 text-xs text-[var(--brand-muted)]">Parcours les autres articles réellement disponibles. La liste se prolonge au fil du défilement.</p>
+            </div>
+            <InfiniteProductFeed
+              initialProducts={discoveryProducts}
+              category=""
+              search=""
+              excludeIds={excludedRecommendationIds}
+              inStockOnly
+            />
+          </section>
+        )}
       </main>
       <BottomNav />
     </div>

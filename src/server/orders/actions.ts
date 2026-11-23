@@ -19,6 +19,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3
 function messageForOrderError(message: string, fallback: string) {
   if (message.includes("forbidden")) return "Tu n’es pas autorisé à modifier cette commande.";
   if (message.includes("invalid_order_transition")) return "Cette commande ne peut plus être modifiée à ce stade.";
+  if (message.includes("product_variant_unavailable_or_insufficient_stock")) return "La taille choisie n’est plus disponible en quantité suffisante. La commande reste en attente.";
   if (message.includes("product_unavailable_or_insufficient_stock")) return "Le produit n’est plus disponible en quantité suffisante. La commande reste en attente.";
   if (message.includes("invalid_order_shop_scope")) return "Cette commande doit être traitée par boutique. Contacte le support.";
   if (message.includes("payment_action_required")) return "Un paiement est en cours ou confirmé. Passe par le processus d’annulation/remboursement sécurisé.";
@@ -48,6 +49,7 @@ async function runOrderTransition(
 
   revalidatePath("/compte/boutique/commandes");
   revalidatePath("/compte/commandes");
+  revalidatePath(`/compte/commandes/${orderId}`);
   revalidatePath(`/compte/commandes/${orderId}/recu`);
   return { error: null, success: true };
 }

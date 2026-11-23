@@ -5,6 +5,8 @@ import type { Product } from "@/types/product";
 const PRODUCT_SELECT =
   "id, shop_id, name, description, base_price, currency, stock_quantity, product_type, size_stock, perfume_volume_ml, status, slug, category_id, created_at, updated_at, categories(name), product_images(image_url, sort_order)";
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 type ProductRow = {
   id: string;
   shop_id: string;
@@ -53,7 +55,15 @@ function mapRow(row: ProductRow): Product {
 
 export async function getActiveProducts(
   supabase: SupabaseClient,
-  options?: { categoryId?: string; productType?: "clothing" | "perfume"; limit?: number; offset?: number; searchTerm?: string }
+  options?: {
+    categoryId?: string;
+    productType?: "clothing" | "perfume";
+    limit?: number;
+    offset?: number;
+    searchTerm?: string;
+    inStockOnly?: boolean;
+    excludeIds?: string[];
+  }
 ): Promise<Product[]> {
   let query = supabase
     .from("products")
@@ -68,6 +78,15 @@ export async function getActiveProducts(
   }
   if (options?.productType) {
     query = query.eq("product_type", options.productType);
+  }
+  if (options?.inStockOnly) {
+    query = query.gt("stock_quantity", 0);
+  }
+  const excludeIds = [...new Set((options?.excludeIds ?? []).filter((id) => UUID_PATTERN.test(id)))].slice(0, 32);
+  if (excludeIds.length === 1) {
+    query = query.neq("id", excludeIds[0]);
+  } else if (excludeIds.length > 1) {
+    query = query.not("id", "in", `(${excludeIds.join(",")})`);
   }
   if (options?.searchTerm) {
     const safeTerm = options.searchTerm.replace(/[%,()]/g, " ").trim();

@@ -37,8 +37,8 @@ export default async function MesCommandesPage() {
   const orders = await getOrdersForBuyer(supabase);
 
   return (
-    <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-2xl">
+    <div className="revant-buyer-orders min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
+      <div className="revant-buyer-orders-layout w-full max-w-5xl">
         <Link href="/compte" className="text-sm underline text-brand-text/60">← Mon compte</Link>
         <h1 className="mt-4 mb-6 text-xl font-bold">Mes commandes</h1>
         {orders.length === 0 ? (
@@ -49,10 +49,13 @@ export default async function MesCommandesPage() {
               const deliveryStatus = order.delivery?.status ?? null;
               const activeDelivery = deliveryStatus !== null && ACTIVE_DELIVERY_STATES.has(deliveryStatus);
               const progress = deliveryStatus === "assigned" ? 0.25 : deliveryStatus === "picked_up" ? 0.55 : deliveryStatus === "in_transit" ? 0.85 : 0;
-              const itemTitle = order.items[0]?.product_name ?? "Commande Revant";
+              const firstItem = order.items[0];
+              const itemTitle = firstItem
+                ? `${firstItem.product_name}${firstItem.variant_label ? `, taille ${firstItem.variant_label}` : ""}`
+                : "Commande Revant";
 
               return (
-                <article key={order.id} className="rounded-2xl bg-white p-4">
+                <article key={order.id} className="revant-buyer-order-card rounded-2xl bg-white p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <p className="text-sm font-semibold">Commande {order.order_number}</p>
@@ -63,7 +66,7 @@ export default async function MesCommandesPage() {
                   <div className="mt-3 space-y-2 border-t border-brand-text/10 pt-3">
                     {order.items.map((item) => (
                       <div key={item.id} className="flex items-center justify-between gap-3 text-sm">
-                        <span className="min-w-0 truncate">{item.product_name} × {item.quantity}</span>
+                        <span className="min-w-0 truncate">{item.product_name} {item.variant_label ? `· Taille : ${item.variant_label}` : ""} × {item.quantity}</span>
                         <span className="shrink-0 font-semibold">{Number(item.line_total).toLocaleString("fr-FR")} {item.currency.trim()}</span>
                       </div>
                     ))}
@@ -73,7 +76,8 @@ export default async function MesCommandesPage() {
                   {activeDelivery && <NativeDeliveryActivityButton action="start" orderReference={order.order_number} itemTitle={itemTitle} status={DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? "Livraison en cours"} detail={DELIVERY_STATUS_LABEL[deliveryStatus ?? ""] ?? "Livraison en cours"} progress={progress} />}
                   {CLOSED_ORDER_STATES.has(order.status) && <NativeDeliveryActivityButton action="end" orderReference={order.order_number} />}
                   {order.status === "pending" && <div className="mt-3"><BuyerOrderActions orderId={order.id} /></div>}
-                  {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
+                  <Link href={`/compte/commandes/${order.id}`} className="mt-3 inline-block rounded-full border border-brand-text/15 px-3 py-2 text-xs font-semibold text-brand-text/70">Voir le détail</Link>
+                  {order.status === "delivered" && <Link href={`/compte/commandes/${order.id}/recu`} className="mt-3 ml-3 inline-block text-xs underline text-brand-text/60">Voir le reçu de commande</Link>}
                 </article>
               );
             })}

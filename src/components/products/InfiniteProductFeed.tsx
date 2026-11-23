@@ -11,10 +11,14 @@ export default function InfiniteProductFeed({
   initialProducts,
   category,
   search,
+  excludeIds = [],
+  inStockOnly = false,
 }: {
   initialProducts: Product[];
   category: string;
   search: string;
+  excludeIds?: string[];
+  inStockOnly?: boolean;
 }) {
   const [products, setProducts] = useState(initialProducts);
   const [hasMore, setHasMore] = useState(initialProducts.length === 24);
@@ -22,9 +26,10 @@ export default function InfiniteProductFeed({
   const [error, setError] = useState(false);
   const sentinel = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
+  const excludeKey = excludeIds.join(",");
 
   useEffect(() => {
-    if (category || search || initialProducts.length === 0 || !("serviceWorker" in navigator)) return;
+    if (category || search || excludeKey || initialProducts.length === 0 || !("serviceWorker" in navigator)) return;
     let cancelled = false;
     const seedCatalogue = async () => {
       try {
@@ -62,7 +67,7 @@ export default function InfiniteProductFeed({
     return () => {
       cancelled = true;
     };
-  }, [category, initialProducts, search]);
+  }, [category, excludeKey, initialProducts, search]);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore) return;
@@ -76,6 +81,8 @@ export default function InfiniteProductFeed({
       });
       if (category) params.set("categorie", category);
       if (search) params.set("q", search);
+      if (excludeKey) params.set("excludeIds", excludeKey);
+      if (inStockOnly) params.set("stock", "1");
       const response = await fetch("/api/products/feed?" + params.toString(), {
         method: "GET",
         headers: { Accept: "application/json" },
@@ -94,7 +101,7 @@ export default function InfiniteProductFeed({
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [category, hasMore, products.length, search]);
+  }, [category, excludeKey, hasMore, inStockOnly, products.length, search]);
 
   useEffect(() => {
     const node = sentinel.current;
@@ -111,7 +118,7 @@ export default function InfiniteProductFeed({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="revant-product-feed-grid grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {products.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
       <div ref={sentinel} aria-live="polite" className="flex min-h-16 items-center justify-center py-5">

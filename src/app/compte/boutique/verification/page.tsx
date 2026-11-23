@@ -39,7 +39,7 @@ export default async function VerificationBoutiquePage({
   if (!shop) {
     return (
       <main className="min-h-screen bg-brand-bg px-4 py-10">
-        <div className="mx-auto max-w-xl rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mx-auto max-w-xl rounded-[24px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-6 shadow-sm">
           <h1 className="text-xl font-bold">Vérification de la boutique</h1>
           <p className="mt-3 text-sm text-brand-text/70">Crée d&apos;abord ta boutique pour déposer tes justificatifs.</p>
           <Link href="/boutiques/creer" className="mt-5 inline-block rounded-full bg-brand-accent px-5 py-3 text-sm text-white">Créer ma boutique</Link>
@@ -61,15 +61,15 @@ export default async function VerificationBoutiquePage({
 
   return (
     <main className="min-h-screen bg-brand-bg px-4 py-10">
-      <div className="mx-auto max-w-xl rounded-[22px] bg-white p-6 shadow-sm sm:p-8">
+      <div className="mx-auto max-w-2xl rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-8">
         <Link href="/compte/boutique" className="text-sm text-brand-text/60 underline">← Ma boutique</Link>
-        <h1 className="mt-4 text-2xl font-bold">Vérification de ma boutique</h1>
-        <p className="mt-2 text-sm text-brand-text/65">Dépose un justificatif d’identité. Après examen et approbation par l’équipe Revant, ta boutique recevra le badge bleu « Boutique certifiée ». Le badge doré Premium est indépendant. Tes documents restent privés et ne sont visibles que par les personnes autorisées à traiter le dossier.</p>
+        <h1 className="mt-4 text-2xl font-black tracking-tight text-[var(--brand-text)]">Vérification de ma boutique</h1>
+        <p className="mt-2 text-sm leading-6 text-[var(--brand-muted)]">Dépose un justificatif d’identité. Après examen et approbation par l’équipe Revant, ta boutique recevra le badge bleu « Boutique certifiée ». Le badge doré Premium est indépendant. Tes documents restent privés et ne sont visibles que par les personnes autorisées à traiter le dossier.</p>
 
-        <section className="mt-6 rounded-xl border border-brand-border p-4">
-          <p className="text-xs text-brand-text/60">État du dossier</p>
-          <p className="mt-1 font-semibold">{STATUS_LABELS[status] ?? "Statut inconnu"}</p>
-          {kyc?.submitted_at && <p className="mt-1 text-xs text-brand-text/60">Déposé le {new Date(kyc.submitted_at).toLocaleDateString("fr-FR")}</p>}
+        <section className="mt-6 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-4">
+          <p className="text-xs text-[var(--brand-muted)]">État du dossier</p>
+          <p className="mt-1 font-bold text-[var(--brand-text)]">{STATUS_LABELS[status] ?? "Statut inconnu"}</p>
+          {kyc?.submitted_at && <p className="mt-1 text-xs text-[var(--brand-muted)]">Déposé le {new Date(kyc.submitted_at).toLocaleDateString("fr-FR")}</p>}
           {kyc?.rejection_reason && <p className="mt-3 text-sm text-red-700">Motif : {kyc.rejection_reason}</p>}
         </section>
 
@@ -79,8 +79,8 @@ export default async function VerificationBoutiquePage({
 
         {canSubmit ? (
           <form action={submitKycDocument} className="mt-6 space-y-4">
-            <label className="block text-sm font-medium">Nom complet légal
-              <input name="legalName" required minLength={2} maxLength={120} autoComplete="name" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-3" />
+            <label className="block text-sm font-semibold text-[var(--brand-muted)]">Nom complet légal
+              <input name="legalName" required minLength={2} maxLength={120} autoComplete="name" className="mt-1 w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15" />
             </label>
             <label className="block text-sm font-medium">Type de justificatif
               <select name="documentType" required defaultValue="" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-3">
@@ -91,16 +91,16 @@ export default async function VerificationBoutiquePage({
               </select>
             </label>
             <label className="block text-sm font-medium">Pays émetteur (code à 2 lettres)
-              <input name="country" required minLength={2} maxLength={2} defaultValue="NE" placeholder="NE" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-3 uppercase" />
+              <input name="country" required minLength={2} maxLength={2} defaultValue="NE" placeholder="NE" className="mt-1 w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm uppercase text-[var(--brand-text)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15" />
             </label>
             <label className="block text-sm font-medium">4 derniers chiffres (facultatif)
               <input name="last4" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} placeholder="1234" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-3" />
             </label>
             <label className="block text-sm font-medium">Photo ou scan du document
-              <input name="document" type="file" required accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" className="mt-1 block w-full text-sm" />
-              <span className="mt-1 block text-xs text-brand-text/60">PDF, JPG ou PNG · 8 Mo maximum. N&apos;envoie jamais ton mot de passe ni tes coordonnées bancaires.</span>
+              <input name="document" type="file" required accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" className="mt-1 block w-full rounded-xl border border-dashed border-[var(--brand-border)] bg-[var(--brand-bg)] p-4 text-sm text-[var(--brand-text)] file:mr-3 file:rounded-full file:border-0 file:bg-[var(--brand-accent)] file:px-4 file:py-2 file:text-xs file:font-bold file:text-white" />
+              <span className="mt-1 block text-xs leading-5 text-[var(--brand-muted)]">PDF, JPG ou PNG · 8 Mo maximum. N&apos;envoie jamais ton mot de passe ni tes coordonnées bancaires.</span>
             </label>
-            <button type="submit" className="w-full rounded-full bg-brand-accent px-5 py-3 text-sm font-semibold text-white">Envoyer pour vérification</button>
+            <button type="submit" className="w-full rounded-full bg-[var(--brand-accent)] px-5 py-3 text-sm font-bold text-[var(--brand-accent-contrast)] transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]">Envoyer pour vérification</button>
           </form>
         ) : (
           <p className="mt-6 text-sm text-brand-text/65">

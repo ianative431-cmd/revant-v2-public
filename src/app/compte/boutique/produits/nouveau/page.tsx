@@ -19,11 +19,11 @@ export default async function NouveauProduitPage() {
 
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
-      <div className="w-full max-w-sm bg-white rounded-[22px] p-8">
+      <div className="w-full max-w-2xl rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-8">
         <Link href="/compte/boutique/produits" className="text-sm underline text-brand-text/60">
           ← Mes annonces
         </Link>
-        <h1 className="text-xl font-bold mt-4 mb-6">Nouvelle annonce</h1>
+        <h1 className="mb-6 mt-4 text-2xl font-black tracking-tight">Nouvelle annonce</h1>
         <NewProductForm shopId={shop.id} shopStatus={shop.status} categories={categories} />
       </div>
     </div>

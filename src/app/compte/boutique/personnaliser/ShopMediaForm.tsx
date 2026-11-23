@@ -13,7 +13,7 @@ type Props = {
   bannerUrl: string | null;
 };
 
-const MAX_BYTES = 8 * 1024 * 1024;
+const MAX_BYTES = 25 * 1024 * 1024;
 
 function extractOwnedShopMediaPath(value: string | null, userId: string, shopId: string): string | null {
   if (!value) return null;
@@ -60,7 +60,7 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
     setMessage(null);
 
     if (file.size === 0 || file.size > MAX_BYTES) {
-      setMessage("Choisis une image de moins de 8 Mo.");
+      setMessage("Choisis une image de moins de 25 Mo.");
       return;
     }
 
@@ -146,41 +146,47 @@ export default function ShopMediaForm({ shopId, userId, logoUrl, bannerUrl }: Pr
   }
 
   return (
-    <section className="bg-white rounded-2xl p-4 mt-6">
-      <h2 className="text-sm font-semibold mb-3">Identité visuelle de la boutique</h2>
-      <div className="grid gap-4">
-        <div className="flex items-center gap-3">
+    <section className="mt-6 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:p-6">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-[var(--brand-accent)]">Vitrine publique</p>
+          <h2 className="mt-1 text-base font-extrabold text-[var(--brand-text)]">Identité visuelle de la boutique</h2>
+        </div>
+        <span className="rounded-full bg-[var(--brand-bg)] px-3 py-1.5 text-[10px] font-semibold text-[var(--brand-muted)]">Logo & bannière</span>
+      </div>
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+        <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-3">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- public Supabase Storage image
-            <img src={logoUrl} alt="Logo actuel" className="w-16 h-16 rounded-full object-cover border border-black/10" />
+            <img src={logoUrl} alt="Logo actuel" className="h-16 w-16 shrink-0 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] object-cover" />
           ) : (
-            <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center text-xs text-black/40">Logo</div>
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-dashed border-[var(--brand-border)] bg-[var(--brand-surface)] text-xs font-semibold text-[var(--brand-muted)]">Logo</div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">Logo</p>
-            <p className="text-xs text-black/50 mb-2">Carré recommandé · 8 Mo maximum</p>
-            <label className="inline-flex cursor-pointer rounded-full border px-3 py-2 text-xs">
+            <p className="text-sm font-bold text-[var(--brand-text)]">Logo</p>
+            <p className="mb-2 text-xs leading-5 text-[var(--brand-muted)]">Carré recommandé · 25 Mo maximum</p>
+            <label className="inline-flex cursor-pointer rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-2 text-xs font-bold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">
               {busy === "logo" ? "Envoi..." : "Ajouter / remplacer"}
               <input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy !== null} onChange={onChange("logo")} />
             </label>
           </div>
         </div>
-        <div className="grid gap-2">
-          <p className="text-sm font-medium">Bannière</p>
+        <div className="grid min-w-0 gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-3">
+          <p className="text-sm font-bold text-[var(--brand-text)]">Bannière</p>
           {bannerUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- public Supabase Storage image
-            <img src={bannerUrl} alt="Bannière actuelle" className="w-full h-28 rounded-xl object-cover" />
+            <img src={bannerUrl} alt="Bannière actuelle" className="aspect-[16/5] w-full rounded-xl border border-[var(--brand-border)] object-cover" />
           ) : (
-            <div className="w-full h-28 rounded-xl bg-black/5 flex items-center justify-center text-xs text-black/40">Aucune bannière</div>
+            <div className="flex aspect-[16/5] w-full items-center justify-center rounded-xl border border-dashed border-[var(--brand-border)] bg-[var(--brand-surface)] text-xs font-semibold text-[var(--brand-muted)]">Aucune bannière</div>
           )}
-          <p className="text-xs text-black/50">Format paysage recommandé · 8 Mo maximum</p>
-          <label className="inline-flex w-fit cursor-pointer rounded-full border px-3 py-2 text-xs">
+          <p className="text-xs leading-5 text-[var(--brand-muted)]">Format paysage recommandé · 25 Mo maximum</p>
+          <label className="inline-flex w-fit cursor-pointer rounded-full border border-[var(--brand-border)] bg-[var(--brand-surface)] px-3 py-2 text-xs font-bold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">
             {busy === "banner" ? "Envoi..." : "Ajouter / remplacer"}
             <input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy !== null} onChange={onChange("banner")} />
           </label>
         </div>
       </div>
-      {message && <p aria-live="polite" className="text-xs mt-3 text-black/70">{message}</p>}
+      {message && <p aria-live="polite" className="mt-4 rounded-xl border border-[var(--brand-border)] bg-[var(--brand-bg)] px-3 py-2.5 text-xs leading-5 text-[var(--brand-text)]">{message}</p>}
     </section>
   );
 }

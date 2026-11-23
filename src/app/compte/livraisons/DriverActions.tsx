@@ -21,17 +21,49 @@ export function ClaimDeliveryButton({ deliveryId }: { deliveryId: string }) {
   </form>;
 }
 
-export function DeliveryStepButton({ deliveryId, status }: { deliveryId: string; status: "picked_up" | "in_transit" | "failed" }) {
+export function DeliveryStepButton({ deliveryId, status }: { deliveryId: string; status: "picked_up" | "in_transit" }) {
   const [state, formAction, pending] = useActionState(updateDeliveryStatus, initialState);
-  const label = status === "picked_up" ? "Confirmer la récupération" : status === "in_transit" ? "Démarrer le trajet" : "Signaler un échec";
+  const label = status === "picked_up" ? "Confirmer la récupération" : "Démarrer le trajet";
   return <form action={formAction}>
     <input type="hidden" name="deliveryId" value={deliveryId} />
     <input type="hidden" name="status" value={status} />
-    <button type="submit" disabled={pending} className="rounded-full border border-black/10 px-3 py-2 text-xs font-semibold disabled:opacity-50">
+    <button type="submit" disabled={pending} aria-busy={pending} className="rounded-full border border-black/10 px-3 py-2 text-xs font-semibold disabled:opacity-50">
       {pending ? "Mise à jour…" : label}
     </button>
     {state.error && <p role="alert" className="mt-2 text-xs text-red-700">{state.error}</p>}
   </form>;
+}
+
+export function DeliveryIncidentForm({ deliveryId }: { deliveryId: string }) {
+  const [state, formAction, pending] = useActionState(updateDeliveryStatus, initialState);
+  return <details className="mt-3 rounded-xl border border-red-200 bg-red-50/60 p-3">
+    <summary className="cursor-pointer text-xs font-semibold text-red-800">Signaler un incident</summary>
+    <form action={formAction} className="mt-3 space-y-3">
+      <input type="hidden" name="deliveryId" value={deliveryId} />
+      <input type="hidden" name="status" value="failed" />
+      <div>
+        <label htmlFor={`incident-category-${deliveryId}`} className="mb-1 block text-xs font-semibold text-red-950">Nature de l’incident</label>
+        <select id={`incident-category-${deliveryId}`} name="incidentCategory" required className="w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-brand-text">
+          <option value="">Choisir un motif</option>
+          <option value="recipient_unavailable">Destinataire absent</option>
+          <option value="address_issue">Adresse ou repère incorrect</option>
+          <option value="package_issue">Problème concernant le colis</option>
+          <option value="vehicle_issue">Panne ou problème de transport</option>
+          <option value="safety_issue">Problème de sécurité</option>
+          <option value="other">Autre incident</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor={`incident-details-${deliveryId}`} className="mb-1 block text-xs font-semibold text-red-950">Description factuelle</label>
+        <textarea id={`incident-details-${deliveryId}`} name="incidentDetails" required minLength={5} maxLength={400} rows={3} className="w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-brand-text" placeholder="Décris ce qui s’est passé, sans données inutiles." />
+      </div>
+      <button type="submit" disabled={pending} aria-busy={pending} className="rounded-full bg-red-700 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50">
+        {pending ? "Enregistrement…" : "Enregistrer l’incident"}
+      </button>
+      {state.error && <p role="alert" className="text-xs text-red-800">{state.error}</p>}
+      {state.success && <p role="status" aria-live="polite" className="text-xs font-semibold text-red-800">Incident enregistré et boutique notifiée.</p>}
+    </form>
+  </details>;
 }
 
 export function DeliveryCodeForm({ deliveryId }: { deliveryId: string }) {

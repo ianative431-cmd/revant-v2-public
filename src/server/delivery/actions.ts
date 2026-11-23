@@ -27,6 +27,7 @@ function deliveryError(message: string, fallback: string) {
   if (message.includes("delivery_already_claimed") || message.includes("delivery_not_available")) return "Cette livraison n’est plus disponible.";
   if (message.includes("delivery_not_assigned_to_driver")) return "Cette livraison ne t’est pas attribuée.";
   if (message.includes("invalid_delivery_transition")) return "Cette étape de livraison n’est pas autorisée.";
+  if (message.includes("invalid_delivery_failure_reason")) return "Ajoute un motif précis à cet incident (5 à 500 caractères).";
   if (message.includes("delivery_code_locked")) return "Trop de codes incorrects. Réessaie dans 15 minutes.";
   if (message.includes("delivery_not_in_transit")) return "La livraison doit être en route avant la confirmation.";
   if (message.includes("order_not_ready_for_delivery")) return "La commande n’est pas encore prête à être livrée.";
@@ -113,7 +114,30 @@ export async function updateDeliveryStatus(
   const status = String(formData.get("status") ?? "");
   if (!UUID_PATTERN.test(deliveryId)) return { error: "Référence de livraison invalide." };
   if (status !== "picked_up" && status !== "in_transit" && status !== "failed") return { error: "Étape de livraison invalide." };
-  const result = await callDeliveryRpc("driver_update_delivery_status", { p_delivery_id: deliveryId, p_status: status }, "Impossible de mettre à jour la livraison.");
+
+  const incidentLabels: Record<string, string> = {
+    recipient_unavailable: "Destinataire absent",
+    address_issue: "Adresse ou point de repère incorrect",
+    package_issue: "Problème concernant le colis",
+    vehicle_issue: "Panne ou problème de transport",
+    safety_issue: "Problème de sécurité",
+    other: "Autre incident",
+  };
+  let failureReason = "";
+  if (status === "failed") {
+    const category = String(formData.get("incidentCategory") ?? "");
+    const details = String(formData.get("incidentDetails") ?? "").trim();
+    if (!Object.hasOwn(incidentLabels, category) || details.length < 5 || details.length > 400) {
+      return { error: "Choisis un motif et décris l’incident en 5 à 400 caractères." };
+    }
+    failureReason = `${incidentLabels[category]} — ${details}`;
+  }
+
+  const result = await callDeliveryRpc(
+    "driver_update_delivery_status",
+    { p_delivery_id: deliveryId, p_status: status, p_failure_reason: failureReason },
+    "Impossible de mettre à jour la livraison."
+  );
   if (result.error) return { error: result.error };
 
   const liveState = status === "picked_up"
