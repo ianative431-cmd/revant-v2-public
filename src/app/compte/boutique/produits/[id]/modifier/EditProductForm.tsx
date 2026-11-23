@@ -245,7 +245,7 @@ export default function EditProductForm({
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <section className="grid gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-4">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold">Photos de l'annonce</p>
+          <p className="text-sm font-semibold">Photos de l&apos;annonce</p>
           <span className="text-xs text-[var(--brand-muted)]">{currentCount}/5</span>
         </div>
         {keptImages.length > 0 && (

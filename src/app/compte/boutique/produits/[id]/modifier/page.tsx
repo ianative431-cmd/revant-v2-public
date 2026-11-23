@@ -39,7 +39,7 @@ export default async function ModifierProduitPage({
         <Link href="/compte/boutique/produits" className="text-sm text-brand-text/65 underline">
           ← Mes annonces
         </Link>
-        <h1 className="mb-2 mt-5 text-2xl font-black tracking-tight text-brand-text">Modifier l'annonce</h1>
+        <h1 className="mb-2 mt-5 text-2xl font-black tracking-tight text-brand-text">Modifier l&apos;annonce</h1>
         <p className="mb-6 text-sm text-[var(--brand-muted)]">Les changements sont enregistrés sur cette annonce uniquement.</p>
         <EditProductForm
           product={product}
