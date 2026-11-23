@@ -32,12 +32,12 @@ button:active, [role="button"]:active, summary:active, a:active { transition-dur
   .revant-cart-added { animation-duration: 90ms !important; }
   .revant-nav-item > span:first-child { transition-duration: 45ms !important; }
 }
-html[data-site-palette] body,
-html[data-site-palette] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) {
+html[data-theme-mode] body,
+html[data-theme-mode] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) {
   transition-duration: 60ms !important;
 }
 @media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
-  html[data-site-palette] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) { transition-duration: 25ms !important; }
+  html[data-theme-mode] body :where(header, footer, nav, main, section, article, aside, button, a, input, select, textarea, [class*="bg-brand-"], [class*="text-brand-"], [class*="border-brand-"]) { transition-duration: 25ms !important; }
   .revant-hero-copy { animation-duration: 45ms !important; filter: none !important; }
   .revant-settings-row:hover { transform: none; }
 }
