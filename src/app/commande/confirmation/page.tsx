@@ -11,6 +11,7 @@ type GuestOrderSummary = {
   total_amount: number;
   currency: string;
   product_name: string;
+  variant_label?: string | null;
   shop_name: string;
   created_at: string;
   delivery_status?: string | null;
@@ -74,6 +75,7 @@ export default async function GuestOrderConfirmation({ searchParams }: Props) {
         <p className="mt-3 rounded-xl border border-brand-border bg-brand-bg p-3 text-left text-xs leading-relaxed text-brand-muted">Aucun paiement en ligne n’a été encaissé par Revant. Attends la confirmation de la boutique et ses instructions avant tout règlement.</p>
         <div className="mt-5 rounded-xl border border-brand-border p-4 text-left">
           <p className="text-sm font-bold">{data.product_name}</p>
+          {data.variant_label && <p className="mt-1 text-xs font-semibold text-brand-muted">Taille : {data.variant_label}</p>}
           <p className="mt-1 text-xs text-brand-muted">Boutique : {data.shop_name}</p>
           <p className="mt-3 text-lg font-black">{Number(data.total_amount).toLocaleString("fr-FR")} {data.currency}</p>
           <p className="mt-2 text-xs text-brand-muted">Statut : {STATUS_LABEL[data.status] ?? data.status}</p>

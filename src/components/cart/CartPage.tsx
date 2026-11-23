@@ -13,10 +13,12 @@ type CartItem = {
   image: string | null;
   shopId?: string;
   shopName?: string | null;
+  variantLabel?: string | null;
   quantity?: number;
 };
 
 type CartGroup = { id: string; name: string; items: CartItem[] };
+function cartLineKey(item: CartItem): string { return `${item.id}::${item.variantLabel?.trim() || ""}`; }
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function normalizeItems(value: unknown): CartItem[] {
@@ -30,6 +32,7 @@ function normalizeItems(value: unknown): CartItem[] {
     ...item,
     shopId: typeof item.shopId === "string" && UUID_PATTERN.test(item.shopId) ? item.shopId : undefined,
     shopName: typeof item.shopName === "string" ? item.shopName.slice(0, 100) : null,
+    variantLabel: typeof item.variantLabel === "string" && item.variantLabel.trim() ? item.variantLabel.trim().slice(0, 50) : null,
     quantity: Math.max(1, Math.min(99, Math.floor(Number(item.quantity) || 1))),
   }));
 }
@@ -87,12 +90,12 @@ export default function CartPage() {
     window.dispatchEvent(new Event("revant-cart-updated"));
   }
 
-  function remove(id: string) {
-    save(items.filter((item) => item.id !== id));
+  function remove(key: string) {
+    save(items.filter((item) => cartLineKey(item) !== key));
   }
 
-  function updateQuantity(id: string, quantity: number) {
-    const next = items.map((item) => item.id === id
+  function updateQuantity(key: string, quantity: number) {
+    const next = items.map((item) => cartLineKey(item) === key
       ? { ...item, quantity: Math.max(1, Math.min(99, Math.floor(quantity))) }
       : item);
     save(next);
@@ -151,7 +154,7 @@ export default function CartPage() {
                       const quantity = item.quantity ?? 1;
                       const imageUrl = safeProductImageUrl(item.image);
                       return (
-                        <article key={item.id} className="flex items-start gap-3 p-3 sm:gap-4 sm:p-4">
+                        <article key={cartLineKey(item)} className="flex items-start gap-3 p-3 sm:gap-4 sm:p-4">
                           {imageUrl ? (
                             <div className="revant-cart-product-image relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[var(--brand-bg)] sm:h-24 sm:w-24"><Image src={imageUrl} alt="" fill sizes="96px" unoptimized className="object-contain" /></div>
                           ) : (
@@ -160,13 +163,14 @@ export default function CartPage() {
                           <div className="min-w-0 flex-1">
                             <h3 className="line-clamp-2 text-sm font-bold">{item.name}</h3>
                             <p className="mt-1 text-sm font-extrabold text-[var(--brand-accent)]">{item.price.toLocaleString("fr-FR")} {item.currency}</p>
+                            {item.variantLabel && <p className="mt-1 text-xs font-semibold text-[var(--brand-muted)]">Taille : {item.variantLabel}</p>}
                             <div className="mt-3 flex flex-wrap items-center gap-2">
-                              <button type="button" aria-label={`Diminuer la quantité de ${item.name}`} onClick={() => updateQuantity(item.id, quantity - 1)} disabled={quantity <= 1} className="h-8 w-8 rounded-full border border-[var(--brand-border)] disabled:opacity-40">−</button>
+                              <button type="button" aria-label={`Diminuer la quantité de ${item.name}`} onClick={() => updateQuantity(cartLineKey(item), quantity - 1)} disabled={quantity <= 1} className="h-8 w-8 rounded-full border border-[var(--brand-border)] disabled:opacity-40">−</button>
                               <span className="min-w-6 text-center text-sm font-semibold" aria-live="polite">{quantity}</span>
-                              <button type="button" aria-label={`Augmenter la quantité de ${item.name}`} onClick={() => updateQuantity(item.id, quantity + 1)} disabled={quantity >= 99} className="h-8 w-8 rounded-full border border-[var(--brand-border)] disabled:opacity-40">+</button>
-                              <button type="button" onClick={() => remove(item.id)} className="ml-1 text-xs text-[var(--brand-muted)] underline">Retirer</button>
+                              <button type="button" aria-label={`Augmenter la quantité de ${item.name}`} onClick={() => updateQuantity(cartLineKey(item), quantity + 1)} disabled={quantity >= 99} className="h-8 w-8 rounded-full border border-[var(--brand-border)] disabled:opacity-40">+</button>
+                              <button type="button" onClick={() => remove(cartLineKey(item))} className="ml-1 text-xs text-[var(--brand-muted)] underline">Retirer</button>
                             </div>
-                            <Link href={`/commande/visiteur?productId=${encodeURIComponent(item.id)}&quantity=${quantity}`} className="mt-3 inline-flex rounded-full bg-brand-accent px-4 py-2.5 text-[10px] font-bold text-white">
+                            <Link href={`/commande/visiteur?productId=${encodeURIComponent(item.id)}&quantity=${quantity}${item.variantLabel ? `&variantLabel=${encodeURIComponent(item.variantLabel)}` : ""}`} className="mt-3 inline-flex rounded-full bg-brand-accent px-4 py-2.5 text-[10px] font-bold text-white">
                               Commander cet article
                             </Link>
                           </div>

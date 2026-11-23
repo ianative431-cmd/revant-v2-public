@@ -35,7 +35,7 @@ export default async function RecuPage({ params }: Props) {
           <div className="mb-4 mt-4 space-y-3 border-y border-dashed border-brand-text/15 py-4">
             {order.items.map((item) => (
               <div key={item.id} className="flex justify-between gap-3 text-sm">
-                <span className="min-w-0">{item.product_name} × {item.quantity}</span>
+                <span className="min-w-0">{item.product_name}{item.variant_label ? ` · Taille : ${item.variant_label}` : ""} × {item.quantity}</span>
                 <span className="shrink-0 font-medium">{Number(item.line_total).toLocaleString("fr-FR")} {item.currency.trim()}</span>
               </div>
             ))}

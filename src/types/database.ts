@@ -981,6 +981,7 @@ export type Database = {
           quantity: number
           shop_id: string
           unit_price: number
+          variant_label: string | null
         }
         Insert: {
           created_at?: string
@@ -993,6 +994,7 @@ export type Database = {
           quantity: number
           shop_id: string
           unit_price: number
+          variant_label?: string | null
         }
         Update: {
           created_at?: string
@@ -1005,6 +1007,7 @@ export type Database = {
           quantity?: number
           shop_id?: string
           unit_price?: number
+          variant_label?: string | null
         }
         Relationships: [
           {
@@ -2722,6 +2725,22 @@ export type Database = {
               p_product_id: string
               p_quantity: number
               p_tracking_token_hash: string
+              p_website: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_buyer_id: string
+              p_guest_address: string
+              p_guest_city: string
+              p_guest_name: string
+              p_guest_phone: string
+              p_idempotency_key: string
+              p_product_id: string
+              p_quantity: number
+              p_tracking_token_hash: string
+              p_variant_label: string | null
               p_website: string
             }
             Returns: Json

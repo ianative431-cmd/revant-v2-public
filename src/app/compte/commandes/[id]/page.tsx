@@ -120,7 +120,7 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
               <article key={item.id} className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
                 <div className="min-w-0">
                   <p className="text-sm font-bold">{item.product_name}</p>
-                  <p className="mt-1 text-xs text-[var(--brand-muted)]">Quantité : {item.quantity} · {Number(item.unit_price).toLocaleString("fr-FR")} {item.currency.trim()} / unité</p>
+                  <p className="mt-1 text-xs text-[var(--brand-muted)]">Quantité : {item.quantity}{item.variant_label ? ` · Taille : ${item.variant_label}` : ""} · {Number(item.unit_price).toLocaleString("fr-FR")} {item.currency.trim()} / unité</p>
                 </div>
                 <p className="shrink-0 text-sm font-extrabold">{Number(item.line_total).toLocaleString("fr-FR")} {item.currency.trim()}</p>
               </article>

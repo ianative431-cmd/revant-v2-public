@@ -47,3 +47,17 @@ test("guest tracking token hash is stable and rejects malformed tokens", () => {
   assert.match(hashGuestTrackingToken(token), /^[0-9a-f]{64}$/);
   assert.throws(() => hashGuestTrackingToken("not-a-token"), /invalid_tracking_token/);
 });
+
+
+test("guest tracking token is bound to the selected size", () => {
+  const small = createGuestOrderTrackingToken(idempotencyKey, 2, secret, "S");
+  const medium = createGuestOrderTrackingToken(idempotencyKey, 2, secret, "M");
+  const sameSmall = createGuestOrderTrackingToken(idempotencyKey, 2, secret, "S");
+  assert.equal(small, sameSmall);
+  assert.notEqual(small, medium);
+});
+
+test("guest tracking token rejects empty or oversized size labels", () => {
+  assert.throws(() => createGuestOrderTrackingToken(idempotencyKey, 1, secret, "   "), /invalid_variant_label/);
+  assert.throws(() => createGuestOrderTrackingToken(idempotencyKey, 1, secret, "X".repeat(51)), /invalid_variant_label/);
+});

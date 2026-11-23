@@ -49,7 +49,10 @@ export default async function MesCommandesPage() {
               const deliveryStatus = order.delivery?.status ?? null;
               const activeDelivery = deliveryStatus !== null && ACTIVE_DELIVERY_STATES.has(deliveryStatus);
               const progress = deliveryStatus === "assigned" ? 0.25 : deliveryStatus === "picked_up" ? 0.55 : deliveryStatus === "in_transit" ? 0.85 : 0;
-              const itemTitle = order.items[0]?.product_name ?? "Commande Revant";
+              const firstItem = order.items[0];
+              const itemTitle = firstItem
+                ? `${firstItem.product_name}${firstItem.variant_label ? `, taille ${firstItem.variant_label}` : ""}`
+                : "Commande Revant";
 
               return (
                 <article key={order.id} className="revant-buyer-order-card rounded-2xl bg-white p-4">
@@ -63,7 +66,7 @@ export default async function MesCommandesPage() {
                   <div className="mt-3 space-y-2 border-t border-brand-text/10 pt-3">
                     {order.items.map((item) => (
                       <div key={item.id} className="flex items-center justify-between gap-3 text-sm">
-                        <span className="min-w-0 truncate">{item.product_name} × {item.quantity}</span>
+                        <span className="min-w-0 truncate">{item.product_name} {item.variant_label ? `· Taille : ${item.variant_label}` : ""} × {item.quantity}</span>
                         <span className="shrink-0 font-semibold">{Number(item.line_total).toLocaleString("fr-FR")} {item.currency.trim()}</span>
                       </div>
                     ))}

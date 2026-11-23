@@ -5,17 +5,23 @@ import { getProductById } from "@/server/products/products";
 import { createGuestOrder } from "@/server/orders/guest-actions";
 import { notFound } from "next/navigation";
 
-type Props = { searchParams: Promise<{ productId?: string; quantity?: string; erreur?: string }> };
+type Props = { searchParams: Promise<{ productId?: string; quantity?: string; variantLabel?: string; erreur?: string }> };
 
 export default async function GuestCheckoutPage({ searchParams }: Props) {
-  const { productId, quantity: rawQuantity, erreur } = await searchParams;
+  const { productId, quantity: rawQuantity, variantLabel: rawVariantLabel, erreur } = await searchParams;
   if (!productId) notFound();
   const supabase = await createSupabaseServerClient();
   const product = await getProductById(supabase, productId);
   if (!product || product.status !== "active" || product.stock_quantity <= 0) notFound();
   const quantity = rawQuantity === undefined ? 1 : Number(rawQuantity);
   if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 99) notFound();
-  const stockUnavailable = quantity > product.stock_quantity || erreur === "stock";
+  const variantLabel = rawVariantLabel?.trim() || null;
+  const requiresVariant = product.product_type === "clothing" && Object.keys(product.size_stock).length > 0;
+  const variantStock = variantLabel ? product.size_stock[variantLabel] : undefined;
+  const variantUnavailable = requiresVariant
+    ? !variantLabel || !Number.isSafeInteger(variantStock) || Number(variantStock) < quantity
+    : variantLabel !== null;
+  const stockUnavailable = quantity > product.stock_quantity || erreur === "stock" || variantUnavailable;
   const idempotencyKey = randomUUID();
   const subtotal = product.base_price * quantity;
 
@@ -28,15 +34,17 @@ export default async function GuestCheckoutPage({ searchParams }: Props) {
           <h1 className="mt-2 text-2xl font-black">Commander sans compte</h1>
           <p className="mt-2 text-sm text-brand-muted">Remplis tes coordonnées de livraison. Aucun mot de passe ni inscription ne sont nécessaires.</p>
           <div className="mt-5 flex items-center gap-4 rounded-xl bg-brand-bg p-3">
-            <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">{product.name}</p><p className="mt-1 text-xs text-brand-muted">Quantité : {quantity}</p></div>
+            <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">{product.name}</p><p className="mt-1 text-xs text-brand-muted">Quantité : {quantity}</p>{variantLabel && <p className="mt-1 text-xs font-semibold text-brand-text">Taille : {variantLabel}</p>}</div>
             <div className="shrink-0 text-right"><p className="text-xs text-brand-muted">{product.base_price.toLocaleString("fr-FR")} × {quantity}</p><p className="text-sm font-black">{subtotal.toLocaleString("fr-FR")} {product.currency}</p></div>
           </div>
-          {stockUnavailable && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">La quantité demandée dépasse le stock disponible. Retourne au panier pour la modifier.</p>}
-          {erreur && erreur !== "stock" && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{erreur === "validation" ? "Vérifie les informations saisies." : "La commande n’a pas pu être créée. Vérifie les informations et réessaie."}</p>}
+          {variantUnavailable && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">La taille choisie est absente ou n’est plus disponible dans cette quantité. Retourne à la fiche produit pour choisir une taille disponible.</p>}
+          {!variantUnavailable && stockUnavailable && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">La quantité demandée dépasse le stock disponible. Retourne au panier pour la modifier.</p>}
+          {erreur && erreur !== "stock" && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{erreur === "validation" ? "Vérifie les informations saisies." : erreur === "variant" ? "La taille choisie n’est plus disponible. Sélectionne une autre taille." : "La commande n’a pas pu être créée. Vérifie les informations et réessaie."}</p>}
           <div role="note" className="mt-5 rounded-xl border border-brand-border bg-brand-bg p-4 text-xs leading-relaxed text-brand-muted"><strong className="text-brand-text">Paiement en ligne indisponible pour le moment.</strong> La commande sera envoyée au vendeur et restera en attente de confirmation. Revant n’encaisse aucun paiement à cette étape : attends les instructions de la boutique avant tout règlement.</div>
           <form action={createGuestOrder} className="revant-checkout-form mt-6 grid gap-4">
             <input type="hidden" name="productId" value={product.id} />
             <input type="hidden" name="quantity" value={quantity} />
+            <input type="hidden" name="variantLabel" value={variantLabel ?? ""} />
             <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
             <div><label htmlFor="guest-name" className="mb-1 block text-xs font-semibold">Nom complet</label><input id="guest-name" name="name" required minLength={2} maxLength={100} autoComplete="name" className="w-full rounded-xl border border-brand-border bg-brand-bg px-4 py-3 text-sm text-brand-text outline-none placeholder:text-brand-muted focus:border-brand-accent" placeholder="Ton nom complet" /></div>
             <div><label htmlFor="guest-phone" className="mb-1 block text-xs font-semibold">Téléphone</label><input id="guest-phone" name="phone" required minLength={8} maxLength={24} autoComplete="tel" inputMode="tel" className="w-full rounded-xl border border-brand-border bg-brand-bg px-4 py-3 text-sm text-brand-text outline-none placeholder:text-brand-muted focus:border-brand-accent" placeholder="+227 ..." /></div>

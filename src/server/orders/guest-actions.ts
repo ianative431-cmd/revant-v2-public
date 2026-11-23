@@ -22,6 +22,7 @@ type GuestOrderRpc = {
 export async function createGuestOrder(formData: FormData): Promise<never> {
   const productId = String(formData.get("productId") ?? "").trim();
   const quantity = Number(formData.get("quantity") ?? "1");
+  const variantLabel = String(formData.get("variantLabel") ?? "").trim() || null;
   const idempotencyKey = String(formData.get("idempotencyKey") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
@@ -31,6 +32,10 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
 
   if (!productId || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 99 || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idempotencyKey) || name.length < 2 || name.length > 100 || phone.length < 8 || phone.length > 24 || city.length < 2 || city.length > 100 || address.length < 5 || address.length > 300) {
     redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&erreur=validation`);
+  }
+
+  if (variantLabel !== null && variantLabel.length > 50) {
+    redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&quantity=${quantity}&erreur=variant`);
   }
 
   const normalizedPhone = phone.replace(/[^0-9]/g, "");
@@ -54,7 +59,7 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
   }
   // Bind the tracking token to the quantity so reusing an idempotency key
   // with a different quantity is rejected by the database RPC.
-  const token = createGuestOrderTrackingToken(idempotencyKey, quantity, tokenSecret);
+  const token = createGuestOrderTrackingToken(idempotencyKey, quantity, tokenSecret, variantLabel);
   const tokenHash = hashGuestTrackingToken(token);
   const sessionSupabase = await createSupabaseServerClient();
   const { data: { user } } = await sessionSupabase.auth.getUser();
@@ -71,10 +76,11 @@ export async function createGuestOrder(formData: FormData): Promise<never> {
     p_idempotency_key: idempotencyKey,
     p_buyer_id: user?.id ?? null,
     p_quantity: quantity,
+    p_variant_label: variantLabel,
   });
 
   if (error || !data?.order_number) {
-    const code = error?.message.includes("product unavailable") ? "stock" : "commande";
+    const code = error?.message.includes("product unavailable") ? "stock" : error?.message.includes("variant") ? "variant" : "commande";
     redirect(`/commande/visiteur?productId=${encodeURIComponent(productId)}&quantity=${quantity}&erreur=${code}`);
   }
 

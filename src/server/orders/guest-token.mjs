@@ -2,7 +2,7 @@ import { createHash, createHmac } from "node:crypto";
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export function createGuestOrderTrackingToken(idempotencyKey, quantity, secret) {
+export function createGuestOrderTrackingToken(idempotencyKey, quantity, secret, variantLabel = null) {
   if (typeof idempotencyKey !== "string" || !UUID_V4.test(idempotencyKey)) {
     throw new Error("invalid_idempotency_key");
   }
@@ -12,8 +12,13 @@ export function createGuestOrderTrackingToken(idempotencyKey, quantity, secret) 
   if (typeof secret !== "string" || secret.length < 32) {
     throw new Error("invalid_tracking_secret");
   }
+  const normalizedVariant = variantLabel === null || variantLabel === undefined ? null : String(variantLabel).trim();
+  if (normalizedVariant !== null && (!normalizedVariant || normalizedVariant.length > 50)) {
+    throw new Error("invalid_variant_label");
+  }
+  const variantSuffix = normalizedVariant === null ? "" : `:${normalizedVariant}`;
   return createHmac("sha256", secret)
-    .update(`revant-guest-order:${idempotencyKey.toLowerCase()}:${quantity}`)
+    .update(`revant-guest-order:${idempotencyKey.toLowerCase()}:${quantity}${variantSuffix}`)
     .digest("hex");
 }
 

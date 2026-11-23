@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/server/auth/session";
 import { getActiveProducts } from "@/server/products/products";
 import { getProductById } from "@/server/products/products";
 import { getPublishedProductReviews } from "@/server/products/reviews";
-import AddToCartButton from "@/components/products/AddToCartButton";
+import ProductPurchaseOptions from "@/components/products/ProductPurchaseOptions";
 import ProductCard from "@/components/products/ProductCard";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductReviews from "@/components/products/ProductReviews";
@@ -32,7 +32,9 @@ export default async function ProductPage({ params }: Props) {
   const currentUser = await getCurrentUser();
   const reviewData = await getPublishedProductReviews(supabase, product.id, 0, 10);
   const isOwner = !!currentUser && !!shop && shop.owner_id === currentUser.id;
-  const outOfStock = product.stock_quantity <= 0;
+  const hasSizeVariants = product.product_type === "clothing" && Object.keys(product.size_stock).length > 0;
+  const availableSizeStock = Object.values(product.size_stock).reduce((sum, value) => sum + (Number.isFinite(value) ? Math.max(0, value) : 0), 0);
+  const outOfStock = product.stock_quantity <= 0 || (hasSizeVariants && availableSizeStock <= 0);
   const imageUrl = product.images[0] ?? null;
 
   const reportTargets = !isOwner && currentUser ? [
@@ -152,12 +154,11 @@ export default async function ProductPage({ params }: Props) {
               ) : outOfStock ? (
                 <p className="rounded-2xl bg-[var(--brand-bg)] p-4 text-sm leading-relaxed">Ce produit est actuellement épuisé. Consulte la boutique pour découvrir les autres articles.</p>
               ) : (
-                <div className="grid gap-3">
-                  <AddToCartButton item={{ id: product.id, name: product.name, price: product.base_price, currency: product.currency, image: imageUrl, shopId: product.shop_id, shopName: shop?.name ?? null }} />
-                  <Link href={`/commande/visiteur?productId=${encodeURIComponent(product.id)}`} className="block w-full rounded-full bg-brand-accent px-6 py-4 text-center text-sm font-extrabold text-white shadow-sm transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
-                    Commander sans créer de compte
-                  </Link>
-                </div>
+                <ProductPurchaseOptions
+                  item={{ id: product.id, name: product.name, price: product.base_price, currency: product.currency, image: imageUrl, shopId: product.shop_id, shopName: shop?.name ?? null }}
+                  sizeStock={hasSizeVariants ? product.size_stock : {}}
+                  stockQuantity={product.stock_quantity}
+                />
               )}
 
               {!isOwner && shop && (
