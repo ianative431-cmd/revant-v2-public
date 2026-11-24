@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Shirt, FlaskConical, ShoppingBag, Smartphone, Store, Leaf, Utensils } from "lucide-react";
 
 const shortcuts = [
@@ -14,15 +13,6 @@ const shortcuts = [
 export default function RevantMegaShortcuts() {
   return (
     <section aria-label="Explorer Revant Mega" className="revant-home-section revant-shortcuts">
-      <div className="revant-home-section__head mb-3 px-1 sm:mb-4">
-        <div>
-          <p className="revant-home-section__eyebrow">Accès rapide</p>
-          <h2 className="revant-home-section__title">Explorer les univers</h2>
-        </div>
-        <Link href="/boutiques" className="revant-home-section__link shrink-0 px-2 py-2">
-          Tout explorer <span aria-hidden="true">→</span>
-        </Link>
-      </div>
       <nav aria-label="Raccourcis des univers Revant" className="relative">
         <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {shortcuts.map(({ label, href, icon: Icon }) => (
