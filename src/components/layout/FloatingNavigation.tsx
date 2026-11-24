@@ -89,10 +89,11 @@ export default function FloatingNavigation({
               action="/#produits"
               method="get"
               role="search"
+              style={{ top: "calc(env(safe-area-inset-top, 0px) + 18px)" }}
               onKeyDown={(event) => {
                 if (event.key === "Escape") setSearchOpen(false);
               }}
-              className="pointer-events-auto absolute left-16 right-3 top-0 mx-auto flex h-11 w-auto max-w-[560px] items-center gap-2 rounded-full border border-brand-accent/50 bg-brand-surface/95 px-3 text-brand-text shadow-xl backdrop-blur-xl focus-within:border-brand-accent focus-within:ring-2 focus-within:ring-brand-accent/20"
+              className="pointer-events-auto absolute left-16 right-3 mx-auto flex h-11 w-auto max-w-[560px] items-center gap-2 rounded-full border border-brand-accent/50 bg-brand-surface/95 px-3 text-brand-text shadow-xl backdrop-blur-xl focus-within:border-brand-accent focus-within:ring-2 focus-within:ring-brand-accent/20"
             >
               <button
                 type="submit"
