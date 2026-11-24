@@ -44,7 +44,7 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
 
   return (
     <section
-      className="relative mx-3 mt-1 min-h-[270px] overflow-hidden rounded-2xl bg-[#142B45] text-white sm:min-h-[360px]"
+      className="relative mx-3 mt-[calc(env(safe-area-inset-top,0px)+4rem)] min-h-[270px] overflow-hidden rounded-2xl bg-[#142B45] text-white sm:mt-1 sm:min-h-[360px]"
       role="region"
       aria-roledescription="carrousel"
       aria-label="À la une"
@@ -74,9 +74,9 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
           aria-live="off"
           className="revant-hero-copy max-w-lg"
         >
-          <p className="mb-2 text-[9px] font-semibold tracking-[0.2em] text-white/75 sm:mb-3 sm:text-[11px]">{activeSlide.eyebrow}</p>
-          <h1 className="mb-3 text-2xl font-black leading-[1.04] tracking-tight sm:mb-4 sm:text-5xl">{activeSlide.title}</h1>
-          <p className="mb-4 max-w-sm text-xs leading-relaxed text-white/85 sm:mb-6 sm:text-sm">{activeSlide.description}</p>
+          <p className="mb-2 text-[clamp(9px,2.5vw,11px)] font-semibold leading-[1.5] tracking-[0.14em] text-white/75 sm:mb-3 sm:text-[11px]">{activeSlide.eyebrow}</p>
+          <h1 className="mb-3 text-[clamp(21px,5.8vw,30px)] font-black leading-[1.08] tracking-tight sm:mb-4 sm:text-5xl">{activeSlide.title}</h1>
+          <p className="mb-4 max-w-sm text-[clamp(12px,3vw,14px)] leading-[1.55] text-white/85 sm:mb-6 sm:text-sm">{activeSlide.description}</p>
           <Link href={activeSlide.ctaHref} className="inline-flex items-center gap-3 rounded-md bg-[var(--brand-accent)] px-4 py-2.5 text-[11px] font-bold text-white transition hover:bg-[var(--brand-accent-hover)] sm:px-5 sm:py-3 sm:text-xs">
             {activeSlide.ctaLabel} <span aria-hidden="true">→</span>
           </Link>
