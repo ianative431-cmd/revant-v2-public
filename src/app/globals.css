@@ -13,6 +13,7 @@
   --brand-accent: #F46A18;
   --brand-accent-hover: #D95812;
   --brand-accent-soft: #FFF0E6;
+  --brand-shortcut-outline: #111111;
   --brand-accent-contrast: #FFFFFF;
   --brand-text: #20252B;
   --brand-on-surface: #20252B;
@@ -33,6 +34,7 @@
   --brand-accent: #FF914D;
   --brand-accent-hover: #FFAA70;
   --brand-accent-soft: #2A1B14;
+  --brand-shortcut-outline: #FFFFFF;
   --brand-accent-contrast: #202832;
   --brand-text: #F4F1EB;
   --brand-on-surface: #F4F1EB;
@@ -54,6 +56,7 @@
   --brand-accent: #FF914D;
   --brand-accent-hover: #FFAA70;
   --brand-accent-soft: #2A1B14;
+  --brand-shortcut-outline: #FFFFFF;
   --brand-accent-contrast: #202832;
   --brand-text: #F4F1EB;
   --brand-on-surface: #F4F1EB;
@@ -308,7 +311,7 @@ a[class*="bg-[#F46A18]"], button[class*="bg-[#F46A18]"] {
   .revant-shortcut { transition: transform 240ms var(--revant-motion-ease); }
   .revant-shortcut:hover { transform: translateY(-4px); }
   .revant-shortcut-icon { transition: transform 260ms var(--revant-motion-ease), box-shadow 260ms ease, background-color 220ms ease; }
-  .revant-shortcut:hover .revant-shortcut-icon { transform: translateY(-2px) scale(1.055); box-shadow: var(--brand-shadow); }
+  .revant-shortcut:hover .revant-shortcut-icon { transform: translateY(-2px) scale(1.055); box-shadow: none; }
   .revant-shortcut:active .revant-shortcut-icon { transform: scale(.92); }
   .revant-product-card { transition: transform 260ms var(--revant-motion-ease), box-shadow 260ms ease, border-color 220ms ease; }
   .revant-product-card:hover { transform: translateY(-4px); box-shadow: var(--brand-shadow); border-color: color-mix(in srgb, var(--brand-accent) 48%, var(--brand-border)); }
