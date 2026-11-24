@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutGrid, MessageCircle, ShoppingCart, Settings, Wallet } from "lucide-react";
+import { Home, MessageCircle, ShoppingCart, Settings, Wallet } from "lucide-react";
 
 type NavIcon = React.ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>;
 
@@ -28,12 +28,11 @@ export default function BottomNavClient({ showWallet }: { showWallet: boolean })
       aria-label="Navigation principale"
       className="revant-bottom-nav fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+10px)] z-50 mx-auto flex min-h-[62px] w-[calc(100%-32px)] max-w-[560px] items-center justify-around gap-0.5 rounded-full border border-[var(--brand-border)] bg-[var(--brand-nav)] px-2 py-1.5 shadow-[0_8px_24px_rgba(0,0,0,.16)] backdrop-blur-xl"
     >
-      <Item href="/" label="Accueil" active={pathname === "/"} icon={Home}/>
-      <Item href="/categories" label="Catégorie" active={pathname === "/categories"} icon={LayoutGrid}/>
-      <Item href="/messages" label="Message" active={pathname === "/messages" || pathname.startsWith("/messages/")} icon={MessageCircle}/>
-      <Item href="/panier" label="Panier" active={pathname === "/panier"} icon={ShoppingCart}/>
-      {showWallet && <Item href="/wallet" label="Wallet" active={pathname === "/wallet" || pathname.startsWith("/wallet/")} icon={Wallet}/>}
-      <Item href="/parametres" label="Paramètres" active={pathname === "/parametres" || pathname.startsWith("/parametres/")} icon={Settings}/>
+      <Item href="/" label="Accueil" active={pathname === "/"} icon={Home} />
+      <Item href="/messages" label="Message" active={pathname === "/messages" || pathname.startsWith("/messages/")} icon={MessageCircle} />
+      <Item href="/panier" label="Panier" active={pathname === "/panier"} icon={ShoppingCart} />
+      {showWallet && <Item href="/wallet" label="Wallet" active={pathname === "/wallet" || pathname.startsWith("/wallet/")} icon={Wallet} />}
+      <Item href="/parametres" label="Paramètres" active={pathname === "/parametres" || pathname.startsWith("/parametres/")} icon={Settings} />
     </nav>
   );
 }
