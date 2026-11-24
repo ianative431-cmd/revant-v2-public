@@ -36,7 +36,10 @@ export default function FloatingNavigation({
       aria-label="Commandes flottantes Revant"
     >
       {isHomePage && (
-        <details className="pointer-events-auto absolute left-3 top-0 group">
+        <details
+          className="pointer-events-auto absolute left-3 group"
+          style={{ top: "calc(env(safe-area-inset-top, 0px) + 10px)" }}
+        >
           <summary
             aria-label="Ouvrir le menu principal"
             onClick={() => setSearchOpen(false)}
@@ -73,7 +76,8 @@ export default function FloatingNavigation({
               aria-expanded={false}
               aria-controls="revant-global-search"
               onClick={() => setSearchOpen(true)}
-              className="pointer-events-auto absolute right-3 top-0 flex h-11 w-11 items-center justify-center rounded-full border border-brand-border bg-brand-surface/95 text-brand-text shadow-lg backdrop-blur-xl transition hover:border-brand-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent"
+              style={{ top: "calc(env(safe-area-inset-top, 0px) + 10px)" }}
+              className="pointer-events-auto absolute right-3 flex h-11 w-11 items-center justify-center rounded-full border border-brand-border bg-brand-surface/95 text-brand-text shadow-lg backdrop-blur-xl transition hover:border-brand-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent"
             >
               <Search {...iconProps} size={21} />
             </button>
