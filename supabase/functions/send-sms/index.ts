@@ -190,7 +190,12 @@ Deno.serve(async (request: Request): Promise<Response> => {
 
   const phone = event.user?.phone;
   const otp = event.sms?.otp;
-  if (!isValidE164(phone) || !isValidOtp(otp)) {
+  if (
+    typeof phone !== "string" ||
+    typeof otp !== "string" ||
+    !isValidE164(phone) ||
+    !isValidOtp(otp)
+  ) {
     return jsonError(400, "invalid_otp_request");
   }
 
