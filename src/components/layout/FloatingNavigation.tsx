@@ -31,7 +31,7 @@ export default function FloatingNavigation({
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+12px)] z-[70] h-11 px-3"
+      className="pointer-events-none relative z-[70] h-11 w-full px-3"
       aria-label="Commandes flottantes Revant"
     >
       {isHomePage && (
