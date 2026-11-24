@@ -23,43 +23,15 @@ export default function FloatingNavigation({
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const [searchOpen, setSearchOpen] = useState(false);
-  const [controlsVisible, setControlsVisible] = useState(true);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const lastScrollY = useRef(0);
 
   useEffect(() => {
     if (searchOpen) searchInputRef.current?.focus();
   }, [searchOpen]);
 
-  useEffect(() => {
-    lastScrollY.current = window.scrollY;
-
-    const handleScroll = () => {
-      const currentY = Math.max(0, window.scrollY);
-      const delta = currentY - lastScrollY.current;
-
-      if (currentY <= 8) {
-        setControlsVisible(true);
-      } else if (!searchOpen && delta > 5) {
-        setControlsVisible(false);
-      } else if (delta < -5) {
-        setControlsVisible(true);
-      }
-
-      lastScrollY.current = currentY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [searchOpen]);
-
-  const visibilityClass = controlsVisible || searchOpen
-    ? "translate-y-0 opacity-100 visible"
-    : "-translate-y-16 opacity-0 invisible";
-
   return (
     <div
-      className={`pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+12px)] z-[70] h-11 px-3 transition-all duration-200 ease-out ${visibilityClass} md:!translate-y-0 md:!opacity-100 md:!visible`}
+      className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+12px)] z-[70] h-11 px-3"
       aria-label="Commandes flottantes Revant"
     >
       {isHomePage && (
@@ -99,10 +71,7 @@ export default function FloatingNavigation({
               aria-label="Afficher la recherche"
               aria-expanded={false}
               aria-controls="revant-global-search"
-              onClick={() => {
-                setControlsVisible(true);
-                setSearchOpen(true);
-              }}
+              onClick={() => setSearchOpen(true)}
               className="pointer-events-auto absolute right-3 top-0 flex h-11 w-11 items-center justify-center rounded-full border border-brand-border bg-brand-surface/95 text-brand-text shadow-lg backdrop-blur-xl transition hover:border-brand-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent"
             >
               <Search {...iconProps} size={21} />
