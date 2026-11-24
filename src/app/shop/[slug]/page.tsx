@@ -107,7 +107,7 @@ export default async function ShopPublicPage({ params }: Props) {
     <div className="min-h-screen bg-[var(--brand-bg)] pb-24 text-[var(--brand-text)]">
       <SiteHeader />
       <main
-        className="revant-storefront pb-10 pt-3 sm:pt-5"
+        className="revant-storefront mx-auto w-full max-w-7xl px-4 pb-10 pt-3 sm:px-6 sm:pt-5 lg:px-8"
         style={savedPalette || customShopColor ? ({
           "--brand-accent": shopAccent,
           "--brand-accent-hover": shopAccentHover,
@@ -126,7 +126,7 @@ export default async function ShopPublicPage({ params }: Props) {
           <div
             role={bannerUrl ? "img" : undefined}
             aria-label={bannerUrl ? `Bannière de ${shop.name}` : undefined}
-            className="revant-storefront__banner relative overflow-hidden bg-cover bg-center"
+            className="revant-storefront__banner relative h-40 overflow-hidden bg-cover bg-center sm:h-56 lg:h-64"
             style={{
               backgroundColor: shopColor,
               backgroundImage: bannerUrl
@@ -151,7 +151,7 @@ export default async function ShopPublicPage({ params }: Props) {
             </div>
           </div>
 
-          <div className="revant-storefront__identity relative">
+          <div className="revant-storefront__identity relative pt-14 sm:pt-20">
             <div
               role={logoUrl ? "img" : undefined}
               aria-label={logoUrl ? `Logo de ${shop.name}` : undefined}
