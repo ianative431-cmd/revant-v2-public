@@ -44,7 +44,7 @@ function verifyHook(payload, headers, secrets) {
 
 function getMetaApiVersion() {
   const version = requiredEnv("META_GRAPH_API_VERSION");
-  if (!/^v\\d+\\.\\d+$/.test(version)) throw new Error("invalid_api_version");
+  if (!/^v\d+\.\d+$/.test(version)) throw new Error("invalid_api_version");
   return version;
 }
 
@@ -107,7 +107,7 @@ async function loadWhatsAppCredentials() {
 }
 
 async function sendAuthenticationCode({ phone, otp }) {
-  const phoneNumberIdTemplate = await loadWhatsAppCredentials();
+  const credentials = await loadWhatsAppCredentials();
   const templateName = requiredEnv("META_WHATSAPP_OTP_TEMPLATE");
   const languageCode = requiredEnv("META_WHATSAPP_OTP_LANGUAGE");
   const apiVersion = getMetaApiVersion();
@@ -120,11 +120,11 @@ async function sendAuthenticationCode({ phone, otp }) {
   });
 
   const response = await fetch(
-    `https://graph.facebook.com/${apiVersion}/${phoneNumberIdTemplate.phoneNumberId}/messages`,
+    `https://graph.facebook.com/${apiVersion}/${credentials.phoneNumberId}/messages`,
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${phoneNumberIdTemplate.accessToken}`,
+        Authorization: `Bearer ${credentials.accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
