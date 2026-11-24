@@ -10,31 +10,40 @@ const MAX_BODY_BYTES = 20 * 1024;
 const DATABASE_TIMEOUT_MS = 700;
 const META_TIMEOUT_MS = 2500;
 
-function jsonError(status, code) {
+type SendSmsEvent = {
+  user?: { phone?: unknown };
+  sms?: { otp?: unknown };
+};
+
+function jsonError(status: number, code: string): Response {
   return new Response(JSON.stringify({ error: code }), {
     status,
     headers: JSON_HEADERS,
   });
 }
 
-function requiredEnv(name) {
+function requiredEnv(name: string): string {
   const value = Deno.env.get(name)?.trim();
   if (!value) throw new Error("missing_configuration");
   return value;
 }
 
-function getHookSecrets() {
+function getHookSecrets(): string[] {
   const raw = requiredEnv("SEND_SMS_HOOK_SECRET");
-  return raw.split("|").map((entry) => entry.trim()).filter(Boolean).map((entry) => {
+  return raw.split("|").map((entry: string) => entry.trim()).filter(Boolean).map((entry: string) => {
     if (!entry.startsWith("v1,whsec_")) throw new Error("invalid_hook_secret");
     return entry.slice("v1,whsec_".length);
   });
 }
 
-function verifyHook(payload, headers, secrets) {
+function verifyHook(
+  payload: string,
+  headers: Record<string, string>,
+  secrets: string[],
+): SendSmsEvent {
   for (const secret of secrets) {
     try {
-      return new Webhook(secret).verify(payload, headers);
+      return new Webhook(secret).verify(payload, headers) as SendSmsEvent;
     } catch {
       // Try the next configured secret during an intentional key rotation.
     }
@@ -42,13 +51,13 @@ function verifyHook(payload, headers, secrets) {
   throw new Error("invalid_signature");
 }
 
-function getMetaApiVersion() {
+function getMetaApiVersion(): string {
   const version = requiredEnv("META_GRAPH_API_VERSION");
   if (!/^v\d+\.\d+$/.test(version)) throw new Error("invalid_api_version");
   return version;
 }
 
-function getSupabaseSecretKey() {
+function getSupabaseSecretKey(): { key: string; legacyJwt: boolean } {
   const namedKeys = Deno.env.get("SUPABASE_SECRET_KEYS");
   if (namedKeys) {
     const parsed = JSON.parse(namedKeys);
@@ -62,7 +71,10 @@ function getSupabaseSecretKey() {
   throw new Error("missing_supabase_secret_key");
 }
 
-async function readSupabaseSingleton(table, select) {
+async function readSupabaseSingleton(
+  table: string,
+  select: string,
+): Promise<Record<string, unknown>> {
   const supabaseUrl = requiredEnv("SUPABASE_URL");
   const { key, legacyJwt } = getSupabaseSecretKey();
   const url = new URL(`${supabaseUrl}/rest/v1/${table}`);
@@ -70,7 +82,7 @@ async function readSupabaseSingleton(table, select) {
   url.searchParams.set("id", "eq.1");
   url.searchParams.set("limit", "1");
 
-  const headers = {
+  const headers: Record<string, string> = {
     apikey: key,
     Accept: "application/json",
   };
@@ -84,19 +96,28 @@ async function readSupabaseSingleton(table, select) {
     signal: AbortSignal.timeout(DATABASE_TIMEOUT_MS),
   });
   if (!response.ok) throw new Error("supabase_lookup_failed");
-  const rows = await response.json();
-  if (!Array.isArray(rows) || rows.length !== 1) throw new Error("whatsapp_not_configured");
-  return rows[0];
+  const rows: unknown = await response.json();
+  if (!Array.isArray(rows) || rows.length !== 1 ||
+      typeof rows[0] !== "object" || rows[0] === null) {
+    throw new Error("whatsapp_not_configured");
+  }
+  return rows[0] as Record<string, unknown>;
 }
 
-async function loadWhatsAppCredentials() {
+async function loadWhatsAppCredentials(): Promise<{
+  phoneNumberId: string;
+  accessToken: string;
+}> {
   const [connection, secret] = await Promise.all([
     readSupabaseSingleton("whatsapp_connection", "phone_number_id,status"),
     readSupabaseSingleton("whatsapp_secret", "access_token"),
   ]);
 
-  if (connection?.status !== "connected" ||
-      !connection?.phone_number_id || !secret?.access_token) {
+  if (connection.status !== "connected" ||
+      typeof connection.phone_number_id !== "string" ||
+      !connection.phone_number_id ||
+      typeof secret.access_token !== "string" ||
+      !secret.access_token) {
     throw new Error("whatsapp_not_configured");
   }
 
@@ -106,7 +127,13 @@ async function loadWhatsAppCredentials() {
   };
 }
 
-async function sendAuthenticationCode({ phone, otp }) {
+async function sendAuthenticationCode({
+  phone,
+  otp,
+}: {
+  phone: string;
+  otp: string;
+}): Promise<void> {
   const credentials = await loadWhatsAppCredentials();
   const templateName = requiredEnv("META_WHATSAPP_OTP_TEMPLATE");
   const languageCode = requiredEnv("META_WHATSAPP_OTP_LANGUAGE");
@@ -139,7 +166,7 @@ async function sendAuthenticationCode({ phone, otp }) {
   }
 }
 
-Deno.serve(async (request) => {
+Deno.serve(async (request: Request): Promise<Response> => {
   if (request.method !== "POST") return jsonError(405, "method_not_allowed");
 
   const declaredLength = Number(request.headers.get("content-length") ?? "0");
@@ -150,7 +177,7 @@ Deno.serve(async (request) => {
     return jsonError(413, "payload_too_large");
   }
 
-  let event;
+  let event: SendSmsEvent;
   try {
     const secrets = getHookSecrets();
     event = verifyHook(payload, Object.fromEntries(request.headers), secrets);
@@ -158,8 +185,8 @@ Deno.serve(async (request) => {
     return jsonError(401, "invalid_hook_signature");
   }
 
-  const phone = event?.user?.phone;
-  const otp = event?.sms?.otp;
+  const phone = event.user?.phone;
+  const otp = event.sms?.otp;
   if (!isValidE164(phone) || !isValidOtp(otp)) {
     return jsonError(400, "invalid_otp_request");
   }
