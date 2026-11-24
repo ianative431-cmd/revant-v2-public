@@ -38,7 +38,7 @@ export default function FloatingNavigation({
       {isHomePage && (
         <details
           className="pointer-events-auto absolute left-3 group"
-          style={{ top: "calc(env(safe-area-inset-top, 0px) + 14px)" }}
+          style={{ top: "calc(env(safe-area-inset-top, 0px) + 18px)" }}
         >
           <summary
             aria-label="Ouvrir le menu principal"
@@ -76,7 +76,7 @@ export default function FloatingNavigation({
               aria-expanded={false}
               aria-controls="revant-global-search"
               onClick={() => setSearchOpen(true)}
-              style={{ top: "calc(env(safe-area-inset-top, 0px) + 14px)" }}
+              style={{ top: "calc(env(safe-area-inset-top, 0px) + 18px)" }}
               className="pointer-events-auto absolute right-3 flex h-11 w-11 items-center justify-center rounded-full border border-brand-border bg-brand-surface/95 text-brand-text shadow-lg backdrop-blur-xl transition hover:border-brand-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-accent"
             >
               <Search {...iconProps} size={21} />
