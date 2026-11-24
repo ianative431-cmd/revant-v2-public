@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Shirt, FlaskConical, ShoppingBag, Smartphone, Store, Leaf, Utensils } from "lucide-react";
 
 const shortcuts = [
