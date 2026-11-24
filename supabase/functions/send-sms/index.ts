@@ -30,10 +30,13 @@ function requiredEnv(name: string): string {
 
 function getHookSecrets(): string[] {
   const raw = requiredEnv("SEND_SMS_HOOK_SECRET");
-  return raw.split("|").map((entry: string) => entry.trim()).filter(Boolean).map((entry: string) => {
-    if (!entry.startsWith("v1,whsec_")) throw new Error("invalid_hook_secret");
-    return entry.slice("v1,whsec_".length);
-  });
+  return raw.split("|")
+    .map((entry: string) => entry.trim())
+    .filter(Boolean)
+    .map((entry: string) => {
+      if (!entry.startsWith("v1,whsec_")) throw new Error("invalid_hook_secret");
+      return entry.slice("v1,whsec_".length);
+    });
 }
 
 function verifyHook(
