@@ -164,19 +164,7 @@ export default async function Home({ searchParams }: Props) {
 
       <RevantMegaShortcuts />
 
-      <section id="a-propos" className="grid grid-cols-2 gap-px border-b border-brand-border bg-brand-surface px-3 sm:grid-cols-4">
-        {[
-          ["↗", "LIVRAISON", "Options selon la boutique"],
-          ["◇", "ACHAT SIMPLE", "Sans compte obligatoire"],
-          ["□", "BOUTIQUES LOCALES", "Des vendeurs à découvrir"],
-          ["○", "AIDE EN FRANÇAIS", "Un parcours clair"],
-        ].map(([icon, title, detail]) => (
-          <div key={title} className="flex min-h-[76px] items-center gap-3 bg-brand-bg px-3 py-4 sm:px-5">
-            <span className="text-2xl font-light" aria-hidden="true">{icon}</span>
-            <span><strong className="block text-[10px] font-extrabold tracking-wide">{title}</strong><span className="mt-1 block text-[10px] text-brand-muted">{detail}</span></span>
-          </div>
-        ))}
-      </section>
+      
 
       <section id="categories" className="px-4 pt-7">
         <div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-extrabold">{term ? "Catégories correspondantes" : "Catégories"}</h2><Link href="/categories" className="text-xs font-medium">Voir tout →</Link></div>
