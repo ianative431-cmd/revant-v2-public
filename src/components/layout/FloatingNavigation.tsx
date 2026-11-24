@@ -8,6 +8,7 @@ import PhotoActionMenu from "./PhotoActionMenu";
 const iconProps = { size: 20, strokeWidth: 1.8, "aria-hidden": true as const };
 const quickLinks = [
   { href: "/parametres", label: "Paramètres" },
+  { href: "/compte/commandes", label: "Livraison" },
   { href: "/compte/commandes", label: "Mes commandes" },
   { href: "/boutiques/creer", label: "Vendre sur Revant" },
   { href: "/legal", label: "Centre juridique" },
