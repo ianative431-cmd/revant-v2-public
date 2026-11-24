@@ -32,8 +32,27 @@ export default function RevantMegaShortcuts() {
               aria-label={`Explorer : ${label}`}
               className="revant-shortcut group flex min-h-[82px] w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-2 bg-transparent px-1 py-1 text-center transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] active:scale-[0.98] sm:w-[84px] sm:min-h-[94px]"
             >
-              <span className="revant-shortcut-icon relative isolate flex h-14 w-14 items-center justify-center rounded-full border-[4px] border-[var(--brand-shortcut-outline)] bg-transparent text-[var(--brand-shortcut-outline)] shadow-none ring-0 transition duration-200 sm:h-[60px] sm:w-[60px]">
-                <Icon size={25} strokeWidth={1.7} aria-hidden />
+              <span
+                className="revant-shortcut-icon relative isolate flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-4 bg-transparent shadow-none ring-0 transition duration-200 sm:h-[60px] sm:w-[60px]"
+                style={{
+                  borderRadius: "50%",
+                  borderWidth: 4,
+                  borderStyle: "solid",
+                  borderColor: "var(--brand-shortcut-outline)",
+                  color: "var(--brand-shortcut-outline)",
+                }}
+              >
+                <Icon
+                  className="revant-shortcut-glyph"
+                  size={25}
+                  strokeWidth={1.7}
+                  aria-hidden
+                  style={{
+                    color: "var(--brand-shortcut-outline)",
+                    stroke: "currentColor",
+                    fill: "none",
+                  }}
+                />
               </span>
               <span className="text-[10px] font-semibold leading-tight text-[var(--brand-text)] sm:text-[11px]">{label}</span>
             </Link>
