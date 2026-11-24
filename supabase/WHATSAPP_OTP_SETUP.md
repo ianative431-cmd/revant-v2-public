@@ -25,7 +25,8 @@ Ne jamais placer ces valeurs dans le dépôt ou le client :
 - `META_GRAPH_API_VERSION` : version Graph API encore prise en charge et validée pour le compte Meta.
 - `META_WHATSAPP_OTP_TEMPLATE` : nom exact du modèle AUTHENTICATION approuvé.
 - `META_WHATSAPP_OTP_LANGUAGE` : code exact de langue approuvé pour ce modèle (par ex. `fr` ou `fr_FR`, à confirmer dans Meta).
-- `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` : paramètres serveur du projet ; la fonction les utilise pour lire `whatsapp_connection` et `whatsapp_secret`.
+
+La fonction utilise `SUPABASE_URL` et les clés serveur déjà injectées par Supabase. Elle privilégie `SUPABASE_SECRET_KEYS` (clé nommée `default`) et accepte l'ancienne variable `SUPABASE_SERVICE_ROLE_KEY` en compatibilité. La nouvelle clé secrète Supabase est envoyée uniquement dans l'en-tête `apikey`, jamais comme Bearer token.
 
 Le jeton Meta et le `phone_number_id` ne sont pas dupliqués dans les secrets Edge : ils sont lus côté serveur depuis les tables de connexion Meta déjà utilisées par l'administration Revant. La ligne `whatsapp_connection` doit avoir `id = 1`, `status = connected` et un `phone_number_id`; `whatsapp_secret` doit contenir le jeton d'accès.
 

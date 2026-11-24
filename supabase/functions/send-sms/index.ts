@@ -1,5 +1,4 @@
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
-import { createClient } from "npm:@supabase/supabase-js@2.117.1";
 import {
   buildAuthenticationTemplatePayload,
   isValidE164,
@@ -8,7 +7,8 @@ import {
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 const MAX_BODY_BYTES = 20 * 1024;
-const META_TIMEOUT_MS = 3500;
+const DATABASE_TIMEOUT_MS = 700;
+const META_TIMEOUT_MS = 2500;
 
 function jsonError(status, code) {
   return new Response(JSON.stringify({ error: code }), {
@@ -48,26 +48,54 @@ function getMetaApiVersion() {
   return version;
 }
 
+function getSupabaseSecretKey() {
+  const namedKeys = Deno.env.get("SUPABASE_SECRET_KEYS");
+  if (namedKeys) {
+    const parsed = JSON.parse(namedKeys);
+    const key = parsed?.default;
+    if (typeof key !== "string" || !key) throw new Error("missing_supabase_secret_key");
+    return { key, legacyJwt: false };
+  }
+
+  const legacyKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")?.trim();
+  if (legacyKey) return { key: legacyKey, legacyJwt: true };
+  throw new Error("missing_supabase_secret_key");
+}
+
+async function readSupabaseSingleton(table, select) {
+  const supabaseUrl = requiredEnv("SUPABASE_URL");
+  const { key, legacyJwt } = getSupabaseSecretKey();
+  const url = new URL(`${supabaseUrl}/rest/v1/${table}`);
+  url.searchParams.set("select", select);
+  url.searchParams.set("id", "eq.1");
+  url.searchParams.set("limit", "1");
+
+  const headers = {
+    apikey: key,
+    Accept: "application/json",
+  };
+  // Legacy service_role keys are JWTs. New sb_secret keys must be sent
+  // only as apikey; putting them in Authorization makes the gateway reject them.
+  if (legacyJwt) headers.Authorization = `Bearer ${key}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers,
+    signal: AbortSignal.timeout(DATABASE_TIMEOUT_MS),
+  });
+  if (!response.ok) throw new Error("supabase_lookup_failed");
+  const rows = await response.json();
+  if (!Array.isArray(rows) || rows.length !== 1) throw new Error("whatsapp_not_configured");
+  return rows[0];
+}
+
 async function loadWhatsAppCredentials() {
-  const supabase = createClient(
-    requiredEnv("SUPABASE_URL"),
-    requiredEnv("SUPABASE_SERVICE_ROLE_KEY"),
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
+  const [connection, secret] = await Promise.all([
+    readSupabaseSingleton("whatsapp_connection", "phone_number_id,status"),
+    readSupabaseSingleton("whatsapp_secret", "access_token"),
+  ]);
 
-  const [{ data: connection, error: connectionError }, { data: secret, error: secretError }] =
-    await Promise.all([
-      supabase.from("whatsapp_connection")
-        .select("phone_number_id,status")
-        .eq("id", 1)
-        .maybeSingle(),
-      supabase.from("whatsapp_secret")
-        .select("access_token")
-        .eq("id", 1)
-        .maybeSingle(),
-    ]);
-
-  if (connectionError || secretError || connection?.status !== "connected" ||
+  if (connection?.status !== "connected" ||
       !connection?.phone_number_id || !secret?.access_token) {
     throw new Error("whatsapp_not_configured");
   }
@@ -79,13 +107,10 @@ async function loadWhatsAppCredentials() {
 }
 
 async function sendAuthenticationCode({ phone, otp }) {
-  const [{ phoneNumberId, accessToken }, templateName, languageCode, apiVersion] =
-    await Promise.all([
-      loadWhatsAppCredentials(),
-      Promise.resolve(requiredEnv("META_WHATSAPP_OTP_TEMPLATE")),
-      Promise.resolve(requiredEnv("META_WHATSAPP_OTP_LANGUAGE")),
-      Promise.resolve(getMetaApiVersion()),
-    ]);
+  const phoneNumberIdTemplate = await loadWhatsAppCredentials();
+  const templateName = requiredEnv("META_WHATSAPP_OTP_TEMPLATE");
+  const languageCode = requiredEnv("META_WHATSAPP_OTP_LANGUAGE");
+  const apiVersion = getMetaApiVersion();
 
   const payload = buildAuthenticationTemplatePayload({
     phone,
@@ -95,11 +120,11 @@ async function sendAuthenticationCode({ phone, otp }) {
   });
 
   const response = await fetch(
-    `https://graph.facebook.com/${apiVersion}/${phoneNumberId}/messages`,
+    `https://graph.facebook.com/${apiVersion}/${phoneNumberIdTemplate.phoneNumberId}/messages`,
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${phoneNumberIdTemplate.accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
