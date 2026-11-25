@@ -2,12 +2,16 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAllProductsForAdmin } from "@/server/admin/products-admin";
 import DeleteProductButton from "./DeleteProductButton";
+import ProductModerationControls from "./ProductModerationControls";
 import { hasPermission, requirePermission } from "@/server/auth/roles";
 
 export default async function AdminProduitsPage() {
   await requirePermission("products.view");
   const supabase = await createSupabaseServerClient();
-  const [products, canManageProducts] = await Promise.all([getAllProductsForAdmin(supabase), hasPermission("products.manage")]);
+  const [products, canManageProducts] = await Promise.all([
+    getAllProductsForAdmin(supabase),
+    hasPermission("products.manage"),
+  ]);
 
   return (
     <div>
@@ -33,11 +37,16 @@ export default async function AdminProduitsPage() {
                   {p.base_price.toLocaleString("fr-FR")} {p.currency} · {p.status}
                 </p>
               </div>
-              <div className="shrink-0 flex items-center gap-2">
+              <div className="shrink-0 flex flex-col items-end gap-2">
                 <Link href={`/produit/${p.id}`} className="text-xs underline text-black/50">
                   Voir
                 </Link>
-                {canManageProducts && <DeleteProductButton productId={p.id} imageUrls={p.images} />}
+                {canManageProducts && (
+                  <>
+                    <ProductModerationControls productId={p.id} status={p.status} />
+                    <DeleteProductButton productId={p.id} imageUrls={p.images} />
+                  </>
+                )}
               </div>
             </div>
           ))}

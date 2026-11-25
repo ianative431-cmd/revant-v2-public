@@ -45,13 +45,6 @@ export default function CreateShopForm() {
         placeholder="Nom de la boutique"
         className="w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] px-4 py-3 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-muted)] focus:border-[var(--brand-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/15"
       />
-      <input
-        name="slogan"
-        type="text"
-        maxLength={120}
-        placeholder="Slogan (facultatif)"
-        className="border rounded-xl px-4 py-3 text-sm"
-      />
       <textarea
         name="description"
         maxLength={1000}
