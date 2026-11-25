@@ -107,12 +107,15 @@ export default async function CategoriesPage() {
                       <div
                         role="img"
                         aria-label={`Illustration de la catégorie ${item.name}`}
-                        className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105"
-                        style={{
-                          backgroundImage: `url("${photo}"), linear-gradient(135deg, var(--brand-accent), var(--brand-surface-soft))`,
-                          backgroundColor: "var(--brand-surface)",
-                        }}
-                      />
+                        className={`absolute inset-0 transition duration-500 group-hover:scale-105 ${photo ? "bg-cover bg-center" : "bg-gradient-to-br from-[#142B45] via-[#3E3D38] to-[#803E2F]"}`}
+                        style={photo ? { backgroundImage: `url("${photo}")` } : undefined}
+                      >
+                        {!photo && (
+                          <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center pb-3 text-6xl font-black text-white/20">
+                            {item.name.slice(0, 1).toLocaleUpperCase("fr")}
+                          </span>
+                        )}
+                      </div>
                       <div
                         aria-hidden="true"
                         className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent"
