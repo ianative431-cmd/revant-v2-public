@@ -10,7 +10,7 @@ const fallbackPath = join(directory, "ProductImageFallback.tsx");
 const cardSource = readFileSync(cardPath, "utf8");
 
 test("product cards use a branded fallback instead of a generic missing-photo state", () => {
-  assert.match(cardSource, /<ProductImageFallback\s*\/>/);
+  assert.ok(cardSource.includes("<ProductImageFallback />"));
   assert.doesNotMatch(cardSource, /Photo indisponible/);
   assert.ok(existsSync(fallbackPath), "the branded fallback component must exist");
 });
