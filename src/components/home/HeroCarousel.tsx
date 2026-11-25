@@ -10,7 +10,7 @@ type HeroSlide = {
   description: string;
   ctaLabel: string;
   ctaHref: string;
-  image: string;
+  image?: string;
 };
 
 const AUTOPLAY_INTERVAL = 6500;
@@ -60,7 +60,7 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
           <div
             key={slide.id}
             className={`revant-hero-slide absolute inset-0 bg-cover bg-[center_35%] transition-[opacity,transform] duration-700 ease-in-out ${index === activeIndex ? "is-active opacity-80" : "opacity-0"} ${reducedMotion ? "duration-0" : ""}`}
-            style={{ backgroundImage: `url("${slide.image}")` }}
+            style={{ backgroundImage: slide.image ? `url("${slide.image}")` : "linear-gradient(135deg, #142B45, #803E2F 58%, #1F1D20)" }}
           />
         ))}
       </div>
