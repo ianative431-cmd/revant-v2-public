@@ -177,7 +177,7 @@ export default async function Home({ searchParams }: Props) {
         ) : shops.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {shops.slice(0, 4).map((shop) => {
-              const shopImage = safeShopBanner(shop.banner_url) ?? safeShopBanner(shop.background_image_url) ?? safeShopBanner(shop.logo_url);
+              const shopImage = safeShopBanner(shop.banner_url) ?? safeShopBanner(shop.background_image_url);
               return (
               <Link key={shop.id} href={`/shop/${shop.slug}`} className="relative aspect-[1.5] overflow-hidden rounded-lg bg-[var(--brand-accent)]">
                 <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand-accent)] via-[#803E2F] to-[#1F1D20]" />
