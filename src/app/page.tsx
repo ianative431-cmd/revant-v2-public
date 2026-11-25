@@ -199,29 +199,30 @@ export default async function Home({ searchParams }: Props) {
           </div>
         ) : shops.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {shops.slice(0, 4).map((shop) => (
-              <Link key={shop.id} href={`/shop/${shop.slug}`} className="relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200">
-                <div
-                  className="absolute inset-0 bg-cover bg-center bg-gradient-to-br from-[#142B45] via-[#3E3D38] to-[#803E2F]"
-                  style={{
-                    backgroundImage: (safeShopBanner(shop.banner_url) ?? safeShopBanner(shop.background_image_url) ?? safeShopBanner(shop.logo_url))
-                      ? `url("${safeShopBanner(shop.banner_url) ?? safeShopBanner(shop.background_image_url) ?? safeShopBanner(shop.logo_url)}")`
-                      : undefined,
-                  }}
-                />
-                <div aria-hidden="true" className="absolute inset-0 flex items-center justify-center text-6xl font-black text-white/20">
-                  {shop.name.slice(0, 1).toLocaleUpperCase("fr")}
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                {(certifiedShopIds.has(shop.id) || shop.is_premium) && (
-                  <div className="absolute right-2 top-2 flex flex-col items-end gap-1.5">
-                    {certifiedShopIds.has(shop.id) && <span className="rounded-full bg-violet-600 px-2.5 py-1 text-[9px] font-extrabold text-white">✓ BOUTIQUE VÉRIFIÉE</span>}
-                    {shop.is_premium && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[9px] font-extrabold text-amber-900">PREMIUM</span>}
-                  </div>
-                )}
-                <div className="absolute bottom-3 left-3 text-white"><strong className="block text-sm">{shop.name}</strong><span className="text-[11px]">{shop.city ?? "Niger"}</span></div>
-              </Link>
-            ))}
+            {shops.slice(0, 4).map((shop) => {
+              const shopImage = safeShopBanner(shop.banner_url) ?? safeShopBanner(shop.background_image_url) ?? safeShopBanner(shop.logo_url);
+              return (
+                <Link key={shop.id} href={`/shop/${shop.slug}`} className="relative aspect-[1.5] overflow-hidden rounded-lg bg-neutral-200">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center bg-gradient-to-br from-[#142B45] via-[#3E3D38] to-[#803E2F]"
+                    style={shopImage ? { backgroundImage: `url("${shopImage}")` } : undefined}
+                  />
+                  {!shopImage && (
+                    <div aria-hidden="true" className="absolute inset-0 flex items-center justify-center text-6xl font-black text-white/20">
+                      {shop.name.slice(0, 1).toLocaleUpperCase("fr")}
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                  {(certifiedShopIds.has(shop.id) || shop.is_premium) && (
+                    <div className="absolute right-2 top-2 flex flex-col items-end gap-1.5">
+                      {certifiedShopIds.has(shop.id) && <span className="rounded-full bg-violet-600 px-2.5 py-1 text-[9px] font-extrabold text-white">✓ BOUTIQUE VÉRIFIÉE</span>}
+                      {shop.is_premium && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[9px] font-extrabold text-amber-900">PREMIUM</span>}
+                    </div>
+                  )}
+                  <div className="absolute bottom-3 left-3 text-white"><strong className="block text-sm">{shop.name}</strong><span className="text-[11px]">{shop.city ?? "Niger"}</span></div>
+                </Link>
+              );
+            })}
           </div>
         ) : term ? (
           <p className="rounded-xl border border-dashed border-brand-border bg-brand-surface px-4 py-5 text-xs text-brand-muted">
