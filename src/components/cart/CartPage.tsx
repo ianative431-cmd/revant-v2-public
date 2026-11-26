@@ -179,7 +179,7 @@ export default function CartPage() {
                               <button type="button" aria-label={`Augmenter la quantité de ${item.name}`} onClick={() => updateQuantity(cartLineKey(item), quantity + 1)} disabled={quantity >= 99} className="h-8 w-8 rounded-full border border-[var(--brand-border)] disabled:opacity-40">+</button>
                               <button type="button" onClick={() => remove(cartLineKey(item))} className="ml-1 text-xs text-[var(--brand-muted)] underline">Retirer</button>
                             </div>
-                            {!shopScoped && (
+                            {!canBatchCheckout && (
                               <Link href={`/commande/visiteur?productId=${encodeURIComponent(item.id)}&quantity=${quantity}${item.variantLabel ? `&variantLabel=${encodeURIComponent(item.variantLabel)}` : ""}`} className="mt-3 inline-flex rounded-full border border-[var(--brand-border)] px-4 py-2.5 text-[10px] font-bold">
                                 Commander cet article
                               </Link>
@@ -196,7 +196,7 @@ export default function CartPage() {
                       </Link>
                     ) : shopScoped ? (
                       <p className="text-xs leading-relaxed text-[var(--brand-muted)]">
-                        {group.items.length > 20 ? "Cette boutique dépasse la limite de 20 lignes par demande. Retire quelques articles pour continuer." : "Les articles de cette boutique utilisent plusieurs devises. Ils doivent être commandés séparément."}
+                        {group.items.length > 20 ? "Cette boutique dépasse la limite de 20 lignes par demande. Tu peux commander chaque ligne séparément." : "Les articles de cette boutique utilisent plusieurs devises. Ils doivent être commandés séparément."}
                       </p>
                     ) : (
                       <p className="text-xs leading-relaxed text-[var(--brand-muted)]">Les anciennes lignes sans identifiant de boutique ne peuvent pas être regroupées automatiquement.</p>
