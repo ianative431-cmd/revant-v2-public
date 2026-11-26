@@ -1,17 +1,25 @@
 -- Integration checks run only against the disposable CI PostgreSQL service.
 BEGIN;
-INSERT INTO public.shops(id,owner_id,name,city,phone,status) VALUES
- ('10000000-0000-0000-0000-000000000001',NULL,'Boutique test','Niamey','+22790000001','active'),
- ('10000000-0000-0000-0000-000000000002',NULL,'Autre boutique','Niamey','+22790000002','active');
-INSERT INTO public.products(id,name,base_price,currency,stock_quantity,shop_id,status,product_type,size_stock) VALUES
- ('20000000-0000-0000-0000-000000000001','T-shirt test',5000,'XOF',20,'10000000-0000-0000-0000-000000000001','active','clothing','{"M":3,"L":2}'),
- ('20000000-0000-0000-0000-000000000002','Sac test',2500,'XOF',5,'10000000-0000-0000-0000-000000000001','active','other','{}'),
- ('20000000-0000-0000-0000-000000000003','Produit autre boutique',1000,'XOF',5,'10000000-0000-0000-0000-000000000002','active','other','{}'),
- ('20000000-0000-0000-0000-000000000004','T-shirt stock agrégé',1000,'XOF',3,'10000000-0000-0000-0000-000000000001','active','clothing','{"M":10,"L":10}');
+INSERT INTO auth.users(id) VALUES
+ ('10000000-0000-0000-0000-000000000001'),
+ ('10000000-0000-0000-0000-000000000002'),
+ ('40000000-0000-0000-0000-000000000001');
+INSERT INTO public.profiles(id) VALUES
+ ('10000000-0000-0000-0000-000000000001'),
+ ('10000000-0000-0000-0000-000000000002'),
+ ('40000000-0000-0000-0000-000000000001');
+INSERT INTO public.shops(id,owner_id,slug,name,city,phone,status) VALUES
+ ('10000000-0000-0000-0000-000000000001','10000000-0000-0000-0000-000000000001','boutique-test','Boutique test','Niamey','+22790000001','active'),
+ ('10000000-0000-0000-0000-000000000002','10000000-0000-0000-0000-000000000002','autre-boutique','Autre boutique','Niamey','+22790000002','active');
+INSERT INTO public.products(id,shop_id,name,slug,base_price,currency,stock_quantity,status,product_type,size_stock) VALUES
+ ('20000000-0000-0000-0000-000000000001','10000000-0000-0000-0000-000000000001','T-shirt test','t-shirt-test',5000,'XOF',20,'active','clothing','{"M":3,"L":2}'),
+ ('20000000-0000-0000-0000-000000000002','10000000-0000-0000-0000-000000000001','Sac test','sac-test',2500,'XOF',5,'active','other','{}'),
+ ('20000000-0000-0000-0000-000000000003','10000000-0000-0000-0000-000000000002','Produit autre boutique','produit-autre-boutique',1000,'XOF',5,'active','other','{}'),
+ ('20000000-0000-0000-0000-000000000004','10000000-0000-0000-0000-000000000001','T-shirt stock agrégé','t-shirt-stock-agrege',1000,'XOF',3,'active','clothing','{"M":10,"L":10}');
 SELECT set_config('request.jwt.claims','{"role":"service_role"}',true);
 SET LOCAL ROLE service_role;
 DO $$
-DECLARE v_first jsonb; v_retry jsonb; v_confirmation jsonb; v_count integer;
+DECLARE v_first jsonb; v_retry jsonb; v_confirmation jsonb; v_count integer; v_buyer_order jsonb;
 BEGIN
  v_first := public.create_guest_order_batch(
   '[
@@ -75,6 +83,23 @@ BEGIN
    'Niamey','Quartier test, rue 1',repeat('1',64),'','30000000-0000-0000-0000-000000000007',NULL);
   RAISE EXCEPTION 'expected invalid request for non-array cart';
  EXCEPTION WHEN OTHERS THEN IF SQLERRM<>'invalid request' THEN RAISE; END IF; END;
+ v_buyer_order := public.create_guest_order_batch(
+  '[{"product_id":"20000000-0000-0000-0000-000000000002","quantity":1}]'::jsonb,
+  'Acheteur test','+22791111111','Niamey','Quartier acheteur, rue 2',
+  repeat('e',64),'','30000000-0000-0000-0000-000000000008',
+  '40000000-0000-0000-0000-000000000001');
+ IF (SELECT buyer_id FROM public.orders WHERE id=(v_buyer_order->>'order_id')::uuid)
+    <> '40000000-0000-0000-0000-000000000001'::uuid THEN
+  RAISE EXCEPTION 'authenticated buyer id was not persisted';
+ END IF;
+ BEGIN
+  PERFORM public.create_guest_order_batch(
+   '[{"product_id":"20000000-0000-0000-0000-000000000002","quantity":1}]'::jsonb,
+   'Vendeur test','+22792222222','Niamey','Quartier vendeur, rue 3',
+   repeat('9',64),'','30000000-0000-0000-0000-000000000009',
+   '10000000-0000-0000-0000-000000000001');
+  RAISE EXCEPTION 'expected own-product rejection';
+ EXCEPTION WHEN OTHERS THEN IF SQLERRM<>'cannot order own product' THEN RAISE; END IF; END;
 END $$;
 RESET ROLE;
 DO $$
