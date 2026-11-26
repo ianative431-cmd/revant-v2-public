@@ -133,6 +133,15 @@ export default function CartPage() {
             {groups.map((group) => {
               const totals = currencyTotals(group.items);
               const groupUnits = group.items.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
+              const shopScoped = group.items.every((item) => Boolean(item.shopId) && item.shopId === group.items[0]?.shopId);
+              const canBatchCheckout = shopScoped && totals.length === 1 && group.items.length <= 20;
+              const checkoutItems = group.items.map((item) => ({
+                productId: item.id,
+                quantity: item.quantity ?? 1,
+                variantLabel: item.variantLabel ?? null,
+              }));
+              const checkoutHref = `/commande/panier?items=${encodeURIComponent(JSON.stringify(checkoutItems))}`;
+
               return (
                 <section key={group.id} className="revant-cart-group overflow-hidden rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-sm">
                   <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--brand-border)] bg-[var(--brand-bg)] px-4 py-4 sm:px-5">
@@ -170,14 +179,29 @@ export default function CartPage() {
                               <button type="button" aria-label={`Augmenter la quantité de ${item.name}`} onClick={() => updateQuantity(cartLineKey(item), quantity + 1)} disabled={quantity >= 99} className="h-8 w-8 rounded-full border border-[var(--brand-border)] disabled:opacity-40">+</button>
                               <button type="button" onClick={() => remove(cartLineKey(item))} className="ml-1 text-xs text-[var(--brand-muted)] underline">Retirer</button>
                             </div>
-                            <Link href={`/commande/visiteur?productId=${encodeURIComponent(item.id)}&quantity=${quantity}${item.variantLabel ? `&variantLabel=${encodeURIComponent(item.variantLabel)}` : ""}`} className="mt-3 inline-flex rounded-full bg-brand-accent px-4 py-2.5 text-[10px] font-bold text-white">
-                              Commander cet article
-                            </Link>
+                            {!shopScoped && (
+                              <Link href={`/commande/visiteur?productId=${encodeURIComponent(item.id)}&quantity=${quantity}${item.variantLabel ? `&variantLabel=${encodeURIComponent(item.variantLabel)}` : ""}`} className="mt-3 inline-flex rounded-full border border-[var(--brand-border)] px-4 py-2.5 text-[10px] font-bold">
+                                Commander cet article
+                              </Link>
+                            )}
                           </div>
                         </article>
                       );
                     })}
                   </div>
+                  <footer className="border-t border-[var(--brand-border)] bg-[var(--brand-bg)] p-4">
+                    {canBatchCheckout ? (
+                      <Link href={checkoutHref} className="flex min-h-12 w-full items-center justify-center rounded-full bg-brand-accent px-5 py-3 text-center text-sm font-bold text-white">
+                        Commander les {groupUnits} article{groupUnits > 1 ? "s" : ""} de cette boutique
+                      </Link>
+                    ) : shopScoped ? (
+                      <p className="text-xs leading-relaxed text-[var(--brand-muted)]">
+                        {group.items.length > 20 ? "Cette boutique dépasse la limite de 20 lignes par demande. Retire quelques articles pour continuer." : "Les articles de cette boutique utilisent plusieurs devises. Ils doivent être commandés séparément."}
+                      </p>
+                    ) : (
+                      <p className="text-xs leading-relaxed text-[var(--brand-muted)]">Les anciennes lignes sans identifiant de boutique ne peuvent pas être regroupées automatiquement.</p>
+                    )}
+                  </footer>
                 </section>
               );
             })}
@@ -186,7 +210,7 @@ export default function CartPage() {
 
         {items.length > 0 && (
           <aside className="revant-cart-note mt-5 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 text-xs leading-relaxed text-[var(--brand-muted)]">
-            Les sous-totaux affichés sont indicatifs. Les prix et stocks sont revérifiés côté serveur. Les frais de livraison sont confirmés par la boutique. Pour le moment, chaque article crée une demande distincte et le paiement en ligne n’est pas activé.
+            Les commandes sont regroupées par boutique : chaque boutique reçoit une demande distincte, qui peut contenir plusieurs articles. Les prix et les stocks sont revérifiés côté serveur. Les frais de livraison sont confirmés par la boutique. Le paiement en ligne n’est pas activé.
           </aside>
         )}
       </div>

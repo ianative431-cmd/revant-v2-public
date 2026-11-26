@@ -42,8 +42,9 @@ export default async function GuestCartCheckoutPage({ searchParams }: Props) {
   if (items.length === 0) notFound();
 
   const supabase = await createSupabaseServerClient();
-  const products = await getProductsByIds(supabase, items.map((item) => item.productId));
-  if (products.length !== items.length) notFound();
+  const uniqueProductIds = [...new Set(items.map((item) => item.productId))];
+  const products = await getProductsByIds(supabase, uniqueProductIds);
+  if (products.length !== uniqueProductIds.length) notFound();
   const byId = new Map(products.map((product) => [product.id, product]));
   const resolved = items.map((item) => ({ ...item, product: byId.get(item.productId) })).filter((item) => item.product);
   if (resolved.length !== items.length) notFound();
@@ -60,7 +61,7 @@ export default async function GuestCartCheckoutPage({ searchParams }: Props) {
     }
     return variantLabel !== null;
   });
-  const aggregateStockInvalid = [...new Set(items.map((item) => item.productId))].some((productId) => {
+  const aggregateStockInvalid = uniqueProductIds.some((productId) => {
     const product = byId.get(productId)!;
     const total = items.filter((item) => item.productId === productId).reduce((sum, item) => sum + item.quantity, 0);
     return total > product.stock_quantity;
