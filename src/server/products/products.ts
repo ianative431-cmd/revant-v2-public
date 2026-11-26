@@ -128,6 +128,22 @@ export async function getProductById(
   return data ? mapRow(data) : null;
 }
 
+export async function getProductsByIds(
+  supabase: SupabaseClient,
+  ids: string[]
+): Promise<Product[]> {
+  const normalizedIds = [...new Set(ids.filter((id) => UUID_PATTERN.test(id)))].slice(0, 20);
+  if (normalizedIds.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .in("id", normalizedIds)
+    .returns<ProductRow[]>();
+
+  if (error) throw error;
+  return (data ?? []).map(mapRow);
+}
 
 /** Public storefront query: never return drafts, pending, rejected or archived listings. */
 export async function getActiveProductsForShop(

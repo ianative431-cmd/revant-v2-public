@@ -5,12 +5,21 @@ import { notFound } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { decryptDeliveryCode } from "@/server/delivery/code-crypto.mjs";
 
+type GuestOrderLine = {
+  product_name: string;
+  variant_label?: string | null;
+  quantity: number;
+  unit_price: number;
+  line_total: number;
+  currency: string;
+};
 type GuestOrderSummary = {
   order_number: string;
   status: string;
   total_amount: number;
   currency: string;
   product_name: string;
+  items?: GuestOrderLine[];
   variant_label?: string | null;
   shop_name: string;
   created_at: string;
@@ -63,6 +72,14 @@ export default async function GuestOrderConfirmation({ searchParams }: Props) {
   if (data.delivery_code_ciphertext && deliverySecret) {
     try { deliveryCode = decryptDeliveryCode(data.delivery_code_ciphertext, deliverySecret); } catch { deliveryCode = null; }
   }
+  const lines = data.items?.length ? data.items : [{
+    product_name: data.product_name,
+    variant_label: data.variant_label ?? null,
+    quantity: 1,
+    unit_price: data.total_amount,
+    line_total: data.total_amount,
+    currency: data.currency,
+  }];
 
   return (
     <main className="revant-order-confirmation min-h-screen bg-brand-bg px-4 py-10 text-brand-text">
@@ -74,10 +91,22 @@ export default async function GuestOrderConfirmation({ searchParams }: Props) {
         <p className="mt-5 rounded-xl bg-brand-bg p-4 text-lg font-black">{data.order_number}</p>
         <p className="mt-3 rounded-xl border border-brand-border bg-brand-bg p-3 text-left text-xs leading-relaxed text-brand-muted">Aucun paiement en ligne n’a été encaissé par Revant. Attends la confirmation de la boutique et ses instructions avant tout règlement.</p>
         <div className="mt-5 rounded-xl border border-brand-border p-4 text-left">
-          <p className="text-sm font-bold">{data.product_name}</p>
-          {data.variant_label && <p className="mt-1 text-xs font-semibold text-brand-muted">Taille : {data.variant_label}</p>}
-          <p className="mt-1 text-xs text-brand-muted">Boutique : {data.shop_name}</p>
-          <p className="mt-3 text-lg font-black">{Number(data.total_amount).toLocaleString("fr-FR")} {data.currency}</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-muted">Boutique : {data.shop_name}</p>
+          <div className="mt-3 divide-y divide-brand-border">
+            {lines.map((line, index) => (
+              <div key={`${line.product_name}-${index}`} className="py-3 first:pt-0 last:pb-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold">{line.product_name}</p>
+                    {line.variant_label && <p className="mt-1 text-xs font-semibold text-brand-muted">Taille : {line.variant_label}</p>}
+                    <p className="mt-1 text-xs text-brand-muted">Quantité : {line.quantity}</p>
+                  </div>
+                  <p className="shrink-0 text-sm font-bold">{Number(line.line_total).toLocaleString("fr-FR")} {line.currency || data.currency}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 border-t border-brand-border pt-3 text-lg font-black">{Number(data.total_amount).toLocaleString("fr-FR")} {data.currency}</p>
           <p className="mt-2 text-xs text-brand-muted">Statut : {STATUS_LABEL[data.status] ?? data.status}</p>
           {data.delivery_status && <p className="mt-2 text-xs text-brand-muted">Livraison : {DELIVERY_STATUS_LABEL[data.delivery_status] ?? data.delivery_status}</p>}
         </div>
