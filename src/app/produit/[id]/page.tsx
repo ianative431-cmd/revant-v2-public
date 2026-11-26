@@ -16,11 +16,12 @@ import BottomNav from "@/components/layout/BottomNav";
 import ReportContentButton from "@/components/reports/ReportContentButton";
 import { startConversationAboutProduct } from "@/app/messages/actions";
 
-type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ review?: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ [key: string]: string | string[] | undefined }> };
 
 export default async function ProductPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const { review: reviewNotice } = await searchParams;
+  const { review: rawReviewNotice } = await searchParams;
+  const reviewNotice = Array.isArray(rawReviewNotice) ? rawReviewNotice[0] ?? null : rawReviewNotice ?? null;
   const supabase = await createSupabaseServerClient();
   const product = await getProductById(supabase, id);
   if (!product || product.status !== "active") notFound();

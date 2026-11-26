@@ -39,7 +39,7 @@ export default function ProductReviewForm({
         <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[var(--brand-accent)]">Après réception</p>
         <h2 id="product-review-form-title" className="mt-1 text-xl font-black tracking-tight sm:text-2xl">Donner ton avis</h2>
         <p className="mt-2 text-xs leading-relaxed text-[var(--brand-muted)]">
-          Seuls les acheteurs ayant reçu ce produit peuvent publier un avis. Chaque avis est contrôlé avant sa publication.
+          Seuls les acheteurs ayant reçu ce produit peuvent déposer un avis. Chaque avis est contrôlé avant sa publication.
         </p>
       </div>
 

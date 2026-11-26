@@ -20,8 +20,11 @@ export async function submitProductReview(formData: FormData): Promise<void> {
   const title = String(formData.get("title") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
 
+  if (!UUID_RE.test(productId)) {
+    throw new Error("Demande d'avis invalide.");
+  }
+
   if (
-    !UUID_RE.test(productId) ||
     !UUID_RE.test(orderId) ||
     !Number.isInteger(rating) ||
     rating < 1 ||
@@ -30,7 +33,7 @@ export async function submitProductReview(formData: FormData): Promise<void> {
     body.length < 10 ||
     body.length > 2000
   ) {
-    reviewRedirect(UUID_RE.test(productId) ? productId : "", "invalid");
+    reviewRedirect(productId, "invalid");
   }
 
   const supabase = await createSupabaseServerClient();
