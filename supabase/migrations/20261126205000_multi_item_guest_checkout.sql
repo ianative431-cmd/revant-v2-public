@@ -23,7 +23,7 @@ declare
   v_item_count integer;
   v_found_count integer;
   v_buyer_id uuid := case
-    when (select auth.role()) = 'service_role' then p_buyer_id
+    when (select auth.jwt() ->> 'role') = 'service_role' then p_buyer_id
     else (select auth.uid())
   end;
   v_phone text;

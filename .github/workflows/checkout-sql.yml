@@ -1,0 +1,48 @@
+name: Validate multi-item checkout SQL
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/ci/**"
+      - ".github/workflows/checkout-sql.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  postgres-integration:
+    name: PostgreSQL 17 isolated checkout tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: revant_checkout_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d revant_checkout_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout repository
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+      - name: Create disposable test schema
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/ci/checkout-bootstrap.sql
+      - name: Apply the proposed migration
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/migrations/20261126205000_multi_item_guest_checkout.sql
+      - name: Run checkout integration and privilege tests
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/ci/multi-item-checkout.test.sql
