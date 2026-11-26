@@ -140,11 +140,13 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
             <h2 id="order-reviews-title" className="text-base font-black">Donner ton avis</h2>
             <p className="mt-1 text-xs leading-relaxed text-[var(--brand-muted)]">Ton retour aide les autres acheteurs. Chaque avis est vérifié avant publication.</p>
             <div className="mt-3 divide-y divide-[var(--brand-border)]">
-              {order.items.map((item) => (
-                <div key={item.id} className="py-3 first:pt-0 last:pb-0">
-                  <ProductReviewForm orderId={order.id} productId={item.product_id} productName={item.product_name} />
-                </div>
-              ))}
+              {order.items
+                .filter((item, index, items) => items.findIndex((candidate) => candidate.product_id === item.product_id) === index)
+                .map((item) => (
+                  <div key={item.product_id} className="py-3 first:pt-0 last:pb-0">
+                    <ProductReviewForm orderId={order.id} productId={item.product_id} productName={item.product_name} />
+                  </div>
+                ))}
             </div>
           </section>
         )}
