@@ -10,7 +10,7 @@ type HeroSlide = {
   description: string;
   ctaLabel: string;
   ctaHref: string;
-  image: string;
+  image: string | null;
 };
 
 const AUTOPLAY_INTERVAL = 6500;
@@ -59,8 +59,8 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`revant-hero-slide absolute inset-0 bg-cover bg-[center_35%] transition-[opacity,transform] duration-700 ease-in-out ${index === activeIndex ? "is-active opacity-80" : "opacity-0"} ${reducedMotion ? "duration-0" : ""}`}
-            style={{ backgroundImage: `url("${slide.image}")` }}
+            className={`revant-hero-slide absolute inset-0 bg-cover bg-[center_35%] transition-[opacity,transform] duration-700 ease-in-out ${slide.image ? "" : slide.id === "terroir" ? "bg-gradient-to-br from-[#243D32] via-[#526C4E] to-[#A79986]" : slide.id === "boutiques" ? "bg-gradient-to-br from-[#803E2F] via-[#3E3D38] to-[#142B45]" : "bg-gradient-to-br from-[#142B45] via-[#263F50] to-[#803E2F]"} ${index === activeIndex ? "is-active opacity-80" : "opacity-0"} ${reducedMotion ? "duration-0" : ""}`}
+            style={slide.image ? { backgroundImage: `url("${slide.image}")` } : undefined}
           />
         ))}
       </div>

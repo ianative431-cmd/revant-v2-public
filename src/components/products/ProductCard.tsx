@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types/product";
 import AddToCartButton from "@/components/products/AddToCartButton";
+import ProductImageFallback from "@/components/products/ProductImageFallback";
 import { safeProductImageUrl } from "@/lib/product-image";
 
 function formatPrice(amount: number, currency: string): string {
@@ -31,10 +32,7 @@ export default function ProductCard({ product }: { product: Product }) {
               className="object-contain transition-opacity duration-300 group-hover:opacity-95"
             />
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[var(--brand-surface)] via-[var(--brand-bg)] to-[var(--brand-border)] px-2 text-center text-xs font-medium text-[var(--brand-muted)]">
-              <span aria-hidden="true" className="text-2xl">◇</span>
-              Photo indisponible
-            </div>
+            <ProductImageFallback />
           )}
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 to-transparent" />
           {product.categoryName && (
