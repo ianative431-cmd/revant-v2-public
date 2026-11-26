@@ -4,21 +4,23 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/server/auth/session";
 import { getActiveProducts } from "@/server/products/products";
 import { getProductById } from "@/server/products/products";
-import { getPublishedProductReviews } from "@/server/products/reviews";
+import { getPublishedProductReviews, getProductReviewContext } from "@/server/products/reviews";
 import ProductPurchaseOptions from "@/components/products/ProductPurchaseOptions";
 import ProductCard from "@/components/products/ProductCard";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductReviews from "@/components/products/ProductReviews";
+import ProductReviewForm from "@/components/products/ProductReviewForm";
 import InfiniteProductFeed from "@/components/products/InfiniteProductFeed";
 import SiteHeader from "@/components/layout/SiteHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import ReportContentButton from "@/components/reports/ReportContentButton";
 import { startConversationAboutProduct } from "@/app/messages/actions";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ review?: string }> };
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { review: reviewNotice } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const product = await getProductById(supabase, id);
   if (!product || product.status !== "active") notFound();
@@ -32,6 +34,9 @@ export default async function ProductPage({ params }: Props) {
   const currentUser = await getCurrentUser();
   const reviewData = await getPublishedProductReviews(supabase, product.id, 0, 10);
   const isOwner = !!currentUser && !!shop && shop.owner_id === currentUser.id;
+  const reviewContext = currentUser && !isOwner
+    ? await getProductReviewContext(supabase, currentUser.id, product.id)
+    : null;
   const hasSizeVariants = product.product_type === "clothing" && Object.keys(product.size_stock).length > 0;
   const availableSizeStock = Object.values(product.size_stock).reduce((sum, value) => sum + (Number.isFinite(value) ? Math.max(0, value) : 0), 0);
   const outOfStock = product.stock_quantity <= 0 || (hasSizeVariants && availableSizeStock <= 0);
@@ -177,6 +182,29 @@ export default async function ProductPage({ params }: Props) {
         </div>
 
         <ProductReviews productId={product.id} initialReviews={reviewData.reviews} totalReviews={reviewData.total} />
+
+        {!isOwner && currentUser && reviewContext && (
+          <ProductReviewForm
+            productId={product.id}
+            eligibleOrders={reviewContext.eligibleOrders}
+            previousReviews={reviewContext.previousReviews}
+            notice={reviewNotice ?? null}
+          />
+        )}
+        {!isOwner && !currentUser && (
+          <section className="mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-7">
+            <h2 className="text-lg font-black tracking-tight">Donner ton avis</h2>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--brand-muted)]">
+              Connecte-toi pour vérifier tes achats livrés et laisser un avis sur ce produit.
+            </p>
+            <Link
+              href={`/connexion?next=${encodeURIComponent(`/produit/${product.id}`)}`}
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-brand-accent px-5 py-3 text-sm font-bold text-white transition hover:brightness-95"
+            >
+              Se connecter
+            </Link>
+          </section>
+        )}
 
         {relatedProducts.length > 0 && (
           <section aria-labelledby="related-products-title" className="mt-7 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 shadow-sm sm:rounded-[30px] sm:p-7">
