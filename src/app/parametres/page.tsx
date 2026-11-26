@@ -3,13 +3,11 @@ import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Bell, ChevronRight, CircleHelp, FileText, Globe2, Info,
-  LockKeyhole, Palette, ShieldCheck, UserRound, Zap,
+  LockKeyhole, Palette, ShieldCheck, UserRound,
 } from "lucide-react";
 import BottomNav from "@/components/layout/BottomNav";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SettingsSearch from "@/components/layout/SettingsSearch";
-import SettingsExperienceControls from "@/components/layout/SettingsExperienceControls";
-import { getDisplayMode } from "@/server/theme/display-mode";
 
 type SettingsItem = { href: string; label: string; description: string; Icon: LucideIcon };
 
@@ -25,13 +23,13 @@ const GROUPS: { title: string; id: string; items: SettingsItem[] }[] = [
     { href: "/compte/notifications", label: "Centre de notifications", description: "Alertes de commandes, paiements, messages et livraisons", Icon: Bell },
   ]},
   { title: "Apparence", id: "apparence", items: [
-    { href: "#apparence-options", label: "Thème et finition visuelle", description: "Choisir l’apparence de Revant et l’intensité Liquid Glass", Icon: Palette },
+    { href: "/parametres/apparence", label: "Personnaliser l’apparence", description: "Thème, luminosité, Liquid Glass et identité visuelle", Icon: Palette },
   ]},
   { title: "Affichage et interactions", id: "affichage-interactions", items: [
-    { href: "#interaction-options", label: "Confort et réactivité", description: "Animations, taille du texte et confort de lecture", Icon: Zap },
+    { href: "/parametres/affichage", label: "Confort d’utilisation", description: "Animations et taille du texte", Icon: ChevronRight },
   ]},
   { title: "Langue et région", id: "langue-region", items: [
-    { href: "#region-details", label: "Préférences régionales", description: "Langue, pays et devise utilisés actuellement", Icon: Globe2 },
+    { href: "/parametres/langue-region", label: "Préférences régionales", description: "Langue, pays et devise actuellement utilisés", Icon: Globe2 },
   ]},
   { title: "Confidentialité", id: "confidentialite", items: [
     { href: "/compte/blocages", label: "Comptes bloqués", description: "Gérer les comptes dont tu as limité les interactions", Icon: LockKeyhole },
@@ -47,13 +45,19 @@ const GROUPS: { title: string; id: string; items: SettingsItem[] }[] = [
   ]},
 ];
 
+const FEATURE_SEARCH_ENTRIES = [
+  { href: "/parametres/apparence/theme", label: "Thème et luminosité", description: "Automatique, clair ou sombre", group: "Apparence" },
+  { href: "/parametres/apparence/liquid-glass", label: "Effet Liquid Glass", description: "Intensité de transparence et de flou", group: "Apparence" },
+  { href: "/parametres/apparence/identite-visuelle", label: "Identité visuelle", description: "Palette officielle Tangerine électrique", group: "Apparence" },
+  { href: "/parametres/affichage/animations", label: "Animations", description: "Transitions fluides ou réduites", group: "Affichage et interactions" },
+  { href: "/parametres/affichage/taille-texte", label: "Taille du texte", description: "Taille standard ou agrandie", group: "Affichage et interactions" },
+];
+
 function SettingsGroup({ title, id, children }: { title: string; id: string; children: ReactNode }) {
   return (
     <section id={id} aria-labelledby={id + "-title"} className="scroll-mt-24 space-y-2">
       <h2 id={id + "-title"} className="px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{title}</h2>
-      <div className="revant-settings-glass overflow-hidden rounded-2xl border border-brand-border bg-brand-surface shadow-sm divide-y divide-brand-border">
-        {children}
-      </div>
+      <div className="revant-settings-glass overflow-hidden rounded-2xl border border-brand-border bg-brand-surface shadow-sm divide-y divide-brand-border">{children}</div>
     </section>
   );
 }
@@ -61,9 +65,7 @@ function SettingsGroup({ title, id, children }: { title: string; id: string; chi
 function SettingsLink({ href, label, description, Icon }: SettingsItem) {
   return (
     <Link href={href} className="revant-settings-row flex min-h-[66px] items-center gap-3 px-4 py-3 transition-colors hover:bg-brand-accent/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent sm:px-5">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-bg text-brand-accent">
-        <Icon size={19} strokeWidth={1.8} aria-hidden="true" />
-      </span>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-bg text-brand-accent"><Icon size={19} strokeWidth={1.8} aria-hidden="true" /></span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold text-brand-text">{label}</span>
         <span className="mt-0.5 block text-xs leading-relaxed text-brand-muted">{description}</span>
@@ -73,11 +75,11 @@ function SettingsLink({ href, label, description, Icon }: SettingsItem) {
   );
 }
 
-export default async function ParametresPage() {
-  const displayMode = await getDisplayMode();
-  const searchEntries = GROUPS.flatMap((group) =>
-    group.items.map(({ href, label, description }) => ({ href, label, description, group: group.title })),
-  );
+export default function ParametresPage() {
+  const searchEntries = [
+    ...GROUPS.flatMap((group) => group.items.map(({ href, label, description }) => ({ href, label, description, group: group.title }))),
+    ...FEATURE_SEARCH_ENTRIES,
+  ];
 
   return (
     <div className="revant-settings-page min-h-screen bg-brand-bg pb-32 text-brand-text">
@@ -88,65 +90,14 @@ export default async function ParametresPage() {
           <h1 className="mt-1 text-2xl font-bold tracking-tight">Centre de contrôle</h1>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-brand-muted">Gère ton compte et personnalise ton expérience Revant depuis un seul endroit.</p>
         </header>
-
         <SettingsSearch entries={searchEntries} />
-
         <div className="space-y-5">
-          <SettingsGroup title="Mon compte" id="mon-compte">
-            {GROUPS[0].items.map((item) => <SettingsLink key={item.label} {...item} />)}
-          </SettingsGroup>
-
-          <SettingsGroup title="Sécurité" id="securite">
-            {GROUPS[1].items.map((item) => <SettingsLink key={item.label} {...item} />)}
-            <div className="px-4 py-3 sm:px-5">
-              <p className="text-xs leading-relaxed text-brand-muted">La gestion des appareils et la fermeture des sessions à distance ne sont pas proposées ici tant qu’un service sécurisé dédié n’est pas disponible.</p>
-            </div>
-          </SettingsGroup>
-
-          <SettingsGroup title="Notifications" id="notifications">
-            {GROUPS[2].items.map((item) => <SettingsLink key={item.label} {...item} />)}
-            <p className="px-4 py-3 text-xs leading-relaxed text-brand-muted sm:px-5">Les catégories de notifications et leurs préférences se règlent dans le centre de notifications.</p>
-          </SettingsGroup>
-
-          <SettingsGroup title="Apparence" id="apparence">
-            {GROUPS[3].items.map((item) => <SettingsLink key={item.label} {...item} />)}
-            <div id="apparence-options" className="scroll-mt-24">
-              <SettingsExperienceControls mode="appearance" currentMode={displayMode} />
-            </div>
-          </SettingsGroup>
-
-          <SettingsGroup title="Affichage et interactions" id="affichage-interactions">
-            {GROUPS[4].items.map((item) => <SettingsLink key={item.label} {...item} />)}
-            <div id="interaction-options" className="scroll-mt-24">
-              <SettingsExperienceControls mode="interactions" currentMode={displayMode} />
-            </div>
-          </SettingsGroup>
-
-          <SettingsGroup title="Langue et région" id="langue-region">
-            {GROUPS[5].items.map((item) => <SettingsLink key={item.label} {...item} />)}
-            <div id="region-details" className="grid grid-cols-3 gap-2 px-4 py-4 sm:px-5">
-              <div className="rounded-xl bg-brand-bg p-3"><p className="text-[10px] text-brand-muted">Langue</p><p className="mt-1 text-sm font-semibold">Français</p></div>
-              <div className="rounded-xl bg-brand-bg p-3"><p className="text-[10px] text-brand-muted">Pays</p><p className="mt-1 text-sm font-semibold">Niger</p></div>
-              <div className="rounded-xl bg-brand-bg p-3"><p className="text-[10px] text-brand-muted">Devise</p><p className="mt-1 text-sm font-semibold">XOF</p></div>
-            </div>
-            <p className="px-4 pb-4 text-xs leading-relaxed text-brand-muted sm:px-5">Ces valeurs indiquent la configuration actuelle. Le changement de langue, de pays ou de devise n’est pas encore activé.</p>
-          </SettingsGroup>
-
-          <SettingsGroup title="Confidentialité" id="confidentialite">
-            {GROUPS[6].items.map((item) => <SettingsLink key={item.label} {...item} />)}
-          </SettingsGroup>
-
-          <SettingsGroup title="Aide et assistance" id="aide-assistance">
-            {GROUPS[7].items.map((item) => <SettingsLink key={item.label} {...item} />)}
-          </SettingsGroup>
-
-          <SettingsGroup title="À propos de Revant" id="a-propos">
-            {GROUPS[8].items.map((item) => <SettingsLink key={item.label} {...item} />)}
-            <div className="px-4 py-4 sm:px-5">
-              <p className="text-sm font-semibold">Revant — seconde vie, nouvelle valeur</p>
-              <p className="mt-1 text-xs leading-relaxed text-brand-muted">Une marketplace qui rapproche acheteurs, boutiques et services de livraison.</p>
-            </div>
-          </SettingsGroup>
+          {GROUPS.map((group) => (
+            <SettingsGroup key={group.id} title={group.title} id={group.id}>
+              {group.items.map((item) => <SettingsLink key={item.label} {...item} />)}
+              {group.id === "securite" && <p className="px-4 py-3 text-xs leading-relaxed text-brand-muted sm:px-5">La gestion des appareils et la fermeture des sessions à distance nécessitent encore un service sécurisé dédié.</p>}
+            </SettingsGroup>
+          ))}
         </div>
       </main>
       <BottomNav />
