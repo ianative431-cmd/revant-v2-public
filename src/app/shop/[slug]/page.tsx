@@ -12,6 +12,7 @@ import {
   normalizeShopPhone,
   normalizeShopSocialUrl,
 } from "@/lib/shop-contact.mjs";
+import { formatShopLocation } from "@/lib/shop-location.mjs";
 import { resolveShopBySlug } from "@/server/shops/shops";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -101,7 +102,7 @@ export default async function ShopPublicPage({ params }: Props) {
     const href = normalizeShopSocialUrl(value, network.key) ?? null;
     return href ? [{ label: network.label, href }] : [];
   });
-  const location = [shop.city, shop.country_code].filter(Boolean).join(", ");
+  const location = formatShopLocation(shop.city, shop.country_code);
 
   return (
     <div className="min-h-screen bg-[var(--brand-bg)] pb-24 text-[var(--brand-text)]">
