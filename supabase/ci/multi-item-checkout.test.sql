@@ -44,6 +44,12 @@ BEGIN
  IF v_count<>1 THEN RAISE EXCEPTION 'idempotent retry created a duplicate'; END IF;
  v_confirmation := private.get_guest_order_impl(v_first->>'order_number',repeat('a',64));
  IF jsonb_array_length(v_confirmation->'items')<>3 THEN RAISE EXCEPTION 'confirmation omitted order lines'; END IF;
+ IF v_confirmation->'items'->0->>'product_name'<>'T-shirt test'
+    OR v_confirmation->'items'->0->>'variant_label'<>'L'
+    OR v_confirmation->'items'->1->>'variant_label'<>'M'
+    OR v_confirmation->'items'->2->>'product_name'<>'Sac test' THEN
+  RAISE EXCEPTION 'confirmation item order is not deterministic';
+ END IF;
  BEGIN
   PERFORM public.create_guest_order_batch('[{"product_id":"20000000-0000-0000-0000-000000000002","quantity":1}]'::jsonb,
    'Client Test','+22790000000','Niamey','Quartier test, rue 1',repeat('a',64),'',

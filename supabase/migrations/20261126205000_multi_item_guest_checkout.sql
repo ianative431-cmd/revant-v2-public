@@ -412,7 +412,7 @@ begin
       select oi.product_name
       from public.order_items oi
       where oi.order_id = o.id
-      order by oi.id
+      order by oi.product_id, coalesce(oi.variant_label, '')
       limit 1
     ),
     'items', coalesce((
@@ -425,7 +425,7 @@ begin
           'line_total', oi.line_total,
           'currency', btrim(oi.currency::text)
         )
-        order by oi.id
+        order by oi.product_id, coalesce(oi.variant_label, '')
       )
       from public.order_items oi
       where oi.order_id = o.id
@@ -435,7 +435,7 @@ begin
       from public.order_items oi
       join public.shops s on s.id = oi.shop_id
       where oi.order_id = o.id
-      order by oi.id
+      order by oi.product_id, coalesce(oi.variant_label, '')
       limit 1
     ),
     'created_at', o.created_at,
