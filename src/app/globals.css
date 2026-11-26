@@ -112,7 +112,7 @@ button, input, select, textarea { font: inherit; }
 button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
 button, input, select, textarea, a { touch-action: manipulation; }
 
-:focus-visible {
+:focus-visible:not(input):not(textarea):not(select) {
   outline: 3px solid var(--brand-accent);
   outline-offset: 3px;
 }
@@ -139,12 +139,8 @@ a, button, [role="button"], summary {
     opacity var(--revant-motion-normal) var(--revant-motion-ease);
 }
 button:active, [role="button"]:active, summary:active { transform: scale(.975); }
-input[type="search"]:focus,
-input[placeholder*="Recherch"]:focus,
-input[aria-label*="Recherch"]:focus {
-  outline-color: var(--brand-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-accent) 20%, transparent);
-}
+/* Le focus du champ de recherche est indiqué par le conteneur :focus-within,
+   pour éviter un second contour épais autour de l'input sur mobile. */
 nav a[aria-current="page"] { font-weight: 700; }
 nav a:active { transform: scale(.97); }
 @media (hover: hover) and (pointer: fine) {
