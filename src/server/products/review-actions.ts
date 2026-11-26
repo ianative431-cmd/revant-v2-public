@@ -1,98 +1,84 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
-import { checkRateLimit } from "@/server/security/rate-limit";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+export type ReviewActionState = {
+  error: string | null;
+  success: string | null;
+};
 
-function reviewRedirect(productId: string, status: string): never {
-  redirect(`/produit/${productId}?review=${status}#product-review-form`);
-}
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export async function submitProductReview(formData: FormData): Promise<void> {
+export async function submitProductReview(
+  _previousState: ReviewActionState,
+  formData: FormData
+): Promise<ReviewActionState> {
+  void _previousState;
+
   const user = await requireUserWithLegalConsent();
-  const productId = String(formData.get("productId") ?? "");
-  const orderId = String(formData.get("orderId") ?? "");
-  const rating = Number(formData.get("rating"));
-  const titleField = formData.get("title");
-  const bodyField = formData.get("body");
-  if ((titleField !== null && typeof titleField !== "string") || typeof bodyField !== "string") {
-    reviewRedirect(productId, "invalid");
-  }
-  const title = typeof titleField === "string" ? titleField.trim() : "";
-  const body = bodyField.trim();
+  const orderId = String(formData.get("orderId") ?? "").trim();
+  const productId = String(formData.get("productId") ?? "").trim();
+  const ratingRaw = String(formData.get("rating") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  const rating = Number(ratingRaw);
 
-  if (!UUID_RE.test(productId)) {
-    throw new Error("Demande d'avis invalide.");
+  if (!UUID_PATTERN.test(orderId) || !UUID_PATTERN.test(productId)) {
+    return { error: "Référence de commande ou de produit invalide.", success: null };
   }
-
-  if (
-    !UUID_RE.test(orderId) ||
-    !Number.isInteger(rating) ||
-    rating < 1 ||
-    rating > 5 ||
-    title.length > 120 ||
-    body.length < 10 ||
-    body.length > 2000
-  ) {
-    reviewRedirect(productId, "invalid");
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return { error: "Choisis une note entre 1 et 5.", success: null };
+  }
+  if (title.length > 120 || body.length < 10 || body.length > 2000) {
+    return { error: "Le titre ne doit pas dépasser 120 caractères et le commentaire doit contenir entre 10 et 2 000 caractères.", success: null };
   }
 
   const supabase = await createSupabaseServerClient();
   const { data: order, error: orderError } = await supabase
     .from("orders")
-    .select("id")
+    .select("id,status")
     .eq("id", orderId)
     .eq("buyer_id", user.id)
     .eq("status", "delivered")
     .maybeSingle();
 
-  if (orderError) throw orderError;
-  if (!order) reviewRedirect(productId, "not-eligible");
+  if (orderError || !order) {
+    return { error: "Seul l’acheteur d’une commande livrée peut déposer un avis.", success: null };
+  }
 
-  const { data: matchingItem, error: itemError } = await supabase
+  const { data: item, error: itemError } = await supabase
     .from("order_items")
     .select("id")
     .eq("order_id", orderId)
     .eq("product_id", productId)
-    .limit(1)
     .maybeSingle();
 
-  if (itemError) throw itemError;
-  if (!matchingItem) reviewRedirect(productId, "not-eligible");
+  if (itemError || !item) {
+    return { error: "Ce produit ne figure pas dans cette commande.", success: null };
+  }
 
-  const { data: existingReview, error: existingError } = await supabase
-    .from("reviews")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("order_id", orderId)
-    .eq("product_id", productId)
-    .maybeSingle();
-
-  if (existingError) throw existingError;
-  if (existingReview) reviewRedirect(productId, "already");
-
-  const allowed = await checkRateLimit(`product-review:${user.id}:${productId}`, 5, 86400);
-  if (!allowed) reviewRedirect(productId, "limited");
-
-  const { error: insertError } = await supabase.from("reviews").insert({
+  // is_published is deliberately omitted: the database default and column
+  // privileges force every buyer-submitted review into moderation.
+  const { error } = await supabase.from("reviews").insert({
     user_id: user.id,
-    order_id: orderId,
     product_id: productId,
+    order_id: orderId,
     rating,
     title: title || null,
     body,
   });
 
-  if (insertError) {
-    if (insertError.code === "23505") reviewRedirect(productId, "already");
-    console.error("[product-review] submission failed", insertError.message);
-    reviewRedirect(productId, "error");
+  if (error) {
+    if (error.code === "23505") {
+      return { error: "Un avis a déjà été envoyé pour ce produit et cette commande.", success: null };
+    }
+    console.error("Product review submission failed", error);
+    return { error: "Impossible d’envoyer ton avis pour le moment. Réessaie plus tard.", success: null };
   }
 
+  revalidatePath(`/compte/commandes/${orderId}`);
   revalidatePath(`/produit/${productId}`);
-  reviewRedirect(productId, "submitted");
+  return { error: null, success: "Avis envoyé. Il sera visible après validation par Revant." };
 }
