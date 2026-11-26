@@ -1,5 +1,3 @@
-"use server";
-
 import { submitProductReview } from "@/server/products/review-actions";
 
 type ReviewableOrder = {
