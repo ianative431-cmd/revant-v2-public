@@ -1,8 +1,6 @@
-import SettingsFeatureControl from "@/components/layout/SettingsFeatureControl";
-import SettingsFeaturePage from "@/components/layout/SettingsFeaturePage";
-
-export default function TextSizeSettingsPage() {
-  return <SettingsFeaturePage title="Taille du texte" description="Ajuste la lisibilité de l’interface selon ton confort.">
-    <SettingsFeatureControl setting="text" />
-  </SettingsFeaturePage>;
-}
+"use client";
+import Link from "next/link";
+import SiteHeader from "@/components/layout/SiteHeader";
+import BottomNav from "@/components/layout/BottomNav";
+import SettingsPreferenceControl from "@/components/layout/SettingsPreferenceControl";
+export default function TextSizePage(){return <div className="revant-settings-page min-h-screen bg-brand-bg pb-28 text-brand-text"><SiteHeader hideSearch/><main className="mx-auto max-w-2xl px-4 pb-8 pt-20 sm:px-6"><Link href="/parametres/affichage" className="text-sm font-semibold text-brand-muted">← Affichage et interactions</Link><header className="my-6"><p className="text-[10px] font-bold uppercase tracking-[.18em] text-brand-accent">REVANT · PARAMÈTRES</p><h1 className="mt-1 text-2xl font-bold">Taille du texte</h1><p className="mt-2 text-sm text-brand-muted">Adapte légèrement la taille du texte à ton confort de lecture.</p></header><section className="rounded-2xl border border-brand-border bg-brand-surface p-4"><SettingsPreferenceControl preference="text"/><p className="mt-4 rounded-xl bg-brand-bg p-3 text-sm">Aperçu : Revant — seconde vie, nouvelle valeur.</p></section></main><BottomNav/></div>}
