@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { getOrderById } from "@/server/orders/orders";
 import BuyerOrderActions from "../BuyerOrderActions";
+import ProductReviewForm from "@/components/products/ProductReviewForm";
 import type { OrderStatus } from "@/types/order";
 
 type Props = { params: Promise<{ id: string }> };
@@ -133,6 +134,20 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
             {Number(order.delivery_fee) === 0 && <p className="mt-2 text-[10px] leading-relaxed text-[var(--brand-muted)]">Le montant affiché n’inclut pas de frais de livraison confirmés. La boutique doit les préciser avant tout règlement.</p>}
           </div>
         </section>
+
+        {order.status === "delivered" && order.items.length > 0 && (
+          <section className="revant-order-content-panel mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-6" aria-labelledby="order-reviews-title">
+            <h2 id="order-reviews-title" className="text-base font-black">Donner ton avis</h2>
+            <p className="mt-1 text-xs leading-relaxed text-[var(--brand-muted)]">Ton retour aide les autres acheteurs. Chaque avis est vérifié avant publication.</p>
+            <div className="mt-3 divide-y divide-[var(--brand-border)]">
+              {order.items.map((item) => (
+                <div key={item.id} className="py-3 first:pt-0 last:pb-0">
+                  <ProductReviewForm orderId={order.id} productId={item.product_id} productName={item.product_name} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="revant-order-content-panel mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-6" aria-labelledby="order-timeline-title">
           <h2 id="order-timeline-title" className="text-base font-black">Historique réel</h2>
