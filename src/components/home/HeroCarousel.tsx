@@ -44,7 +44,7 @@ export default function HeroCarousel({ slides }: { slides: readonly HeroSlide[] 
 
   return (
     <section
-      className="relative mx-3 mt-[calc(env(safe-area-inset-top,0px)+2.5rem)] min-h-[270px] overflow-hidden rounded-2xl bg-[#142B45] text-white sm:mt-1 sm:min-h-[360px]"
+      className="relative mx-3 mt-[calc(env(safe-area-inset-top,0px)+1.5rem)] min-h-[270px] overflow-hidden rounded-2xl bg-[#142B45] text-white sm:mt-1 sm:min-h-[360px]"
       role="region"
       aria-roledescription="carrousel"
       aria-label="À la une"
