@@ -1,8 +1,6 @@
-import SettingsFeatureControl from "@/components/layout/SettingsFeatureControl";
-import SettingsFeaturePage from "@/components/layout/SettingsFeaturePage";
-
-export default function MotionSettingsPage() {
-  return <SettingsFeaturePage title="Animations" description="Choisis le niveau de mouvement et de réactivité des transitions de Revant.">
-    <SettingsFeatureControl setting="motion" />
-  </SettingsFeaturePage>;
-}
+"use client";
+import Link from "next/link";
+import SiteHeader from "@/components/layout/SiteHeader";
+import BottomNav from "@/components/layout/BottomNav";
+import SettingsPreferenceControl from "@/components/layout/SettingsPreferenceControl";
+export default function AnimationsPage(){return <div className="revant-settings-page min-h-screen bg-brand-bg pb-28 text-brand-text"><SiteHeader hideSearch/><main className="mx-auto max-w-2xl px-4 pb-8 pt-20 sm:px-6"><Link href="/parametres/affichage" className="text-sm font-semibold text-brand-muted">← Affichage et interactions</Link><header className="my-6"><p className="text-[10px] font-bold uppercase tracking-[.18em] text-brand-accent">REVANT · PARAMÈTRES</p><h1 className="mt-1 text-2xl font-bold">Animations</h1><p className="mt-2 text-sm text-brand-muted">Choisis des transitions rapides ou limite les mouvements.</p></header><section className="rounded-2xl border border-brand-border bg-brand-surface p-4"><SettingsPreferenceControl preference="motion"/></section></main><BottomNav/></div>}
