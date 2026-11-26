@@ -1,8 +1,6 @@
-import SettingsFeatureControl from "@/components/layout/SettingsFeatureControl";
-import SettingsFeaturePage from "@/components/layout/SettingsFeaturePage";
-
-export default function LiquidGlassSettingsPage() {
-  return <SettingsFeaturePage title="Effet Liquid Glass" description="Ajuste l’intensité de l’effet sur les surfaces de paramètres compatibles.">
-    <SettingsFeatureControl setting="glass" />
-  </SettingsFeaturePage>;
-}
+"use client";
+import Link from "next/link";
+import SiteHeader from "@/components/layout/SiteHeader";
+import BottomNav from "@/components/layout/BottomNav";
+import SettingsPreferenceControl from "@/components/layout/SettingsPreferenceControl";
+export default function LiquidGlassPage(){return <div className="revant-settings-page min-h-screen bg-brand-bg pb-28 text-brand-text"><SiteHeader hideSearch/><main className="mx-auto max-w-2xl px-4 pb-8 pt-20 sm:px-6"><Link href="/parametres/apparence" className="text-sm font-semibold text-brand-muted">← Apparence</Link><header className="my-6"><p className="text-[10px] font-bold uppercase tracking-[.18em] text-brand-accent">REVANT · PARAMÈTRES</p><h1 className="mt-1 text-2xl font-bold">Effet Liquid Glass</h1><p className="mt-2 text-sm text-brand-muted">Ajuste le flou et la transparence des panneaux compatibles.</p></header><section className="rounded-2xl border border-brand-border bg-brand-surface p-4"><SettingsPreferenceControl preference="glass"/></section></main><BottomNav/></div>}
