@@ -1,14 +1,2 @@
-import DisplayModeSwitcher from "@/components/layout/DisplayModeSwitcher";
-import SettingsFeaturePage from "@/components/layout/SettingsFeaturePage";
-import { getDisplayMode } from "@/server/theme/display-mode";
-
-export default async function ThemeSettingsPage() {
-  const currentMode = await getDisplayMode();
-  return <SettingsFeaturePage title="Thème et luminosité" description="Choisis comment Revant adapte son apparence à tes préférences.">
-    <fieldset>
-      <legend className="text-sm font-semibold">Mode d’affichage</legend>
-      <p className="mt-1 text-xs leading-relaxed text-brand-muted">Le mode Système suit automatiquement le réglage de ton appareil. Clair et Sombre permettent de choisir manuellement.</p>
-      <div className="mt-4"><DisplayModeSwitcher current={currentMode} /></div>
-    </fieldset>
-  </SettingsFeaturePage>;
-}
+import Link from "next/link"; import SiteHeader from "@/components/layout/SiteHeader"; import BottomNav from "@/components/layout/BottomNav"; import DisplayModeSwitcher from "@/components/layout/DisplayModeSwitcher"; import {getDisplayMode} from "@/server/theme/display-mode";
+export default async function ThemePage(){const current=await getDisplayMode();return <div className="revant-settings-page min-h-screen bg-brand-bg pb-28 text-brand-text"><SiteHeader hideSearch/><main className="mx-auto max-w-2xl px-4 pt-20"><Link href="/parametres/apparence" className="text-sm text-brand-muted">← Apparence</Link><h1 className="my-6 text-2xl font-bold">Thème et luminosité</h1><section className="rounded-2xl border border-brand-border bg-brand-surface p-4"><p className="mb-3 text-sm font-semibold">Mode d’affichage</p><p className="mb-4 text-xs text-brand-muted">Le mode système suit les préférences de ton appareil.</p><DisplayModeSwitcher current={current}/></section></main><BottomNav/></div>}
