@@ -53,9 +53,9 @@ export async function submitProductReview(
     .select("id")
     .eq("order_id", orderId)
     .eq("product_id", productId)
-    .maybeSingle();
+    .limit(1);
 
-  if (itemError || !item) {
+  if (itemError || !item?.length) {
     return { error: "Ce produit ne figure pas dans cette commande.", success: null };
   }
 
