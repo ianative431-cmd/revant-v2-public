@@ -1,6 +1,6 @@
 -- Enforce review content bounds at the database boundary.
 -- Applied to production project xugcmpnrigqfszyfufoc as migration
--- 20261126183300_enforce_review_content_length_constraints_20261126.
+-- 20261126183226_enforce_review_content_length_constraints_20261126.
 -- Do not replay manually.
 
 ALTER TABLE public.reviews
