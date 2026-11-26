@@ -17,8 +17,13 @@ export async function submitProductReview(formData: FormData): Promise<void> {
   const productId = String(formData.get("productId") ?? "");
   const orderId = String(formData.get("orderId") ?? "");
   const rating = Number(formData.get("rating"));
-  const title = String(formData.get("title") ?? "").trim();
-  const body = String(formData.get("body") ?? "").trim();
+  const titleField = formData.get("title");
+  const bodyField = formData.get("body");
+  if ((titleField !== null && typeof titleField !== "string") || typeof bodyField !== "string") {
+    reviewRedirect(productId, "invalid");
+  }
+  const title = typeof titleField === "string" ? titleField.trim() : "";
+  const body = bodyField.trim();
 
   if (!UUID_RE.test(productId)) {
     throw new Error("Demande d'avis invalide.");
