@@ -1,21 +1,2 @@
-import SettingsFeaturePage from "@/components/layout/SettingsFeaturePage";
-
-const COLORS = [
-  { name: "Orange Tangerine", hex: "#F46A18", role: "Accent principal" },
-  { name: "Fond ivoire", hex: "#F8F5EF", role: "Fond clair" },
-  { name: "Encre", hex: "#20252B", role: "Texte principal" },
-  { name: "Ardoise", hex: "#142B45", role: "Éléments structurants" },
-];
-
-export default function BrandIdentitySettingsPage() {
-  return <SettingsFeaturePage title="Identité visuelle" description="La palette officielle de Revant garantit une identité cohérente sur l’ensemble de la marketplace.">
-    <div className="space-y-3">
-      {COLORS.map((color) => <div key={color.hex} className="flex items-center gap-3 rounded-xl border border-brand-border p-3">
-        <span className="h-10 w-10 shrink-0 rounded-xl border border-black/10" style={{ backgroundColor: color.hex }} />
-        <span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{color.name}</span><span className="block text-xs text-brand-muted">{color.role}</span></span>
-        <span className="text-xs font-mono text-brand-muted">{color.hex}</span>
-      </div>)}
-      <p className="pt-2 text-xs leading-relaxed text-brand-muted">Cette identité est volontairement commune à tous les utilisateurs. Le thème Clair/Sombre adapte la luminosité sans remplacer les couleurs de marque.</p>
-    </div>
-  </SettingsFeaturePage>;
-}
+import Link from "next/link"; import SiteHeader from "@/components/layout/SiteHeader"; import BottomNav from "@/components/layout/BottomNav"; import PaletteSwitcher from "@/components/layout/PaletteSwitcher"; import {getSitePalette} from "@/server/theme/site-palette";
+export default async function PalettePage(){const current=await getSitePalette();return <div className="revant-settings-page min-h-screen bg-brand-bg pb-28 text-brand-text"><SiteHeader hideSearch/><main className="mx-auto max-w-2xl px-4 pt-20"><Link href="/parametres/apparence" className="text-sm text-brand-muted">← Apparence</Link><h1 className="my-6 text-2xl font-bold">Palette de couleurs</h1><section className="rounded-2xl border border-brand-border bg-brand-surface p-4"><p className="mb-4 text-sm font-semibold">Palette Revant</p><PaletteSwitcher current={current}/><p className="mt-4 text-xs text-brand-muted">Les palettes disponibles sont présentées ici sans modifier les couleurs officielles de la marque.</p></section></main><BottomNav/></div>}
