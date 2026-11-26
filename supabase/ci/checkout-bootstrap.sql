@@ -20,7 +20,7 @@ CREATE TABLE public.shops (
 CREATE TABLE public.products (
  id uuid PRIMARY KEY, name text NOT NULL, base_price numeric NOT NULL, currency text NOT NULL,
  stock_quantity integer NOT NULL, shop_id uuid NOT NULL REFERENCES public.shops(id),
- status text NOT NULL, product_type text NOT NULL DEFAULT 'standard',
+ status text NOT NULL, product_type text NOT NULL DEFAULT 'other' CHECK (product_type IN ('clothing','perfume','other')),
  size_stock jsonb NOT NULL DEFAULT '{}'::jsonb
 );
 CREATE TABLE public.orders (
@@ -31,14 +31,14 @@ CREATE TABLE public.orders (
  stock_reserved boolean NOT NULL DEFAULT false, created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE TABLE public.order_items (
- id bigserial PRIMARY KEY, order_id uuid NOT NULL REFERENCES public.orders(id),
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(), order_id uuid NOT NULL REFERENCES public.orders(id),
  product_id uuid NOT NULL REFERENCES public.products(id), shop_id uuid NOT NULL REFERENCES public.shops(id),
  product_name text NOT NULL, variant_label text, quantity integer NOT NULL,
  unit_price numeric NOT NULL, line_total numeric NOT NULL, currency text NOT NULL
 );
 CREATE TABLE public.deliveries (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), order_id uuid NOT NULL REFERENCES public.orders(id),
- status text NOT NULL, delivery_address text, pickup_address text
+ status text NOT NULL, delivery_address text, pickup_address text, UNIQUE(order_id)
 );
 CREATE TABLE private.delivery_code_secrets (
  delivery_id uuid PRIMARY KEY REFERENCES public.deliveries(id), code_ciphertext text, code_hint text

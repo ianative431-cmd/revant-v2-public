@@ -5,8 +5,8 @@ INSERT INTO public.shops(id,owner_id,name,city,phone,status) VALUES
  ('10000000-0000-0000-0000-000000000002',NULL,'Autre boutique','Niamey','+22790000002','active');
 INSERT INTO public.products(id,name,base_price,currency,stock_quantity,shop_id,status,product_type,size_stock) VALUES
  ('20000000-0000-0000-0000-000000000001','T-shirt test',5000,'XOF',20,'10000000-0000-0000-0000-000000000001','active','clothing','{"M":3,"L":2}'),
- ('20000000-0000-0000-0000-000000000002','Sac test',2500,'XOF',5,'10000000-0000-0000-0000-000000000001','active','standard','{}'),
- ('20000000-0000-0000-0000-000000000003','Produit autre boutique',1000,'XOF',5,'10000000-0000-0000-0000-000000000002','active','standard','{}'),
+ ('20000000-0000-0000-0000-000000000002','Sac test',2500,'XOF',5,'10000000-0000-0000-0000-000000000001','active','other','{}'),
+ ('20000000-0000-0000-0000-000000000003','Produit autre boutique',1000,'XOF',5,'10000000-0000-0000-0000-000000000002','active','other','{}'),
  ('20000000-0000-0000-0000-000000000004','T-shirt stock agrégé',1000,'XOF',3,'10000000-0000-0000-0000-000000000001','active','clothing','{"M":10,"L":10}');
 SELECT set_config('request.jwt.claims','{"role":"service_role"}',true);
 SET LOCAL ROLE service_role;
