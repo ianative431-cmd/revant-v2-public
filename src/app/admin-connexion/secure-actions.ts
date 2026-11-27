@@ -117,31 +117,79 @@ export async function configureInitialSuperAdminIdentity(_prev: SecureAdminState
     return { error: "Vérifie le nom, la clé de 64 caractères et sa confirmation." };
   }
   const current = await getCurrentSuperAdmin();
-  if (!current || !(await recentEmailProof(current.supabase)) || !(await hasVerifiedTotp(current.supabase)) || !(await hasAal2(current.supabase)) || !(await hasBootstrapClaim(current.user.id))) {
+  if (!current || !(await recentEmailProof(current.supabase)) || !(await hasVerifiedTotp(current.supabase)) ||
+      !(await hasAal2(current.supabase)) || !(await hasBootstrapClaim(current.user.id))) {
     return { error: "La preuve e-mail récente, la réservation et le second facteur sont obligatoires." };
   }
   const db = createSupabaseAdminClient();
   const { count, error: countError } = await db.from("super_admin_identities").select("user_id", { count: "exact", head: true });
   if (countError || (count ?? 0) > 0) return { error: "La première configuration est déjà terminée." };
 
-  const { error: authError } = await current.supabase.auth.updateUser({ password: key });
-  if (authError) return { error: "Impossible d’enregistrer la clé dans Supabase Auth. Réessaie." };
+  const { data: pending, error: pendingReadError } = await db.from("super_admin_bootstrap_pending")
+    .select("operation_id,first_name_normalized,access_key_salt,access_key_digest,device_name,device_token_digest,expires_at")
+    .eq("user_id", current.user.id).maybeSingle();
+  if (pendingReadError) return { error: "Impossible de vérifier la configuration en attente. Réessaie." };
 
-  const token = createDeviceToken();
-  const salt = createAccessKeySalt();
+  let operationId: string;
+  let token: string;
+  if (pending && Date.parse(pending.expires_at) > Date.now()) {
+    if (!safeDigestEqual(digestSuperAdminAccessKey(key, pending.access_key_salt), pending.access_key_digest)) {
+      return { error: "Une configuration est déjà en cours avec une autre clé. Réessaie après son expiration." };
+    }
+    if (pending.first_name_normalized !== normalizeAdminName(username) || pending.device_name !== deviceName) {
+      return { error: "Pour reprendre cette configuration, conserve le même nom d’utilisateur et le même nom d’appareil." };
+    }
+    token = (await cookies()).get(DEVICE_COOKIE)?.value ?? "";
+    if (!token || !safeDigestEqual(digestDeviceToken(token), pending.device_token_digest)) {
+      return { error: "Cette configuration doit être reprise depuis le même navigateur. Si tu n’y as plus accès, attends l’expiration de l’opération avant de recommencer." };
+    }
+    operationId = pending.operation_id;
+  } else {
+    operationId = randomUUID();
+    token = createDeviceToken();
+    const salt = createAccessKeySalt();
+    const { data: started, error: beginError } = await db.rpc("begin_super_admin_bootstrap", {
+      p_user_id: current.user.id,
+      p_operation_id: operationId,
+      p_first_name: username,
+      p_first_name_normalized: normalizeAdminName(username),
+      p_access_key_salt: salt,
+      p_access_key_digest: digestSuperAdminAccessKey(key, salt),
+      p_device_name: deviceName,
+      p_device_token_digest: digestDeviceToken(token),
+      p_expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
+    if (beginError || started !== true) {
+      return { error: "Une autre initialisation est en cours ou la réservation a échoué. Réessaie avec la même clé depuis le même navigateur." };
+    }
+    (await cookies()).set(DEVICE_COOKIE, token, COOKIE_OPTIONS);
+  }
+
+  const { error: authError } = await current.supabase.auth.updateUser({ password: key });
+  if (authError) {
+    return { error: "Supabase Auth n’a pas confirmé la clé. Conserve exactement cette clé et réessaie depuis ce navigateur avant l’expiration." };
+  }
+
   const { data: deviceId, error: finalizeError } = await db.rpc("finalize_super_admin_bootstrap", {
     p_user_id: current.user.id,
-    p_first_name: username,
-    p_first_name_normalized: normalizeAdminName(username),
-    p_access_key_salt: salt,
-    p_access_key_digest: digestSuperAdminAccessKey(key, salt),
-    p_device_name: deviceName,
-    p_device_token_digest: digestDeviceToken(token),
+    p_operation_id: operationId,
   });
-  if (finalizeError || !deviceId) {
-    return { error: "La clé Auth est enregistrée, mais la création transactionnelle de l’identité et du premier appareil n’a pas abouti. Réessaie avec exactement la même clé." };
+  let completed = !finalizeError && Boolean(deviceId);
+  if (!completed) {
+    const [identityResult, deviceResult] = await Promise.all([
+      db.from("super_admin_identities").select("access_key_salt,access_key_digest").eq("user_id", current.user.id).maybeSingle(),
+      db.from("super_admin_devices").select("id").eq("user_id", current.user.id)
+        .eq("device_token_digest", digestDeviceToken(token)).eq("status", "approved").maybeSingle(),
+    ]);
+    completed = Boolean(identityResult.data && deviceResult.data && safeDigestEqual(
+      digestSuperAdminAccessKey(key, identityResult.data.access_key_salt),
+      identityResult.data.access_key_digest
+    ));
   }
-  (await cookies()).set(DEVICE_COOKIE, token, COOKIE_OPTIONS);
+  if (!completed) {
+    return { error: "La clé Auth est enregistrée, mais la finalisation transactionnelle reste en attente. Réutilise exactement la même clé depuis ce navigateur pour reprendre avant l’expiration." };
+  }
+
   await current.supabase.auth.signOut();
   redirect("/admin-connexion?configured=1");
 }
