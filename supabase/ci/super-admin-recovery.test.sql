@@ -38,6 +38,7 @@ do $$
 declare first_user uuid := '00000000-0000-4000-8000-000000000001';
         second_user uuid := '00000000-0000-4000-8000-000000000002';
         result boolean;
+        created_device_id uuid;
 begin
   select public.claim_super_admin_bootstrap(first_user, now() + interval '20 minutes') into result;
   if result is distinct from true then raise exception 'first bootstrap claim failed'; end if;
@@ -56,12 +57,12 @@ begin
   select public.finalize_super_admin_bootstrap(
     first_user, 'Root Admin', 'root admin', repeat('d',48), repeat('a',64),
     'Primary device', repeat('e',64)
-  ) into result;
-  if result is null then raise exception 'atomic bootstrap finalization failed'; end if;
+  ) into created_device_id;
+  if created_device_id is null then raise exception 'atomic bootstrap finalization failed'; end if;
   if exists(select 1 from public.super_admin_bootstrap_claims where id = 1) then
     raise exception 'bootstrap claim was not released after atomic finalization';
   end if;
-  if not exists(select 1 from public.super_admin_devices where id = result and user_id = first_user and status = 'approved') then
+  if not exists(select 1 from public.super_admin_devices where id = created_device_id and user_id = first_user and status = 'approved') then
     raise exception 'first trusted device was not created atomically';
   end if;
 end;
