@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminOverviewStats } from "@/server/admin/stats";
 import { getAdminFinanceSnapshot } from "@/server/admin/finance";
 import { getAllProductsForAdmin } from "@/server/admin/products-admin";
@@ -45,11 +44,10 @@ export default async function AdminDashboardPage() {
 
   await requirePermission("users.view");
   const canManageReports = await hasPermission("products.manage");
-  const supabase = await createSupabaseServerClient();
   const [stats, finance, products, audit] = await Promise.all([
     getAdminOverviewStats(),
     getAdminFinanceSnapshot(),
-    getAllProductsForAdmin(supabase, 5),
+    getAllProductsForAdmin(5),
     createSupabaseAdminClient().from("audit_logs").select("id,action,description,entity_type,created_at").order("created_at", { ascending: false }).limit(5),
   ]);
   const revenue = buildRecentRevenueSeries(finance.payments);
