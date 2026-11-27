@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getRequiredConsentVersions } from "@/server/legal/consent";
 import {
   checkRateLimit,
@@ -242,6 +243,20 @@ export async function updatePassword(
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) return { error: "Le lien de réinitialisation est invalide ou a expiré. Demande un nouveau lien." };
+
+  // The Super Admin key is also the Supabase Auth password. A generic reset would
+  // desynchronize it from super_admin_identities.access_key_digest and lock out the account.
+  // Fail closed if the identity registry cannot be checked.
+  const adminDb = createSupabaseAdminClient();
+  const { data: superAdminIdentity, error: identityError } = await adminDb
+    .from("super_admin_identities")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (identityError) return { error: "Impossible de vérifier le statut du compte. Réessaie plus tard." };
+  if (superAdminIdentity) {
+    return { error: "La réinitialisation classique est désactivée pour le Super Admin afin de protéger sa clé de connexion. N’effectue pas de changement depuis ce formulaire." };
+  }
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: "Impossible de modifier le mot de passe. Demande un nouveau lien et réessaie." };
