@@ -41,7 +41,7 @@ jobs:
       - name: Apply proposed moderation migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_moderation_test -f supabase/migrations/20261127061500_secure_shop_product_moderation.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_moderation_test -f supabase/migrations/20261127110218_secure_shop_product_moderation.sql
       - name: Run moderation security and audit tests
         env:
           PGPASSWORD: ci-only-password
