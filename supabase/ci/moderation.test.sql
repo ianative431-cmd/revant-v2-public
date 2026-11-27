@@ -57,7 +57,7 @@ end;
 $$;
 set test.permission = 'products.manage';
 
--- Shop decisions follow the same audited server-side moderation path.
+set test.permission = 'shops.manage';\n\n-- Shop decisions follow the same audited server-side moderation path.
 select public.admin_moderate_shop(
   '10000000-0000-4000-8000-000000000003', 'active', 'Dossier boutique contrôlé'
 );
@@ -103,7 +103,7 @@ begin
 end;
 $;
 
--- Admin approval is transactional, permission-gated, and requires an active shop.
+set test.permission = 'products.manage';\n\n-- Admin approval is transactional, permission-gated, and requires an active shop.
 select public.admin_moderate_product(
   '20000000-0000-4000-8000-000000000001', 'active', 'Contrôle du catalogue effectué'
 );
