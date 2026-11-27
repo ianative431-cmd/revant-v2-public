@@ -2302,6 +2302,45 @@ export type Database = {
         Update: { id?: number; user_id?: string; claimed_at?: string; expires_at?: string }
         Relationships: []
       }
+      super_admin_bootstrap_pending: {
+        Row: {
+          user_id: string
+          operation_id: string
+          first_name: string
+          first_name_normalized: string
+          access_key_salt: string
+          access_key_digest: string
+          device_name: string
+          device_token_digest: string
+          created_at: string
+          expires_at: string
+        }
+        Insert: {
+          user_id: string
+          operation_id: string
+          first_name: string
+          first_name_normalized: string
+          access_key_salt: string
+          access_key_digest: string
+          device_name: string
+          device_token_digest: string
+          created_at?: string
+          expires_at: string
+        }
+        Update: {
+          user_id?: string
+          operation_id?: string
+          first_name?: string
+          first_name_normalized?: string
+          access_key_salt?: string
+          access_key_digest?: string
+          device_name?: string
+          device_token_digest?: string
+          created_at?: string
+          expires_at?: string
+        }
+        Relationships: []
+      }
       super_admin_key_rotation_pending: {
         Row: {
           user_id: string
@@ -2686,6 +2725,20 @@ export type Database = {
       }
     }
     Functions: {
+      begin_super_admin_bootstrap: {
+        Args: {
+          p_user_id: string
+          p_operation_id: string
+          p_first_name: string
+          p_first_name_normalized: string
+          p_access_key_salt: string
+          p_access_key_digest: string
+          p_device_name: string
+          p_device_token_digest: string
+          p_expires_at: string
+        }
+        Returns: boolean
+      }
       begin_super_admin_key_rotation: {
         Args: {
           p_user_id: string
@@ -2701,15 +2754,7 @@ export type Database = {
         Returns: boolean
       }
       finalize_super_admin_bootstrap: {
-        Args: {
-          p_user_id: string
-          p_first_name: string
-          p_first_name_normalized: string
-          p_access_key_salt: string
-          p_access_key_digest: string
-          p_device_name: string
-          p_device_token_digest: string
-        }
+        Args: { p_user_id: string; p_operation_id: string }
         Returns: string
       }
       finalize_super_admin_key_rotation: {
