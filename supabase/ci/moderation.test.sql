@@ -64,7 +64,7 @@ select public.admin_moderate_shop(
   '10000000-0000-4000-8000-000000000003', 'active', 'Dossier boutique contrôlé'
 );
 
-do $
+do $$
 begin
   if (select status from public.shops where id = '10000000-0000-4000-8000-000000000003') <> 'active' then
     raise exception 'admin shop approval did not activate shop';
@@ -85,7 +85,7 @@ begin
     if sqlerrm = 'draft shop must not be approved' then raise; end if;
   end;
 end;
-$;
+$$;
 
 select public.admin_moderate_shop(
   '10000000-0000-4000-8000-000000000003', 'suspended', 'Contrôle administratif'
@@ -94,7 +94,7 @@ select public.admin_moderate_shop(
   '10000000-0000-4000-8000-000000000003', 'active', 'Réactivation après contrôle'
 );
 
-do $
+do $$
 begin
   if (select count(*) from public.admin_actions where target_id = '10000000-0000-4000-8000-000000000003' and action = 'suspend_shop') <> 1 then
     raise exception 'shop suspension admin action was not recorded';
@@ -109,7 +109,7 @@ begin
     raise exception 'shop suspension/reactivation audit logs were not recorded';
   end if;
 end;
-$;
+$$;
 
 set test.permission = 'products.manage';
 
