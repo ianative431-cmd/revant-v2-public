@@ -29,3 +29,12 @@ test("admin product decisions require a reason on rejection and write audit reco
   assert.match(migration, /insert into public\.admin_actions/i);
   assert.match(migration, /insert into public\.audit_logs/i);
 });
+
+test("shop moderation is permission-gated, requires submission, and records each decision", () => {
+  assert.match(migration, /current_user_has_permission\('shops\.manage'\)/i);
+  assert.match(migration, /v_old_status not in \('pending', 'suspended'\)/i);
+  assert.match(migration, /v_old_status <> 'active'/i);
+  assert.match(migration, /approve_shop/i);
+  assert.match(migration, /suspend_shop/i);
+  assert.match(migration, /reactivate_shop/i);
+});

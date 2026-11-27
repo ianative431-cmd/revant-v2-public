@@ -5,7 +5,6 @@ import { requirePermission } from "@/server/auth/roles";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PRODUCT_IMAGE_BUCKET } from "@/lib/product-image";
-import { canTransitionShopStatus } from "@/lib/shop-status.mjs";
 
 export type AdminModerationState = { error: string | null };
 
