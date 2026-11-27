@@ -2658,6 +2658,14 @@ export type Database = {
         Args: { p_note?: string; p_publish: boolean; p_review_id: string }
         Returns: undefined
       }
+      admin_moderate_shop: {
+        Args: { p_next_status: string; p_note?: string | null; p_shop_id: string }
+        Returns: undefined
+      }
+      admin_moderate_product: {
+        Args: { p_next_status: string; p_note?: string | null; p_product_id: string }
+        Returns: undefined
+      }
       admin_operations_snapshot: { Args: never; Returns: Json }
       admin_overview_snapshot: { Args: never; Returns: Json }
       admin_set_associate_role: {

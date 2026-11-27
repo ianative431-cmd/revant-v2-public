@@ -15,8 +15,7 @@ export function getShopStatusLabel(status) {
 }
 
 /**
- * Retourne l'action de modération adaptée au statut courant.
- * Les boutiques fermées ne sont pas réactivées par ce bouton générique.
+ * Une boutique en brouillon doit d'abord être soumise par son propriétaire.
  * @param {string} status
  * @returns {{nextStatus: "active" | "suspended", label: string, kind: "activate" | "suspend"} | null}
  */
@@ -30,9 +29,6 @@ export function getShopStatusAction(status) {
   if (status === "pending") {
     return { nextStatus: "active", label: "Approuver", kind: "activate" };
   }
-  if (status === "draft") {
-    return { nextStatus: "active", label: "Activer", kind: "activate" };
-  }
   return null;
 }
 
@@ -44,7 +40,7 @@ export function getShopStatusAction(status) {
  */
 export function canTransitionShopStatus(currentStatus, nextStatus) {
   if (currentStatus === "active") return nextStatus === "suspended";
-  if (["draft", "pending", "suspended"].includes(currentStatus)) {
+  if (currentStatus === "pending" || currentStatus === "suspended") {
     return nextStatus === "active";
   }
   return false;

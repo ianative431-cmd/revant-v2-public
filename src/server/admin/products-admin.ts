@@ -1,8 +1,10 @@
 import "server-only";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Product } from "@/types/product";
 
-export type AdminProductRow = Product & { shop: { name: string; slug: string } | null };
+export type AdminProductRow = Product & {
+  shop: { name: string; slug: string; status: string } | null;
+};
 
 type RawRow = {
   id: string;
@@ -22,29 +24,28 @@ type RawRow = {
   updated_at: string;
   categories: { name: string } | null;
   product_images: { image_url: string; sort_order: number }[] | null;
-  shop: { name: string; slug: string } | null;
+  shop: { name: string; slug: string; status: string } | null;
 };
 
 /**
- * Tous les produits, toutes boutiques confondues, pour la modération
- * admin. products_public_read autorise déjà cette lecture (using(true)) —
- * pas besoin de service role ici, contrairement aux boutiques/comptes.
+ * Vue complète de modération, y compris le statut des boutiques non publiques.
+ * Cette fonction server-only est appelée après requirePermission("products.view").
  */
-export async function getAllProductsForAdmin(
-  supabase: SupabaseClient,
-  limit = 200
-): Promise<AdminProductRow[]> {
-  const { data } = await supabase
+export async function getAllProductsForAdmin(limit = 200): Promise<AdminProductRow[]> {
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
     .from("products")
     .select(
       `id, shop_id, name, description, base_price, currency, stock_quantity, product_type, size_stock, perfume_volume_ml, status, slug,
        category_id, created_at, updated_at,
        categories ( name ),
        product_images ( image_url, sort_order ),
-       shop:shops ( name, slug )`
+       shop:shops ( name, slug, status )`
     )
     .order("created_at", { ascending: false })
     .limit(limit);
+
+  if (error) throw new Error("Impossible de charger les annonces pour la modération.");
 
   return ((data ?? []) as unknown as RawRow[]).map((row) => ({
     id: row.id,
