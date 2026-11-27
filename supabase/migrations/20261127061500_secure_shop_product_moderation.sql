@@ -47,6 +47,109 @@ begin
 end;
 $function$;
 
+
+create or replace function private.admin_moderate_shop(
+  p_shop_id uuid,
+  p_next_status text,
+  p_note text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path to ''
+as $function$
+declare
+  v_old_status text;
+  v_action text;
+  v_audit_action public.audit_action;
+begin
+  if auth.uid() is null
+     or not public.current_user_has_permission('shops.manage') then
+    raise exception 'forbidden';
+  end if;
+  if p_next_status is null or p_next_status not in ('active', 'suspended') then
+    raise exception 'invalid_shop_decision';
+  end if;
+  if p_note is not null and length(trim(p_note)) > 500 then
+    raise exception 'note_too_long';
+  end if;
+
+  select s.status::text into v_old_status
+  from public.shops s
+  where s.id = p_shop_id
+  for update;
+
+  if not found then raise exception 'shop_not_found'; end if;
+
+  if p_next_status = 'active' and v_old_status not in ('pending', 'suspended') then
+    raise exception 'shop_transition_forbidden';
+  end if;
+  if p_next_status = 'suspended' and v_old_status <> 'active' then
+    raise exception 'shop_transition_forbidden';
+  end if;
+
+  update public.shops
+  set status = p_next_status::public.shop_status
+  where id = p_shop_id and status::text = v_old_status;
+  if not found then raise exception 'shop_transition_conflict'; end if;
+
+  v_action := case
+    when v_old_status = 'pending' and p_next_status = 'active' then 'approve_shop'
+    when v_old_status = 'suspended' and p_next_status = 'active' then 'reactivate_shop'
+    else 'suspend_shop'
+  end;
+  v_audit_action := case
+    when v_old_status = 'pending' and p_next_status = 'active'
+      then 'approve'::public.audit_action
+    else 'update'::public.audit_action
+  end;
+
+  insert into public.admin_actions(admin_id, action, target_type, target_id, reason, metadata)
+  values (
+    auth.uid(), v_action, 'shop', p_shop_id, nullif(trim(p_note), ''),
+    jsonb_build_object('from_status', v_old_status, 'to_status', p_next_status)
+  );
+
+  insert into public.audit_logs(actor_id, action, entity_type, entity_id, description, metadata)
+  values (
+    auth.uid(), v_audit_action, 'shop', p_shop_id,
+    case
+      when v_action = 'approve_shop' then 'Shop approved by marketplace moderation'
+      when v_action = 'reactivate_shop' then 'Shop reactivated by marketplace moderation'
+      else 'Shop suspended by marketplace moderation'
+    end,
+    jsonb_build_object('from_status', v_old_status, 'to_status', p_next_status)
+  );
+end;
+$function$;
+
+create or replace function public.admin_moderate_shop(
+  p_shop_id uuid,
+  p_next_status text,
+  p_note text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path to ''
+as $function$
+begin
+  if not public.current_user_has_permission('shops.manage') then
+    raise exception 'forbidden';
+  end if;
+  perform private.admin_moderate_shop(p_shop_id, p_next_status, p_note);
+end;
+$function$;
+
+revoke all on function private.admin_moderate_shop(uuid, text, text)
+  from public, anon, authenticated;
+grant execute on function private.admin_moderate_shop(uuid, text, text)
+  to service_role;
+revoke all on function public.admin_moderate_shop(uuid, text, text)
+  from public, anon;
+grant execute on function public.admin_moderate_shop(uuid, text, text)
+  to authenticated;
+
 create or replace function private.admin_moderate_product(
   p_product_id uuid,
   p_next_status text,

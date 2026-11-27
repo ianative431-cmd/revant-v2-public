@@ -29,32 +29,24 @@ export async function setShopStatus(
     return { error: "Statut demandé invalide." };
   }
 
-  const admin = createSupabaseAdminClient();
-  const { data: currentShop, error: readError } = await admin
-    .from("shops")
-    .select("status, slug")
-    .eq("id", shopId)
-    .maybeSingle();
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.rpc("admin_moderate_shop", {
+    p_shop_id: shopId,
+    p_next_status: nextStatus,
+    p_note: null,
+  });
 
-  if (readError || !currentShop) return { error: "Boutique introuvable." };
-  if (!canTransitionShopStatus(currentShop.status, nextStatus)) {
-    return { error: "Transition refusée : une boutique doit être soumise avant son approbation." };
-  }
-
-  const { data: updatedShop, error } = await admin
-    .from("shops")
-    .update({ status: nextStatus })
-    .eq("id", shopId)
-    .eq("status", currentShop.status)
-    .select("id")
-    .maybeSingle();
-
-  if (error || !updatedShop) {
-    return { error: "Le statut a changé ou la mise à jour a échoué. Recharge la page puis réessaie." };
+  if (error) {
+    return {
+      error: error.message.includes("shop_transition_forbidden")
+        ? "Transition refusée : une boutique doit être soumise avant son approbation."
+        : "Impossible d'enregistrer la décision. Recharge la page puis vérifie tes permissions.",
+    };
   }
 
   revalidatePath("/admin/boutiques");
-  revalidatePath("/shop/" + currentShop.slug);
+  revalidatePath("/compte/boutique");
+  revalidatePath("/shop/[slug]", "page");
   revalidatePath("/");
   revalidatePath("/boutiques");
   revalidatePath("/restaurants");

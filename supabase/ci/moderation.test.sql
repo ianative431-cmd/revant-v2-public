@@ -2,7 +2,9 @@
 
 insert into public.shops(id, status) values
   ('10000000-0000-4000-8000-000000000001', 'active'),
-  ('10000000-0000-4000-8000-000000000002', 'draft');
+  ('10000000-0000-4000-8000-000000000002', 'draft'),
+  ('10000000-0000-4000-8000-000000000003', 'pending'),
+  ('10000000-0000-4000-8000-000000000004', 'suspended');
 
 insert into public.products(id, shop_id, status) values
   ('20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'pending'),
@@ -54,6 +56,52 @@ begin
 end;
 $$;
 set test.permission = 'products.manage';
+
+-- Shop decisions follow the same audited server-side moderation path.
+select public.admin_moderate_shop(
+  '10000000-0000-4000-8000-000000000003', 'active', 'Dossier boutique contrôlé'
+);
+
+do $
+begin
+  if (select status from public.shops where id = '10000000-0000-4000-8000-000000000003') <> 'active' then
+    raise exception 'admin shop approval did not activate shop';
+  end if;
+  if (select count(*) from public.admin_actions where target_id = '10000000-0000-4000-8000-000000000003' and action = 'approve_shop') <> 1 then
+    raise exception 'shop approval admin action was not recorded';
+  end if;
+
+  begin
+    perform public.admin_moderate_shop(
+      '10000000-0000-4000-8000-000000000002', 'active', null
+    );
+    raise exception 'draft shop must not be approved';
+  exception when others then
+    if sqlerrm = 'draft shop must not be approved' then raise; end if;
+  end;
+end;
+$;
+
+select public.admin_moderate_shop(
+  '10000000-0000-4000-8000-000000000003', 'suspended', 'Contrôle administratif'
+);
+select public.admin_moderate_shop(
+  '10000000-0000-4000-8000-000000000003', 'active', 'Réactivation après contrôle'
+);
+
+do $
+begin
+  if (select count(*) from public.admin_actions where target_id = '10000000-0000-4000-8000-000000000003' and action = 'suspend_shop') <> 1 then
+    raise exception 'shop suspension admin action was not recorded';
+  end if;
+  if (select count(*) from public.admin_actions where target_id = '10000000-0000-4000-8000-000000000003' and action = 'reactivate_shop') <> 1 then
+    raise exception 'shop reactivation admin action was not recorded';
+  end if;
+  if (select status from public.shops where id = '10000000-0000-4000-8000-000000000003') <> 'active' then
+    raise exception 'shop reactivation did not restore active status';
+  end if;
+end;
+$;
 
 -- Admin approval is transactional, permission-gated, and requires an active shop.
 select public.admin_moderate_product(
