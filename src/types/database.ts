@@ -2296,6 +2296,39 @@ export type Database = {
         }
         Relationships: []
       }
+      super_admin_bootstrap_claims: {
+        Row: { id: number; user_id: string; claimed_at: string; expires_at: string }
+        Insert: { id?: number; user_id: string; claimed_at?: string; expires_at: string }
+        Update: { id?: number; user_id?: string; claimed_at?: string; expires_at?: string }
+        Relationships: []
+      }
+      super_admin_key_rotation_pending: {
+        Row: {
+          user_id: string
+          operation_id: string
+          access_key_salt: string
+          access_key_digest: string
+          created_at: string
+          expires_at: string
+        }
+        Insert: {
+          user_id: string
+          operation_id: string
+          access_key_salt: string
+          access_key_digest: string
+          created_at?: string
+          expires_at: string
+        }
+        Update: {
+          user_id?: string
+          operation_id?: string
+          access_key_salt?: string
+          access_key_digest?: string
+          created_at?: string
+          expires_at?: string
+        }
+        Relationships: []
+      }
       support_messages: {
         Row: {
           body: string
@@ -2653,6 +2686,40 @@ export type Database = {
       }
     }
     Functions: {
+      begin_super_admin_key_rotation: {
+        Args: {
+          p_user_id: string
+          p_operation_id: string
+          p_access_key_salt: string
+          p_access_key_digest: string
+          p_expires_at: string
+        }
+        Returns: boolean
+      }
+      claim_super_admin_bootstrap: {
+        Args: { p_user_id: string; p_expires_at: string }
+        Returns: boolean
+      }
+      finalize_super_admin_bootstrap: {
+        Args: {
+          p_user_id: string
+          p_first_name: string
+          p_first_name_normalized: string
+          p_access_key_salt: string
+          p_access_key_digest: string
+          p_device_name: string
+          p_device_token_digest: string
+        }
+        Returns: string
+      }
+      finalize_super_admin_key_rotation: {
+        Args: { p_user_id: string; p_operation_id: string }
+        Returns: boolean
+      }
+      release_super_admin_bootstrap: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
       admin_finance_snapshot: { Args: never; Returns: Json }
       admin_moderate_review: {
         Args: { p_note?: string; p_publish: boolean; p_review_id: string }

@@ -41,7 +41,7 @@ export async function signInSuperAdmin(_prev:AdminLoginState,formData:FormData):
 /** One-time transition through the existing Supabase Auth account. Google OAuth is not offered. */
 export async function signInInitialSuperAdmin(_prev:AdminLoginState,_formData:FormData):Promise<AdminLoginState>{void _prev;void _formData;return {error:"La connexion initiale par mot de passe est désactivée. Utilise la vérification par e-mail."};}
 
-export async function beginSuperAdminTotpEnrollment(){return {error:"L’enrôlement TOTP doit passer par la preuve e-mail initiale.",factorId:null,qrCode:null,secret:null,alreadyVerified:false};}
+export async function beginSuperAdminTotpEnrollment(){return {error:"L’enrôlement TOTP doit passer par la preuve e-mail initiale.",factorId:undefined,qrCode:null,secret:null,alreadyVerified:false};}
 
 export async function verifySuperAdminTotpEnrollment(_prev:AdminLoginState,_formData:FormData):Promise<AdminLoginState>{void _prev;void _formData;return {error:"Ancien parcours désactivé. Recommence la configuration sécurisée."};}
 
