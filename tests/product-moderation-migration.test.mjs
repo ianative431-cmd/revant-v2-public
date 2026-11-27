@@ -21,6 +21,7 @@ test("admin product moderation requires products.manage and a pending product", 
   assert.match(migration, /current_user_has_permission\('products\.manage'\)/i);
   assert.match(migration, /v_old_status <> 'pending'/i);
   assert.match(migration, /p_next_status = 'active' and v_shop_status <> 'active'/i);
+  assert.match(migration, /p_next_status is null or p_next_status not in/i);
 });
 
 test("admin product decisions require a reason on rejection and write audit records", () => {

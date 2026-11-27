@@ -9,8 +9,6 @@ as $function$
 declare
   v_shop_status text;
 begin
-  -- Service-role and trusted server operations are handled by server-side
-  -- permission checks or dedicated RPCs. This guard protects API roles.
   if current_user not in ('anon', 'authenticated') then
     return new;
   end if;
@@ -26,9 +24,6 @@ begin
     if new.is_featured is distinct from old.is_featured then
       raise exception 'product_field_forbidden' using errcode = '42501';
     end if;
-
-    -- Sellers may pause an active listing or reactivate their own archived
-    -- listing, but may never approve a pending/rejected/draft listing.
     if new.status is distinct from old.status
        and not (
          (old.status = 'active' and new.status = 'archived')
@@ -43,7 +38,6 @@ begin
     select s.status::text into v_shop_status
     from public.shops s
     where s.id = new.shop_id;
-
     if v_shop_status is distinct from 'active' then
       raise exception 'shop_not_active' using errcode = '42501';
     end if;
@@ -74,10 +68,9 @@ begin
     raise exception 'forbidden';
   end if;
 
-  if p_next_status not in ('active', 'rejected') then
+  if p_next_status is null or p_next_status not in ('active', 'rejected') then
     raise exception 'invalid_product_decision';
   end if;
-
   if p_note is not null and length(trim(p_note)) > 500 then
     raise exception 'note_too_long';
   end if;
@@ -93,12 +86,8 @@ begin
   where p.id = p_product_id
   for update of p;
 
-  if not found then
-    raise exception 'product_not_found';
-  end if;
-  if v_old_status <> 'pending' then
-    raise exception 'product_not_pending';
-  end if;
+  if not found then raise exception 'product_not_found'; end if;
+  if v_old_status <> 'pending' then raise exception 'product_not_pending'; end if;
   if p_next_status = 'active' and v_shop_status <> 'active' then
     raise exception 'shop_not_active';
   end if;
@@ -106,33 +95,21 @@ begin
   update public.products
   set status = p_next_status::public.product_status
   where id = p_product_id and status = 'pending';
-
-  if not found then
-    raise exception 'product_not_pending';
-  end if;
+  if not found then raise exception 'product_not_pending'; end if;
 
   v_action := case when p_next_status = 'active' then 'approve_product' else 'reject_product' end;
   v_audit_action := case when p_next_status = 'active'
-    then 'approve'::public.audit_action
-    else 'reject'::public.audit_action
-  end;
+    then 'approve'::public.audit_action else 'reject'::public.audit_action end;
 
   insert into public.admin_actions(admin_id, action, target_type, target_id, reason, metadata)
   values (
-    auth.uid(),
-    v_action,
-    'product',
-    p_product_id,
-    nullif(trim(p_note), ''),
+    auth.uid(), v_action, 'product', p_product_id, nullif(trim(p_note), ''),
     jsonb_build_object('from_status', v_old_status, 'to_status', p_next_status)
   );
 
   insert into public.audit_logs(actor_id, action, entity_type, entity_id, description, metadata)
   values (
-    auth.uid(),
-    v_audit_action,
-    'product',
-    p_product_id,
+    auth.uid(), v_audit_action, 'product', p_product_id,
     case when p_next_status = 'active'
       then 'Product approved by catalog moderation'
       else 'Product rejected by catalog moderation'
@@ -156,7 +133,6 @@ begin
   if not public.current_user_has_permission('products.manage') then
     raise exception 'forbidden';
   end if;
-
   perform private.admin_moderate_product(p_product_id, p_next_status, p_note);
 end;
 $function$;
@@ -165,7 +141,6 @@ revoke all on function private.admin_moderate_product(uuid, text, text)
   from public, anon, authenticated;
 grant execute on function private.admin_moderate_product(uuid, text, text)
   to service_role;
-
 revoke all on function public.admin_moderate_product(uuid, text, text)
   from public, anon;
 grant execute on function public.admin_moderate_product(uuid, text, text)
