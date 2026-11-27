@@ -1,8 +1,8 @@
 # Super Admin Revant — local-first
 
 ## Décisions
-- Connexion quotidienne indépendante de Google : nom, prénom, clé d'accès personnelle et mot de passe.
-- Supabase Auth reste l'unique autorité du mot de passe. La clé personnelle est un secret secondaire aléatoire de 256 bits, stocké sous forme de condensat salé ; aucun mot de passe personnalisé n'est stocké.
+- Connexion quotidienne indépendante de Google : nom d’utilisateur et clé secrète personnelle unique de 256 bits, sans mot de passe séparé à saisir.
+- Supabase Auth reste l'unique autorité d'authentification : la clé secrète aléatoire de 256 bits est utilisée comme mot de passe Supabase et son empreinte salée est conservée dans le registre privé d'identité pour lier le nom d’utilisateur au compte. Aucun mot de passe distinct n'est demandé à l'utilisateur au quotidien.
 - Première configuration : authentification temporaire avec le compte Supabase déjà doté du rôle `super_admin`, puis inscription et vérification d'un facteur TOTP. Google OAuth n'est pas proposé dans les écrans Super Admin.
 - MFA TOTP et appareil approuvé obligatoires pour le Super Admin ; les gardes serveur et la migration AAL2 doivent être actifs avant l'ouverture de la production.
 - Chaque navigateur possède un cookie de confiance HttpOnly, Secure en production, SameSite=Strict. Le premier appareil est approuvé pendant la configuration ; les suivants attendent une validation depuis un appareil déjà approuvé. Révocation disponible dans Sécurité → Appareils.
