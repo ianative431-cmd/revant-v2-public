@@ -57,7 +57,9 @@ end;
 $$;
 set test.permission = 'products.manage';
 
-set test.permission = 'shops.manage';\n\n-- Shop decisions follow the same audited server-side moderation path.
+set test.permission = 'shops.manage';
+
+-- Shop decisions follow the same audited server-side moderation path.
 select public.admin_moderate_shop(
   '10000000-0000-4000-8000-000000000003', 'active', 'Dossier boutique contrôlé'
 );
@@ -69,6 +71,9 @@ begin
   end if;
   if (select count(*) from public.admin_actions where target_id = '10000000-0000-4000-8000-000000000003' and action = 'approve_shop') <> 1 then
     raise exception 'shop approval admin action was not recorded';
+  end if;
+  if (select count(*) from public.audit_logs where entity_id = '10000000-0000-4000-8000-000000000003' and action = 'approve') <> 1 then
+    raise exception 'shop approval audit log was not recorded';
   end if;
 
   begin
@@ -100,10 +105,15 @@ begin
   if (select status from public.shops where id = '10000000-0000-4000-8000-000000000003') <> 'active' then
     raise exception 'shop reactivation did not restore active status';
   end if;
+  if (select count(*) from public.audit_logs where entity_id = '10000000-0000-4000-8000-000000000003' and action = 'update') <> 2 then
+    raise exception 'shop suspension/reactivation audit logs were not recorded';
+  end if;
 end;
 $;
 
-set test.permission = 'products.manage';\n\n-- Admin approval is transactional, permission-gated, and requires an active shop.
+set test.permission = 'products.manage';
+
+-- Admin approval is transactional, permission-gated, and requires an active shop.
 select public.admin_moderate_product(
   '20000000-0000-4000-8000-000000000001', 'active', 'Contrôle du catalogue effectué'
 );
