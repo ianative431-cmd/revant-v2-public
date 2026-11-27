@@ -16,7 +16,7 @@ export default async function ConfigureSuperAdminPage() {
   const { data: identity, error } = await db.from("super_admin_identities").select("user_id").eq("user_id", user.id).maybeSingle();
   if (error || identity) redirect("/admin-connexion");
   const { data: claim, error: claimError } = await db.from("super_admin_bootstrap_claims").select("user_id,expires_at").eq("id", 1).eq("user_id", user.id).maybeSingle();
-  if (claimError || !claim || Date.parse(claim.expires_at) <= Date.now()) redirect("/admin-connexion/initialiser");
+  if (claimError || !claim) redirect("/admin-connexion/initialiser");
   if (!(await hasVerifiedTotp(supabase))) redirect("/admin-connexion/securite");
   if (!(await hasAal2(supabase))) redirect("/admin-connexion/mfa?next=setup");
   return <SecureConfigureForm />;

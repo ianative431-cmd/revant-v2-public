@@ -14,7 +14,6 @@ import {
 import { hasRecentSuperAdminAuthMethod } from "@/server/auth/super-admin-proof";
 
 export type SecureAdminState = { error: string | null; success?: boolean };
-const genericMessage = "Si l’adresse correspond au compte autorisé, un lien sécurisé vient d’être envoyé. Vérifie ta boîte de réception.";
 const genericError = "Identifiants incorrects ou accès non autorisé.";
 const DEVICE_COOKIE = process.env.NODE_ENV === "production" ? "__Host-revant-super-admin-device" : "revant-super-admin-device";
 const COOKIE_OPTIONS = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict" as const, path: "/", maxAge: 60 * 60 * 24 * 365 };
@@ -118,7 +117,7 @@ export async function configureInitialSuperAdminIdentity(_prev: SecureAdminState
     return { error: "Vérifie le nom, la clé de 64 caractères et sa confirmation." };
   }
   const current = await getCurrentSuperAdmin();
-  if (!current || !(await recentEmailProof(current.supabase)) || !(await hasAal2(current.supabase)) || !(await hasBootstrapClaim(current.user.id))) {
+  if (!current || !(await recentEmailProof(current.supabase)) || !(await hasVerifiedTotp(current.supabase)) || !(await hasAal2(current.supabase)) || !(await hasBootstrapClaim(current.user.id))) {
     return { error: "La preuve e-mail récente, la réservation et le second facteur sont obligatoires." };
   }
   const db = createSupabaseAdminClient();
