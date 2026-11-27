@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isSuperAdminUser } from "@/server/auth/super-admin";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getRequiredConsentVersions } from "@/server/legal/consent";
 import {
   checkRateLimit,
@@ -246,7 +246,15 @@ export async function updatePassword(
 
   // The Super Admin key is also the Supabase Auth password. A generic reset would
   // desynchronize it from super_admin_identities.access_key_digest and lock out the account.
-  if (await isSuperAdminUser(user.id)) {
+  // Fail closed if the identity registry cannot be checked.
+  const adminDb = createSupabaseAdminClient();
+  const { data: superAdminIdentity, error: identityError } = await adminDb
+    .from("super_admin_identities")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (identityError) return { error: "Impossible de vérifier le statut du compte. Réessaie plus tard." };
+  if (superAdminIdentity) {
     return { error: "La réinitialisation classique est désactivée pour le Super Admin afin de protéger sa clé de connexion. N’effectue pas de changement depuis ce formulaire." };
   }
 
