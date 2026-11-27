@@ -68,9 +68,6 @@ begin
 end;
 $$;
 
-insert into public.super_admin_identities(user_id,access_key_salt,access_key_digest)
-values ('00000000-0000-4000-8000-000000000001', repeat('a',48), repeat('0',64));
-
 -- Rotation is staged first, then finalized atomically into the identity row.
 do $$
 declare uid uuid := '00000000-0000-4000-8000-000000000001';
