@@ -115,4 +115,38 @@ BEGIN
   RAISE EXCEPTION 'public roles have EXECUTE on privileged checkout RPC';
  END IF;
 END $$;
+
+-- Seller acceptance reserves every item/variant; cancellation restores all stock.
+SELECT set_config('request.jwt.claims','{"role":"authenticated","sub":"10000000-0000-0000-0000-000000000001"}',true);
+SET LOCAL ROLE authenticated;
+DO $
+DECLARE
+ v_order_id uuid; v_status public.order_status; v_reserved boolean;
+ v_stock integer; v_sizes jsonb;
+BEGIN
+ SELECT id INTO v_order_id FROM public.orders
+ WHERE idempotency_key='30000000-0000-0000-0000-000000000001';
+ PERFORM public.seller_confirm_order(v_order_id);
+ SELECT status,stock_reserved INTO v_status,v_reserved FROM public.orders WHERE id=v_order_id;
+ IF v_status<>'confirmed' OR NOT v_reserved THEN RAISE EXCEPTION 'seller confirmation did not reserve stock'; END IF;
+ SELECT stock_quantity,size_stock INTO v_stock,v_sizes FROM public.products
+ WHERE id='20000000-0000-0000-0000-000000000001';
+ IF v_stock<>17 OR v_sizes->>'M'<>'1' OR v_sizes->>'L'<>'1' THEN
+   RAISE EXCEPTION 'variant stock was not reserved across all order lines';
+ END IF;
+ SELECT stock_quantity INTO v_stock FROM public.products WHERE id='20000000-0000-0000-0000-000000000002';
+ IF v_stock<>3 THEN RAISE EXCEPTION 'non-variant stock was not reserved'; END IF;
+ PERFORM public.seller_cancel_order(v_order_id);
+ SELECT status,stock_reserved INTO v_status,v_reserved FROM public.orders WHERE id=v_order_id;
+ IF v_status<>'cancelled' OR v_reserved THEN RAISE EXCEPTION 'seller cancellation did not release reservation'; END IF;
+ SELECT stock_quantity,size_stock INTO v_stock,v_sizes FROM public.products
+ WHERE id='20000000-0000-0000-0000-000000000001';
+ IF v_stock<>20 OR v_sizes->>'M'<>'3' OR v_sizes->>'L'<>'2' THEN
+   RAISE EXCEPTION 'variant stock was not restored across all order lines';
+ END IF;
+ SELECT stock_quantity INTO v_stock FROM public.products WHERE id='20000000-0000-0000-0000-000000000002';
+ IF v_stock<>5 THEN RAISE EXCEPTION 'non-variant stock was not restored'; END IF;
+END $;
+RESET ROLE;
+
 ROLLBACK;
