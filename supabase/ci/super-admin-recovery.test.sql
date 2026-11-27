@@ -49,6 +49,21 @@ begin
   if result is distinct from true then raise exception 'bootstrap release failed'; end if;
   select public.claim_super_admin_bootstrap(second_user, now() + interval '20 minutes') into result;
   if result is distinct from true then raise exception 'bootstrap claim was not reusable after release'; end if;
+  select public.release_super_admin_bootstrap(second_user) into result;
+  if result is distinct from true then raise exception 'second bootstrap release failed'; end if;
+  select public.claim_super_admin_bootstrap(first_user, now() + interval '20 minutes') into result;
+  if result is distinct from true then raise exception 'first user could not reclaim bootstrap'; end if;
+  select public.finalize_super_admin_bootstrap(
+    first_user, 'Root Admin', 'root admin', repeat('d',48), repeat('a',64),
+    'Primary device', repeat('e',64)
+  ) into result;
+  if result is null then raise exception 'atomic bootstrap finalization failed'; end if;
+  if exists(select 1 from public.super_admin_bootstrap_claims where id = 1) then
+    raise exception 'bootstrap claim was not released after atomic finalization';
+  end if;
+  if not exists(select 1 from public.super_admin_devices where id = result and user_id = first_user and status = 'approved') then
+    raise exception 'first trusted device was not created atomically';
+  end if;
 end;
 $$;
 

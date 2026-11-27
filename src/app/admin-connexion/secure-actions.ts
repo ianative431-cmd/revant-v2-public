@@ -128,23 +128,19 @@ export async function configureInitialSuperAdminIdentity(_prev: SecureAdminState
   if (authError) return { error: "Impossible d’enregistrer la clé dans Supabase Auth. Réessaie." };
 
   const token = createDeviceToken();
-  const { data: device, error: deviceError } = await db.from("super_admin_devices").insert({
-    user_id: current.user.id, device_name: deviceName, device_token_digest: digestDeviceToken(token),
-    status: "approved", approved_at: new Date().toISOString(), last_seen_at: new Date().toISOString(),
-  }).select("id").single();
-  if (deviceError || !device) return { error: "La clé Auth est enregistrée, mais le premier appareil n’a pas pu être créé. Réessaie avec la même clé." };
-
   const salt = createAccessKeySalt();
-  const { error: identityError } = await db.from("super_admin_identities").insert({
-    user_id: current.user.id, first_name: username, last_name: "Super Admin",
-    first_name_normalized: normalizeAdminName(username), last_name_normalized: normalizeAdminName("Super Admin"),
-    access_key_salt: salt, access_key_digest: digestSuperAdminAccessKey(key, salt),
+  const { data: deviceId, error: finalizeError } = await db.rpc("finalize_super_admin_bootstrap", {
+    p_user_id: current.user.id,
+    p_first_name: username,
+    p_first_name_normalized: normalizeAdminName(username),
+    p_access_key_salt: salt,
+    p_access_key_digest: digestSuperAdminAccessKey(key, salt),
+    p_device_name: deviceName,
+    p_device_token_digest: digestDeviceToken(token),
   });
-  if (identityError) {
-    await db.from("super_admin_devices").delete().eq("id", device.id);
-    return { error: "La clé Auth est enregistrée, mais l’identité n’a pas pu être créée. Réessaie avec la même clé." };
+  if (finalizeError || !deviceId) {
+    return { error: "La clé Auth est enregistrée, mais la création transactionnelle de l’identité et du premier appareil n’a pas abouti. Réessaie avec exactement la même clé." };
   }
-  await db.rpc("release_super_admin_bootstrap", { p_user_id: current.user.id });
   (await cookies()).set(DEVICE_COOKIE, token, COOKIE_OPTIONS);
   await current.supabase.auth.signOut();
   redirect("/admin-connexion?configured=1");
