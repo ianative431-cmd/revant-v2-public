@@ -216,3 +216,5 @@ BEGIN
  VALUES (auth.uid(),'update'::public.audit_action,'order',p_order_id,'Order cancelled by seller',jsonb_build_object('from',v_status::text,'to','cancelled'));
 END;
 $function$;
+
+GRANT SELECT ON public.products, public.orders, public.order_items TO authenticated;
