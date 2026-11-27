@@ -17,12 +17,10 @@ set test.permission = 'products.manage';
 do $$
 begin
   begin
-    update public.products
-    set status = 'active'
+    update public.products set status = 'active'
     where id = '20000000-0000-4000-8000-000000000001';
     raise exception 'pending product must not be self-published';
-  exception when sqlstate '42501' then
-    null;
+  exception when sqlstate '42501' then null;
   end;
 
   begin
@@ -30,8 +28,7 @@ begin
     values ('20000000-0000-4000-8000-000000000004',
       '10000000-0000-4000-8000-000000000002', 'active');
     raise exception 'product must not be activated in a draft shop';
-  exception when sqlstate '42501' then
-    null;
+  exception when sqlstate '42501' then null;
   end;
 end;
 $$;
@@ -41,6 +38,22 @@ update public.products set status = 'archived'
 where id = '20000000-0000-4000-8000-000000000003';
 update public.products set status = 'active'
 where id = '20000000-0000-4000-8000-000000000003';
+
+-- A user with view-only permission cannot moderate products.
+set test.permission = 'products.view';
+do $$
+begin
+  begin
+    perform public.admin_moderate_product(
+      '20000000-0000-4000-8000-000000000001', 'active', null
+    );
+    raise exception 'view-only role must not moderate products';
+  exception when others then
+    if sqlerrm = 'view-only role must not moderate products' then raise; end if;
+  end;
+end;
+$$;
+set test.permission = 'products.manage';
 
 -- Admin approval is transactional, permission-gated, and requires an active shop.
 select public.admin_moderate_product(
@@ -65,9 +78,7 @@ begin
     );
     raise exception 'already approved product must not be moderated twice';
   exception when others then
-    if sqlerrm = 'already approved product must not be moderated twice' then
-      raise;
-    end if;
+    if sqlerrm = 'already approved product must not be moderated twice' then raise; end if;
   end;
 
   begin
@@ -76,9 +87,7 @@ begin
     );
     raise exception 'product in draft shop must not be approved';
   exception when others then
-    if sqlerrm = 'product in draft shop must not be approved' then
-      raise;
-    end if;
+    if sqlerrm = 'product in draft shop must not be approved' then raise; end if;
   end;
 
   begin
@@ -87,9 +96,7 @@ begin
     );
     raise exception 'rejection without a reason must fail';
   exception when others then
-    if sqlerrm = 'rejection without a reason must fail' then
-      raise;
-    end if;
+    if sqlerrm = 'rejection without a reason must fail' then raise; end if;
   end;
 end;
 $$;
@@ -109,6 +116,13 @@ begin
   if (select count(*) from public.audit_logs where entity_id = '20000000-0000-4000-8000-000000000002' and action = 'reject') <> 1 then
     raise exception 'rejection audit log was not recorded';
   end if;
+
+  begin
+    update public.products set status = 'active'
+    where id = '20000000-0000-4000-8000-000000000002';
+    raise exception 'seller must not reactivate a rejected product';
+  exception when sqlstate '42501' then null;
+  end;
 end;
 $$;
 

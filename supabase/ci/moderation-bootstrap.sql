@@ -85,3 +85,5 @@ for each row execute function private.guard_product_writes();
 grant usage on schema public, auth to anon, authenticated, service_role;
 grant usage on type public.product_status, public.shop_status, public.audit_action to anon, authenticated, service_role;
 grant execute on function auth.uid(), auth.jwt(), public.current_user_has_permission(text) to anon, authenticated, service_role;
+grant select, insert, update on public.products to authenticated;
+grant select on public.shops to authenticated;
