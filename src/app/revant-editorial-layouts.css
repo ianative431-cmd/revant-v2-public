@@ -139,3 +139,36 @@ input:not([type="checkbox"]):not([type="radio"]),select,textarea{border-radius:1
  .revant-driver-section{padding:13px!important}.revant-driver-mission,.revant-driver-available-mission{padding:12px!important}
  .revant-message-thread-body{min-height:48vh;padding-inline:12px!important}
 }
+
+
+/* Public storefront — refined identity, responsive rhythm and persistent navigation */
+.revant-storefront{padding-bottom:clamp(34px,5vw,64px)}
+.revant-storefront__hero{overflow:hidden;border:1px solid var(--brand-border);border-radius:26px;background:var(--brand-surface);box-shadow:var(--brand-shadow)}
+.revant-storefront__banner{border-radius:0!important;background-position:center;background-size:cover}
+.revant-storefront__identity{padding-inline:clamp(16px,3vw,30px);padding-bottom:clamp(20px,3vw,30px);background:var(--brand-surface)}
+.revant-storefront__identity>div{gap:clamp(14px,2vw,22px)}
+.revant-storefront__identity h1{overflow-wrap:anywhere}
+.revant-storefront__identity a,.revant-storefront__contact a{transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms ease}
+.revant-storefront__identity a:active,.revant-storefront__contact a:active{transform:translateY(1px)}
+.revant-storefront__nav{position:sticky;top:70px;z-index:25;backdrop-filter:blur(16px);background:color-mix(in srgb,var(--brand-surface) 92%,transparent)}
+.revant-storefront__nav a{min-height:40px;display:inline-flex;align-items:center}
+.revant-storefront__products{padding-top:clamp(30px,4vw,48px)}
+.revant-storefront__products>div:last-child>article{height:100%}
+.revant-storefront__contact{padding-top:12px}
+.revant-storefront__contact>div{background:linear-gradient(145deg,var(--brand-surface),var(--brand-bg))}
+.revant-storefront :where(a,button):focus-visible{outline:2px solid var(--brand-accent);outline-offset:3px}
+@media(max-width:640px){
+ .revant-storefront{padding-bottom:28px}
+ .revant-storefront__hero{border-radius:18px}
+ .revant-storefront__banner{border-radius:0!important}
+ .revant-storefront__identity{padding-inline:15px;padding-bottom:19px}
+ .revant-storefront__identity>div{gap:14px}
+ .revant-storefront__identity h1{font-size:clamp(21px,6vw,28px)}
+ .revant-storefront__nav{top:70px;gap:2px;padding:5px}
+ .revant-storefront__nav a{min-height:38px;padding-inline:12px;font-size:10px}
+ .revant-storefront__products{padding-top:28px}
+ .revant-storefront__contact{padding-top:6px}
+}
+@media(prefers-reduced-motion:reduce){
+ .revant-storefront__identity a,.revant-storefront__contact a{transition:none}
+}
