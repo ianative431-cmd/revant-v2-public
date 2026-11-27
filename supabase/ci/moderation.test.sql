@@ -1,0 +1,115 @@
+\set ON_ERROR_STOP on
+
+insert into public.shops(id, status) values
+  ('10000000-0000-4000-8000-000000000001', 'active'),
+  ('10000000-0000-4000-8000-000000000002', 'draft');
+
+insert into public.products(id, shop_id, status) values
+  ('20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', 'pending'),
+  ('20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000002', 'pending'),
+  ('20000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', 'active');
+
+set role authenticated;
+set request.jwt.claim.sub = '30000000-0000-4000-8000-000000000001';
+set request.jwt.claims = '{"role":"authenticated","aal":"aal2"}';
+set test.permission = 'products.manage';
+
+do $$
+begin
+  begin
+    update public.products
+    set status = 'active'
+    where id = '20000000-0000-4000-8000-000000000001';
+    raise exception 'pending product must not be self-published';
+  exception when sqlstate '42501' then
+    null;
+  end;
+
+  begin
+    insert into public.products(id, shop_id, status)
+    values ('20000000-0000-4000-8000-000000000004',
+      '10000000-0000-4000-8000-000000000002', 'active');
+    raise exception 'product must not be activated in a draft shop';
+  exception when sqlstate '42501' then
+    null;
+  end;
+end;
+$$;
+
+-- Sellers retain only the ordinary active <-> archived controls.
+update public.products set status = 'archived'
+where id = '20000000-0000-4000-8000-000000000003';
+update public.products set status = 'active'
+where id = '20000000-0000-4000-8000-000000000003';
+
+-- Admin approval is transactional, permission-gated, and requires an active shop.
+select public.admin_moderate_product(
+  '20000000-0000-4000-8000-000000000001', 'active', 'Contrôle du catalogue effectué'
+);
+
+do $$
+begin
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'active' then
+    raise exception 'admin approval did not activate product';
+  end if;
+  if (select count(*) from public.admin_actions where target_id = '20000000-0000-4000-8000-000000000001' and action = 'approve_product') <> 1 then
+    raise exception 'admin action was not recorded';
+  end if;
+  if (select count(*) from public.audit_logs where entity_id = '20000000-0000-4000-8000-000000000001' and action = 'approve') <> 1 then
+    raise exception 'audit log was not recorded';
+  end if;
+
+  begin
+    perform public.admin_moderate_product(
+      '20000000-0000-4000-8000-000000000001', 'active', null
+    );
+    raise exception 'already approved product must not be moderated twice';
+  exception when others then
+    if sqlerrm = 'already approved product must not be moderated twice' then
+      raise;
+    end if;
+  end;
+
+  begin
+    perform public.admin_moderate_product(
+      '20000000-0000-4000-8000-000000000002', 'active', null
+    );
+    raise exception 'product in draft shop must not be approved';
+  exception when others then
+    if sqlerrm = 'product in draft shop must not be approved' then
+      raise;
+    end if;
+  end;
+
+  begin
+    perform public.admin_moderate_product(
+      '20000000-0000-4000-8000-000000000002', 'rejected', '   '
+    );
+    raise exception 'rejection without a reason must fail';
+  exception when others then
+    if sqlerrm = 'rejection without a reason must fail' then
+      raise;
+    end if;
+  end;
+end;
+$$;
+
+select public.admin_moderate_product(
+  '20000000-0000-4000-8000-000000000002', 'rejected', 'Photos et description insuffisantes'
+);
+
+do $$
+begin
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000002') <> 'rejected' then
+    raise exception 'admin rejection did not reject product';
+  end if;
+  if (select count(*) from public.admin_actions where target_id = '20000000-0000-4000-8000-000000000002' and action = 'reject_product') <> 1 then
+    raise exception 'rejection admin action was not recorded';
+  end if;
+  if (select count(*) from public.audit_logs where entity_id = '20000000-0000-4000-8000-000000000002' and action = 'reject') <> 1 then
+    raise exception 'rejection audit log was not recorded';
+  end if;
+end;
+$$;
+
+reset role;

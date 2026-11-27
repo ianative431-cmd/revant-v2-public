@@ -1,0 +1,48 @@
+name: Validate shop and product moderation SQL
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/ci/moderation-*.sql"
+      - ".github/workflows/moderation-sql.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  moderation-postgres:
+    name: PostgreSQL 17 isolated moderation tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: revant_moderation_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d revant_moderation_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+      - name: Create isolated moderation schema
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_moderation_test -f supabase/ci/moderation-bootstrap.sql
+      - name: Apply proposed moderation migration
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_moderation_test -f supabase/migrations/20261127061500_secure_shop_product_moderation.sql
+      - name: Run moderation security and audit tests
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_moderation_test -f supabase/ci/moderation.test.sql
