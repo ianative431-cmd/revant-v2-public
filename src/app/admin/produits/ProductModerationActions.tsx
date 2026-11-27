@@ -58,7 +58,7 @@ export default function ProductModerationActions({
       </div>
       {!shopActive && (
         <p className="max-w-64 text-right text-[10px] text-amber-700">
-          Publie d'abord la boutique avant d'approuver cette annonce.
+          Publie d&apos;abord la boutique avant d&apos;approuver cette annonce.
         </p>
       )}
       {state.error && <p role="alert" className="text-right text-[10px] text-red-600">{state.error}</p>}
