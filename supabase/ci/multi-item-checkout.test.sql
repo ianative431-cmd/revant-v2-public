@@ -119,7 +119,7 @@ END $$;
 -- Seller acceptance reserves every item/variant; cancellation restores all stock.
 SELECT set_config('request.jwt.claims','{"role":"authenticated","sub":"10000000-0000-0000-0000-000000000001"}',true);
 SET LOCAL ROLE authenticated;
-DO $
+DO $$
 DECLARE
  v_order_id uuid; v_status public.order_status; v_reserved boolean;
  v_stock integer; v_sizes jsonb;
@@ -146,7 +146,7 @@ BEGIN
  END IF;
  SELECT stock_quantity INTO v_stock FROM public.products WHERE id='20000000-0000-0000-0000-000000000002';
  IF v_stock<>5 THEN RAISE EXCEPTION 'non-variant stock was not restored'; END IF;
-END $;
+END $$;
 RESET ROLE;
 
 ROLLBACK;
