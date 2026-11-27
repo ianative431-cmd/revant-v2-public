@@ -16,7 +16,7 @@ test("affiche correctement chaque statut de boutique", () => {
 });
 
 test("propose la bonne action selon le statut", () => {
-  assert.deepEqual(getShopStatusAction("draft"), { nextStatus: "active", label: "Activer", kind: "activate" });
+  assert.equal(getShopStatusAction("draft"), null);
   assert.deepEqual(getShopStatusAction("pending"), { nextStatus: "active", label: "Approuver", kind: "activate" });
   assert.deepEqual(getShopStatusAction("suspended"), { nextStatus: "active", label: "Réactiver", kind: "activate" });
   assert.deepEqual(getShopStatusAction("active"), { nextStatus: "suspended", label: "Suspendre", kind: "suspend" });
@@ -24,7 +24,7 @@ test("propose la bonne action selon le statut", () => {
 });
 
 test("autorise uniquement les transitions prévues", () => {
-  assert.equal(canTransitionShopStatus("draft", "active"), true);
+  assert.equal(canTransitionShopStatus("draft", "active"), false);
   assert.equal(canTransitionShopStatus("pending", "active"), true);
   assert.equal(canTransitionShopStatus("suspended", "active"), true);
   assert.equal(canTransitionShopStatus("active", "suspended"), true);
