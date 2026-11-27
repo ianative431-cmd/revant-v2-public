@@ -19,7 +19,7 @@ INSERT INTO public.products(id,shop_id,name,slug,base_price,currency,stock_quant
 SELECT set_config('request.jwt.claims','{"role":"service_role"}',true);
 SET LOCAL ROLE service_role;
 DO $$
-DECLARE v_first jsonb; v_retry jsonb; v_confirmation jsonb; v_count integer; v_buyer_order jsonb;
+DECLARE v_first jsonb; v_retry jsonb; v_confirmation jsonb; v_count integer; v_delivery_count integer; v_buyer_order jsonb;
 BEGIN
  v_first := public.create_guest_order_batch(
   '[
@@ -30,6 +30,15 @@ BEGIN
   repeat('a',64),'','30000000-0000-0000-0000-000000000001',NULL);
  SELECT count(*) INTO v_count FROM public.order_items WHERE order_id=(v_first->>'order_id')::uuid;
  IF v_count<>3 THEN RAISE EXCEPTION 'expected 3 lines, got %',v_count; END IF;
+ SELECT count(*) INTO v_delivery_count FROM public.deliveries WHERE order_id=(v_first->>'order_id')::uuid;
+ IF v_delivery_count<>1 THEN RAISE EXCEPTION 'expected exactly one delivery record per multi-item order'; END IF;
+ IF NOT EXISTS (
+   SELECT 1 FROM public.deliveries
+   WHERE order_id=(v_first->>'order_id')::uuid
+     AND delivery_address LIKE '%Client Test%'
+     AND delivery_address LIKE '%Quartier test, rue 1%'
+     AND pickup_address LIKE '%Boutique test%'
+ ) THEN RAISE EXCEPTION 'delivery addresses were not created for the order'; END IF;
  IF (SELECT total_amount FROM public.orders WHERE id=(v_first->>'order_id')::uuid)<>20000 THEN
   RAISE EXCEPTION 'incorrect order total'; END IF;
  v_retry := public.create_guest_order_batch(
@@ -40,6 +49,8 @@ BEGIN
   ]'::jsonb,'Client Test','+22790000000','Niamey','Quartier test, rue 1',
   repeat('a',64),'','30000000-0000-0000-0000-000000000001',NULL);
  IF v_retry->>'order_id'<>v_first->>'order_id' THEN RAISE EXCEPTION 'retry returned a different order'; END IF;
+ SELECT count(*) INTO v_delivery_count FROM public.deliveries WHERE order_id=(v_first->>'order_id')::uuid;
+ IF v_delivery_count<>1 THEN RAISE EXCEPTION 'idempotent retry duplicated the delivery record'; END IF;
  SELECT count(*) INTO v_count FROM public.orders WHERE idempotency_key='30000000-0000-0000-0000-000000000001';
  IF v_count<>1 THEN RAISE EXCEPTION 'idempotent retry created a duplicate'; END IF;
  v_confirmation := private.get_guest_order_impl(v_first->>'order_number',repeat('a',64));
