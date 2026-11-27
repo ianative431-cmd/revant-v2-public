@@ -2,11 +2,12 @@
 create table if not exists public.super_admin_bootstrap_claims (
   id smallint primary key default 1 check (id = 1),
   user_id uuid not null references auth.users(id) on delete cascade,
-  claimed_at timestamptz not null default now()
+  claimed_at timestamptz not null default now(),
+  expires_at timestamptz not null
 );
 alter table public.super_admin_bootstrap_claims enable row level security;
 revoke all on table public.super_admin_bootstrap_claims from public, anon, authenticated;
-grant select, insert on table public.super_admin_bootstrap_claims to service_role;
+grant select, insert, update, delete on table public.super_admin_bootstrap_claims to service_role;
 
 create table if not exists public.super_admin_key_rotation_pending (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -19,6 +20,33 @@ create table if not exists public.super_admin_key_rotation_pending (
 alter table public.super_admin_key_rotation_pending enable row level security;
 revoke all on table public.super_admin_key_rotation_pending from public, anon, authenticated;
 grant select, insert, update, delete on table public.super_admin_key_rotation_pending to service_role;
+
+create or replace function public.claim_super_admin_bootstrap(
+  p_user_id uuid, p_expires_at timestamptz
+) returns boolean language plpgsql security definer set search_path = '' as $$
+declare affected integer;
+begin
+  if p_expires_at <= now() or p_expires_at > now() + interval '30 minutes' then return false; end if;
+  insert into public.super_admin_bootstrap_claims(id, user_id, expires_at)
+  values (1, p_user_id, p_expires_at)
+  on conflict (id) do update
+    set user_id = excluded.user_id, claimed_at = now(), expires_at = excluded.expires_at
+    where public.super_admin_bootstrap_claims.expires_at <= now()
+       or public.super_admin_bootstrap_claims.user_id = excluded.user_id;
+  get diagnostics affected = row_count;
+  return affected = 1;
+end;
+$$;
+
+create or replace function public.release_super_admin_bootstrap(p_user_id uuid)
+returns boolean language plpgsql security definer set search_path = '' as $$
+declare affected integer;
+begin
+  delete from public.super_admin_bootstrap_claims where id = 1 and user_id = p_user_id;
+  get diagnostics affected = row_count;
+  return affected = 1;
+end;
+$$;
 
 create or replace function public.begin_super_admin_key_rotation(
   p_user_id uuid, p_operation_id uuid, p_access_key_salt text,
@@ -38,7 +66,8 @@ begin
         access_key_salt = excluded.access_key_salt,
         access_key_digest = excluded.access_key_digest,
         created_at = now(), expires_at = excluded.expires_at
-    where public.super_admin_key_rotation_pending.expires_at <= now();
+    where public.super_admin_key_rotation_pending.expires_at <= now()
+       or public.super_admin_key_rotation_pending.access_key_digest = excluded.access_key_digest;
   get diagnostics affected = row_count;
   return affected = 1;
 end;
@@ -64,7 +93,11 @@ begin
 end;
 $$;
 
+revoke all on function public.claim_super_admin_bootstrap(uuid, timestamptz) from public, anon, authenticated;
+revoke all on function public.release_super_admin_bootstrap(uuid) from public, anon, authenticated;
 revoke all on function public.begin_super_admin_key_rotation(uuid, uuid, text, text, timestamptz) from public, anon, authenticated;
 revoke all on function public.finalize_super_admin_key_rotation(uuid, uuid) from public, anon, authenticated;
+grant execute on function public.claim_super_admin_bootstrap(uuid, timestamptz) to service_role;
+grant execute on function public.release_super_admin_bootstrap(uuid) to service_role;
 grant execute on function public.begin_super_admin_key_rotation(uuid, uuid, text, text, timestamptz) to service_role;
 grant execute on function public.finalize_super_admin_key_rotation(uuid, uuid) to service_role;
