@@ -27,7 +27,8 @@ create table public.products (
   category_id uuid,
   product_type text,
   size_stock jsonb,
-  perfume_volume_ml integer
+  perfume_volume_ml integer,
+  moderation_required boolean not null default false
 );
 
 create table public.product_images (

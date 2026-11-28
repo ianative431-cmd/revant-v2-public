@@ -1,5 +1,8 @@
--- Return approved products to moderation whenever seller-visible commercial content or photos change.
--- This migration changes no existing rows; it only installs database-side guards and audit triggers.
+-- Track whether approved catalog content has changed since the last moderation decision.
+-- No existing product is automatically republished or unpublished by this migration.
+
+alter table public.products
+  add column if not exists moderation_required boolean not null default false;
 
 create or replace function private.guard_product_writes()
 returns trigger
@@ -10,7 +13,12 @@ declare
   v_shop_status text;
   v_content_changed boolean := false;
 begin
+  -- Privileged server-side moderation can clear the review flag only while
+  -- performing the pending -> active approval transition.
   if current_user not in ('anon', 'authenticated') then
+    if tg_op = 'UPDATE' and old.status = 'pending' and new.status = 'active' then
+      new.moderation_required := false;
+    end if;
     return new;
   end if;
 
@@ -35,17 +43,24 @@ begin
       raise exception 'product_field_forbidden' using errcode = '42501';
     end if;
 
-    -- A seller cannot choose the moderation state. An approved product is
-    -- automatically returned to pending when its commercial content changes.
+    if v_content_changed then
+      new.moderation_required := true;
+    end if;
+
     if old.status = 'active' and v_content_changed then
+      new.status := 'pending';
+    elsif old.status = 'archived' and old.moderation_required and new.status = 'active' then
+      -- An archived product whose content/photos changed cannot be republished
+      -- by the seller; it must pass through admin moderation again.
       new.status := 'pending';
     end if;
 
     if new.status is distinct from old.status
        and not (
          (old.status = 'active' and new.status = 'archived')
-         or (old.status = 'archived' and new.status = 'active')
+         or (old.status = 'archived' and new.status = 'active' and not old.moderation_required and not v_content_changed)
          or (old.status = 'active' and new.status = 'pending' and v_content_changed)
+         or (old.status = 'archived' and new.status = 'pending' and old.moderation_required)
        ) then
       raise exception 'product_status_forbidden' using errcode = '42501';
     end if;
@@ -72,14 +87,14 @@ security definer
 set search_path to ''
 as $function$
 begin
-  if old.status = 'active' and new.status = 'pending' then
+  if old.moderation_required is false and new.moderation_required is true then
     insert into public.audit_logs(actor_id, action, entity_type, entity_id, description, metadata)
     values (
       auth.uid(),
       'update'::public.audit_action,
       'product',
       new.id,
-      'Product returned to moderation after seller content or image changes',
+      'Product content changed; moderation is required before publication',
       jsonb_build_object(
         'from_status', old.status::text,
         'to_status', new.status::text,
@@ -95,7 +110,7 @@ drop trigger if exists audit_product_remoderation on public.products;
 create trigger audit_product_remoderation
 after update on public.products
 for each row
-when (old.status = 'active' and new.status = 'pending')
+when (old.moderation_required is false and new.moderation_required is true)
 execute function private.audit_product_remoderation();
 
 create or replace function private.remoderate_product_after_image_change()
@@ -109,17 +124,23 @@ declare
 begin
   if tg_op = 'DELETE' then
     v_product_id := old.product_id;
-    update public.products set status = 'pending'
-    where id = v_product_id and status = 'active';
+    update public.products
+      set moderation_required = true,
+          status = case when status = 'active' then 'pending'::public.product_status else status end
+    where id = v_product_id and status in ('active', 'archived');
     return old;
   end if;
 
-  update public.products set status = 'pending'
-  where id = new.product_id and status = 'active';
+  update public.products
+    set moderation_required = true,
+        status = case when status = 'active' then 'pending'::public.product_status else status end
+  where id = new.product_id and status in ('active', 'archived');
 
   if tg_op = 'UPDATE' and old.product_id is distinct from new.product_id then
-    update public.products set status = 'pending'
-    where id = old.product_id and status = 'active';
+    update public.products
+      set moderation_required = true,
+          status = case when status = 'active' then 'pending'::public.product_status else status end
+    where id = old.product_id and status in ('active', 'archived');
   end if;
 
   return new;
