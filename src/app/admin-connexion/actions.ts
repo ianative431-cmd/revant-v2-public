@@ -5,8 +5,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { checkRateLimit, getClientIdentifier, RATE_LIMIT_ERROR_MESSAGE } from "@/server/security/rate-limit";
-import { createDeviceToken, digestDeviceToken, digestSuperAdminAccessKey, hasAal2, hasVerifiedTotp, isSuperAdminUser, normalizeAdminName, safeDigestEqual } from "@/server/auth/super-admin";
+import { createDeviceToken, digestDeviceToken, digestSuperAdminAccessKey, hasAal2, hasVerifiedTotp, isSuperAdminUser, isTrustedSuperAdminDevice, normalizeAdminName, safeDigestEqual } from "@/server/auth/super-admin";
 
 export type AdminLoginState = { error: string | null };
 const genericLoginError = "Identifiants incorrects ou accès non autorisé.";
@@ -53,7 +54,31 @@ export async function verifySuperAdminMfa(formData:FormData){
 }
 
 export async function configureSuperAdminIdentity(_prev:AdminLoginState,_formData:FormData):Promise<AdminLoginState>{void _prev;void _formData;return {error:"Ancien parcours désactivé. Recommence la configuration sécurisée."};}
-async function trustedDeviceId(userId:string){const token=(await cookies()).get(DEVICE_COOKIE)?.value;if(!token)return null;const db=createSupabaseAdminClient();const {data}=await db.from("super_admin_devices").select("id").eq("user_id",userId).eq("device_token_digest",digestDeviceToken(token)).eq("status","approved").maybeSingle();return data?.id??null;}
-export async function approveSuperAdminDevice(formData:FormData){const id=String(formData.get("deviceId")??"");const current=await getCurrentSuperAdmin();if(!current||!(await hasAal2(current.supabase))||!(await trustedDeviceId(current.user.id)))return;const db=createSupabaseAdminClient();const {data:target}=await db.from("super_admin_devices").select("id,device_name").eq("id",id).eq("user_id",current.user.id).eq("status","pending").maybeSingle();if(!target)return;await db.from("super_admin_devices").update({status:"approved",approved_at:new Date().toISOString()}).eq("id",target.id);await db.from("admin_actions").insert({admin_id:current.user.id,action:"super_admin_device_approved",target_type:"super_admin_device",target_id:target.id,reason:"Appareil approuvé depuis un appareil de confiance",metadata:{device_name:target.device_name}});revalidatePath("/admin/securite/appareils");}
-export async function revokeSuperAdminDevice(formData:FormData){const id=String(formData.get("deviceId")??"");const current=await getCurrentSuperAdmin();if(!current||!(await hasAal2(current.supabase))||!(await trustedDeviceId(current.user.id)))return;const db=createSupabaseAdminClient();const {data:target}=await db.from("super_admin_devices").select("id,device_name,device_token_digest").eq("id",id).eq("user_id",current.user.id).eq("status","approved").maybeSingle();if(!target)return;const token=(await cookies()).get(DEVICE_COOKIE)?.value;if(token&&digestDeviceToken(token)===target.device_token_digest)return;await db.from("super_admin_devices").update({status:"revoked",revoked_at:new Date().toISOString()}).eq("id",target.id);await db.from("admin_actions").insert({admin_id:current.user.id,action:"super_admin_device_revoked",target_type:"super_admin_device",target_id:target.id,reason:"Appareil révoqué depuis un appareil de confiance",metadata:{device_name:target.device_name}});revalidatePath("/admin/securite/appareils");}
+
+export async function approveSuperAdminDevice(formData: FormData) {
+  const id = String(formData.get("deviceId") ?? "").trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) return;
+
+  const current = await getCurrentSuperAdmin();
+  if (!current || !(await hasAal2(current.supabase)) || !(await isTrustedSuperAdminDevice(current.user.id))) return;
+
+  const db = current.supabase as unknown as SupabaseClient;
+  const { error } = await db.rpc("admin_approve_super_admin_device", { p_device_id: id });
+  if (error) throw new Error("Impossible d’approuver cet appareil.");
+
+  revalidatePath("/admin/securite/appareils");
+}
+export async function revokeSuperAdminDevice(formData: FormData) {
+  const id = String(formData.get("deviceId") ?? "").trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) return;
+
+  const current = await getCurrentSuperAdmin();
+  if (!current || !(await hasAal2(current.supabase)) || !(await isTrustedSuperAdminDevice(current.user.id))) return;
+
+  const db = current.supabase as unknown as SupabaseClient;
+  const { error } = await db.rpc("admin_revoke_super_admin_device", { p_device_id: id });
+  if (error) throw new Error("Impossible de révoquer cet appareil.");
+
+  revalidatePath("/admin/securite/appareils");
+}
 export async function signOutSuperAdminAction(){const supabase=await createSupabaseServerClient();const {data:{user}}=await supabase.auth.getUser();const wasSuperAdmin=user?await isSuperAdminUser(user.id):false;await supabase.auth.signOut();redirect(wasSuperAdmin?"/admin-connexion":"/connexion");}
