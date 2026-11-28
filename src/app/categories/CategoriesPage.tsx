@@ -12,6 +12,17 @@ const virtualCategories = [
   { slug: "parfums", name: "Parfums", description: "Eaux de parfum et fragrances", image_url: null },
 ];
 
+const categoryDescriptions: Record<string, string> = {
+  electronique: "Téléphones, informatique, accessoires et appareils connectés.",
+  maison: "Mobilier, décoration, ustensiles et équipements pour la maison.",
+  beaute: "Soins, cosmétiques et accessoires de beauté du quotidien.",
+  sport: "Équipements, vêtements et accessoires pour vos activités sportives.",
+  auto: "Pièces, accessoires et équipements pour véhicules.",
+  restaurants: "Menus, plats et spécialités proposés par les restaurants partenaires.",
+  alimentation: "Produits alimentaires, boissons et spécialités du quotidien.",
+  electromenager: "Appareils ménagers et équipements pratiques pour la maison.",
+};
+
 export default async function CategoriesPage() {
   let categories: Awaited<ReturnType<typeof getActiveCategories>> = [];
   let categoriesUnavailable = false;
@@ -37,7 +48,7 @@ export default async function CategoriesPage() {
       .map((item) => ({
         slug: item.slug,
         name: item.name,
-        description: item.description,
+        description: item.description?.trim() || categoryDescriptions[item.slug] || "Parcourez les produits proposés par les boutiques Revant.",
         image_url: item.image_url,
       })),
   ];
