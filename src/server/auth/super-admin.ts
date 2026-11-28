@@ -2,6 +2,7 @@ import "server-only";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type ServerSupabase = Awaited<ReturnType<typeof createSupabaseServerClient>>;
@@ -48,7 +49,7 @@ export async function isTrustedSuperAdminDevice(userId: string) {
   const sessionId = getSessionIdFromAccessToken(session.access_token);
   if (!sessionId) return false;
 
-  const db = createSupabaseAdminClient();
+  const db = createSupabaseAdminClient() as unknown as SupabaseClient;
   const { data, error } = await db
     .from("super_admin_devices")
     .select("id")

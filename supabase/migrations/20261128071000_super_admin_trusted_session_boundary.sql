@@ -11,6 +11,32 @@ create unique index if not exists super_admin_devices_approved_session_uidx
 create index if not exists super_admin_devices_user_status_session_idx
   on public.super_admin_devices(user_id, status, session_id);
 
+create schema if not exists private;
+revoke all on schema private from public, anon;
+grant usage on schema private to authenticated, service_role;
+
+create or replace function private.is_current_super_admin_device_trusted()
+returns boolean
+language sql
+stable
+security definer
+set search_path to ''
+as $function$
+  select
+    (select auth.uid()) is not null
+    and (select auth.jwt() ->> 'aal') = 'aal2'
+    and exists (
+      select 1
+      from public.super_admin_devices d
+      where d.user_id = (select auth.uid())
+        and d.status = 'approved'
+        and d.session_id::text = (select auth.jwt() ->> 'session_id')
+    );
+$function$;
+
+revoke all on function private.is_current_super_admin_device_trusted() from public, anon;
+grant execute on function private.is_current_super_admin_device_trusted() to authenticated, service_role;
+
 create or replace function public.has_any_admin_role()
 returns boolean
 language sql
@@ -32,16 +58,7 @@ as $function$
         where ur.user_id = (select auth.uid())
           and ur.role = 'super_admin'
       )
-      or (
-        (select auth.jwt() ->> 'aal') = 'aal2'
-        and exists (
-          select 1
-          from public.super_admin_devices d
-          where d.user_id = (select auth.uid())
-            and d.status = 'approved'
-            and d.session_id::text = (select auth.jwt() ->> 'session_id')
-        )
-      )
+      or private.is_current_super_admin_device_trusted()
     );
 $function$;
 
@@ -73,25 +90,12 @@ as $function$
         where ur.user_id = (select auth.uid())
           and ur.role = 'super_admin'
       )
-      or (
-        (select auth.jwt() ->> 'aal') = 'aal2'
-        and exists (
-          select 1
-          from public.super_admin_devices d
-          where d.user_id = (select auth.uid())
-            and d.status = 'approved'
-            and d.session_id::text = (select auth.jwt() ->> 'session_id')
-        )
-      )
+      or private.is_current_super_admin_device_trusted()
     );
 $function$;
 
 revoke all on function public.current_user_has_permission(text) from public, anon;
 grant execute on function public.current_user_has_permission(text) to authenticated, service_role;
-
-create schema if not exists private;
-revoke all on schema private from public, anon;
-grant usage on schema private to authenticated, service_role;
 
 create or replace function private.admin_approve_super_admin_device(p_device_id uuid)
 returns void

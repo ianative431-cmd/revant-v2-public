@@ -20,6 +20,7 @@ do $$
 begin
   if has_function_privilege('anon', 'public.has_any_admin_role()', 'EXECUTE')
      or has_function_privilege('anon', 'public.current_user_has_permission(text)', 'EXECUTE')
+     or has_function_privilege('anon', 'private.is_current_super_admin_device_trusted()', 'EXECUTE')
      or has_function_privilege('anon', 'public.admin_approve_super_admin_device(uuid)', 'EXECUTE')
      or has_function_privilege('anon', 'public.admin_revoke_super_admin_device(uuid)', 'EXECUTE') then
     raise exception 'anonymous role can execute an admin security function';
