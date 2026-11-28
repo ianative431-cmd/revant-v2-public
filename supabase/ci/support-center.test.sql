@@ -323,7 +323,7 @@ begin
 end;
 $$;
 
-do $
+do $$
 begin
   if not exists (
     select 1 from pg_policies
@@ -356,7 +356,7 @@ begin
     raise exception 'Super Admin bootstrap claim user index missing';
   end if;
 end;
-$;
+$$;
 
 select 'support ticket workflow and permission tests passed' as result;
 do $$
