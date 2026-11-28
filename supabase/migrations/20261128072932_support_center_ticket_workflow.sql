@@ -25,9 +25,6 @@ create index if not exists support_tickets_status_created_idx
 create index if not exists support_tickets_assigned_status_created_idx
   on public.support_tickets(assigned_to, status, updated_at desc);
 
-create index if not exists support_messages_ticket_created_idx
-  on public.support_messages(ticket_id, created_at asc);
-
 create table public.support_ticket_events (
   id uuid primary key default gen_random_uuid(),
   ticket_id uuid not null references public.support_tickets(id) on delete restrict,
