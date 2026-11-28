@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requirePermission } from "@/server/auth/roles";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -24,9 +24,13 @@ type OrderRow = {
 };
 
 export default async function AdminCommandesPage() {
-  await requirePermission("users.view");
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  await requirePermission("support.manage");
+
+  // Le client privilégié est utilisé uniquement après le contrôle serveur
+  // support.manage. Le client normal ne peut lire que les commandes acheteur/vendeur
+  // via les politiques RLS et faisait donc apparaître une liste vide côté admin.
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
     .from("orders")
     .select(
       "id, order_number, status, total_amount, currency, created_at, order_items(product_name, variant_label, shops(name))"
@@ -34,14 +38,16 @@ export default async function AdminCommandesPage() {
     .order("created_at", { ascending: false })
     .limit(200)
     .returns<OrderRow[]>();
+
+  if (error) throw new Error("Impossible de charger les commandes administratives.");
   const orders = data ?? [];
 
   return (
     <div>
       <h1 className="text-xl font-bold mb-1">Commandes</h1>
       <p className="text-sm text-black/60 mb-6">
-        {orders.length} commande{orders.length > 1 ? "s" : ""} (200 plus récentes) — paiement réglé
-        hors app, confirmé par le vendeur.
+        {orders.length} commande{orders.length > 1 ? "s" : ""} (200 plus récentes) — suivi opérationnel.
+        Le statut de commande ne constitue pas une preuve de paiement.
       </p>
 
       {orders.length === 0 ? (
@@ -57,8 +63,9 @@ export default async function AdminCommandesPage() {
               <div key={order.id} className="bg-white rounded-2xl p-4 flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate">
-                    {firstItem?.product_name ?? "Article indisponible"}{firstItem?.variant_label ? ` · Taille : ${firstItem.variant_label}` : ""}
-                    {extraCount > 0 ? ` +${extraCount}` : ""}
+                    {firstItem?.product_name ?? "Article indisponible"}
+                    {firstItem?.variant_label ? " · Taille : " + firstItem.variant_label : ""}
+                    {extraCount > 0 ? " +" + extraCount : ""}
                   </p>
                   <p className="text-xs text-black/50 mt-0.5">
                     {firstItem?.shops?.name ?? "Boutique"} ·{" "}
@@ -67,13 +74,14 @@ export default async function AdminCommandesPage() {
                   </p>
                 </div>
                 <span
-                  className={`text-[11px] shrink-0 rounded-full px-2 py-1 ${
-                    order.status === "delivered"
+                  className={
+                    "text-[11px] shrink-0 rounded-full px-2 py-1 " +
+                    (order.status === "delivered"
                       ? "bg-black text-white"
                       : order.status === "cancelled" || order.status === "disputed"
                         ? "bg-red-50 text-red-600"
-                        : "bg-black/5 text-black/60"
-                  }`}
+                        : "bg-black/5 text-black/60")
+                  }
                 >
                   {STATUS_LABEL[order.status] ?? order.status}
                 </span>

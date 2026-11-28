@@ -33,15 +33,16 @@ export async function getCurrentUserRoles(): Promise<AppRole[]> {
     .eq("user_id", user.id);
 
   if (error) {
-    throw new Error(`Impossible de charger les rôles : ${error.message}`);
+    throw new Error("Impossible de charger les rôles : " + error.message);
   }
 
   return (data ?? []).map((r) => r.role);
 }
 
 /**
- * Rôle "principal" pour l'affichage simple (ex. annuaire utilisateurs).
- * Priorité : rôle admin le plus élevé, sinon vendeur, sinon acheteur.
+ * Rôle principal pour les éléments d'interface qui affichent un seul rôle.
+ * Les contrôles d'accès doivent utiliser les permissions cumulées, pas
+ * uniquement ce rôle principal.
  */
 export async function getCurrentUserRole(): Promise<AppRole> {
   const roles = await getCurrentUserRoles();
@@ -53,10 +54,42 @@ export async function getCurrentUserRole(): Promise<AppRole> {
 }
 
 /**
+ * Retourne l'union des permissions attribuées à tous les rôles réels
+ * de l'utilisateur. Les données viennent exclusivement de la matrice
+ * role_permissions en base, jamais des métadonnées client.
+ */
+export async function getCurrentUserPermissions(): Promise<string[]> {
+  const roles = await getCurrentUserRoles();
+  if (roles.length === 0) return [];
+
+  const supabase = await createSupabaseServerClient();
+  const { data: assignments, error: assignmentsError } = await supabase
+    .from("role_permissions")
+    .select("permission_id")
+    .in("role", roles);
+
+  if (assignmentsError) {
+    throw new Error("Impossible de vérifier les permissions administrateur.");
+  }
+
+  const permissionIds = [...new Set((assignments ?? []).map((row) => row.permission_id))];
+  if (permissionIds.length === 0) return [];
+
+  const { data: permissions, error: permissionsError } = await supabase
+    .from("permissions")
+    .select("key")
+    .in("id", permissionIds);
+
+  if (permissionsError) {
+    throw new Error("Impossible de vérifier les permissions administrateur.");
+  }
+
+  return [...new Set((permissions ?? []).map((permission) => permission.key))];
+}
+
+/**
  * Garde-fou serveur pour toute page ou Server Action réservée à
- * l'administration. Les visiteurs non connectés sont dirigés vers
- * la connexion admin dédiée, puis le rôle est relu en base à chaque
- * requête. Le rôle ne vient jamais des métadonnées modifiables du client.
+ * l'administration. Les rôles sont relus depuis la base à chaque requête.
  */
 export async function requireAdmin() {
   const currentUser = await getCurrentUser();
@@ -77,36 +110,10 @@ export async function requireAdmin() {
 
 /**
  * Vérifie une permission métier issue de role_permissions.
- * Les rôles sont relus depuis la base à chaque requête : aucune
- * permission ne provient des métadonnées modifiables du client.
  */
 export async function hasPermission(permissionKey: string): Promise<boolean> {
-  const roles = await getCurrentUserRoles();
-  if (roles.length === 0) return false;
-
-  const supabase = await createSupabaseServerClient();
-  const { data: assignments, error: assignmentsError } = await supabase
-    .from("role_permissions")
-    .select("permission_id")
-    .in("role", roles);
-
-  if (assignmentsError) {
-    throw new Error("Impossible de vérifier les permissions administrateur.");
-  }
-
-  const permissionIds = [...new Set((assignments ?? []).map((row) => row.permission_id))];
-  if (permissionIds.length === 0) return false;
-
-  const { data: permissions, error: permissionsError } = await supabase
-    .from("permissions")
-    .select("key")
-    .in("id", permissionIds);
-
-  if (permissionsError) {
-    throw new Error("Impossible de vérifier les permissions administrateur.");
-  }
-
-  return Boolean(permissions?.some((permission) => permission.key === permissionKey));
+  const permissions = await getCurrentUserPermissions();
+  return permissions.includes(permissionKey);
 }
 
 export async function requirePermission(permissionKey: string) {
