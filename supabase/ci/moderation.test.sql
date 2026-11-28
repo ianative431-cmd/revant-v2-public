@@ -184,7 +184,6 @@ begin
 end;
 $$;
 
-reset role;
 
 
 -- Editing approved commercial content must return the product to moderation.
