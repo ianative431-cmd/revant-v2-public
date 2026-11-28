@@ -110,8 +110,17 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000004',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000004","role":"authenticated"}',true);
-do $$
+do $
 begin
+  if (select count(*) from public.support_tickets where id='10000000-0000-4000-8000-000000000001') <> 0 then
+    raise exception 'second support agent can view another agent ticket';
+  end if;
+  if (select count(*) from public.support_messages where ticket_id='10000000-0000-4000-8000-000000000001') <> 0 then
+    raise exception 'second support agent can read another agent messages';
+  end if;
+  if (select count(*) from public.support_ticket_events where ticket_id='10000000-0000-4000-8000-000000000001') <> 0 then
+    raise exception 'second support agent can read another agent events';
+  end if;
   begin
     perform public.claim_support_ticket('10000000-0000-4000-8000-000000000001');
     raise exception 'second agent claimed another agent ticket';
@@ -121,6 +130,24 @@ begin
   end;
 end;
 $$;
+reset role;
+commit;
+
+-- Elevated administrators can review all support cases and their history.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000005',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000005","role":"authenticated"}',true);
+do $
+begin
+  if (select count(*) from public.support_tickets where id='10000000-0000-4000-8000-000000000001') <> 1 then
+    raise exception 'elevated admin cannot view all support tickets';
+  end if;
+  if (select count(*) from public.support_ticket_events where ticket_id='10000000-0000-4000-8000-000000000001') = 0 then
+    raise exception 'elevated admin cannot view support event history';
+  end if;
+end;
+$;
 reset role;
 commit;
 
