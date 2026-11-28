@@ -2,7 +2,7 @@ name: Validate Super Admin trusted-device session boundary
 on:
   pull_request:
     paths:
-      - "supabase/migrations/20261128071000_super_admin_trusted_session_boundary.sql"
+      - "supabase/migrations/20261128071152_super_admin_trusted_session_boundary.sql"
       - "supabase/ci/super-admin-device-session-*.sql"
       - "src/server/auth/super-admin.ts"
       - "src/app/admin-connexion/actions.ts"
@@ -43,7 +43,7 @@ jobs:
       - name: Apply trusted-device session migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_super_admin_device_test -f supabase/migrations/20261128071000_super_admin_trusted_session_boundary.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_super_admin_device_test -f supabase/migrations/20261128071152_super_admin_trusted_session_boundary.sql
       - name: Run trusted-device session security tests
         env:
           PGPASSWORD: ci-only-password
