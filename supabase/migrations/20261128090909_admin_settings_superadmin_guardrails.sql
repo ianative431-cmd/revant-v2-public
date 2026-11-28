@@ -21,7 +21,7 @@ begin
  if v_type='number' and jsonb_typeof(p_value)<>'number' then raise exception 'Valeur numérique attendue'; end if;
  if v_type='boolean' and jsonb_typeof(p_value)<>'boolean' then raise exception 'Valeur booléenne attendue'; end if;
  if v_type='string' and jsonb_typeof(p_value)<>'string' then raise exception 'Texte attendu'; end if;
- if p_key='revant.commission_percent' and ((p_value)::numeric<0 or (p_value)::numeric>100) then raise exception 'La commission doit être comprise entre 0 et 100 %%'; end if;
+ if p_key='revant.commission_percent' and ((p_value)::numeric<0 or (p_value)::numeric>100) then raise exception 'La commission doit être comprise entre 0 and 100 %%'; end if;
  update public.system_settings set value=p_value,updated_by=v_actor,updated_at=now() where key=p_key;
  insert into public.audit_logs(actor_id,action,entity_type,description,metadata)
  values(v_actor,'config_change','system_settings','Modification du paramètre '||p_key,jsonb_build_object('key',p_key,'old',v_old,'new',p_value));
