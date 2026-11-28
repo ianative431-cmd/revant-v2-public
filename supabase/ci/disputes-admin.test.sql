@@ -36,7 +36,7 @@ insert into public.order_items(id,order_id,shop_id) values
  ('40000000-0000-4000-8000-000000000002','20000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000001'),
  ('40000000-0000-4000-8000-000000000003','20000000-0000-4000-8000-000000000006','10000000-0000-4000-8000-000000000001');
 
-do $$
+do $block$
 begin
   if (select prosecdef from pg_proc where oid='public.admin_update_dispute(uuid,text,text)'::regprocedure) then
     raise exception 'public dispute RPC must be SECURITY INVOKER';
@@ -48,14 +48,14 @@ begin
     raise exception 'anonymous role can execute dispute decisions';
   end if;
 end;
-$;
+$block$;
 
 -- Pending, cancelled and refunded orders cannot enter the formal dispute workflow.
 begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
-do $$
+do $block$
 begin
   begin
     insert into public.disputes(order_id,opened_by,reason,description)
@@ -78,7 +78,7 @@ begin
   exception when insufficient_privilege then null;
   end;
 end;
-$;
+$block$;
 reset role;
 commit;
 
@@ -119,7 +119,7 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000005',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000005","role":"authenticated"}',true);
-do $$
+do $block$
 begin
   begin
     insert into public.disputes(order_id,opened_by,reason,description)
@@ -128,7 +128,7 @@ begin
   exception when insufficient_privilege then null;
   end;
 end;
-$;
+$block$;
 reset role;
 commit;
 
@@ -136,7 +136,7 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
-do $$
+do $block$
 begin
   begin
     insert into public.disputes(order_id,opened_by,reason,description)
@@ -145,7 +145,7 @@ begin
   exception when unique_violation then null;
   end;
 end;
-$;
+$block$;
 reset role;
 commit;
 
@@ -156,7 +156,7 @@ select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000003'
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
 select public.admin_update_dispute('50000000-0000-4000-8000-000000000001','review',null);
 reset role;
-do $assert$
+do $block$
 begin
   if not exists (
     select 1 from public.disputes
@@ -164,7 +164,7 @@ begin
       and status='under_review' and assigned_to='00000000-0000-4000-8000-000000000003'
   ) then raise exception 'support agent claim failed'; end if;
 end;
-$assert$;
+$block$;
 reset role;
 commit;
 
@@ -180,7 +180,7 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000003',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
-do $$
+do $block$
 begin
   begin
     perform public.admin_update_dispute('50000000-0000-4000-8000-000000000001','buyer','Décision en faveur de l’acheteur.');
@@ -190,7 +190,7 @@ begin
     if sqlerrm <> 'dispute_assigned_to_another_agent' and sqlerrm <> 'dispute_must_be_claimed_before_decision' then raise; end if;
   end;
 end;
-$;
+$block$;
 reset role;
 commit;
 
@@ -199,7 +199,7 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000004',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000004","role":"authenticated"}',true);
-do $$
+do $block$
 begin
   begin
     perform public.admin_update_dispute('50000000-0000-4000-8000-000000000001','buyer',null);
@@ -209,14 +209,14 @@ begin
     if sqlerrm <> 'resolution_note_required' then raise; end if;
   end;
 end;
-$;
+$block$;
 select public.admin_update_dispute(
  '50000000-0000-4000-8000-000000000001',
  'buyer',
  'Décision favorable à l’acheteur après vérification du dossier.'
 );
 reset role;
-do $assert$
+do $block$
 begin
   if not exists (
     select 1 from public.disputes
@@ -232,7 +232,7 @@ begin
     raise exception 'dispute audit history incomplete';
   end if;
 end;
-$assert$;
+$block$;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000004',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000004","role":"authenticated"}',true);
@@ -258,7 +258,7 @@ select public.admin_update_dispute(
 reset role;
 commit;
 
-do $$
+do $block$
 begin
   if not exists (
     select 1 from public.disputes
@@ -267,6 +267,6 @@ begin
       and assigned_to='00000000-0000-4000-8000-000000000003'
   ) then raise exception 'support agent resolution failed'; end if;
 end;
-$;
+$block$;
 
 select 'dispute eligibility, assignment, decisions and audit tests passed' as result;
