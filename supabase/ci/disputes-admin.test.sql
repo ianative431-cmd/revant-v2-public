@@ -155,7 +155,8 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000003',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
 select public.admin_update_dispute('50000000-0000-4000-8000-000000000001','review',null);
-do $$
+reset role;
+do $
 begin
   if not exists (
     select 1 from public.disputes
@@ -214,7 +215,8 @@ select public.admin_update_dispute(
  'buyer',
  'Décision favorable à l’acheteur après vérification du dossier.'
 );
-do $$
+reset role;
+do $
 begin
   if not exists (
     select 1 from public.disputes
@@ -231,6 +233,9 @@ begin
   end if;
 end;
 $$;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000004',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000004","role":"authenticated"}',true);
 select public.admin_update_dispute(
  '50000000-0000-4000-8000-000000000001',
  'close',

@@ -224,7 +224,7 @@ export default async function AdminDisputesPage() {
 
                   {(canClaim || canResolve || canClose) && (
                     <div className="mt-5 space-y-3 border-t border-brand-border pt-4">
-                      {canClaim && !canDecide && (
+                      {canClaim && (dispute.assigned_to === null || (canManageAll && dispute.assigned_to !== user.id)) && (
                         <form action={updateDisputeAction} className="flex flex-wrap items-end gap-3">
                           <input type="hidden" name="disputeId" value={dispute.id} />
                           <input type="hidden" name="action" value="review" />
