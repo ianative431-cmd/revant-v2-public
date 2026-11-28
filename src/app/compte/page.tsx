@@ -9,7 +9,12 @@ export default async function ComptePage() {
   return (
     <div className="min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
       <div className="w-full max-w-xl rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-8">
-        <AvatarUploader userId={user.id} initialAvatarUrl={(user.user_metadata?.avatar_url as string | undefined) ?? null} email={user.email} phone={user.phone} />
+        <AvatarUploader
+          userId={user.id}
+          initialAvatarUrl={(user.user_metadata?.avatar_url as string | undefined) ?? null}
+          email={user.email}
+          phone={user.phone}
+        />
         <h1 className="mb-1 text-center text-2xl font-black tracking-tight text-[var(--brand-text)]">Mon compte</h1>
         <p className="mb-6 text-center text-sm text-[var(--brand-muted)]">Connecté avec succès.</p>
         <dl className="mb-6 space-y-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-4 text-sm">
