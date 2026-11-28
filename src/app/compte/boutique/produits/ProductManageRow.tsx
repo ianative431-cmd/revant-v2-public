@@ -94,6 +94,13 @@ export default function ProductManageRow({ product, shopStatus }: { product: Pro
         <p className="text-sm font-black text-[var(--brand-accent)]">
           {product.base_price.toLocaleString("fr-FR")} {product.currency}
         </p>
+        {status === "pending" && (
+          <p className="mt-1 text-[11px] leading-5 text-amber-700">
+            {shopStatus === "active"
+              ? "Annonce en attente de validation par Revant."
+              : "Annonce enregistrée. Elle pourra être examinée après publication de la boutique."}
+          </p>
+        )}
 
         <div className="mt-2 flex flex-wrap gap-2">
           <Link

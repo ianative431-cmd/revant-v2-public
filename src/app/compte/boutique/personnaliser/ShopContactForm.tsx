@@ -34,6 +34,9 @@ export default function ShopContactForm({
       <p className="mt-1 text-xs leading-5 text-[var(--brand-muted)]">
         Ces informations apparaissent sur la vitrine publique de ta boutique.
       </p>
+      <p className="mt-3 rounded-xl border border-amber-700/15 bg-amber-50/70 px-3 py-2.5 text-xs leading-5 text-amber-900">
+        Pour envoyer ta boutique en validation, enregistre au moins un numéro de téléphone ou WhatsApp. Le numéro choisi sera affiché aux clients sur ta vitrine.
+      </p>
 
       <form action={formAction} className="mt-4 flex flex-col gap-3">
         <label className="text-xs font-semibold text-[var(--brand-muted)]">

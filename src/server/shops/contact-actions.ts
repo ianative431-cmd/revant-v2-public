@@ -65,6 +65,7 @@ export async function updateShopContacts(
   }
 
   revalidatePath("/compte/boutique/personnaliser");
+  revalidatePath("/compte/boutique");
   revalidatePath("/shop/" + shop.slug);
 
   return { error: null, success: "Coordonnées et réseaux sociaux enregistrés." };
