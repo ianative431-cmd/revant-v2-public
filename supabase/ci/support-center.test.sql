@@ -124,6 +124,35 @@ begin
 end;
 $$;
 
+-- Notifications are readable only by their intended recipients.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+do $
+begin
+  if (select count(*) from public.notifications where data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001') <> 1 then
+    raise exception 'customer cannot read only their support notification';
+  end if;
+end;
+$;
+reset role;
+commit;
+
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
+do $
+begin
+  if (select count(*) from public.notifications where data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001') <> 1 then
+    raise exception 'assigned agent cannot read their support notification';
+  end if;
+end;
+$;
+reset role;
+commit;
+
 -- A second support agent cannot take a ticket already assigned to another agent.
 begin;
 set local role authenticated;
