@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - "supabase/migrations/20261128074843_support_center_ticket_workflow.sql"
+      - "supabase/migrations/20261128075204_support_policy_consolidation_and_fk_indexes.sql"
       - "supabase/ci/support-center-*.sql"
   workflow_dispatch:
 permissions:
@@ -41,6 +42,10 @@ jobs:
         env:
           PGPASSWORD: ci-only-password
         run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_support_test -f supabase/migrations/20261128074843_support_center_ticket_workflow.sql
+      - name: Apply support policy consolidation and FK indexes
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_support_test -f supabase/migrations/20261128075204_support_policy_consolidation_and_fk_indexes.sql
       - name: Run support workflow tests
         env:
           PGPASSWORD: ci-only-password
