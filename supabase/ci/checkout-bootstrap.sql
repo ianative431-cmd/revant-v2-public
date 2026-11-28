@@ -235,7 +235,8 @@ CREATE TABLE public.wallets (
   currency character(3) NOT NULL DEFAULT 'XOF',
   available_balance numeric NOT NULL DEFAULT 0,
   pending_balance numeric NOT NULL DEFAULT 0,
-  status text NOT NULL DEFAULT 'active'
+  status text NOT NULL DEFAULT 'active',
+  updated_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE TABLE public.ledger_entries (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
