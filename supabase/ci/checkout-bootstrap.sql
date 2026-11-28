@@ -228,12 +228,7 @@ CREATE TABLE public.system_settings (
 INSERT INTO public.system_settings(key,value)
 VALUES ('revant.commission_percent','0.5'::jsonb);
 
-CREATE TABLE public.payments (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  order_id uuid NOT NULL REFERENCES public.orders(id),
-  status text NOT NULL,
-  paid_at timestamptz
-);
+ALTER TABLE public.payments ADD COLUMN paid_at timestamptz;
 CREATE TABLE public.wallets (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL UNIQUE,
