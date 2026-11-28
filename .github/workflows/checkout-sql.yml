@@ -45,7 +45,7 @@ jobs:
       - name: Apply immutable order commission migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/migrations/20261128170000_order_commission_snapshot.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/migrations/20261128151026_order_commission_snapshot.sql
       - name: Run checkout integration and privilege tests
         env:
           PGPASSWORD: ci-only-password
@@ -53,7 +53,7 @@ jobs:
       - name: Apply manual payout finalization migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/migrations/20261128180000_manual_payout_finalization.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/migrations/20261128153211_manual_payout_finalization.sql
       - name: Run commission snapshot integration tests
         env:
           PGPASSWORD: ci-only-password
