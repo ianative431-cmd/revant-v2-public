@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - "supabase/migrations/**"
-      - "supabase/ci/moderation-*.sql"
+      - "supabase/ci/moderation*.sql"
       - ".github/workflows/product-remoderation-sql.yml"
   workflow_dispatch:
 permissions:
