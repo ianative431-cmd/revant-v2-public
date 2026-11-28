@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
 import { getOrderById } from "@/server/orders/orders";
 import BuyerOrderActions from "../BuyerOrderActions";
+import CreateDisputeForm from "@/components/disputes/CreateDisputeForm";
 import type { OrderStatus } from "@/types/order";
 
 type Props = { params: Promise<{ id: string }> };
@@ -19,6 +20,8 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   refunded: "Remboursée",
   disputed: "En litige",
 };
+
+const DISPUTE_ELIGIBLE_ORDER_STATUSES = new Set(["confirmed", "processing", "ready_for_delivery", "shipped", "delivered", "disputed"]);
 
 const DELIVERY_STATUS_LABEL: Record<string, string> = {
   unassigned: "Recherche d’un livreur",
@@ -46,6 +49,9 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
 
   // Sellers may also see orders through RLS; this route is strictly buyer-only.
   if (!order || order.buyer_id !== user.id) notFound();
+
+  const { data: dispute, error: disputeError } = await supabase.from("disputes").select("id,status,reason,description,resolution_note,created_at,resolved_at").eq("order_id", id).maybeSingle();
+  if (disputeError) throw disputeError;
 
   const delivery = order.delivery;
   const deliveryStatus = delivery?.status ?? null;
@@ -163,6 +169,21 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
           </section>
         )}
 
+        <section className="revant-order-content-panel mt-5 rounded-[26px] border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 shadow-sm sm:p-6" aria-labelledby="order-dispute-title">
+          <h2 id="order-dispute-title" className="text-base font-black">Assistance et litiges</h2>
+          {dispute ? (
+            <div className="mt-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-4">
+              <p className="text-xs font-extrabold uppercase tracking-wide text-[var(--brand-muted)]">Dossier {dispute.id.slice(0, 8)} · {dispute.status === "open" ? "Ouvert" : dispute.status === "under_review" ? "En cours d’examen" : dispute.status === "resolved_buyer" ? "Résolu en ta faveur" : dispute.status === "resolved_seller" ? "Résolu en faveur du vendeur" : dispute.status === "rejected" ? "Rejeté" : "Clôturé"}</p>
+              <p className="mt-2 text-sm font-bold">{dispute.reason}</p>
+              <p className="mt-1 whitespace-pre-wrap text-xs leading-relaxed text-[var(--brand-muted)]">{dispute.description}</p>
+              {dispute.resolution_note && <div className="mt-3 border-t border-[var(--brand-border)] pt-3"><p className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--brand-muted)]">Réponse du support</p><p className="mt-1 whitespace-pre-wrap text-sm">{dispute.resolution_note}</p></div>}
+            </div>
+          ) : DISPUTE_ELIGIBLE_ORDER_STATUSES.has(order.status) ? (
+            <div className="mt-3 space-y-2"><p className="text-xs leading-relaxed text-[var(--brand-muted)]">Si un problème sérieux concerne cette commande, transmets les faits au support Revant.</p><CreateDisputeForm orderId={order.id} /></div>
+          ) : (
+            <p className="mt-2 text-xs leading-relaxed text-[var(--brand-muted)]">L’ouverture d’un litige devient possible après confirmation de la commande par le vendeur.</p>
+          )}
+        </section>
         <div className="mt-5 flex flex-wrap gap-3">
           {order.status === "pending" && <BuyerOrderActions orderId={order.id} />}
           {order.status === "delivered" && (

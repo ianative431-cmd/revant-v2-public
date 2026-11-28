@@ -25,6 +25,7 @@ import {
   FileCheck,
   Repeat,
   LifeBuoy,
+  Gavel,
   LogOut,
   type LucideIcon,
 } from "lucide-react";
@@ -50,6 +51,7 @@ const ICONS: Record<string, LucideIcon> = {
   "/admin/demandes-suppression": ClipboardList,
   "/admin/messages": MessageSquare,
   "/admin/support": LifeBuoy,
+  "/admin/litiges": Gavel,
   "/admin/whatsapp": MessageCircle,
   "/admin/securite": ShieldCheck,
   "/admin/kyc": FileCheck,
