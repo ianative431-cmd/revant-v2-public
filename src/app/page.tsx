@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveProducts } from "@/server/products/products";
 import { getActiveCategories } from "@/server/catalog/categories";
+import { resolveCatalogCategoryFilter } from "@/lib/catalog-category-filter.mjs";
 import { getActiveShops } from "@/server/shops/shops";
 import { getCategoryCoverImage } from "@/content/products/category-cover-images";
 import SiteHeader from "@/components/layout/SiteHeader";
@@ -80,15 +81,13 @@ export default async function Home({ searchParams }: Props) {
     } catch {
       categoriesUnavailable = true;
     }
-    const productType = categorie === "mode" ? "clothing" : categorie === "parfums" ? "perfume" : undefined;
-    const categoryId = productType ? undefined : categories.find((c) => c.slug === categorie)?.id;
-    if (categorie && !productType && categoriesUnavailable) {
-      productsUnavailable = true;
-    } else if (categorie && !productType && !categoryId) {
-      loadedProducts = [];
+    const categoryFilter = resolveCatalogCategoryFilter(categorie ?? "", categories, categoriesUnavailable);
+    if (categorie && !categoryFilter) {
+      if (categoriesUnavailable) productsUnavailable = true;
+      else loadedProducts = [];
     } else {
       try {
-        loadedProducts = await getActiveProducts(supabase, { categoryId, productType, limit: 24, searchTerm: q?.trim() || undefined });
+        loadedProducts = await getActiveProducts(supabase, { ...categoryFilter, limit: 24, searchTerm: q?.trim() || undefined });
       } catch {
         productsUnavailable = true;
       }
