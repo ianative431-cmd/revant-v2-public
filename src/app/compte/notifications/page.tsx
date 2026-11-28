@@ -43,9 +43,12 @@ export default async function NotificationsPage() {
       /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.support_ticket_id)
       ? payload.support_ticket_id
       : null;
-    const supportTicketHref = supportTicketId
-      ? canManageSupport ? `/admin/support/${supportTicketId}` : `/compte/support/${supportTicketId}`
+    let supportTicketHref: string | null = supportTicketId
+      ? `/compte/support/${supportTicketId}`
       : null;
+    if (supportTicketId && canManageSupport) {
+      supportTicketHref = `/admin/support/${supportTicketId}`;
+    }
     return { ...item, deliveryCode, supportTicketId, supportTicketHref };
   });
 
