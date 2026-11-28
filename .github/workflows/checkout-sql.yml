@@ -50,7 +50,15 @@ jobs:
         env:
           PGPASSWORD: ci-only-password
         run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/ci/multi-item-checkout.test.sql
+      - name: Apply manual payout finalization migration
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/migrations/20261128180000_manual_payout_finalization.sql
       - name: Run commission snapshot integration tests
         env:
           PGPASSWORD: ci-only-password
         run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/ci/order-commission-snapshot.test.sql
+      - name: Run manual payout finalization tests
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_checkout_test -f supabase/ci/manual-payout-finalization.test.sql
