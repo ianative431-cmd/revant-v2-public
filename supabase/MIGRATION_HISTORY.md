@@ -140,3 +140,6 @@ The following migration versions were verified in the production project's `supa
 This section records the new migrations confirmed on this date. It does **not** claim that the older local/remote migration inventory is fully reconciled; the earlier drift review remains open for a complete SQL-effect comparison.
 
 - `20261128075530_support_policy_consolidation_and_fk_indexes.sql` — consolidates support ticket/message SELECT policies and adds indexes for support event actors and Super Admin bootstrap claims.
+
+
+- `20261128090909_admin_settings_superadmin_guardrails.sql` — applied to production after PR #246 was merged. Removes `settings.manage` from the generic `admin` role and makes the database-side setting writer require the Super Admin role plus the current trusted device-bound session. Production verification confirmed that only `super_admin` retains `settings.manage`, the private writer remains SECURITY DEFINER, and the public wrapper keeps its existing three-argument signature. The database applied version is `20261128090909`; the source file was aligned to that recorded version.

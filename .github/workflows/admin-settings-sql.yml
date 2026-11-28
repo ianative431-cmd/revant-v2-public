@@ -2,7 +2,7 @@ name: Validate admin settings permission guardrails
 on:
   pull_request:
     paths:
-      - "supabase/migrations/20261128085515_admin_settings_superadmin_guardrails.sql"
+      - "supabase/migrations/20261128090909_admin_settings_superadmin_guardrails.sql"
       - "supabase/ci/admin-settings-*.sql"
       - ".github/workflows/admin-settings-sql.yml"
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
       - name: Apply migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_settings_test -f supabase/migrations/20261128085515_admin_settings_superadmin_guardrails.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_settings_test -f supabase/migrations/20261128090909_admin_settings_superadmin_guardrails.sql
       - name: Test permission boundaries
         env:
           PGPASSWORD: ci-only-password
