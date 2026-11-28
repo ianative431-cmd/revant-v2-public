@@ -1,0 +1,43 @@
+name: Validate admin settings permission guardrails
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/20261128085515_admin_settings_superadmin_guardrails.sql"
+      - "supabase/ci/admin-settings-*.sql"
+      - ".github/workflows/admin-settings-sql.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  postgres-17:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: revant_settings_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d revant_settings_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install --yes postgresql-client
+      - name: Bootstrap isolated schema
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_settings_test -f supabase/ci/admin-settings-bootstrap.sql
+      - name: Apply migration
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_settings_test -f supabase/migrations/20261128085515_admin_settings_superadmin_guardrails.sql
+      - name: Test permission boundaries
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_settings_test -f supabase/ci/admin-settings.test.sql
