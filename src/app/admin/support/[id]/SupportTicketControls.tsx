@@ -30,16 +30,18 @@ export default function SupportTicketControls({
   priority,
   assignedTo,
   currentUserId,
+  canManageAll,
 }: {
   ticketId: string;
   status: string;
   priority: string;
   assignedTo: string | null;
   currentUserId: string;
+  canManageAll: boolean;
 }) {
   const [claimState, claimAction, claimPending] = useActionState(claimSupportTicketAction, INITIAL_STATE);
   const [updateState, updateAction, updatePending] = useActionState(updateSupportTicketAction, INITIAL_STATE);
-  const canClaim = !assignedTo || assignedTo === currentUserId;
+  const canClaim = !assignedTo || assignedTo === currentUserId || canManageAll;
 
   return (
     <div className="space-y-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4">

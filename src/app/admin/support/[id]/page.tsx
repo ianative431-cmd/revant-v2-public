@@ -65,6 +65,7 @@ export default async function AdminSupportDetailPage({ params }: { params: Promi
           priority={ticket.priority}
           assignedTo={ticket.assigned_to}
           currentUserId={user.id}
+          canManageAll={canManageAll}
         />
       </div>
 
