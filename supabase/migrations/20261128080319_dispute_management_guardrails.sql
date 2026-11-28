@@ -248,3 +248,80 @@ create policy "order participants can view disputes"
     private.is_order_buyer(order_id)
     or private.is_order_seller(order_id)
   );
+
+
+-- Notify the non-acting order participants when a dispute is opened or updated.
+create or replace function private.notify_dispute_participants()
+returns trigger
+language plpgsql
+security definer
+set search_path to ''
+as $function$
+declare
+  v_order public.orders%rowtype;
+  v_actor uuid := auth.uid();
+  v_recipient uuid;
+  v_title text;
+  v_body text;
+begin
+  select * into v_order
+  from public.orders
+  where id = new.order_id;
+
+  if not found then
+    return new;
+  end if;
+
+  if tg_op = 'INSERT' then
+    v_title := 'Nouveau litige sur une commande';
+    v_body := 'Un litige a été ouvert pour la commande ' ||
+      coalesce(v_order.order_number::text, left(new.order_id::text, 8)) ||
+      '. Consulte tes commandes pour suivre le dossier.';
+  else
+    v_title := 'Mise à jour de ton litige';
+    v_body := 'Le dossier lié à la commande ' ||
+      coalesce(v_order.order_number::text, left(new.order_id::text, 8)) ||
+      ' a été mis à jour : ' || new.status::text || '.';
+  end if;
+
+  for v_recipient in
+    select distinct participant_id
+    from (
+      select v_order.buyer_id as participant_id
+      union
+      select s.owner_id as participant_id
+      from public.order_items oi
+      join public.shops s on s.id = oi.shop_id
+      where oi.order_id = new.order_id
+    ) participants
+    where participant_id is not null
+      and (v_actor is null or participant_id <> v_actor)
+  loop
+    insert into public.notifications(user_id, type, title, body, data)
+    values (
+      v_recipient,
+      'system'::public.notification_type,
+      v_title,
+      v_body,
+      jsonb_build_object(
+        'kind', 'dispute_case',
+        'dispute_id', new.id,
+        'order_id', new.order_id,
+        'status', new.status::text
+      )
+    );
+  end loop;
+
+  return new;
+end;
+$function$;
+
+revoke all on function private.notify_dispute_participants() from public, anon, authenticated;
+grant execute on function private.notify_dispute_participants() to service_role;
+
+drop trigger if exists disputes_notify_participants on public.disputes;
+create trigger disputes_notify_participants
+  after insert or update of status, assigned_to, resolution_note
+  on public.disputes
+  for each row
+  execute function private.notify_dispute_participants();

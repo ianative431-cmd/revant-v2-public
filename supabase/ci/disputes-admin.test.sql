@@ -96,6 +96,20 @@ values (
  'Le produit reçu ne correspond pas à la description publiée.'
 );
 reset role;
+do $block$
+begin
+  if not exists (
+    select 1 from public.notifications
+    where user_id='00000000-0000-4000-8000-000000000002'
+      and data->>'dispute_id'='50000000-0000-4000-8000-000000000001'
+  ) then raise exception 'seller was not notified about buyer dispute'; end if;
+  if exists (
+    select 1 from public.notifications
+    where user_id='00000000-0000-4000-8000-000000000001'
+      and data->>'dispute_id'='50000000-0000-4000-8000-000000000001'
+  ) then raise exception 'dispute opener received an unnecessary self-notification'; end if;
+end;
+$block$;
 commit;
 
 -- Both buyer and seller can read the shared dispute; unrelated users cannot.
@@ -155,6 +169,15 @@ values (
  'Le client ne répond pas malgré plusieurs tentatives de livraison.'
 );
 reset role;
+do $block$
+begin
+  if not exists (
+    select 1 from public.notifications
+    where user_id='00000000-0000-4000-8000-000000000001'
+      and data->>'dispute_id'='50000000-0000-4000-8000-000000000001'
+  ) then raise exception 'buyer cannot see shared dispute notification'; end if;
+end;
+$block$;
 commit;
 
 -- A non-participant cannot open a dispute, and one dispute per order is enforced.
@@ -273,6 +296,9 @@ begin
   end if;
   if (select count(*) from public.audit_logs where entity_type='dispute' and entity_id='50000000-0000-4000-8000-000000000001') <> 3 then
     raise exception 'dispute audit history incomplete';
+  end if;
+  if (select count(*) from public.notifications where data->>'dispute_id'='50000000-0000-4000-8000-000000000001' and user_id in ('00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002')) < 4 then
+    raise exception 'buyer and seller were not notified of dispute updates';
   end if;
 end;
 $block$;
