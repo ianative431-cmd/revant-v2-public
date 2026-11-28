@@ -143,3 +143,6 @@ This section records the new migrations confirmed on this date. It does **not** 
 
 
 - `20261128090909_admin_settings_superadmin_guardrails.sql` — applied to production after PR #246 was merged. Removes `settings.manage` from the generic `admin` role and makes the database-side setting writer require the Super Admin role plus the current trusted device-bound session. Production verification confirmed that only `super_admin` retains `settings.manage`, the private writer remains SECURITY DEFINER, and the public wrapper keeps its existing three-argument signature. The database applied version is `20261128090909`; the source file was aligned to that recorded version.
+
+
+- `20261128091808_admin_private_rpc_boundary.sql` — applied to production after PR #248 was merged. Revokes direct `anon`/`authenticated`/`PUBLIC` execution on eight SECURITY DEFINER private admin implementation RPCs, while converting the corresponding public wrappers to SECURITY DEFINER with their existing permission or trusted Super Admin checks preserved. Production verification confirmed that authenticated direct execution is false for all eight private functions, service_role execution remains available, and the eight public wrappers remain executable by authenticated with their guards intact.
