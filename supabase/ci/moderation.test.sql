@@ -238,9 +238,6 @@ begin
 end;
 $$;
 
-reset role;
-
-
 -- An archived product with modified content/photos cannot be republished directly.
 select public.admin_moderate_product(
   '20000000-0000-4000-8000-000000000001', 'active', 'Approbation avant archivage'
