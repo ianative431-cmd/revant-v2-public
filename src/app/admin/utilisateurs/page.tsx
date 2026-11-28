@@ -47,7 +47,7 @@ export default async function AdminUtilisateursPage() {
     <div>
       <h1 className="text-xl font-bold mb-1">Utilisateurs</h1>
       <p className="text-sm text-black/60 mb-2">
-        ${users.length} compte${users.length > 1 ? "s" : ""} réel${users.length > 1 ? "s" : ""}.
+        {users.length} compte${users.length > 1 ? "s" : ""} réel${users.length > 1 ? "s" : ""}.
       </p>
       {canManageAssociate && <p className="text-xs text-black/50 mb-6">Le rôle associé donne uniquement accès à la consultation des boutiques et produits. Aucun accès aux finances, paiements, retraits, KYC ou paramètres.</p>}
       {!canManageAssociate && <div className="mb-6" />}

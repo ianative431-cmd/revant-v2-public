@@ -184,4 +184,108 @@ begin
 end;
 $$;
 
+
+
+-- Editing approved commercial content must return the product to moderation.
+update public.products
+set name = 'Nom commercial modifié'
+where id = '20000000-0000-4000-8000-000000000001';
+
+do $$
+begin
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'pending' then
+    raise exception 'approved product content edit must return product to pending';
+  end if;
+  if (select count(*) from public.audit_logs where entity_id = '20000000-0000-4000-8000-000000000001' and description = 'Product content changed; moderation is required before publication') <> 1 then
+    raise exception 'product re-moderation audit entry missing';
+  end if;
+  begin
+    update public.products set status = 'active'
+    where id = '20000000-0000-4000-8000-000000000001';
+    raise exception 'seller must not self-approve edited product';
+  exception when sqlstate '42501' then null;
+  end;
+end;
+$$;
+
+-- An image change is also catalog content and must trigger re-moderation.
+select public.admin_moderate_product(
+  '20000000-0000-4000-8000-000000000001', 'active', 'Nouvelle approbation après modification'
+);
+insert into public.product_images(product_id, image_url, sort_order)
+values ('20000000-0000-4000-8000-000000000001', 'https://example.test/product-a.jpg', 0);
+
+do $$
+begin
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'pending' then
+    raise exception 'adding an image to an approved product must return it to pending';
+  end if;
+end;
+$$;
+
+select public.admin_moderate_product(
+  '20000000-0000-4000-8000-000000000001', 'active', 'Approbation après ajout de photo'
+);
+update public.product_images
+set image_url = 'https://example.test/product-a-updated.jpg'
+where product_id = '20000000-0000-4000-8000-000000000001';
+
+do $$
+begin
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'pending' then
+    raise exception 'updating an image must return product to pending';
+  end if;
+end;
+$$;
+
+-- An archived product with modified content/photos cannot be republished directly.
+select public.admin_moderate_product(
+  '20000000-0000-4000-8000-000000000001', 'active', 'Approbation avant archivage'
+);
+update public.products set status = 'archived'
+where id = '20000000-0000-4000-8000-000000000001';
+update public.product_images
+set image_url = 'https://example.test/product-a-archived-edit.jpg'
+where product_id = '20000000-0000-4000-8000-000000000001';
+
+do $debug$
+begin
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'archived' then
+    raise exception 'photo change must not republish an archived product';
+  end if;
+  if (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001') is not true then
+    raise exception 'archived product must retain moderation_required flag after photo change';
+  end if;
+  raise notice 'Before seller reactivation: status=%, moderation_required=%',
+    (select status from public.products where id = '20000000-0000-4000-8000-000000000001'),
+    (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001');
+end;
+$debug$;
+
+update public.products set status = 'active'
+where id = '20000000-0000-4000-8000-000000000001';
+
+do $debug$
+begin
+  raise notice 'After seller reactivation: status=%, moderation_required=%',
+    (select status from public.products where id = '20000000-0000-4000-8000-000000000001'),
+    (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001');
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'pending' then
+    raise exception 'archived edited product must return to pending instead of self-publishing';
+  end if;
+end;
+$debug$;
+
+select public.admin_moderate_product(
+  '20000000-0000-4000-8000-000000000001', 'active', 'Approbation après revue des modifications'
+);
+
+do $debug$
+begin
+  if (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001') is not false then
+    raise exception 'admin approval must clear moderation_required';
+  end if;
+end;
+$debug$;
+
 reset role;
