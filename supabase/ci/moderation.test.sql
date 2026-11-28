@@ -251,7 +251,7 @@ update public.product_images
 set image_url = 'https://example.test/product-a-archived-edit.jpg'
 where product_id = '20000000-0000-4000-8000-000000000001';
 
-do $$
+do $debug$
 begin
   if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'archived' then
     raise exception 'photo change must not republish an archived product';
@@ -259,37 +259,36 @@ begin
   if (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001') is not true then
     raise exception 'archived product must retain moderation_required flag after photo change';
   end if;
+  raise notice 'Before seller reactivation: status=%, moderation_required=%',
+    (select status from public.products where id = '20000000-0000-4000-8000-000000000001'),
+    (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001');
 end;
-$$;
-
-do $
-begin
-  raise notice 'Before seller reactivation: status=%, moderation_required=%', (select status from public.products where id = '20000000-0000-4000-8000-000000000001'), (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001');
-end;
-$;
+$debug$;
 
 update public.products set status = 'active'
 where id = '20000000-0000-4000-8000-000000000001';
 
-do $
+do $debug$
 begin
-  raise notice 'After seller reactivation: status=%, moderation_required=%', (select status from public.products where id = '20000000-0000-4000-8000-000000000001'), (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001');
+  raise notice 'After seller reactivation: status=%, moderation_required=%',
+    (select status from public.products where id = '20000000-0000-4000-8000-000000000001'),
+    (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001');
   if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'pending' then
     raise exception 'archived edited product must return to pending instead of self-publishing';
   end if;
 end;
-$$;
+$debug$;
 
 select public.admin_moderate_product(
   '20000000-0000-4000-8000-000000000001', 'active', 'Approbation après revue des modifications'
 );
 
-do $$
+do $debug$
 begin
   if (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001') is not false then
     raise exception 'admin approval must clear moderation_required';
   end if;
 end;
-$$;
+$debug$;
 
 reset role;
