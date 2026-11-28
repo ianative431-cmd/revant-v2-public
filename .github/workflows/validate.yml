@@ -35,3 +35,15 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+
+  validate-supabase-edge-functions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check WhatsApp OTP Edge Function
+        run: deno check supabase/functions/send-sms/index.ts
