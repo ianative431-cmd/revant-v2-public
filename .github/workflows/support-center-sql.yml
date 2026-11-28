@@ -2,7 +2,7 @@ name: Validate support ticket workflow
 on:
   pull_request:
     paths:
-      - "supabase/migrations/20261128072932_support_center_ticket_workflow.sql"
+      - "supabase/migrations/20261128074843_support_center_ticket_workflow.sql"
       - "supabase/ci/support-center-*.sql"
   workflow_dispatch:
 permissions:
@@ -40,7 +40,7 @@ jobs:
       - name: Apply support workflow migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_support_test -f supabase/migrations/20261128072932_support_center_ticket_workflow.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_support_test -f supabase/migrations/20261128074843_support_center_ticket_workflow.sql
       - name: Run support workflow tests
         env:
           PGPASSWORD: ci-only-password

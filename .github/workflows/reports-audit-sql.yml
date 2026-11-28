@@ -2,7 +2,7 @@ name: Validate report audit and duplicate prevention
 on:
   pull_request:
     paths:
-      - "supabase/migrations/20261128072647_reports_active_dedup_and_audit.sql"
+      - "supabase/migrations/20261128073827_reports_active_dedup_and_audit.sql"
       - "supabase/ci/reports-audit-*.sql"
   workflow_dispatch:
 permissions:
@@ -40,7 +40,7 @@ jobs:
       - name: Apply reports migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_reports_test -f supabase/migrations/20261128072647_reports_active_dedup_and_audit.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_reports_test -f supabase/migrations/20261128073827_reports_active_dedup_and_audit.sql
       - name: Run report integrity tests
         env:
           PGPASSWORD: ci-only-password
