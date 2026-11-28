@@ -143,12 +143,42 @@ language plpgsql
 security definer
 set search_path to ''
 as $function$
+declare
+  v_ticket_user uuid;
+  v_assigned_to uuid;
+  v_subject text;
 begin
   insert into public.support_ticket_events(ticket_id, actor_id, event_type, metadata)
   values (
     new.ticket_id, new.sender_id, 'message_sent',
     jsonb_build_object('message_id', new.id)
   );
+
+  select user_id, assigned_to, subject
+  into v_ticket_user, v_assigned_to, v_subject
+  from public.support_tickets
+  where id = new.ticket_id;
+
+  if v_ticket_user is not null and new.sender_id <> v_ticket_user then
+    insert into public.notifications(user_id, type, title, body, data)
+    values (
+      v_ticket_user,
+      'message'::public.notification_type,
+      'Réponse de l’assistance Revant',
+      'L’équipe Revant a répondu à ta demande « ' || coalesce(v_subject, 'Support') || ' ».',
+      jsonb_build_object('kind', 'support_ticket_reply', 'support_ticket_id', new.ticket_id)
+    );
+  elsif v_assigned_to is not null then
+    insert into public.notifications(user_id, type, title, body, data)
+    values (
+      v_assigned_to,
+      'message'::public.notification_type,
+      'Nouveau message client',
+      'Le client a répondu au dossier « ' || coalesce(v_subject, 'Support') || ' ».',
+      jsonb_build_object('kind', 'support_ticket_customer_reply', 'support_ticket_id', new.ticket_id)
+    );
+  end if;
+
   return new;
 end;
 $function$;

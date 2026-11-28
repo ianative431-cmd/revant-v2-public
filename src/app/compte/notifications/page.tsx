@@ -37,7 +37,11 @@ export default async function NotificationsPage() {
     if (payload.kind === "delivery_code" && typeof payload.code_ciphertext === "string" && deliverySecret) {
       try { deliveryCode = decryptDeliveryCode(payload.code_ciphertext, deliverySecret); } catch { deliveryCode = null; }
     }
-    return { ...item, deliveryCode };
+    const supportTicketId = typeof payload.support_ticket_id === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.support_ticket_id)
+      ? payload.support_ticket_id
+      : null;
+    return { ...item, deliveryCode, supportTicketId };
   });
 
   return <div className="revant-notifications-page min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
@@ -50,6 +54,7 @@ export default async function NotificationsPage() {
         <div className="flex flex-wrap items-start justify-between gap-2"><div><p className="text-[10px] font-semibold uppercase tracking-wide text-brand-text/40">{TYPE_LABEL[item.type] ?? item.type}</p><h2 className="mt-1 text-sm font-semibold">{item.title}</h2></div>{!item.read_at && <span className="rounded-full bg-[var(--brand-accent)]/10 px-2 py-1 text-[10px] font-semibold text-[var(--brand-accent)]">Nouveau</span>}</div>
         {item.body && <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-brand-text/75">{item.body}</p>}
         {item.deliveryCode && <div className="mt-3 rounded-xl bg-[var(--brand-accent)]/5 p-3"><p className="text-[10px] font-bold uppercase tracking-wide text-[var(--brand-accent)]">Code de remise</p><p className="mt-1 text-xl font-black tracking-[0.25em]">{item.deliveryCode}</p><p className="mt-1 text-xs text-brand-text/55">À communiquer au livreur uniquement au moment de la remise physique.</p></div>}
+        {item.supportTicketId && <Link href={`/compte/support/${item.supportTicketId}`} className="mt-3 inline-flex text-xs font-bold text-[var(--brand-accent)] underline">Voir le dossier de support</Link>}
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2"><time className="text-[11px] text-brand-text/40">{new Date(item.created_at).toLocaleString("fr-FR")}</time>{!item.read_at && <MarkNotificationReadButton notificationId={item.id} />}</div>
       </article>)}</div>}
     </div>

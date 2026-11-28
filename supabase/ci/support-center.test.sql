@@ -78,6 +78,12 @@ begin
     raise exception 'staff reply was not stored';
   end if;
   if not exists (
+    select 1 from public.notifications
+    where user_id='00000000-0000-4000-8000-000000000001'
+      and type='message'
+      and data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001'
+  ) then raise exception 'customer notification for staff reply missing'; end if;
+  if not exists (
     select 1 from public.support_ticket_events
     where ticket_id='10000000-0000-4000-8000-000000000001'
       and actor_id='00000000-0000-4000-8000-000000000002'
@@ -109,6 +115,12 @@ begin
       and event_type='status_changed'
       and metadata->>'to'='open'
   ) then raise exception 'buyer reopen event missing'; end if;
+  if not exists (
+    select 1 from public.notifications
+    where user_id='00000000-0000-4000-8000-000000000002'
+      and type='message'
+      and data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001'
+  ) then raise exception 'agent notification for customer reply missing'; end if;
 end;
 $$;
 
