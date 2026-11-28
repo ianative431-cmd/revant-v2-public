@@ -48,7 +48,7 @@ begin
     raise exception 'anonymous role can execute dispute decisions';
   end if;
 end;
-$assert$;
+$;
 
 -- Pending, cancelled and refunded orders cannot enter the formal dispute workflow.
 begin;
@@ -78,7 +78,7 @@ begin
   exception when insufficient_privilege then null;
   end;
 end;
-$assert$;
+$;
 reset role;
 commit;
 
@@ -128,7 +128,7 @@ begin
   exception when insufficient_privilege then null;
   end;
 end;
-$assert$;
+$;
 reset role;
 commit;
 
@@ -145,7 +145,7 @@ begin
   exception when unique_violation then null;
   end;
 end;
-$assert$;
+$;
 reset role;
 commit;
 
@@ -190,7 +190,7 @@ begin
     if sqlerrm <> 'dispute_assigned_to_another_agent' and sqlerrm <> 'dispute_must_be_claimed_before_decision' then raise; end if;
   end;
 end;
-$assert$;
+$;
 reset role;
 commit;
 
@@ -209,7 +209,7 @@ begin
     if sqlerrm <> 'resolution_note_required' then raise; end if;
   end;
 end;
-$assert$;
+$;
 select public.admin_update_dispute(
  '50000000-0000-4000-8000-000000000001',
  'buyer',
@@ -267,6 +267,6 @@ begin
       and assigned_to='00000000-0000-4000-8000-000000000003'
   ) then raise exception 'support agent resolution failed'; end if;
 end;
-$assert$;
+$;
 
 select 'dispute eligibility, assignment, decisions and audit tests passed' as result;
