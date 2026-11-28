@@ -1,24 +1,24 @@
 \set ON_ERROR_STOP on
 set role authenticated;
-select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',false);
 do $block$
 begin
-  if private.refund_remaining_amount('50000000-0000-4000-8000-000000000001') <> 80 then
+  if private.refund_remaining_amount('50000000-0000-4000-8000-000000000001') is distinct from 80 then
     raise exception 'buyer should see only their own remaining refund amount';
   end if;
-  if not private.is_order_dispute_eligible('50000000-0000-4000-8000-000000000001') then
+  if private.is_order_dispute_eligible('50000000-0000-4000-8000-000000000001') is distinct from true then
     raise exception 'buyer should see dispute eligibility for their order';
   end if;
   if private.refund_remaining_amount('50000000-0000-4000-8000-000000000002') is not null then
     raise exception 'buyer must not see another buyer refund amount';
   end if;
-  if private.is_order_dispute_eligible('50000000-0000-4000-8000-000000000002') then
+  if private.is_order_dispute_eligible('50000000-0000-4000-8000-000000000002') is distinct from false then
     raise exception 'buyer must not probe another order dispute eligibility';
   end if;
 end;
 $block$;
 
-select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true);
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',false);
 do $block$
 begin
   if private.refund_remaining_amount('50000000-0000-4000-8000-000000000001') is not null then
@@ -30,7 +30,7 @@ begin
 end;
 $block$;
 
-select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000009',true);
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000009',false);
 do $block$
 begin
   if private.refund_remaining_amount('50000000-0000-4000-8000-000000000001') is not null then
