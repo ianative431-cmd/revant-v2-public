@@ -275,7 +275,7 @@ begin
   if tg_op = 'INSERT' then
     v_title := 'Nouveau litige sur une commande';
     v_body := 'Un litige a été ouvert pour la commande ' ||
-      coalesce(v_order.order_number::text, left(new.order_id::text, 8)) ||
+      left(new.order_id::text, 8) ||
       '. Consulte tes commandes pour suivre le dossier.';
   else
     v_title := 'Mise à jour de ton litige';
