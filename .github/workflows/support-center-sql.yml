@@ -1,0 +1,47 @@
+name: Validate support ticket workflow
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/20261128072932_support_center_ticket_workflow.sql"
+      - "supabase/ci/support-center-*.sql"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  support-postgres:
+    name: PostgreSQL 17 support workflow tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: revant_support_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d revant_support_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+      - name: Create isolated support schema
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_support_test -f supabase/ci/support-center-bootstrap.sql
+      - name: Apply support workflow migration
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_support_test -f supabase/migrations/20261128072932_support_center_ticket_workflow.sql
+      - name: Run support workflow tests
+        env:
+          PGPASSWORD: ci-only-password
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_support_test -f supabase/ci/support-center.test.sql
