@@ -2,12 +2,12 @@ import Link from "next/link";
 import { getAdminUserDirectory } from "@/server/admin/user-directory";
 import { getAllShopsForAdmin } from "@/server/admin/shops-admin";
 import { getShopTypeLabel } from "@/content/shops/shop-type-labels";
-import { requirePermission } from "@/server/auth/roles";
+import { hasPermission, requirePermission } from "@/server/auth/roles";
 
 export default async function AdminVendeursPage() {
   await requirePermission("users.view");
   await requirePermission("shops.view");
-  const [users, shops] = await Promise.all([getAdminUserDirectory(), getAllShopsForAdmin()]);
+  const [users, shops, canViewContacts] = await Promise.all([getAdminUserDirectory(), getAllShopsForAdmin(), hasPermission("users.manage")]);
 
   const shopByOwnerId = new Map(shops.map((s) => [s.owner_id, s]));
   const sellers = users.filter((u) => u.role === "seller" || shopByOwnerId.has(u.id));
@@ -31,7 +31,7 @@ export default async function AdminVendeursPage() {
             return (
               <div key={u.id} className="bg-white rounded-2xl p-4 flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{u.email ?? u.phone ?? u.id}</p>
+                  <p className="text-sm font-medium truncate">{canViewContacts ? (u.email ?? u.phone ?? u.id) : "Coordonnées protégées"}</p>
                   {shop ? (
                     <p className="text-xs text-black/50 mt-0.5">
                       {shop.name} · {getShopTypeLabel(shop)} ·{" "}
