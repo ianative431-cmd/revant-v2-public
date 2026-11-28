@@ -181,7 +181,7 @@ reset role;
 commit;
 
 -- Database constraints reject unsupported states, invalid priorities and oversized text.
-do $
+do $$
 begin
   begin
     insert into public.support_tickets(user_id,subject,description,status)
@@ -218,7 +218,7 @@ begin
   exception when check_violation then null;
   end;
 end;
-$;
+$$;
 
 -- Ticket events are staff-readable only and immutable.
 do $$
