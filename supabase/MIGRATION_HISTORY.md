@@ -127,3 +127,14 @@ Ces 29 versions figurent dans l'historique Supabase mais aucun fichier SQL corre
 - `20261101095900_p0_guards_no_admin_self_exemption.sql`
 
 La base contient déjà le résultat de ces migrations. Cette liste est un inventaire de récupération, pas une instruction d'exécution.
+
+
+## Production migrations confirmed on 2026-11-28
+
+The following migration versions were verified in the production project's `supabase_migrations.schema_migrations` history. Their local filenames are aligned to those exact remote versions:
+
+- `20261128072230_super_admin_trusted_session_boundary.sql` — binds Super Admin privileges to an approved device and the current authenticated session; public permission checks enforce AAL2 and the device/session match.
+- `20261128073827_reports_active_dedup_and_audit.sql` — validates report targets/reasons, prevents duplicate active reports per reporter and target, and records report creation in the audit log.
+- `20261128074843_support_center_ticket_workflow.sql` — adds the controlled support-ticket workflow, assignment-scoped RLS, RPC-only replies, immutable event history and in-app notifications.
+
+This section records the new migrations confirmed on this date. It does **not** claim that the older local/remote migration inventory is fully reconciled; the earlier drift review remains open for a complete SQL-effect comparison.
