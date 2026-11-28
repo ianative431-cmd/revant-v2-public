@@ -138,3 +138,5 @@ The following migration versions were verified in the production project's `supa
 - `20261128074843_support_center_ticket_workflow.sql` — adds the controlled support-ticket workflow, assignment-scoped RLS, RPC-only replies, immutable event history and in-app notifications.
 
 This section records the new migrations confirmed on this date. It does **not** claim that the older local/remote migration inventory is fully reconciled; the earlier drift review remains open for a complete SQL-effect comparison.
+
+- `20261128075530_support_policy_consolidation_and_fk_indexes.sql` — consolidates support ticket/message SELECT policies and adds indexes for support event actors and Super Admin bootstrap claims.
