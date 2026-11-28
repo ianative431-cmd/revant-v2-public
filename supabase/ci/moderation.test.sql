@@ -262,11 +262,18 @@ begin
 end;
 $$;
 
+do $
+begin
+  raise notice 'Before seller reactivation: status=%, moderation_required=%', (select status from public.products where id = '20000000-0000-4000-8000-000000000001'), (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001');
+end;
+$;
+
 update public.products set status = 'active'
 where id = '20000000-0000-4000-8000-000000000001';
 
-do $$
+do $
 begin
+  raise notice 'After seller reactivation: status=%, moderation_required=%', (select status from public.products where id = '20000000-0000-4000-8000-000000000001'), (select moderation_required from public.products where id = '20000000-0000-4000-8000-000000000001');
   if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'pending' then
     raise exception 'archived edited product must return to pending instead of self-publishing';
   end if;
