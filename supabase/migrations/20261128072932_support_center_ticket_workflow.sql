@@ -43,6 +43,24 @@ alter table public.support_ticket_events enable row level security;
 revoke all on table public.support_ticket_events from public, anon, authenticated;
 grant select on table public.support_ticket_events to authenticated, service_role;
 
+-- Separate customer ownership from staff assignment. Losing support.manage
+-- must immediately revoke access even if an old ticket remains assigned.
+drop policy if exists "users view own tickets" on public.support_tickets;
+create policy "users view own tickets"
+  on public.support_tickets for select to authenticated
+  using (user_id = (select auth.uid()));
+
+drop policy if exists "ticket participants view messages" on public.support_messages;
+create policy "ticket users view messages"
+  on public.support_messages for select to authenticated
+  using (
+    exists (
+      select 1 from public.support_tickets t
+      where t.id = support_messages.ticket_id
+        and t.user_id = (select auth.uid())
+    )
+  );
+
 drop policy if exists "support staff view tickets" on public.support_tickets;
 create policy "support staff view tickets"
   on public.support_tickets for select to authenticated
