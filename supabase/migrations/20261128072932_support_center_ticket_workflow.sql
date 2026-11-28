@@ -1,10 +1,15 @@
 -- Turn the existing dormant support tables into a controlled support-ticket workflow.
 alter table public.support_tickets
-  add column if not exists resolved_at timestamptz,
+  add column if not exists resolved_at timestamptz;
+
+-- Production already has status and priority checks. Replace only the status
+-- constraint to add waiting_user; retain the existing priority constraint.
+alter table public.support_tickets
+  drop constraint if exists support_tickets_status_check;
+
+alter table public.support_tickets
   add constraint support_tickets_status_check
     check (status in ('open','in_progress','waiting_user','resolved','closed')),
-  add constraint support_tickets_priority_check
-    check (priority in ('low','normal','high','urgent')),
   add constraint support_tickets_subject_length_check
     check (char_length(trim(subject)) between 5 and 160),
   add constraint support_tickets_description_length_check
@@ -19,9 +24,6 @@ create index if not exists support_tickets_status_created_idx
 
 create index if not exists support_tickets_assigned_status_created_idx
   on public.support_tickets(assigned_to, status, updated_at desc);
-
-create index if not exists support_messages_ticket_created_idx
-  on public.support_messages(ticket_id, created_at asc);
 
 create table public.support_ticket_events (
   id uuid primary key default gen_random_uuid(),
@@ -41,6 +43,24 @@ alter table public.support_ticket_events enable row level security;
 revoke all on table public.support_ticket_events from public, anon, authenticated;
 grant select on table public.support_ticket_events to authenticated, service_role;
 
+-- Separate customer ownership from staff assignment. Losing support.manage
+-- must immediately revoke access even if an old ticket remains assigned.
+drop policy if exists "users view own tickets" on public.support_tickets;
+create policy "users view own tickets"
+  on public.support_tickets for select to authenticated
+  using (user_id = (select auth.uid()));
+
+drop policy if exists "ticket participants view messages" on public.support_messages;
+create policy "ticket users view messages"
+  on public.support_messages for select to authenticated
+  using (
+    exists (
+      select 1 from public.support_tickets t
+      where t.id = support_messages.ticket_id
+        and t.user_id = (select auth.uid())
+    )
+  );
+
 drop policy if exists "support staff view tickets" on public.support_tickets;
 create policy "support staff view tickets"
   on public.support_tickets for select to authenticated
@@ -52,6 +72,11 @@ create policy "support staff view tickets"
       or assigned_to = (select auth.uid())
     )
   );
+
+-- All support replies must pass through the transactional RPCs below.
+-- This keeps status transitions, assignment history and notifications in sync.
+drop policy if exists "ticket users send messages" on public.support_messages;
+drop policy if exists "ticket owners send messages" on public.support_messages;
 
 drop policy if exists "support staff view messages" on public.support_messages;
 create policy "support staff view messages"
@@ -141,12 +166,42 @@ language plpgsql
 security definer
 set search_path to ''
 as $function$
+declare
+  v_ticket_user uuid;
+  v_assigned_to uuid;
+  v_subject text;
 begin
   insert into public.support_ticket_events(ticket_id, actor_id, event_type, metadata)
   values (
     new.ticket_id, new.sender_id, 'message_sent',
     jsonb_build_object('message_id', new.id)
   );
+
+  select user_id, assigned_to, subject
+  into v_ticket_user, v_assigned_to, v_subject
+  from public.support_tickets
+  where id = new.ticket_id;
+
+  if v_ticket_user is not null and new.sender_id <> v_ticket_user then
+    insert into public.notifications(user_id, type, title, body, data)
+    values (
+      v_ticket_user,
+      'message'::public.notification_type,
+      'Réponse de l’assistance Revant',
+      'L’équipe Revant a répondu à ta demande « ' || coalesce(v_subject, 'Support') || ' ».',
+      jsonb_build_object('kind', 'support_ticket_reply', 'support_ticket_id', new.ticket_id)
+    );
+  elsif v_assigned_to is not null then
+    insert into public.notifications(user_id, type, title, body, data)
+    values (
+      v_assigned_to,
+      'message'::public.notification_type,
+      'Nouveau message client',
+      'Le client a répondu au dossier « ' || coalesce(v_subject, 'Support') || ' ».',
+      jsonb_build_object('kind', 'support_ticket_customer_reply', 'support_ticket_id', new.ticket_id)
+    );
+  end if;
+
   return new;
 end;
 $function$;
@@ -178,7 +233,7 @@ create trigger support_ticket_events_immutable
   before update or delete on public.support_ticket_events
   for each row execute function private.prevent_support_ticket_event_mutation();
 
-create or replace function public.reply_to_support_ticket(
+create or replace function private.support_reply_to_ticket_impl(
   p_ticket_id uuid, p_body text
 )
 returns void
@@ -212,7 +267,7 @@ begin
 end;
 $function$;
 
-create or replace function public.claim_support_ticket(p_ticket_id uuid)
+create or replace function private.support_claim_ticket_impl(p_ticket_id uuid)
 returns void
 language plpgsql
 security definer
@@ -245,7 +300,7 @@ begin
 end;
 $function$;
 
-create or replace function public.staff_reply_to_support_ticket(
+create or replace function private.support_staff_reply_to_ticket_impl(
   p_ticket_id uuid, p_body text
 )
 returns void
@@ -286,7 +341,7 @@ begin
 end;
 $function$;
 
-create or replace function public.update_support_ticket(
+create or replace function private.support_update_ticket_impl(
   p_ticket_id uuid, p_status text, p_priority text
 )
 returns void
@@ -327,6 +382,49 @@ begin
       resolved_at = case when p_status in ('resolved','closed') then coalesce(resolved_at, now()) else null end,
       updated_at = now()
   where id = p_ticket_id;
+end;
+$function$;
+
+grant usage on schema private to authenticated, service_role;
+
+revoke all on function private.support_reply_to_ticket_impl(uuid, text) from public, anon;
+revoke all on function private.support_claim_ticket_impl(uuid) from public, anon;
+revoke all on function private.support_staff_reply_to_ticket_impl(uuid, text) from public, anon;
+revoke all on function private.support_update_ticket_impl(uuid, text, text) from public, anon;
+grant execute on function private.support_reply_to_ticket_impl(uuid, text) to authenticated, service_role;
+grant execute on function private.support_claim_ticket_impl(uuid) to authenticated, service_role;
+grant execute on function private.support_staff_reply_to_ticket_impl(uuid, text) to authenticated, service_role;
+grant execute on function private.support_update_ticket_impl(uuid, text, text) to authenticated, service_role;
+
+create or replace function public.reply_to_support_ticket(p_ticket_id uuid, p_body text)
+returns void language plpgsql security invoker set search_path to ''
+as $function$
+begin
+  perform private.support_reply_to_ticket_impl(p_ticket_id, p_body);
+end;
+$function$;
+
+create or replace function public.claim_support_ticket(p_ticket_id uuid)
+returns void language plpgsql security invoker set search_path to ''
+as $function$
+begin
+  perform private.support_claim_ticket_impl(p_ticket_id);
+end;
+$function$;
+
+create or replace function public.staff_reply_to_support_ticket(p_ticket_id uuid, p_body text)
+returns void language plpgsql security invoker set search_path to ''
+as $function$
+begin
+  perform private.support_staff_reply_to_ticket_impl(p_ticket_id, p_body);
+end;
+$function$;
+
+create or replace function public.update_support_ticket(p_ticket_id uuid, p_status text, p_priority text)
+returns void language plpgsql security invoker set search_path to ''
+as $function$
+begin
+  perform private.support_update_ticket_impl(p_ticket_id, p_status, p_priority);
 end;
 $function$;
 

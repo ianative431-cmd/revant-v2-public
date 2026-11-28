@@ -16,6 +16,22 @@ as $$ select coalesce(nullif(current_setting('request.jwt.claims', true), '')::j
 
 create table public.profiles(id uuid primary key);
 
+create type public.notification_type as enum ('order','payment','payout','message','promotion','system','security','delivery');
+create table public.notifications(
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  type public.notification_type not null,
+  title text not null,
+  body text,
+  data jsonb not null default '{}'::jsonb,
+  read_at timestamptz,
+  created_at timestamptz not null default now()
+);
+alter table public.notifications enable row level security;
+create policy "users manage own notifications" on public.notifications
+  for select to authenticated using (user_id=(select auth.uid()));
+
+
 create table public.user_roles(user_id uuid not null, role text not null, primary key(user_id,role));
 create table public.permissions(id uuid primary key, key text not null unique);
 create table public.role_permissions(role text not null, permission_id uuid not null references public.permissions(id), primary key(role,permission_id));
@@ -37,8 +53,8 @@ create table public.support_tickets(
   user_id uuid not null references public.profiles(id),
   subject text not null,
   description text not null,
-  status text not null default 'open',
-  priority text not null default 'normal',
+  status text not null default 'open' check (status in ('open','in_progress','resolved','closed')),
+  priority text not null default 'normal' check (priority in ('low','normal','high','urgent')),
   assigned_to uuid references public.profiles(id),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -78,6 +94,6 @@ create policy "ticket users send messages" on public.support_messages
 grant usage on schema auth, private to authenticated, service_role;
 grant execute on function auth.uid() to authenticated, service_role;
 grant execute on function auth.jwt() to authenticated, service_role;
-grant select on public.user_roles, public.role_permissions, public.permissions to authenticated;
+grant select on public.user_roles, public.role_permissions, public.permissions, public.notifications to authenticated;
 grant select,insert on public.support_tickets,public.support_messages to authenticated;
 grant select on public.support_tickets,public.support_messages to service_role;

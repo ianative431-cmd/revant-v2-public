@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireUserWithLegalConsent } from "@/server/legal/consent";
+import { hasPermission } from "@/server/auth/roles";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { decryptDeliveryCode } from "@/server/delivery/code-crypto.mjs";
 import { MarkAllNotificationsReadButton, MarkNotificationReadButton } from "./NotificationActions";
@@ -18,6 +19,7 @@ const TYPE_LABEL: Record<string, string> = {
 
 export default async function NotificationsPage() {
   const user = await requireUserWithLegalConsent();
+  const canManageSupport = await hasPermission("support.manage");
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("notifications")
@@ -37,19 +39,30 @@ export default async function NotificationsPage() {
     if (payload.kind === "delivery_code" && typeof payload.code_ciphertext === "string" && deliverySecret) {
       try { deliveryCode = decryptDeliveryCode(payload.code_ciphertext, deliverySecret); } catch { deliveryCode = null; }
     }
-    return { ...item, deliveryCode };
+    const supportTicketId = typeof payload.support_ticket_id === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.support_ticket_id)
+      ? payload.support_ticket_id
+      : null;
+    let supportTicketHref: string | null = supportTicketId
+      ? `/compte/support/${supportTicketId}`
+      : null;
+    if (supportTicketId && canManageSupport) {
+      supportTicketHref = `/admin/support/${supportTicketId}`;
+    }
+    return { ...item, deliveryCode, supportTicketId, supportTicketHref };
   });
 
   return <div className="revant-notifications-page min-h-screen bg-brand-bg px-4 py-10 flex justify-center">
     <div className="revant-notifications-layout w-full max-w-4xl space-y-5">
       <Link href="/compte" className="text-sm underline text-brand-text/60">← Mon compte</Link>
       <NotificationPreferences />
-      <header><div className="mt-4 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-xl font-bold">Notifications</h1><p className="mt-1 text-sm text-brand-text/55">Tes commandes, paiements, livraisons et informations Revant.</p></div><span className="rounded-full bg-white px-3 py-1 text-xs text-brand-text/65">{unreadCount} non lue(s)</span></div></header>
+      <header><div className="mt-4 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-xl font-bold">Notifications</h1><p className="mt-1 text-sm text-brand-text/55">Tes commandes, paiements, livraisons, demandes d’assistance et informations Revant.</p></div><span className="rounded-full bg-white px-3 py-1 text-xs text-brand-text/65">{unreadCount} non lue(s)</span></div></header>
       {unreadCount > 0 && <div className="flex justify-end"><MarkAllNotificationsReadButton /></div>}
       {error ? <p className="rounded-xl bg-white p-4 text-sm text-red-700">Impossible de charger les notifications pour le moment.</p> : notifications.length === 0 ? <p className="rounded-2xl bg-white p-6 text-center text-sm text-brand-text/55">Tu n’as aucune notification pour le moment.</p> : <div className="space-y-3">{displayNotifications.map((item) => <article key={item.id} className={`revant-notification-card rounded-2xl bg-white p-4 ${item.read_at ? "opacity-75" : "border-l-4 border-[var(--brand-accent)]"}`}>
         <div className="flex flex-wrap items-start justify-between gap-2"><div><p className="text-[10px] font-semibold uppercase tracking-wide text-brand-text/40">{TYPE_LABEL[item.type] ?? item.type}</p><h2 className="mt-1 text-sm font-semibold">{item.title}</h2></div>{!item.read_at && <span className="rounded-full bg-[var(--brand-accent)]/10 px-2 py-1 text-[10px] font-semibold text-[var(--brand-accent)]">Nouveau</span>}</div>
         {item.body && <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-brand-text/75">{item.body}</p>}
         {item.deliveryCode && <div className="mt-3 rounded-xl bg-[var(--brand-accent)]/5 p-3"><p className="text-[10px] font-bold uppercase tracking-wide text-[var(--brand-accent)]">Code de remise</p><p className="mt-1 text-xl font-black tracking-[0.25em]">{item.deliveryCode}</p><p className="mt-1 text-xs text-brand-text/55">À communiquer au livreur uniquement au moment de la remise physique.</p></div>}
+        {item.supportTicketId && <Link href={item.supportTicketHref ?? "/compte/support"} className="mt-3 inline-flex text-xs font-bold text-[var(--brand-accent)] underline">Voir le dossier de support</Link>}
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2"><time className="text-[11px] text-brand-text/40">{new Date(item.created_at).toLocaleString("fr-FR")}</time>{!item.read_at && <MarkNotificationReadButton notificationId={item.id} />}</div>
       </article>)}</div>}
     </div>

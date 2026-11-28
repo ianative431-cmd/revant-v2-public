@@ -61,6 +61,17 @@ begin
 end;
 $$;
 select public.claim_support_ticket('10000000-0000-4000-8000-000000000001');
+do $$
+begin
+  begin
+    insert into public.support_messages(ticket_id,sender_id,body)
+    values ('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002','Insertion directe interdite');
+    raise exception 'support agent bypassed the controlled staff reply RPC';
+  exception when insufficient_privilege then
+    null;
+  end;
+end;
+$$;
 select public.staff_reply_to_support_ticket('10000000-0000-4000-8000-000000000001','Nous vérifions votre livraison et revenons vers vous.');
 select public.update_support_ticket('10000000-0000-4000-8000-000000000001','resolved','high');
 reset role;
@@ -78,6 +89,12 @@ begin
     raise exception 'staff reply was not stored';
   end if;
   if not exists (
+    select 1 from public.notifications
+    where user_id='00000000-0000-4000-8000-000000000001'
+      and type='message'
+      and data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001'
+  ) then raise exception 'customer notification for staff reply missing'; end if;
+  if not exists (
     select 1 from public.support_ticket_events
     where ticket_id='10000000-0000-4000-8000-000000000001'
       and actor_id='00000000-0000-4000-8000-000000000002'
@@ -91,6 +108,17 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+do $$
+begin
+  begin
+    insert into public.support_messages(ticket_id,sender_id,body)
+    values ('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000001','Insertion directe interdite');
+    raise exception 'buyer bypassed the controlled reply RPC';
+  exception when insufficient_privilege then
+    null;
+  end;
+end;
+$$;
 select public.reply_to_support_ticket('10000000-0000-4000-8000-000000000001','Merci, voici une précision sur mon adresse.');
 reset role;
 commit;
@@ -109,8 +137,43 @@ begin
       and event_type='status_changed'
       and metadata->>'to'='open'
   ) then raise exception 'buyer reopen event missing'; end if;
+  if not exists (
+    select 1 from public.notifications
+    where user_id='00000000-0000-4000-8000-000000000002'
+      and type='message'
+      and data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001'
+  ) then raise exception 'agent notification for customer reply missing'; end if;
 end;
 $$;
+
+-- Notifications are readable only by their intended recipients.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+do $$
+begin
+  if (select count(*) from public.notifications where data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001') <> 1 then
+    raise exception 'customer cannot read only their support notification';
+  end if;
+end;
+$$;
+reset role;
+commit;
+
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
+do $$
+begin
+  if (select count(*) from public.notifications where data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001') <> 1 then
+    raise exception 'assigned agent cannot read their support notification';
+  end if;
+end;
+$$;
+reset role;
+commit;
 
 -- A second support agent cannot take a ticket already assigned to another agent.
 begin;
@@ -180,6 +243,69 @@ $$;
 reset role;
 commit;
 
+-- Database constraints reject unsupported states, invalid priorities and oversized text.
+do $$
+begin
+  begin
+    insert into public.support_tickets(user_id,subject,description,status)
+    values ('00000000-0000-4000-8000-000000000003','Commande invalide','Description suffisamment longue pour ce test.','pending');
+    raise exception 'invalid support status unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into public.support_tickets(user_id,subject,description,priority)
+    values ('00000000-0000-4000-8000-000000000003','Commande invalide','Description suffisamment longue pour ce test.','critical');
+    raise exception 'invalid support priority unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into public.support_tickets(user_id,subject,description)
+    values ('00000000-0000-4000-8000-000000000003','Bad','Description suffisamment longue pour ce test.');
+    raise exception 'short support subject unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into public.support_tickets(user_id,subject,description)
+    values ('00000000-0000-4000-8000-000000000003','Sujet valide',repeat('x',3001));
+    raise exception 'oversized support description unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into public.support_messages(ticket_id,sender_id,body)
+    values ('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000003',repeat('x',5001));
+    raise exception 'oversized support message unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+end;
+$$;
+
+-- Removing support.manage revokes staff visibility even while the ticket remains assigned.
+delete from public.user_roles
+where user_id='00000000-0000-4000-8000-000000000002' and role='support_admin';
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
+do $$
+begin
+  if (select count(*) from public.support_tickets where id='10000000-0000-4000-8000-000000000001') <> 0 then
+    raise exception 'revoked support agent can still view assigned ticket';
+  end if;
+  if (select count(*) from public.support_messages where ticket_id='10000000-0000-4000-8000-000000000001') <> 0 then
+    raise exception 'revoked support agent can still view assigned messages';
+  end if;
+  if (select count(*) from public.support_ticket_events where ticket_id='10000000-0000-4000-8000-000000000001') <> 0 then
+    raise exception 'revoked support agent can still view assigned events';
+  end if;
+end;
+$$;
+reset role;
+commit;
+
 -- Ticket events are staff-readable only and immutable.
 do $$
 begin
@@ -198,3 +324,28 @@ end;
 $$;
 
 select 'support ticket workflow and permission tests passed' as result;
+do $$
+begin
+  if (select prosecdef from pg_proc where oid='public.reply_to_support_ticket(uuid,text)'::regprocedure)
+     or (select prosecdef from pg_proc where oid='public.claim_support_ticket(uuid)'::regprocedure)
+     or (select prosecdef from pg_proc where oid='public.staff_reply_to_support_ticket(uuid,text)'::regprocedure)
+     or (select prosecdef from pg_proc where oid='public.update_support_ticket(uuid,text,text)'::regprocedure) then
+    raise exception 'public support RPC wrappers must be SECURITY INVOKER';
+  end if;
+  if not (select prosecdef from pg_proc where oid='private.support_reply_to_ticket_impl(uuid,text)'::regprocedure)
+     or not (select prosecdef from pg_proc where oid='private.support_claim_ticket_impl(uuid)'::regprocedure)
+     or not (select prosecdef from pg_proc where oid='private.support_staff_reply_to_ticket_impl(uuid,text)'::regprocedure)
+     or not (select prosecdef from pg_proc where oid='private.support_update_ticket_impl(uuid,text,text)'::regprocedure) then
+    raise exception 'private support implementations must be SECURITY DEFINER';
+  end if;
+  if has_function_privilege('anon','public.claim_support_ticket(uuid)','EXECUTE')
+     or has_function_privilege('anon','private.support_claim_ticket_impl(uuid)','EXECUTE') then
+    raise exception 'anonymous role can execute support mutations';
+  end if;
+  if not has_function_privilege('authenticated','public.claim_support_ticket(uuid)','EXECUTE')
+     or not has_function_privilege('authenticated','private.support_claim_ticket_impl(uuid)','EXECUTE') then
+    raise exception 'authenticated role is missing support RPC execution';
+  end if;
+end;
+$$;
+
