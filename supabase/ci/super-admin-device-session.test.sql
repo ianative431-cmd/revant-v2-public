@@ -71,7 +71,7 @@ begin
     if sqlerrm <> 'forbidden' then raise; end if;
   end;
 end;
-$;
+$$;
 reset role;
 commit;
 
