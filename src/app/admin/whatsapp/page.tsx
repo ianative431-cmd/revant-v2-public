@@ -30,12 +30,13 @@ function Badge({ children, className }: { children: React.ReactNode; className: 
 
 async function getRecentWhatsAppEvents() {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("audit_logs")
     .select("id, action, description, metadata, created_at")
     .in("entity_type", ["whatsapp_connection", "whatsapp_webhook"])
     .order("created_at", { ascending: false })
     .limit(20);
+  if (error) throw new Error("Impossible de charger le journal des événements WhatsApp.");
   return data ?? [];
 }
 
