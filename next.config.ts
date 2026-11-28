@@ -28,6 +28,20 @@ const nextConfig: NextConfig = {
   // pour chaque requête, afin d'autoriser les scripts de démarrage Next.js
   // sans autoriser globalement les scripts inline.
   // Les autres en-têtes de sécurité restent définis ici.
+  async redirects() {
+    return [
+      {
+        source: "/centre-juridique",
+        destination: "/legal",
+        permanent: true,
+      },
+    ];
+  },
+
+  // Les en-têtes CSP sont générés par src/proxy.ts avec un nonce unique
+  // pour chaque requête, afin d'autoriser les scripts de démarrage Next.js
+  // sans autoriser globalement les scripts inline.
+  // Les autres en-têtes de sécurité restent définis ici.
   async headers() {
     return [
       {
