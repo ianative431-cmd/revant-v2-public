@@ -218,3 +218,35 @@ END;
 $function$;
 
 GRANT SELECT ON public.products, public.orders, public.order_items TO authenticated;
+
+
+-- Minimal finance schema for immutable commission-snapshot integration tests.
+CREATE TABLE public.system_settings (
+  key text PRIMARY KEY,
+  value jsonb NOT NULL
+);
+INSERT INTO public.system_settings(key,value)
+VALUES ('revant.commission_percent','0.5'::jsonb);
+
+ALTER TABLE public.payments ADD COLUMN paid_at timestamptz;
+CREATE TABLE public.wallets (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL UNIQUE,
+  currency character(3) NOT NULL DEFAULT 'XOF',
+  available_balance numeric NOT NULL DEFAULT 0,
+  pending_balance numeric NOT NULL DEFAULT 0,
+  status text NOT NULL DEFAULT 'active',
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE public.ledger_entries (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  wallet_id uuid NOT NULL REFERENCES public.wallets(id),
+  order_id uuid,
+  payment_id uuid,
+  type text NOT NULL,
+  amount numeric NOT NULL,
+  currency character(3) NOT NULL DEFAULT 'XOF',
+  reference text NOT NULL UNIQUE,
+  description text,
+  metadata jsonb NOT NULL DEFAULT '{}'::jsonb
+);
