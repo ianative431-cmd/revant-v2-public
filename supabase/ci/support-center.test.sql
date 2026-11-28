@@ -61,7 +61,7 @@ begin
 end;
 $$;
 select public.claim_support_ticket('10000000-0000-4000-8000-000000000001');
-do $
+do $$
 begin
   begin
     insert into public.support_messages(ticket_id,sender_id,body)
@@ -71,7 +71,7 @@ begin
     null;
   end;
 end;
-$;
+$$;
 select public.staff_reply_to_support_ticket('10000000-0000-4000-8000-000000000001','Nous vérifions votre livraison et revenons vers vous.');
 select public.update_support_ticket('10000000-0000-4000-8000-000000000001','resolved','high');
 reset role;
@@ -108,7 +108,7 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
-do $
+do $$
 begin
   begin
     insert into public.support_messages(ticket_id,sender_id,body)
@@ -118,7 +118,7 @@ begin
     null;
   end;
 end;
-$;
+$$;
 select public.reply_to_support_ticket('10000000-0000-4000-8000-000000000001','Merci, voici une précision sur mon adresse.');
 reset role;
 commit;
@@ -151,13 +151,13 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
-do $
+do $$
 begin
   if (select count(*) from public.notifications where data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001') <> 1 then
     raise exception 'customer cannot read only their support notification';
   end if;
 end;
-$;
+$$;
 reset role;
 commit;
 
@@ -165,13 +165,13 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
-do $
+do $$
 begin
   if (select count(*) from public.notifications where data->>'support_ticket_id'='10000000-0000-4000-8000-000000000001') <> 1 then
     raise exception 'assigned agent cannot read their support notification';
   end if;
 end;
-$;
+$$;
 reset role;
 commit;
 
@@ -290,7 +290,7 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
-do $
+do $$
 begin
   if (select count(*) from public.support_tickets where id='10000000-0000-4000-8000-000000000001') <> 0 then
     raise exception 'revoked support agent can still view assigned ticket';
@@ -302,7 +302,7 @@ begin
     raise exception 'revoked support agent can still view assigned events';
   end if;
 end;
-$;
+$$;
 reset role;
 commit;
 
