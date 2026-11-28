@@ -1040,6 +1040,7 @@ export type Database = {
           confirmed_at: string | null
           created_at: string
           currency: string
+          commission_rate: number
           delivered_at: string | null
           delivery_fee: number
           guest_address: string | null
@@ -1064,6 +1065,7 @@ export type Database = {
           confirmed_at?: string | null
           created_at?: string
           currency?: string
+          commission_rate?: number
           delivered_at?: string | null
           delivery_fee?: number
           guest_address?: string | null
@@ -1088,6 +1090,7 @@ export type Database = {
           confirmed_at?: string | null
           created_at?: string
           currency?: string
+          commission_rate?: number
           delivered_at?: string | null
           delivery_fee?: number
           guest_address?: string | null
@@ -2848,6 +2851,15 @@ export type Database = {
       }
       admin_update_payout: {
         Args: { p_action: string; p_payout_id: string; p_reason?: string }
+        Returns: undefined
+      }
+      admin_finalize_payout: {
+        Args: {
+          p_action: string
+          p_payout_id: string
+          p_reason?: string | null
+          p_transfer_reference?: string | null
+        }
         Returns: undefined
       }
       admin_update_report: {
