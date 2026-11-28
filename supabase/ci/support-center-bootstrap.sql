@@ -16,6 +16,13 @@ as $$ select coalesce(nullif(current_setting('request.jwt.claims', true), '')::j
 
 create table public.profiles(id uuid primary key);
 
+create table public.super_admin_bootstrap_claims(
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+
 create type public.notification_type as enum ('order','payment','payout','message','promotion','system','security','delivery');
 create table public.notifications(
   id uuid primary key default gen_random_uuid(),

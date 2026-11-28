@@ -323,6 +323,41 @@ begin
 end;
 $$;
 
+do $
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='support_tickets'
+      and policyname='owners and support staff view tickets' and cmd='SELECT'
+  ) then raise exception 'consolidated support ticket SELECT policy missing'; end if;
+
+  if exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='support_tickets'
+      and policyname in ('support staff view tickets','users view own tickets')
+  ) then raise exception 'duplicate support ticket SELECT policies remain'; end if;
+
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='support_messages'
+      and policyname='owners and support staff view messages' and cmd='SELECT'
+  ) then raise exception 'consolidated support message SELECT policy missing'; end if;
+
+  if exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='support_messages'
+      and policyname in ('support staff view messages','ticket users view messages')
+  ) then raise exception 'duplicate support message SELECT policies remain'; end if;
+
+  if to_regclass('public.support_ticket_events_actor_id_idx') is null then
+    raise exception 'support ticket event actor index missing';
+  end if;
+  if to_regclass('public.super_admin_bootstrap_claims_user_id_idx') is null then
+    raise exception 'Super Admin bootstrap claim user index missing';
+  end if;
+end;
+$;
+
 select 'support ticket workflow and permission tests passed' as result;
 do $$
 begin
