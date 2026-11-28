@@ -93,7 +93,7 @@ $function$;
 
 drop trigger if exists audit_product_remoderation on public.products;
 create trigger audit_product_remoderation
-after update of status on public.products
+after update on public.products
 for each row
 when (old.status = 'active' and new.status = 'pending')
 execute function private.audit_product_remoderation();
