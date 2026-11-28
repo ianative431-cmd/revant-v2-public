@@ -4,7 +4,6 @@ on:
     paths:
       - "supabase/migrations/20261128080319_dispute_management_guardrails.sql"
       - "supabase/ci/disputes-admin-*.sql"
-      - ".github/workflows/disputes-admin-sql.yml"
   workflow_dispatch:
 permissions:
   contents: read
