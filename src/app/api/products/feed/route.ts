@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveCategories } from "@/server/catalog/categories";
 import { getActiveProducts } from "@/server/products/products";
+import { resolveCatalogCategoryFilter } from "@/lib/catalog-category-filter.mjs";
 
 const PAGE_SIZE = 24;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -25,23 +26,28 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = await createSupabaseServerClient();
-    let categoryId: string | undefined;
-    let productType: "clothing" | "perfume" | undefined;
+    let categoryFilter: { categoryId?: string; productType?: "clothing" | "perfume" } = {};
 
-    if (categorySlug === "mode") productType = "clothing";
-    else if (categorySlug === "parfums") productType = "perfume";
-    else if (categorySlug) {
-      const categories = await getActiveCategories(supabase);
-      const category = categories.find((item) => item.slug === categorySlug);
-      if (!category) {
+    if (categorySlug) {
+      let categories: Awaited<ReturnType<typeof getActiveCategories>> = [];
+      let categoriesUnavailable = false;
+      try {
+        categories = await getActiveCategories(supabase);
+      } catch {
+        categoriesUnavailable = true;
+      }
+      const resolvedFilter = resolveCatalogCategoryFilter(categorySlug, categories, categoriesUnavailable);
+      if (!resolvedFilter) {
+        if (categoriesUnavailable) {
+          return NextResponse.json({ error: "Les catégories sont temporairement indisponibles." }, { status: 503 });
+        }
         return NextResponse.json({ products: [], hasMore: false });
       }
-      categoryId = category.id;
+      categoryFilter = resolvedFilter;
     }
 
     const products = await getActiveProducts(supabase, {
-      categoryId,
-      productType,
+      ...categoryFilter,
       offset,
       limit,
       searchTerm: searchTerm || undefined,
