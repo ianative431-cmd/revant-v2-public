@@ -60,14 +60,16 @@ export async function isTrustedSuperAdminDevice(userId: string) {
 
   if (error || !data) return false;
 
-  const { error: updateError } = await db
+  const { data: updatedDevice, error: updateError } = await db
     .from("super_admin_devices")
     .update({
       last_seen_at: new Date().toISOString(),
       session_id: sessionId,
     })
     .eq("id", data.id)
-    .eq("status", "approved");
+    .eq("status", "approved")
+    .select("id")
+    .maybeSingle();
 
-  return !updateError;
+  return !updateError && Boolean(updatedDevice?.id);
 }
