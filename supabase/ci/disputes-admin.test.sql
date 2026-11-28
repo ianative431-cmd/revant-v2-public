@@ -98,6 +98,49 @@ values (
 reset role;
 commit;
 
+-- Both buyer and seller can read the shared dispute; unrelated users cannot.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+do $block$
+begin
+  if not exists (select 1 from public.disputes where order_id='20000000-0000-4000-8000-000000000002' and opened_by='00000000-0000-4000-8000-000000000001') then
+    raise exception 'buyer cannot read own dispute';
+  end if;
+end;
+$block$;
+reset role;
+commit;
+
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
+do $block$
+begin
+  if not exists (select 1 from public.disputes where order_id='20000000-0000-4000-8000-000000000002' and opened_by='00000000-0000-4000-8000-000000000001') then
+    raise exception 'seller cannot read buyer dispute';
+  end if;
+end;
+$block$;
+reset role;
+commit;
+
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000005',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000005","role":"authenticated"}',true);
+do $block$
+begin
+  if exists (select 1 from public.disputes where order_id='20000000-0000-4000-8000-000000000002') then
+    raise exception 'unrelated user can read dispute';
+  end if;
+end;
+$block$;
+reset role;
+commit;
+
 -- A seller can open a dispute for a delivered order they own.
 begin;
 set local role authenticated;
