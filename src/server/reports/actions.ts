@@ -22,8 +22,8 @@ async function validateReportTarget(
 ): Promise<string | null> {
   if (targetType === "user") {
     if (targetId === userId) return "Tu ne peux pas signaler ton propre compte.";
-    const { data, error } = await db.from("profiles").select("id").eq("id", targetId).maybeSingle();
-    if (error || !data) return "Ce compte n’est plus disponible.";
+    const { data, error } = await db.from("shops").select("id").eq("owner_id", targetId).limit(1).maybeSingle();
+    if (error || !data) return "Ce compte vendeur n’est pas disponible.";
     return null;
   }
 
