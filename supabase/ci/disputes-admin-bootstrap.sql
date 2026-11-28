@@ -21,6 +21,9 @@ create type public.order_status as enum (
 create type public.dispute_status as enum (
   'open','under_review','resolved_buyer','resolved_seller','rejected','closed'
 );
+create type public.notification_type as enum (
+  'order','payment','payout','message','promotion','system','security','delivery'
+);
 create type public.audit_action as enum ('approve','reject','update');
 
 create table public.profiles(id uuid primary key, display_name text);
@@ -77,6 +80,17 @@ create table public.audit_logs(
   description text not null,
   metadata jsonb not null default '{}'::jsonb,
   ip_hash text,
+  created_at timestamptz not null default now()
+);
+
+create table public.notifications(
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  type public.notification_type not null,
+  title text not null,
+  body text,
+  data jsonb not null default '{}'::jsonb,
+  read_at timestamptz,
   created_at timestamptz not null default now()
 );
 
