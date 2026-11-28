@@ -4,16 +4,23 @@ insert into public.profiles(id) values
  ('00000000-0000-4000-8000-000000000001'),
  ('00000000-0000-4000-8000-000000000002'),
  ('00000000-0000-4000-8000-000000000003'),
- ('00000000-0000-4000-8000-000000000004');
+ ('00000000-0000-4000-8000-000000000004'),
+ ('00000000-0000-4000-8000-000000000005');
 
 insert into public.permissions(id,key)
-values ('30000000-0000-4000-8000-000000000001','support.manage');
+values
+ ('30000000-0000-4000-8000-000000000001','support.manage'),
+ ('30000000-0000-4000-8000-000000000002','users.manage');
 insert into public.user_roles(user_id,role)
 values
  ('00000000-0000-4000-8000-000000000002','support_admin'),
- ('00000000-0000-4000-8000-000000000004','support_admin');
+ ('00000000-0000-4000-8000-000000000004','support_admin'),
+ ('00000000-0000-4000-8000-000000000005','admin');
 insert into public.role_permissions(role,permission_id)
-values ('support_admin','30000000-0000-4000-8000-000000000001');
+values
+ ('support_admin','30000000-0000-4000-8000-000000000001'),
+ ('admin','30000000-0000-4000-8000-000000000001'),
+ ('admin','30000000-0000-4000-8000-000000000002');
 
 -- A buyer can create their own ticket; the trigger records the creator.
 begin;
@@ -110,7 +117,7 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000004',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000004","role":"authenticated"}',true);
-do $
+do $$
 begin
   if (select count(*) from public.support_tickets where id='10000000-0000-4000-8000-000000000001') <> 0 then
     raise exception 'second support agent can view another agent ticket';
@@ -138,7 +145,7 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000005',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000005","role":"authenticated"}',true);
-do $
+do $$
 begin
   if (select count(*) from public.support_tickets where id='10000000-0000-4000-8000-000000000001') <> 1 then
     raise exception 'elevated admin cannot view all support tickets';
@@ -147,7 +154,7 @@ begin
     raise exception 'elevated admin cannot view support event history';
   end if;
 end;
-$;
+$$;
 reset role;
 commit;
 
