@@ -25,10 +25,12 @@ export default function FeatureToggle({
     setEnabled(next);
     setError(null);
     startTransition(async () => {
-      const result = await toggleWhatsAppFeature(feature, next);
-      if (result.error) {
+      try {
+        const result = await toggleWhatsAppFeature(feature, next);
+        if (result.error) { setEnabled(!next); setError(result.error); }
+      } catch {
         setEnabled(!next);
-        setError(result.error);
+        setError("Impossible de confirmer l’enregistrement du réglage.");
       }
     });
   }
