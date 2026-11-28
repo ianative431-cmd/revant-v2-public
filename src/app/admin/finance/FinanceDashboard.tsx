@@ -24,6 +24,7 @@ import type {
 } from "@/server/admin/finance";
 import CommissionForm from "./CommissionForm";
 import PayoutActions from "./PayoutActions";
+import PayoutFinalizeActions from "./PayoutFinalizeActions";
 
 type ShopLite = { status: string; createdAt: string };
 
@@ -585,6 +586,8 @@ export default function FinanceDashboard({
                 </div>
                 {p.status === "pending" && canManagePayouts ? (
                   <PayoutActions payoutId={p.id} />
+                ) : (p.status === "approved" || p.status === "processing") && canManagePayouts ? (
+                  <PayoutFinalizeActions payoutId={p.id} />
                 ) : (
                   <span className="text-[11px] shrink-0 rounded-full px-2 py-1 bg-white/5 text-white/50">
                     {PAYOUT_STATUS_LABEL[p.status] ?? p.status}

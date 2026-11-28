@@ -73,3 +73,46 @@ export async function updateCommissionPercent(
   revalidatePath("/admin/finance");
   return { error: null };
 }
+
+
+/**
+ * Finalise un retrait après transfert manuel réellement exécuté hors Revant.
+ * L'action SQL enregistre la référence ou restitue les fonds si le transfert a échoué.
+ */
+export async function finalizePayout(
+  _prevState: FinanceActionState,
+  formData: FormData
+): Promise<FinanceActionState> {
+  await requirePermission("payouts.manage");
+
+  const payoutId = String(formData.get("payoutId") ?? "");
+  const action = String(formData.get("action") ?? "");
+  const transferReference = String(formData.get("transferReference") ?? "").trim();
+  const reason = String(formData.get("reason") ?? "").trim();
+
+  if (action !== "paid" && action !== "failed") {
+    return { error: "Action de finalisation invalide." };
+  }
+  if (action === "paid" && (transferReference.length < 4 || transferReference.length > 128)) {
+    return { error: "Saisis une référence de transfert valide." };
+  }
+  if (action === "failed" && (reason.length < 5 || reason.length > 500)) {
+    return { error: "Le motif d'échec doit contenir entre 5 et 500 caractères." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.rpc("admin_finalize_payout", {
+    p_payout_id: payoutId,
+    p_action: action,
+    p_transfer_reference: action === "paid" ? transferReference : null,
+    p_reason: action === "failed" ? reason : null,
+  });
+
+  if (error) {
+    return { error: `Impossible de finaliser ce retrait : ${error.message}` };
+  }
+
+  revalidatePath("/admin/finance");
+  revalidatePath("/admin/retraits");
+  return { error: null };
+}

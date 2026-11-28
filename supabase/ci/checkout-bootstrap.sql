@@ -250,3 +250,41 @@ CREATE TABLE public.ledger_entries (
   description text,
   metadata jsonb NOT NULL DEFAULT '{}'::jsonb
 );
+
+
+-- Minimal payout administration schema for manual transfer finalization tests.
+CREATE TYPE public.payout_status AS ENUM ('pending','approved','processing','paid','failed','cancelled','rejected');
+CREATE TABLE public.user_roles (
+  user_id uuid NOT NULL,
+  role text NOT NULL,
+  PRIMARY KEY (user_id, role)
+);
+CREATE TABLE public.admin_actions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  admin_id uuid NOT NULL,
+  action text NOT NULL,
+  target_type text NOT NULL,
+  target_id uuid NOT NULL,
+  reason text,
+  metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE public.payouts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  wallet_id uuid NOT NULL REFERENCES public.wallets(id),
+  seller_id uuid NOT NULL,
+  amount numeric NOT NULL,
+  currency character(3) NOT NULL DEFAULT 'XOF',
+  status public.payout_status NOT NULL DEFAULT 'pending',
+  provider text,
+  provider_payout_id text,
+  destination_type text,
+  destination_reference text,
+  failure_reason text,
+  requested_at timestamptz NOT NULL DEFAULT now(),
+  approved_at timestamptz,
+  paid_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT ON public.payouts, public.wallets, public.ledger_entries, public.admin_actions, public.audit_logs TO authenticated;
