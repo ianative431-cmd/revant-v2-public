@@ -4,7 +4,6 @@ on:
     paths:
       - "supabase/migrations/20261128072932_support_center_ticket_workflow.sql"
       - "supabase/ci/support-center-*.sql"
-      - ".github/workflows/support-center-sql.yml"
   workflow_dispatch:
 permissions:
   contents: read
