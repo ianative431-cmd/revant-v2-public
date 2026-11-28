@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   FileCheck,
   Repeat,
+  LifeBuoy,
   LogOut,
   type LucideIcon,
 } from "lucide-react";
@@ -46,12 +47,12 @@ const ICONS: Record<string, LucideIcon> = {
   "/admin/promotions": Megaphone,
   "/admin/parrainages": Share2,
   "/admin/avis": Star,
-  "/admin/demandes-suppression": ClipboardList,
   "/admin/messages": MessageSquare,
   "/admin/whatsapp": MessageCircle,
   "/admin/securite": ShieldCheck,
   "/admin/kyc": FileCheck,
   "/admin/abonnements": Repeat,
+  "/admin/support": LifeBuoy,
 };
 
 const ROLES: Record<string, string> = {
@@ -73,11 +74,7 @@ function canSeeItem(
   adminPermissions: string[],
 ) {
   if (item.superAdminOnly && adminRole !== "super_admin") return false;
-
-  if (adminRole === "associate") {
-    return ASSOCIATE_ROUTES.includes(item.href);
-  }
-
+  if (adminRole === "associate") return ASSOCIATE_ROUTES.includes(item.href);
   const required = item.requiredPermissions ?? [];
   return required.every((permission) => adminPermissions.includes(permission));
 }
@@ -105,14 +102,11 @@ export default function AdminSidebar({
   const renderLink = (item: (typeof ADMIN_NAV_GROUPS)[number]["items"][number], mobile: boolean) => {
     const Icon = ICONS[item.href];
     if (!Icon) return null;
-
     const className = mobile
       ? "flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium " +
         (active(item.href) ? "bg-brand-accent text-white" : "bg-white/5 text-white/65")
       : "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition-colors " +
-        (active(item.href)
-          ? "bg-brand-accent font-semibold text-white"
-          : "text-white/65 hover:bg-white/5 hover:text-white");
+        (active(item.href) ? "bg-brand-accent font-semibold text-white" : "text-white/65 hover:bg-white/5 hover:text-white");
 
     return (
       <Link key={item.href} href={item.href} aria-current={active(item.href) ? "page" : undefined} className={className}>
@@ -124,24 +118,10 @@ export default function AdminSidebar({
 
   return (
     <>
-      <nav
-        aria-label="Navigation Super Admin"
-        className="revant-admin-mobile-nav sticky top-0 z-30 flex items-center gap-2 overflow-x-auto border-b border-white/10 bg-brand-header px-3 py-2 md:hidden"
-      >
+      <nav aria-label="Navigation Super Admin" className="revant-admin-mobile-nav sticky top-0 z-30 flex items-center gap-2 overflow-x-auto border-b border-white/10 bg-brand-header px-3 py-2 md:hidden">
         <Link href="/admin" aria-label="Revant Super Admin" className="mr-1 flex shrink-0 items-center gap-2 rounded-xl pr-2">
-          <Image
-            src="/images/logo-super-admin-512.png?v=20261105"
-            alt="Logo Revant Super Admin"
-            width={36}
-            height={36}
-            priority
-            unoptimized
-            className="h-9 w-9 rounded-lg object-contain"
-          />
-          <span className="text-xs font-semibold leading-tight text-white">
-            Revant
-            <span className="block text-[9px] font-normal tracking-[.16em] text-white/50">SUPER ADMIN</span>
-          </span>
+          <Image src="/images/logo-super-admin-512.png?v=20261105" alt="Logo Revant Super Admin" width={36} height={36} priority unoptimized className="h-9 w-9 rounded-lg object-contain" />
+          <span className="text-xs font-semibold leading-tight text-white">Revant<span className="block text-[9px] font-normal tracking-[.16em] text-white/50">SUPER ADMIN</span></span>
         </Link>
         <div className="h-8 w-px shrink-0 bg-white/15" />
         {groups.flatMap((group) => group.items).map((item) => renderLink(item, true))}
@@ -149,50 +129,26 @@ export default function AdminSidebar({
 
       <aside className="revant-admin-sidebar hidden min-h-screen w-64 shrink-0 flex-col bg-brand-header px-3 py-5 text-white md:flex">
         <Link href="/admin" className="mb-7 flex items-center gap-3 px-3">
-          <Image
-            src="/images/logo-super-admin-512.png?v=20261105"
-            alt="Revant Super Admin"
-            width={42}
-            height={42}
-            priority
-            unoptimized
-            className="rounded-xl"
-          />
-          <span className="text-base font-semibold">
-            Revant
-            <span className="block text-[10px] font-normal tracking-[.18em] text-white/45">SUPER ADMIN</span>
-          </span>
+          <Image src="/images/logo-super-admin-512.png?v=20261105" alt="Revant Super Admin" width={42} height={42} priority unoptimized className="rounded-xl" />
+          <span className="text-base font-semibold">Revant<span className="block text-[10px] font-normal tracking-[.18em] text-white/45">SUPER ADMIN</span></span>
         </Link>
-
         <div className="flex-1 space-y-5 overflow-y-auto">
           {groups.map((group) => (
             <section key={group.label}>
-              <h2 className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[.18em] text-white/35">
-                {group.label}
-              </h2>
+              <h2 className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[.18em] text-white/35">{group.label}</h2>
               <div className="space-y-1">{group.items.map((item) => renderLink(item, false))}</div>
             </section>
           ))}
         </div>
-
         <div className="mt-5 border-t border-white/10 px-1 pt-4">
           <div className="flex items-center gap-2 rounded-xl px-2 py-2">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-accent-soft text-sm font-semibold">
-              {adminEmail.slice(0, 1).toUpperCase()}
-            </span>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-accent-soft text-sm font-semibold">{adminEmail.slice(0, 1).toUpperCase()}</span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-medium">{adminEmail}</p>
               <p className="truncate text-[10px] text-white/45">{ROLES[adminRole] ?? adminRole}</p>
             </div>
             <form action={signOutSuperAdminAction}>
-              <button
-                type="submit"
-                title="Se déconnecter"
-                aria-label="Se déconnecter"
-                className="rounded-lg p-2 text-white/50 hover:bg-white/5 hover:text-white"
-              >
-                <LogOut size={15} />
-              </button>
+              <button type="submit" title="Se déconnecter" aria-label="Se déconnecter" className="rounded-lg p-2 text-white/50 hover:bg-white/5 hover:text-white"><LogOut size={15} /></button>
             </form>
           </div>
         </div>

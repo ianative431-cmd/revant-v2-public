@@ -33,6 +33,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       { label: "Commandes", href: "/admin/commandes", ready: true, requiredPermissions: ["support.manage"] },
       { label: "Livraisons", href: "/admin/livraisons", ready: true, requiredPermissions: ["support.manage"] },
+      { label: "Centre de support", href: "/admin/support", ready: true, requiredPermissions: ["support.manage"] },
       { label: "Vérification KYC", href: "/admin/kyc", ready: true, requiredPermissions: ["kyc.manage"] },
       { label: "Avis & signalements", href: "/admin/avis", ready: true, requiredPermissions: ["support.manage"] },
     ],
