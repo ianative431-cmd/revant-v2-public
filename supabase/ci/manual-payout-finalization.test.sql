@@ -24,7 +24,7 @@ VALUES
 
 SET ROLE authenticated;
 SET request.jwt.claim.sub = '61000000-0000-4000-8000-000000000001';
-SET request.jwt.claims = '{"role":"authenticated","aal":"aal2"}';
+SET request.jwt.claims = '{"role":"authenticated","aal":"aal2","sub":"61000000-0000-4000-8000-000000000001"}';
 
 SELECT public.admin_finalize_payout(
  '63000000-0000-4000-8000-000000000001','paid','BANK-TRANSFER-REVANT-001',NULL
