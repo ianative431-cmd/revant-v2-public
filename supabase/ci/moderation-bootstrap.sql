@@ -20,7 +20,21 @@ create table public.products (
   id uuid primary key,
   shop_id uuid not null references public.shops(id),
   status public.product_status not null,
-  is_featured boolean not null default false
+  is_featured boolean not null default false,
+  name text,
+  description text,
+  base_price numeric,
+  category_id uuid,
+  product_type text,
+  size_stock jsonb,
+  perfume_volume_ml integer
+);
+
+create table public.product_images (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id),
+  image_url text not null,
+  sort_order integer not null default 0
 );
 
 create table public.admin_actions (
@@ -86,6 +100,7 @@ grant usage on schema public, auth to anon, authenticated, service_role;
 grant usage on type public.product_status, public.shop_status, public.audit_action to anon, authenticated, service_role;
 grant execute on function auth.uid(), auth.jwt(), public.current_user_has_permission(text) to anon, authenticated, service_role;
 grant select, insert, update on public.products to authenticated;
+grant select, insert, update, delete on public.product_images to authenticated;
 grant select on public.shops to authenticated;
 grant update on public.shops to authenticated;
 grant select on public.admin_actions, public.audit_logs to authenticated;

@@ -185,3 +185,58 @@ end;
 $$;
 
 reset role;
+
+
+-- Editing approved commercial content must return the product to moderation.
+update public.products
+set name = 'Nom commercial modifié'
+where id = '20000000-0000-4000-8000-000000000001';
+
+do $$
+begin
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'pending' then
+    raise exception 'approved product content edit must return product to pending';
+  end if;
+  if (select count(*) from public.audit_logs where entity_id = '20000000-0000-4000-8000-000000000001' and description = 'Product returned to moderation after seller content or image changes') <> 1 then
+    raise exception 'product re-moderation audit entry missing';
+  end if;
+  begin
+    update public.products set status = 'active'
+    where id = '20000000-0000-4000-8000-000000000001';
+    raise exception 'seller must not self-approve edited product';
+  exception when sqlstate '42501' then null;
+  end;
+end;
+$$;
+
+-- An image change is also catalog content and must trigger re-moderation.
+select public.admin_moderate_product(
+  '20000000-0000-4000-8000-000000000001', 'active', 'Nouvelle approbation après modification'
+);
+insert into public.product_images(product_id, image_url, sort_order)
+values ('20000000-0000-4000-8000-000000000001', 'https://example.test/product-a.jpg', 0);
+
+do $$
+begin
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'pending' then
+    raise exception 'adding an image to an approved product must return it to pending';
+  end if;
+end;
+$$;
+
+select public.admin_moderate_product(
+  '20000000-0000-4000-8000-000000000001', 'active', 'Approbation après ajout de photo'
+);
+update public.product_images
+set image_url = 'https://example.test/product-a-updated.jpg'
+where product_id = '20000000-0000-4000-8000-000000000001';
+
+do $$
+begin
+  if (select status from public.products where id = '20000000-0000-4000-8000-000000000001') <> 'pending' then
+    raise exception 'updating an image must return product to pending';
+  end if;
+end;
+$$;
+
+reset role;
