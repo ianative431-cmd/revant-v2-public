@@ -146,3 +146,6 @@ This section records the new migrations confirmed on this date. It does **not** 
 
 
 - `20261128091808_admin_private_rpc_boundary.sql` — applied to production after PR #248 was merged. Revokes direct `anon`/`authenticated`/`PUBLIC` execution on eight SECURITY DEFINER private admin implementation RPCs, while converting the corresponding public wrappers to SECURITY DEFINER with their existing permission or trusted Super Admin checks preserved. Production verification confirmed that authenticated direct execution is false for all eight private functions, service_role execution remains available, and the eight public wrappers remain executable by authenticated with their guards intact.
+
+
+- `20261128092514_order_helper_information_boundary.sql` — applied to production after PR #251 was merged. Restricts `refund_remaining_amount` to the order buyer and `is_order_dispute_eligible` to the buyer or seller. Both helpers remain executable for RLS evaluation, but their answers no longer reveal financial or order-state information to unrelated users. Production verification confirmed the participant checks and that the existing refund/dispute RLS policies still call these helpers.

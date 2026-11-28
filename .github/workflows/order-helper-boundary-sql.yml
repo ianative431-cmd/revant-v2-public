@@ -2,7 +2,7 @@ name: Validate order helper information boundaries
 on:
   pull_request:
     paths:
-      - "supabase/migrations/20261128092100_order_helper_information_boundary.sql"
+      - "supabase/migrations/20261128092514_order_helper_information_boundary.sql"
       - "supabase/ci/order-helper-*.sql"
       - ".github/workflows/order-helper-boundary-sql.yml"
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
       - name: Apply migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_order_helper_test -f supabase/migrations/20261128092100_order_helper_information_boundary.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_order_helper_test -f supabase/migrations/20261128092514_order_helper_information_boundary.sql
       - name: Test participant boundaries
         env:
           PGPASSWORD: ci-only-password
