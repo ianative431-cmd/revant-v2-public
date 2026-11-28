@@ -202,7 +202,9 @@ begin
 
   if not found then raise exception 'ticket_not_found'; end if;
   if v_ticket.status in ('resolved','closed') then raise exception 'ticket_not_claimable'; end if;
-  if v_ticket.assigned_to is not null and v_ticket.assigned_to <> v_user then
+  if v_ticket.assigned_to is not null
+     and v_ticket.assigned_to <> v_user
+     and not public.current_user_has_permission('users.manage') then
     raise exception 'ticket_assigned_to_other';
   end if;
 
@@ -238,7 +240,9 @@ begin
 
   if not found then raise exception 'ticket_not_found'; end if;
   if v_ticket.status = 'closed' then raise exception 'ticket_closed'; end if;
-  if v_ticket.assigned_to is not null and v_ticket.assigned_to <> v_user then
+  if v_ticket.assigned_to is not null
+     and v_ticket.assigned_to <> v_user
+     and not public.current_user_has_permission('users.manage') then
     raise exception 'ticket_assigned_to_other';
   end if;
 
@@ -279,7 +283,9 @@ begin
   for update;
 
   if not found then raise exception 'ticket_not_found'; end if;
-  if v_ticket.assigned_to is not null and v_ticket.assigned_to <> v_user then
+  if v_ticket.assigned_to is not null
+     and v_ticket.assigned_to <> v_user
+     and not public.current_user_has_permission('users.manage') then
     raise exception 'ticket_assigned_to_other';
   end if;
 
