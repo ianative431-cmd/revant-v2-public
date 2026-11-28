@@ -2,7 +2,7 @@ name: Validate dispute management workflow
 on:
   pull_request:
     paths:
-      - "supabase/migrations/20261128080319_dispute_management_guardrails.sql"
+      - "supabase/migrations/20261128084756_dispute_management_guardrails.sql"
       - "supabase/ci/disputes-admin-*.sql"
   workflow_dispatch:
 permissions:
