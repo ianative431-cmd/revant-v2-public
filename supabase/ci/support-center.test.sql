@@ -61,6 +61,17 @@ begin
 end;
 $$;
 select public.claim_support_ticket('10000000-0000-4000-8000-000000000001');
+do $
+begin
+  begin
+    insert into public.support_messages(ticket_id,sender_id,body)
+    values ('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002','Insertion directe interdite');
+    raise exception 'support agent bypassed the controlled staff reply RPC';
+  exception when insufficient_privilege then
+    null;
+  end;
+end;
+$;
 select public.staff_reply_to_support_ticket('10000000-0000-4000-8000-000000000001','Nous vérifions votre livraison et revenons vers vous.');
 select public.update_support_ticket('10000000-0000-4000-8000-000000000001','resolved','high');
 reset role;

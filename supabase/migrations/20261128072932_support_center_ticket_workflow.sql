@@ -55,6 +55,18 @@ create policy "support staff view tickets"
     )
   );
 
+drop policy if exists "ticket users send messages" on public.support_messages;
+create policy "ticket owners send messages"
+  on public.support_messages for insert to authenticated
+  with check (
+    sender_id = (select auth.uid())
+    and exists (
+      select 1 from public.support_tickets t
+      where t.id = support_messages.ticket_id
+        and t.user_id = (select auth.uid())
+    )
+  );
+
 drop policy if exists "support staff view messages" on public.support_messages;
 create policy "support staff view messages"
   on public.support_messages for select to authenticated
