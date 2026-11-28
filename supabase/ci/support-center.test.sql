@@ -238,3 +238,28 @@ end;
 $$;
 
 select 'support ticket workflow and permission tests passed' as result;
+do $$
+begin
+  if (select prosecdef from pg_proc where oid='public.reply_to_support_ticket(uuid,text)'::regprocedure)
+     or (select prosecdef from pg_proc where oid='public.claim_support_ticket(uuid)'::regprocedure)
+     or (select prosecdef from pg_proc where oid='public.staff_reply_to_support_ticket(uuid,text)'::regprocedure)
+     or (select prosecdef from pg_proc where oid='public.update_support_ticket(uuid,text,text)'::regprocedure) then
+    raise exception 'public support RPC wrappers must be SECURITY INVOKER';
+  end if;
+  if not (select prosecdef from pg_proc where oid='private.support_reply_to_ticket_impl(uuid,text)'::regprocedure)
+     or not (select prosecdef from pg_proc where oid='private.support_claim_ticket_impl(uuid)'::regprocedure)
+     or not (select prosecdef from pg_proc where oid='private.support_staff_reply_to_ticket_impl(uuid,text)'::regprocedure)
+     or not (select prosecdef from pg_proc where oid='private.support_update_ticket_impl(uuid,text,text)'::regprocedure) then
+    raise exception 'private support implementations must be SECURITY DEFINER';
+  end if;
+  if has_function_privilege('anon','public.claim_support_ticket(uuid)','EXECUTE')
+     or has_function_privilege('anon','private.support_claim_ticket_impl(uuid)','EXECUTE') then
+    raise exception 'anonymous role can execute support mutations';
+  end if;
+  if not has_function_privilege('authenticated','public.claim_support_ticket(uuid)','EXECUTE')
+     or not has_function_privilege('authenticated','private.support_claim_ticket_impl(uuid)','EXECUTE') then
+    raise exception 'authenticated role is missing support RPC execution';
+  end if;
+end;
+$$;
+
