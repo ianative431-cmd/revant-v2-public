@@ -43,14 +43,24 @@ export default async function AdminDashboardPage() {
   }
 
   await requirePermission("users.view");
-  const canManageReports = await hasPermission("products.manage");
+  const [canManageReports, canViewFinance, canViewProducts, canViewAudit] = await Promise.all([
+    hasPermission("support.manage"),
+    hasPermission("finance.view"),
+    hasPermission("products.view"),
+    hasPermission("audit.view"),
+  ]);
+
+  const admin = createSupabaseAdminClient();
   const [stats, finance, products, audit] = await Promise.all([
     getAdminOverviewStats(),
-    getAdminFinanceSnapshot(),
-    getAllProductsForAdmin(5),
-    createSupabaseAdminClient().from("audit_logs").select("id,action,description,entity_type,created_at").order("created_at", { ascending: false }).limit(5),
+    canViewFinance ? getAdminFinanceSnapshot() : Promise.resolve(null),
+    canViewProducts ? getAllProductsForAdmin(5) : Promise.resolve([]),
+    canViewAudit
+      ? admin.from("audit_logs").select("id,action,description,entity_type,created_at").order("created_at", { ascending: false }).limit(5)
+      : Promise.resolve({ data: null, error: null }),
   ]);
-  const revenue = buildRecentRevenueSeries(finance.payments);
+
+  const revenue = finance ? buildRecentRevenueSeries(finance.payments) : [];
   const orders = stats.recentOrders.map((order) => ({
     id: order.id,
     number: order.orderNumber,
@@ -86,8 +96,8 @@ export default async function AdminDashboardPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           {canManageReports && (
-            <Link href="/admin/signalements" className="rounded-xl border border-brand-border px-4 py-2 text-xs font-semibold text-brand-text hover:bg-brand-bg">
-              Signalements
+            <Link href="/admin/avis" className="rounded-xl border border-brand-border px-4 py-2 text-xs font-semibold text-brand-text hover:bg-brand-bg">
+              Avis et signalements
             </Link>
           )}
           <Link href="/admin/analytics" className="rounded-xl border border-brand-border px-4 py-2 text-xs font-semibold text-brand-text hover:bg-brand-bg">
@@ -96,10 +106,10 @@ export default async function AdminDashboardPage() {
         </div>
       </header>
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <StatCard label="Utilisateurs" value={stats.users} sub={`${stats.suspendedUsers} suspendu(s)`} href="/admin/utilisateurs" />
-        <StatCard label="Boutiques" value={stats.shops} sub={`${stats.activeShops} active(s)`} href="/admin/boutiques" />
-        <StatCard label="Produits" value={stats.products} sub={`${stats.pendingProducts} en attente`} href="/admin/produits" />
-        <StatCard label="Commandes" value={stats.orders} sub={`${stats.pendingOrders} en cours`} href="/admin/commandes" />
+        <StatCard label="Utilisateurs" value={stats.users} sub={stats.suspendedUsers.toLocaleString("fr-FR") + " suspendu(s)"} href="/admin/utilisateurs" />
+        <StatCard label="Boutiques" value={stats.shops} sub={stats.activeShops.toLocaleString("fr-FR") + " active(s)"} href="/admin/boutiques" />
+        <StatCard label="Produits" value={stats.products} sub={stats.pendingProducts.toLocaleString("fr-FR") + " en attente"} href="/admin/produits" />
+        <StatCard label="Commandes" value={stats.orders} sub={stats.pendingOrders.toLocaleString("fr-FR") + " en cours"} href="/admin/commandes" />
       </div>
       <DashboardOverviewCharts
         revenue={revenue}
