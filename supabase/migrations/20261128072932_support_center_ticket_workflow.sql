@@ -55,17 +55,10 @@ create policy "support staff view tickets"
     )
   );
 
+-- All support replies must pass through the transactional RPCs below.
+-- This keeps status transitions, assignment history and notifications in sync.
 drop policy if exists "ticket users send messages" on public.support_messages;
-create policy "ticket owners send messages"
-  on public.support_messages for insert to authenticated
-  with check (
-    sender_id = (select auth.uid())
-    and exists (
-      select 1 from public.support_tickets t
-      where t.id = support_messages.ticket_id
-        and t.user_id = (select auth.uid())
-    )
-  );
+drop policy if exists "ticket owners send messages" on public.support_messages;
 
 drop policy if exists "support staff view messages" on public.support_messages;
 create policy "support staff view messages"

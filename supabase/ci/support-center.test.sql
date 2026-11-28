@@ -108,6 +108,17 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',true);
 select set_config('request.jwt.claims','{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+do $
+begin
+  begin
+    insert into public.support_messages(ticket_id,sender_id,body)
+    values ('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000001','Insertion directe interdite');
+    raise exception 'buyer bypassed the controlled reply RPC';
+  exception when insufficient_privilege then
+    null;
+  end;
+end;
+$;
 select public.reply_to_support_ticket('10000000-0000-4000-8000-000000000001','Merci, voici une précision sur mon adresse.');
 reset role;
 commit;
