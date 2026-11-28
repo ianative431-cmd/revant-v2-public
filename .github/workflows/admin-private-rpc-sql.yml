@@ -2,7 +2,7 @@ name: Validate private admin RPC boundaries
 on:
   pull_request:
     paths:
-      - "supabase/migrations/20261128091300_admin_private_rpc_boundary.sql"
+      - "supabase/migrations/20261128091808_admin_private_rpc_boundary.sql"
       - "supabase/ci/admin-private-rpc-*.sql"
       - ".github/workflows/admin-private-rpc-sql.yml"
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
       - name: Apply migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_admin_rpc_test -f supabase/migrations/20261128091300_admin_private_rpc_boundary.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_admin_rpc_test -f supabase/migrations/20261128091808_admin_private_rpc_boundary.sql
       - name: Test private RPC boundary
         env:
           PGPASSWORD: ci-only-password
