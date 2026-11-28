@@ -174,8 +174,13 @@ begin
   if not exists (
     select 1 from public.notifications
     where user_id='00000000-0000-4000-8000-000000000001'
-      and data->>'dispute_id'='50000000-0000-4000-8000-000000000001'
-  ) then raise exception 'buyer cannot see shared dispute notification'; end if;
+      and data->>'dispute_id'='50000000-0000-4000-8000-000000000002'
+  ) then raise exception 'buyer was not notified when seller opened dispute'; end if;
+  if exists (
+    select 1 from public.notifications
+    where user_id='00000000-0000-4000-8000-000000000002'
+      and data->>'dispute_id'='50000000-0000-4000-8000-000000000002'
+  ) then raise exception 'seller received self-notification'; end if;
 end;
 $block$;
 commit;
