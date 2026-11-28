@@ -78,3 +78,20 @@ grant execute on function auth.uid() to authenticated, service_role;
 grant execute on function auth.jwt() to authenticated, service_role;
 grant select on public.user_roles, public.permissions, public.role_permissions to authenticated;
 grant usage on schema private to authenticated, service_role;
+
+
+-- Stubs for existing privileged functions, replaced/wrapped by the migration.
+create function private.admin_operations_snapshot()
+returns jsonb language sql security definer
+set search_path to ''
+as $$ select jsonb_build_object('trusted', true) $$;
+
+create function private.admin_set_associate_role(p_user_id uuid, p_enabled boolean, p_note text default null)
+returns void language sql security definer
+set search_path to ''
+as $$ select $$;
+
+create function private.admin_update_payout(p_payout_id uuid, p_action text, p_reason text default null)
+returns void language sql security definer
+set search_path to ''
+as $$ select $$;

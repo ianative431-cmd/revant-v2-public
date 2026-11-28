@@ -42,8 +42,36 @@ do $$
 begin
   if public.has_any_admin_role() then raise exception 'Super Admin without trusted device was accepted'; end if;
   if public.current_user_has_permission('settings.manage') then raise exception 'Super Admin without trusted device received a permission'; end if;
+  begin
+    perform public.admin_operations_snapshot();
+    raise exception 'admin_operations_snapshot accepted an untrusted device';
+  exception when others then
+    if sqlerrm = 'admin_operations_snapshot accepted an untrusted device' then raise; end if;
+    if sqlerrm <> 'forbidden' then raise; end if;
+  end;
+  begin
+    perform public.admin_set_associate_role('00000000-0000-4000-8000-000000000004', true, null);
+    raise exception 'admin_set_associate_role accepted an untrusted device';
+  exception when others then
+    if sqlerrm = 'admin_set_associate_role accepted an untrusted device' then raise; end if;
+    if sqlerrm <> 'forbidden' then raise; end if;
+  end;
+  begin
+    perform private.admin_set_associate_role('00000000-0000-4000-8000-000000000004', true, null);
+    raise exception 'private admin_set_associate_role accepted an untrusted device';
+  exception when others then
+    if sqlerrm = 'private admin_set_associate_role accepted an untrusted device' then raise; end if;
+    if sqlerrm <> 'forbidden' then raise; end if;
+  end;
+  begin
+    perform private.admin_update_payout('20000000-0000-4000-8000-000000000003', 'approve', null);
+    raise exception 'private admin_update_payout accepted an untrusted device';
+  exception when others then
+    if sqlerrm = 'private admin_update_payout accepted an untrusted device' then raise; end if;
+    if sqlerrm <> 'forbidden' then raise; end if;
+  end;
 end;
-$$;
+$;
 reset role;
 commit;
 
@@ -66,6 +94,10 @@ do $$
 begin
   if not public.has_any_admin_role() then raise exception 'trusted Super Admin session was rejected'; end if;
   if not public.current_user_has_permission('settings.manage') then raise exception 'trusted Super Admin permission was rejected'; end if;
+  if public.admin_operations_snapshot() <> jsonb_build_object('trusted', true) then raise exception 'trusted Super Admin operations snapshot was rejected'; end if;
+  perform public.admin_set_associate_role('00000000-0000-4000-8000-000000000004', true, null);
+  perform private.admin_set_associate_role('00000000-0000-4000-8000-000000000004', true, null);
+  perform private.admin_update_payout('20000000-0000-4000-8000-000000000003', 'approve', null);
 end;
 $$;
 reset role;

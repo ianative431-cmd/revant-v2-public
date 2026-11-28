@@ -224,3 +224,130 @@ revoke all on function public.admin_approve_super_admin_device(uuid) from public
 revoke all on function public.admin_revoke_super_admin_device(uuid) from public, anon;
 grant execute on function public.admin_approve_super_admin_device(uuid) to authenticated, service_role;
 grant execute on function public.admin_revoke_super_admin_device(uuid) to authenticated, service_role;
+
+
+-- Close the remaining Super Admin-only RPC paths that still checked AAL2
+-- without checking the approved device-bound session.
+create or replace function public.admin_operations_snapshot()
+returns jsonb
+language plpgsql
+security invoker
+set search_path to ''
+as $function$
+begin
+  if not exists (
+    select 1
+    from public.user_roles ur
+    where ur.user_id = (select auth.uid())
+      and ur.role = 'super_admin'
+  ) or not private.is_current_super_admin_device_trusted() then
+    raise exception 'forbidden';
+  end if;
+
+  return private.admin_operations_snapshot();
+end;
+$function$;
+
+-- Preserve the existing privileged implementations, but make their callable
+-- entry points enforce the device-bound session first.
+alter function private.admin_set_associate_role(uuid, boolean, text)
+  rename to admin_set_associate_role_legacy;
+revoke all on function private.admin_set_associate_role_legacy(uuid, boolean, text)
+  from public, anon, authenticated, service_role;
+
+create or replace function private.admin_set_associate_role(
+  p_user_id uuid, p_enabled boolean, p_note text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path to ''
+as $function$
+begin
+  if auth.uid() is null
+     or not exists (
+       select 1 from public.user_roles
+       where user_id = (select auth.uid()) and role = 'super_admin'
+     )
+     or not private.is_current_super_admin_device_trusted() then
+    raise exception 'forbidden';
+  end if;
+
+  perform private.admin_set_associate_role_legacy(p_user_id, p_enabled, p_note);
+end;
+$function$;
+
+revoke all on function private.admin_set_associate_role(uuid, boolean, text)
+  from public, anon;
+grant execute on function private.admin_set_associate_role(uuid, boolean, text)
+  to authenticated, service_role;
+
+create or replace function public.admin_set_associate_role(
+  p_user_id uuid, p_enabled boolean, p_note text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path to ''
+as $function$
+begin
+  if auth.uid() is null
+     or not exists (
+       select 1 from public.user_roles
+       where user_id = (select auth.uid()) and role = 'super_admin'
+     )
+     or not private.is_current_super_admin_device_trusted() then
+    raise exception 'forbidden';
+  end if;
+
+  perform private.admin_set_associate_role(p_user_id, p_enabled, p_note);
+end;
+$function$;
+
+revoke all on function public.admin_set_associate_role(uuid, boolean, text)
+  from public, anon;
+grant execute on function public.admin_set_associate_role(uuid, boolean, text)
+  to authenticated, service_role;
+
+alter function private.admin_update_payout(uuid, text, text)
+  rename to admin_update_payout_legacy;
+revoke all on function private.admin_update_payout_legacy(uuid, text, text)
+  from public, anon, authenticated, service_role;
+
+create or replace function private.admin_update_payout(
+  p_payout_id uuid, p_action text, p_reason text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path to ''
+as $function$
+declare
+  v_admin uuid := auth.uid();
+  v_role_ok boolean;
+begin
+  if v_admin is null then raise exception 'not_authenticated'; end if;
+
+  select exists(
+    select 1 from public.user_roles
+    where user_id = v_admin
+      and role in ('super_admin','admin','finance_admin')
+  ) into v_role_ok;
+
+  if not v_role_ok then raise exception 'not_authorized'; end if;
+
+  if exists (
+    select 1 from public.user_roles
+    where user_id = v_admin and role = 'super_admin'
+  ) and not private.is_current_super_admin_device_trusted() then
+    raise exception 'forbidden';
+  end if;
+
+  perform private.admin_update_payout_legacy(p_payout_id, p_action, p_reason);
+end;
+$function$;
+
+revoke all on function private.admin_update_payout(uuid, text, text)
+  from public, anon;
+grant execute on function private.admin_update_payout(uuid, text, text)
+  to authenticated, service_role;
