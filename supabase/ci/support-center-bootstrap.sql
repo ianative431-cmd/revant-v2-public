@@ -16,10 +16,12 @@ as $$ select coalesce(nullif(current_setting('request.jwt.claims', true), '')::j
 
 create table public.profiles(id uuid primary key);
 
+create table auth.users(id uuid primary key);
 create table public.super_admin_bootstrap_claims(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
-  created_at timestamptz not null default now()
+  id smallint primary key check (id = 1),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  claimed_at timestamptz not null default now(),
+  expires_at timestamptz not null
 );
 
 
