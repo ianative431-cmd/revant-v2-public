@@ -180,6 +180,46 @@ $$;
 reset role;
 commit;
 
+-- Database constraints reject unsupported states, invalid priorities and oversized text.
+do $
+begin
+  begin
+    insert into public.support_tickets(user_id,subject,description,status)
+    values ('00000000-0000-4000-8000-000000000003','Commande invalide','Description suffisamment longue pour ce test.','pending');
+    raise exception 'invalid support status unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into public.support_tickets(user_id,subject,description,priority)
+    values ('00000000-0000-4000-8000-000000000003','Commande invalide','Description suffisamment longue pour ce test.','critical');
+    raise exception 'invalid support priority unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into public.support_tickets(user_id,subject,description)
+    values ('00000000-0000-4000-8000-000000000003','Bad','Description suffisamment longue pour ce test.');
+    raise exception 'short support subject unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into public.support_tickets(user_id,subject,description)
+    values ('00000000-0000-4000-8000-000000000003','Sujet valide',repeat('x',3001));
+    raise exception 'oversized support description unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into public.support_messages(ticket_id,sender_id,body)
+    values ('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000003',repeat('x',5001));
+    raise exception 'oversized support message unexpectedly succeeded';
+  exception when check_violation then null;
+  end;
+end;
+$;
+
 -- Ticket events are staff-readable only and immutable.
 do $$
 begin

@@ -1,10 +1,15 @@
 -- Turn the existing dormant support tables into a controlled support-ticket workflow.
 alter table public.support_tickets
-  add column if not exists resolved_at timestamptz,
+  add column if not exists resolved_at timestamptz;
+
+-- Production already has status and priority checks. Replace only the status
+-- constraint to add waiting_user; retain the existing priority constraint.
+alter table public.support_tickets
+  drop constraint if exists support_tickets_status_check;
+
+alter table public.support_tickets
   add constraint support_tickets_status_check
     check (status in ('open','in_progress','waiting_user','resolved','closed')),
-  add constraint support_tickets_priority_check
-    check (priority in ('low','normal','high','urgent')),
   add constraint support_tickets_subject_length_check
     check (char_length(trim(subject)) between 5 and 160),
   add constraint support_tickets_description_length_check

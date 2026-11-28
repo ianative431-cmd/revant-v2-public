@@ -37,8 +37,8 @@ create table public.support_tickets(
   user_id uuid not null references public.profiles(id),
   subject text not null,
   description text not null,
-  status text not null default 'open',
-  priority text not null default 'normal',
+  status text not null default 'open' check (status in ('open','in_progress','resolved','closed')),
+  priority text not null default 'normal' check (priority in ('low','normal','high','urgent')),
   assigned_to uuid references public.profiles(id),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
