@@ -40,7 +40,7 @@ jobs:
       - name: Apply dispute guardrails migration
         env:
           PGPASSWORD: ci-only-password
-        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_disputes_test -f supabase/migrations/20261128080319_dispute_management_guardrails.sql
+        run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d revant_disputes_test -f supabase/migrations/20261128084756_dispute_management_guardrails.sql
       - name: Run dispute workflow tests
         env:
           PGPASSWORD: ci-only-password
