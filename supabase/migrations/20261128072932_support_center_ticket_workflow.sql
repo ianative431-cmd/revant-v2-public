@@ -180,7 +180,7 @@ create trigger support_ticket_events_immutable
   before update or delete on public.support_ticket_events
   for each row execute function private.prevent_support_ticket_event_mutation();
 
-create or replace function public.reply_to_support_ticket(
+create or replace function private.support_reply_to_ticket_impl(
   p_ticket_id uuid, p_body text
 )
 returns void
@@ -214,7 +214,7 @@ begin
 end;
 $function$;
 
-create or replace function public.claim_support_ticket(p_ticket_id uuid)
+create or replace function private.support_claim_ticket_impl(p_ticket_id uuid)
 returns void
 language plpgsql
 security definer
@@ -247,7 +247,7 @@ begin
 end;
 $function$;
 
-create or replace function public.staff_reply_to_support_ticket(
+create or replace function private.support_staff_reply_to_ticket_impl(
   p_ticket_id uuid, p_body text
 )
 returns void
@@ -288,7 +288,7 @@ begin
 end;
 $function$;
 
-create or replace function public.update_support_ticket(
+create or replace function private.support_update_ticket_impl(
   p_ticket_id uuid, p_status text, p_priority text
 )
 returns void
@@ -329,6 +329,49 @@ begin
       resolved_at = case when p_status in ('resolved','closed') then coalesce(resolved_at, now()) else null end,
       updated_at = now()
   where id = p_ticket_id;
+end;
+$function$;
+
+grant usage on schema private to authenticated, service_role;
+
+revoke all on function private.support_reply_to_ticket_impl(uuid, text) from public, anon;
+revoke all on function private.support_claim_ticket_impl(uuid) from public, anon;
+revoke all on function private.support_staff_reply_to_ticket_impl(uuid, text) from public, anon;
+revoke all on function private.support_update_ticket_impl(uuid, text, text) from public, anon;
+grant execute on function private.support_reply_to_ticket_impl(uuid, text) to authenticated, service_role;
+grant execute on function private.support_claim_ticket_impl(uuid) to authenticated, service_role;
+grant execute on function private.support_staff_reply_to_ticket_impl(uuid, text) to authenticated, service_role;
+grant execute on function private.support_update_ticket_impl(uuid, text, text) to authenticated, service_role;
+
+create or replace function public.reply_to_support_ticket(p_ticket_id uuid, p_body text)
+returns void language plpgsql security invoker set search_path to ''
+as $function$
+begin
+  perform private.support_reply_to_ticket_impl(p_ticket_id, p_body);
+end;
+$function$;
+
+create or replace function public.claim_support_ticket(p_ticket_id uuid)
+returns void language plpgsql security invoker set search_path to ''
+as $function$
+begin
+  perform private.support_claim_ticket_impl(p_ticket_id);
+end;
+$function$;
+
+create or replace function public.staff_reply_to_support_ticket(p_ticket_id uuid, p_body text)
+returns void language plpgsql security invoker set search_path to ''
+as $function$
+begin
+  perform private.support_staff_reply_to_ticket_impl(p_ticket_id, p_body);
+end;
+$function$;
+
+create or replace function public.update_support_ticket(p_ticket_id uuid, p_status text, p_priority text)
+returns void language plpgsql security invoker set search_path to ''
+as $function$
+begin
+  perform private.support_update_ticket_impl(p_ticket_id, p_status, p_priority);
 end;
 $function$;
 
