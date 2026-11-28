@@ -287,3 +287,4 @@ CREATE TABLE public.payouts (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+GRANT SELECT ON public.payouts, public.wallets, public.ledger_entries, public.admin_actions, public.audit_logs TO authenticated;
