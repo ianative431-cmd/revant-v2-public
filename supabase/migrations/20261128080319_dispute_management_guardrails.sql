@@ -236,3 +236,15 @@ $function$;
 
 revoke all on function public.admin_update_dispute(uuid, text, text) from public, anon;
 grant execute on function public.admin_update_dispute(uuid, text, text) to authenticated, service_role;
+
+
+-- Both order participants can read the shared case and its final resolution.
+drop policy if exists "users view disputes they opened" on public.disputes;
+create policy "order participants can view disputes"
+  on public.disputes
+  for select
+  to authenticated
+  using (
+    private.is_order_buyer(order_id)
+    or private.is_order_seller(order_id)
+  );
