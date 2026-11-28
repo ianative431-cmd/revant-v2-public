@@ -2414,6 +2414,7 @@ export type Database = {
           description: string
           id: string
           priority: string
+          resolved_at: string | null
           status: string
           subject: string
           updated_at: string
@@ -2425,6 +2426,7 @@ export type Database = {
           description: string
           id?: string
           priority?: string
+          resolved_at?: string | null
           status?: string
           subject: string
           updated_at?: string
@@ -2436,6 +2438,7 @@ export type Database = {
           description?: string
           id?: string
           priority?: string
+          resolved_at?: string | null
           status?: string
           subject?: string
           updated_at?: string
@@ -2454,6 +2457,48 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_ticket_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+          ticket_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          ticket_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_events_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_ticket_events_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
             referencedColumns: ["id"]
           },
         ]

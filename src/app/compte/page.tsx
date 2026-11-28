@@ -19,12 +19,13 @@ export default async function ComptePage() {
         <p className="mb-6 text-center text-sm text-[var(--brand-muted)]">Connecté avec succès.</p>
         <dl className="mb-6 space-y-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-bg)] p-4 text-sm">
           {user.email && <div className="flex justify-between"><dt className="text-[var(--brand-muted)]">E-mail</dt><dd>{user.email}</dd></div>}
-          {user.phone && <div className="flex justify-between"><dt className="text-brand-text/60">Téléphone</dt><dd>+{user.phone}</dd></div>}
+          {user.phone && <div className="flex justify-between"><dt className="text-brand-text/60">Téléphone</dt><dd>{user.phone.startsWith("+") ? user.phone : `+${user.phone}`}</dd></div>}
           <div className="flex justify-between"><dt className="text-brand-text/60">Compte créé le</dt><dd>{new Date(user.created_at).toLocaleDateString("fr-FR")}</dd></div>
         </dl>
         <SignOutForm action={signOutAction} />
         <Link href="/compte/boutique" className="mt-4 block rounded-xl border border-[var(--brand-border)] px-4 py-3 text-center text-sm font-semibold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">Ma boutique</Link>
         <Link href="/compte/commandes" className="mt-2 block rounded-xl border border-[var(--brand-border)] px-4 py-3 text-center text-sm font-semibold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">Mes commandes</Link>
+        <Link href="/compte/support" className="mt-2 block rounded-xl border border-[var(--brand-border)] px-4 py-3 text-center text-sm font-semibold text-[var(--brand-text)] transition hover:border-[var(--brand-accent)] hover:text-[var(--brand-accent)]">Assistance Revant</Link>
         <Link href="/wallet" className="block text-center text-sm underline mt-2 text-brand-text/70">Mon Wallet</Link>
         <Link href="/compte/notifications" className="block text-center text-sm underline mt-2 text-brand-text/70">Notifications</Link>
         <Link href="/compte/livraisons" className="block text-center text-sm underline mt-2 text-brand-text/70">Espace livreur</Link>
