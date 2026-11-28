@@ -10,7 +10,7 @@ export type WhatsAppActionState = { error: string | null; info?: string | null }
 type AuditAction = Database["public"]["Enums"]["audit_action"];
 
 function safeMetaError(error: unknown): string {
-  if (error instanceof MetaGraphError) return \`Meta Graph API a renvoyé une erreur (HTTP \${error.status}).\`;
+  if (error instanceof MetaGraphError) return "Meta Graph API a renvoyé une erreur (HTTP " + error.status + ").";
   return "Une erreur est survenue lors de la communication avec Meta.";
 }
 
@@ -68,7 +68,7 @@ export async function exchangeMetaCode(code: string, metaBusinessId: string): Pr
       event: "meta_connect_failed", error: safeError,
     });
     revalidatePath("/admin/whatsapp");
-    if (stateError || auditError) return { error: \`\${safeError} L’état ou le journal d’audit n’a pas pu être entièrement enregistré.\` };
+    if (stateError || auditError) return { error: safeError + " L’état ou le journal d’audit n’a pas pu être entièrement enregistré." };
     return { error: safeError };
   }
 }
@@ -175,9 +175,9 @@ export async function toggleWhatsAppFeature(feature: WhatsAppFeature, enabled: b
   const supabase = createSupabaseAdminClient();
   const update = { [column]: enabled, updated_at: new Date().toISOString() } as Database["public"]["Tables"]["whatsapp_connection"]["Update"];
   const { error } = await supabase.from("whatsapp_connection").update(update).eq("id", 1);
-  if (error) return { error: \`Impossible de modifier ce réglage : \${error.message}\` };
+  if (error) return { error: "Impossible de modifier ce réglage : " + error.message };
 
-  const auditError = await logWhatsAppEvent(admin, "config_change", \`Réglage \${feature} : \${enabled ? "activé" : "désactivé"}\`, {
+  const auditError = await logWhatsAppEvent(admin, "config_change", "Réglage " + feature + " : " + (enabled ? "activé" : "désactivé"), {
     event: "feature_toggle", feature, enabled,
   });
   revalidatePath("/admin/whatsapp");
