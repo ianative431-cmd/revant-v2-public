@@ -160,7 +160,7 @@ begin
   set
     status = v_next_status,
     assigned_to = case
-      when p_action = 'review' then v_actor
+      when p_action = 'review' or v_can_manage_all then v_actor
       when assigned_to is null then v_actor
       else assigned_to
     end,
