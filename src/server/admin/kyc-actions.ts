@@ -18,13 +18,18 @@ async function ensureShopCertificationsForKyc(kycId: string, reviewerId: string 
   const { data: shops, error: shopsError } = await admin.from("shops").select("id,slug").eq("owner_id", kyc.user_id);
   if (shopsError || !shops?.length) return { slugs: [], error: "Aucune boutique associée à ce vendeur." };
 
-  const certification = { status: "approved" as const, badge_label: "Boutique certifiée", badge_color: "#2563EB", reviewed_by: reviewerId, reviewed_at: new Date().toISOString() };
+  const certification = {
+    status: "approved" as const,
+    badge_label: "Boutique certifiée",
+    badge_color: "#2563EB",
+    reviewed_by: reviewerId,
+    reviewed_at: new Date().toISOString(),
+  };
   for (const shop of shops) {
-    const { data: existing, error: existingError } = await admin.from("certifications").select("id").eq("shop_id", shop.id).eq("type", "shop");
-    if (existingError) return { slugs: [], error: "Impossible de lire la certification existante." };
-    const saved = existing?.length
-      ? await admin.from("certifications").update(certification).eq("shop_id", shop.id).eq("type", "shop")
-      : await admin.from("certifications").insert({ shop_id: shop.id, type: "shop", ...certification });
+    const saved = await admin.from("certifications").upsert(
+      { shop_id: shop.id, type: "shop", ...certification },
+      { onConflict: "shop_id,type" }
+    );
     if (saved.error) return { slugs: [], error: "Impossible d'enregistrer le badge bleu." };
   }
   return { slugs: shops.map((shop) => shop.slug) };
