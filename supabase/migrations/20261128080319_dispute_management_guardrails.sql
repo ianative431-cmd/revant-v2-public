@@ -280,7 +280,7 @@ begin
   else
     v_title := 'Mise à jour de ton litige';
     v_body := 'Le dossier lié à la commande ' ||
-      coalesce(v_order.order_number::text, left(new.order_id::text, 8)) ||
+      left(new.order_id::text, 8) ||
       ' a été mis à jour : ' || new.status::text || '.';
   end if;
 
